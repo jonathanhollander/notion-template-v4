@@ -1,0 +1,10 @@
+diagnostics:
+  rules:
+  - check: executor pages must contain disclaimers
+    enforce: true
+  - check: family pages must not contain checklists
+    enforce: true
+  - check: all DBs must have at least one seeded row
+    enforce: true
+  coaching: Each item above should be resolved gently. If a row or disclaimer is missing,
+    add it with care.

@@ -1,0 +1,41 @@
+view_blueprints:
+- name: "Accounts \u2014 Active Only"
+  database: Accounts
+  filter:
+    Status:
+      $ne: Archived
+  sort:
+    Updated: desc
+  link: ''
+- name: "Letters \u2014 Drafts"
+  database: Letters
+  filter:
+    Status: Draft
+  sort:
+    Last Sent: desc
+  link: ''
+rollup_blueprints:
+- name: "Estate \u2014 Liquid Assets Sum"
+  database: Accounts
+  relation_property: Related Page
+  rollup_property: Balance
+  function: sum
+manual_tasks:
+- id: views.accounts_active_only
+  category: saved_view
+  db: Accounts
+  title: Create 'Active Only' saved view
+  instructions:
+  - Open Accounts DB
+  - 'Set filter: Status != Archived'
+  - Sort by Updated desc
+  - Save view as 'Active Only'
+  verification: Admin row status set to Done
+- id: assets.icon_hosting
+  category: covers_icons
+  title: Host icons/covers
+  instructions:
+  - Upload PNG/SVG to your host
+  - Set ASSET_BASE_URL env var
+  - Re-run deploy to apply
+  verification: Icons/covers visible on hubs

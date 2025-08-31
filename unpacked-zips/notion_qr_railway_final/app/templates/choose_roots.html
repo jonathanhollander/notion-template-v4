@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% block content %}
+<h2>Confirm your Family & Executor roots</h2>
+<p class="small">We attempted to auto-detect. Please confirm.</p>
+<form action="/confirm-roots" method="post" class="card">
+  <label>Family root page ID</label><input name="family_root_id" value="{{ family_root_id or '' }}" style="width:100%;padding:8px;margin:8px 0"/>
+  <label>Executor root page ID</label><input name="executor_root_id" value="{{ executor_root_id or '' }}" style="width:100%;padding:8px;margin:8px 0"/>
+  <input type="hidden" name="product" value="{{ product }}"/>
+  <button class="btn">Continue →</button>
+</form>
+{% endblock %}

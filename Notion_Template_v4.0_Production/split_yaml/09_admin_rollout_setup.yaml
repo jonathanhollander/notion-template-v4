@@ -1,0 +1,126 @@
+# 09_admin_rollout_setup.yaml
+complexity: moderate
+# Admin-only rollout helpers. Delete this branch before sharing.
+pages:
+  - title: "Admin – Rollout"
+    icon: "emoji:🧩"
+    description: "Admin-only setup workspace. Complete these steps, verify Rollout Summary hits 100%, then delete this branch."
+    hub: false
+    children:
+
+      - title: "Admin – Rollup Setup Guide"
+        icon: "emoji:📈"
+        description: "Configure UI rollups in Notion (manual, fast). These unlock live totals in Estate Analytics and Hub summaries."
+        body:
+          - type: callout
+            icon: "emoji:⚠️"
+            color: gray_background
+            text: "ADMIN_ONLY • ROLLUP_GUIDE_MARKER • These steps are visible only to the admin. Delete the Admin – Rollout branch before sharing."
+          - type: toggle
+            summary: "Accounts → Estate Analytics (Liquid Assets)"
+            children:
+              - type: paragraph
+                text: >
+                  1) Open “Estate Analytics” DB → add a **Rollup** property named **UI: Liquid Assets**.
+                  2) Relation: **Related Page** → Pages Index → filter to rows for **Account** pages.
+                  3) Rollup property on target: **Balance** (or your chosen balance field).
+                  4) Function: **Sum**.
+                  5) Confirm the **Total Liquid Assets** formula prefers this UI rollup.
+          - type: toggle
+            summary: "Properties → Estate Analytics (Real Property Value)"
+            children:
+              - type: paragraph
+                text: >
+                  Add **UI: Real Property Value** rollup → target **Estimated Value** from **Property** pages (via Pages Index). Function: **Sum**.
+          - type: toggle
+            summary: "Insurance → Estate Analytics (Coverage)"
+            children:
+              - type: paragraph
+                text: >
+                  Add **UI: Insurance Coverage** rollup → target **Coverage Amount** from **Insurance** pages (via Pages Index). Function: **Sum**.
+          - type: paragraph
+            text: "When all three are done, remove this callout or type DONE here: [ADMIN ROLLUP DONE]"
+
+      - title: "Admin – Views Setup Guide"
+        icon: "emoji:🗂️"
+        description: "Create saved views so users see clean, focused lists by default."
+        body:
+          - type: callout
+            icon: "emoji:⚠️"
+            color: gray_background
+            text: "ADMIN_ONLY • VIEWS_GUIDE_MARKER • Create these **Saved Views** and set as default."
+          - type: toggle
+            summary: "Accounts – Active only"
+            children:
+              - type: paragraph
+                text: >
+                  Open **Accounts** DB → add a view named **Active** with filter **Archive Flag != Archive**.
+                  Set as **Default**.
+          - type: toggle
+            summary: "Transactions – By account"
+            children:
+              - type: paragraph
+                text: >
+                  In **Transactions**, add a view **By Account** grouped by **Related Page**.
+                  Add a filter for a specific account for screenshots/demos.
+          - type: toggle
+            summary: "Properties – Active only"
+            children:
+              - type: paragraph
+                text: >
+                  In **Properties**, add view **Active** with filter **Archive Flag != Archive**.
+          - type: toggle
+            summary: "Insurance Claims – Open/Submitted only"
+            children:
+              - type: paragraph
+                text: >
+                  In **Insurance Claims**, add view **Open** with filter **Status is Open/Submitted/In Review**.
+          - type: paragraph
+            text: "When all saved views are created and defaults set, type DONE here: [ADMIN VIEWS DONE]"
+
+      - title: "Admin – QA Checklist"
+        icon: "emoji:✅"
+        description: "Final checks before deleting the Admin branch."
+        body:
+          - type: callout
+            icon: "emoji:⚠️"
+            color: gray_background
+            text: "ADMIN_ONLY • QA_MARKER • Confirm each item, then delete this Admin branch."
+          - type: bulleted_list
+            items:
+              - "Rollout Summary shows 100%"
+              - "UI rollups (Liquid/Property/Insurance) present in **Estate Analytics**"
+              - "Active-only views set as default on major DBs"
+              - "Hubs show progress snapshots and embedded views"
+              - "Letters and Legal pages reviewed for tone and placeholders removed"
+
+acceptance:
+  rows:
+    - Title: "Set UI rollup: UI: Liquid Assets → Accounts"
+      Section: "Admin"
+      Status: "Not Started"
+      Role: "Owner"
+    - Title: "Set UI rollup: UI: Real Property Value → Properties"
+      Section: "Admin"
+      Status: "Not Started"
+      Role: "Owner"
+    - Title: "Set UI rollup: UI: Insurance Coverage → Insurance"
+      Section: "Admin"
+      Status: "Not Started"
+      Role: "Owner"
+    - Title: "Create Active-only views (Accounts/Properties)"
+      Section: "Admin"
+      Status: "Not Started"
+      Role: "Owner"
+    - Title: "Create Open claims view (Insurance Claims)"
+      Section: "Admin"
+      Status: "Not Started"
+      Role: "Owner"
+    - Title: "Verify Hubs show progress + embeds"
+      Section: "Admin"
+      Status: "Not Started"
+      Role: "Owner"
+    - Title: "Delete Admin – Rollout branch"
+      Section: "Admin"
+      Status: "Not Started"
+      Role: "Owner"

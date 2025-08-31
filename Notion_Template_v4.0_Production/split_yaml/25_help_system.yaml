@@ -1,0 +1,345 @@
+# Help System
+complexity: moderate
+
+pages:
+- title: Help Center
+  parent: Preparation Hub
+  icon: emoji:❓
+  description: Comprehensive help and support system
+  role: owner
+  blocks:
+    - type: heading_1
+      content: ❓ Estate Planning Help Center
+    - type: paragraph
+      content: Comprehensive help system with tooltips, FAQs, troubleshooting guides, and best practices for estate planning management.
+    
+    - type: heading_2
+      content: Quick Help Topics
+    - type: callout
+      icon: emoji:🚀
+      content: "Getting Started: Complete setup guide and first steps"
+      color: blue_background
+    - type: callout
+      icon: emoji:📋
+      content: "Task Management: How to create, track, and complete tasks"
+      color: green_background
+    - type: callout
+      icon: emoji:👥
+      content: "Family Coordination: Setting up access and sharing information"
+      color: yellow_background
+    - type: callout
+      icon: emoji:⚖️
+      content: "Legal Documents: Will, trust, and power of attorney guidance"
+      color: purple_background
+    
+    - type: heading_2
+      content: Emergency Quick Actions
+    - type: callout
+      icon: emoji:🚨
+      content: "URGENT: Death occurred - Click here for immediate action checklist"
+      color: red_background
+    - type: callout
+      icon: emoji:📞
+      content: "Emergency Contacts: Attorney, doctor, insurance, funeral director"
+      color: orange_background
+    - type: callout
+      icon: emoji:🏥
+      content: "Medical Emergency: Healthcare directives and medical power of attorney"
+      color: red_background
+
+- title: Contextual Help System
+  parent: Preparation Hub
+  icon: emoji:💡
+  description: Inline help tooltips and contextual guidance
+  role: owner
+  blocks:
+    - type: heading_1
+      content: 💡 Contextual Help System
+    - type: paragraph
+      content: Smart help tooltips and contextual guidance that appears throughout the estate planning system.
+    
+    - type: heading_2
+      content: Help Tooltip Categories
+    - type: toggle
+      content: Legal Terminology Help
+      blocks:
+        - type: paragraph
+          content: "Hover help for legal terms throughout the system:"
+        - type: bulleted_list_item
+          content: "Will vs Testament: Explanation of legal document differences"
+        - type: bulleted_list_item
+          content: "Power of Attorney: Types and when each is needed"
+        - type: bulleted_list_item
+          content: "Beneficiary vs Heir: Legal distinction and implications"
+        - type: bulleted_list_item
+          content: "Trust Types: Revocable vs irrevocable trust guidance"
+    
+    - type: toggle
+      content: Process Guidance
+      blocks:
+        - type: paragraph
+          content: "Step-by-step guidance for complex processes:"
+        - type: bulleted_list_item
+          content: "Document execution: Signing, witnessing, notarization requirements"
+        - type: bulleted_list_item
+          content: "Asset valuation: How to determine fair market value"
+        - type: bulleted_list_item
+          content: "Beneficiary updates: When and how to update designations"
+        - type: bulleted_list_item
+          content: "Professional coordination: Working with attorneys and financial advisors"
+    
+    - type: heading_2
+      content: Smart Help Features
+    - type: bulleted_list_item
+      content: "📍 Context-aware: Help appears based on current page and task"
+    - type: bulleted_list_item
+      content: "🎯 Progressive disclosure: Basic → intermediate → advanced help levels"
+    - type: bulleted_list_item
+      content: "🔍 Search integration: Help content indexed for quick search"
+    - type: bulleted_list_item
+      content: "📱 Mobile-optimized: Help tooltips work on all devices"
+
+- title: FAQ Center
+  parent: Executor Hub
+  icon: emoji:❓
+  description: Frequently asked questions and comprehensive answers
+  role: executor
+  blocks:
+    - type: heading_1
+      content: ❓ Frequently Asked Questions
+    - type: paragraph
+      content: Comprehensive answers to common estate planning questions organized by category.
+    
+    - type: heading_2
+      content: Estate Planning Basics
+    - type: toggle
+      content: What is the difference between a will and a trust?
+      blocks:
+        - type: paragraph
+          content: "A will is a legal document that directs how your assets will be distributed after death and goes through probate court. A trust is a legal entity that holds assets during your lifetime and can distribute them without probate, providing privacy and potentially reducing costs."
+    
+    - type: toggle
+      content: Do I need an attorney to create estate planning documents?
+      blocks:
+        - type: paragraph
+          content: "While not legally required, working with an estate planning attorney is highly recommended for most situations. They ensure documents comply with state laws, are properly executed, and address your specific circumstances. Simple situations might use online tools, but complex estates benefit from professional guidance."
+    
+    - type: toggle
+      content: How often should I update my estate plan?
+      blocks:
+        - type: paragraph
+          content: "Review your estate plan every 3-5 years or after major life events: marriage, divorce, birth/adoption, death of beneficiary, significant asset changes, or moves to different states. Tax law changes may also trigger updates."
+    
+    - type: heading_2
+      content: Digital Assets and Technology
+    - type: toggle
+      content: How do I handle digital assets like cryptocurrency and online accounts?
+      blocks:
+        - type: paragraph
+          content: "Create a digital asset inventory including accounts, passwords (stored securely), and instructions for executors. Consider using password managers, digital legacy services, and specific provisions in your will for digital assets. Include social media account memorialization preferences."
+    
+    - type: toggle
+      content: Can family members access this estate planning system?
+      blocks:
+        - type: paragraph
+          content: "Yes, the Family Hub provides controlled access for family members to view relevant information without access to sensitive details. You control what information is shared and can grant different access levels to different family members."
+    
+    - type: heading_2
+      content: Professional Coordination
+    - type: toggle
+      content: How do I choose the right professionals for my estate planning team?
+      blocks:
+        - type: paragraph
+          content: "Select professionals based on: estate complexity, specializations needed, geographic location, communication style, fee structure, and referrals. Your team typically includes an estate attorney, financial advisor, CPA, and possibly insurance professionals."
+
+- title: Troubleshooting Guide
+  parent: Executor Hub
+  icon: emoji:🔧
+  description: Problem resolution and technical support
+  role: executor
+  blocks:
+    - type: heading_1
+      content: 🔧 Troubleshooting Guide
+    - type: paragraph
+      content: Step-by-step solutions for common issues and technical problems.
+    
+    - type: heading_2
+      content: Common Issues and Solutions
+    - type: toggle
+      content: Documents won't upload or display
+      blocks:
+        - type: numbered_list_item
+          content: "Check file size (max 25MB for most file types)"
+        - type: numbered_list_item
+          content: "Verify file format (PDF, DOC, JPG, PNG supported)"
+        - type: numbered_list_item
+          content: "Try refreshing your browser page"
+        - type: numbered_list_item
+          content: "Clear browser cache and cookies"
+        - type: numbered_list_item
+          content: "Try uploading from a different browser or device"
+    
+    - type: toggle
+      content: Family members can't access shared information
+      blocks:
+        - type: numbered_list_item
+          content: "Verify sharing permissions are enabled for that family member"
+        - type: numbered_list_item
+          content: "Check that they're using the correct login credentials"
+        - type: numbered_list_item
+          content: "Confirm their email address is correctly entered in the system"
+        - type: numbered_list_item
+          content: "Have them check spam folder for invitation emails"
+    
+    - type: toggle
+      content: Formulas or calculations appear incorrect
+      blocks:
+        - type: numbered_list_item
+          content: "Verify all required fields are completed"
+        - type: numbered_list_item
+          content: "Check for empty or zero values that might affect calculations"
+        - type: numbered_list_item
+          content: "Ensure date formats are consistent"
+        - type: numbered_list_item
+          content: "Refresh the page to recalculate formulas"
+    
+    - type: heading_2
+      content: Professional Support Escalation
+    - type: callout
+      icon: emoji:📞
+      content: "Technical Issues: Contact your estate planning attorney or system administrator"
+      color: blue_background
+    - type: callout
+      icon: emoji:⚖️
+      content: "Legal Questions: Consult with your estate planning attorney - never rely solely on system guidance"
+      color: red_background
+    - type: callout
+      icon: emoji:🚨
+      content: "Emergency Situations: Call 911 for medical emergencies, then follow estate plan emergency procedures"
+      color: red_background
+
+- title: Video Learning Center
+  parent: Family Hub
+  icon: emoji:🎥
+  description: Video tutorials and educational content placeholders
+  role: family
+  blocks:
+    - type: heading_1
+      content: 🎥 Video Learning Center
+    - type: paragraph
+      content: Educational videos and tutorials to help family members understand and use the estate planning system.
+    
+    - type: heading_2
+      content: Getting Started Videos
+    - type: callout
+      icon: emoji:▶️
+      content: "Video: Estate Planning System Overview (5 minutes) [PLACEHOLDER - Add video link]"
+      color: blue_background
+    - type: callout
+      icon: emoji:▶️
+      content: "Video: How to Access Your Family Information (3 minutes) [PLACEHOLDER - Add video link]"
+      color: blue_background
+    - type: callout
+      icon: emoji:▶️
+      content: "Video: Understanding Your Role in the Estate Plan (7 minutes) [PLACEHOLDER - Add video link]"
+      color: blue_background
+    
+    - type: heading_2
+      content: Educational Content
+    - type: callout
+      icon: emoji:📚
+      content: "Video: Estate Planning Basics for Families (12 minutes) [PLACEHOLDER - Add video link]"
+      color: green_background
+    - type: callout
+      icon: emoji:📚
+      content: "Video: What Happens When Someone Dies (10 minutes) [PLACEHOLDER - Add video link]"
+      color: green_background
+    - type: callout
+      icon: emoji:📚
+      content: "Video: Digital Legacy and Online Accounts (8 minutes) [PLACEHOLDER - Add video link]"
+      color: green_background
+    
+    - type: heading_2
+      content: How-To Tutorials
+    - type: callout
+      icon: emoji:🔧
+      content: "Video: How to Update Your Contact Information (2 minutes) [PLACEHOLDER - Add video link]"
+      color: yellow_background
+    - type: callout
+      icon: emoji:🔧
+      content: "Video: How to Add Memory Content (4 minutes) [PLACEHOLDER - Add video link]"
+      color: yellow_background
+    - type: callout
+      icon: emoji:🔧
+      content: "Video: How to Use Emergency Procedures (6 minutes) [PLACEHOLDER - Add video link]"
+      color: yellow_background
+    
+    - type: heading_2
+      content: Video Production Notes
+    - type: paragraph
+      content: "All videos should be professionally produced with captions for accessibility. Consider creating versions in multiple languages for international families. Keep videos under 10 minutes for better engagement."
+
+- title: Best Practices Guide
+  parent: Family Hub
+  icon: emoji:⭐
+  description: Recommended practices and optimization tips
+  role: family
+  blocks:
+    - type: heading_1
+      content: ⭐ Estate Planning Best Practices
+    - type: paragraph
+      content: Recommended practices and expert tips for effective estate planning management.
+    
+    - type: heading_2
+      content: Document Management Best Practices
+    - type: bulleted_list_item
+      content: "📁 Keep original documents in fireproof safe, copies in system"
+    - type: bulleted_list_item
+      content: "📋 Update documents immediately after major life changes"
+    - type: bulleted_list_item
+      content: "🔄 Review and refresh all documents every 3-5 years"
+    - type: bulleted_list_item
+      content: "👥 Ensure executors and trustees have access to necessary documents"
+    - type: bulleted_list_item
+      content: "📧 Notify professionals immediately of any document changes"
+    
+    - type: heading_2
+      content: Family Communication Best Practices
+    - type: bulleted_list_item
+      content: "💬 Hold annual family meetings to discuss estate plan updates"
+    - type: bulleted_list_item
+      content: "📖 Educate family members about their roles and responsibilities"
+    - type: bulleted_list_item
+      content: "🎯 Set clear expectations about inheritance and distributions"
+    - type: bulleted_list_item
+      content: "📝 Document family stories and values for future generations"
+    - type: bulleted_list_item
+      content: "🤝 Address conflicts openly and consider family mediation if needed"
+    
+    - type: heading_2
+      content: Security and Privacy Best Practices
+    - type: callout
+      icon: emoji:🔒
+      content: "Password Security: Use unique, strong passwords and enable two-factor authentication"
+      color: red_background
+    - type: callout
+      icon: emoji:🛡️
+      content: "Information Sharing: Only share sensitive information with trusted family members and professionals"
+      color: yellow_background
+    - type: callout
+      icon: emoji:📱
+      content: "Device Security: Keep devices updated and use secure networks for accessing estate information"
+      color: blue_background
+    
+    - type: heading_2
+      content: Professional Relationship Best Practices
+    - type: numbered_list_item
+      content: "Maintain regular communication with your estate planning team"
+    - type: numbered_list_item
+      content: "Provide annual updates on asset changes and family situations"
+    - type: numbered_list_item
+      content: "Ask questions and seek clarification on complex matters"
+    - type: numbered_list_item
+      content: "Keep detailed records of all professional consultations"
+    - type: numbered_list_item
+      content: "Review and update professional contact information annually"

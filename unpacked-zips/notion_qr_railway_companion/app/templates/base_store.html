@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% block content %}
+<h1>Choose your pack</h1>
+<p class="small">One-time purchase. We deliver QR images directly into your Notion (Family & Executor pages).</p>
+<div class="grid">
+{% for p in products %}
+  <div class="card">
+    <h3>{{ p.name }}</h3>
+    <p class="small">Set: {{ p.qr_set|upper }}</p>
+    <form action="/checkout/{{ p.id }}" method="post"><button class="btn">Buy →</button></form>
+  </div>
+{% endfor %}
+</div>
+<p class="small">Promo? Try <code>/promo/savetoday</code>.</p>
+{% endblock %}

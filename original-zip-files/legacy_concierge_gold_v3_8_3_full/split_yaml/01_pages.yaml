@@ -1,0 +1,37 @@
+pages:
+- title: Preparation Hub
+  slug: preparation-hub
+  icon: "emoji:\U0001F5C2"
+  description: Start here. Organize essentials and complete setup steps.
+- title: Executor Hub
+  slug: executor-hub
+  icon: "emoji:\U0001F9ED"
+  description: Guidance and tasks for the executor.
+- title: Family Hub
+  slug: family-hub
+  icon: "emoji:\U0001F3E1"
+  description: Information and guidance for family members.
+- title: QR Codes
+  slug: qr-codes
+  icon: "emoji:\U0001F517"
+  description: Information about codes the template supports.
+- title: Letters
+  slug: letters
+  icon: "emoji:\u2709\uFE0F"
+  description: Formal letters and notices ready to customize.
+- title: Legal Documents
+  slug: legal-documents
+  icon: "emoji:\U0001F4D1"
+  description: Key legal documents and references.
+- title: Accounts & Assets
+  slug: accounts-assets
+  icon: "emoji:\U0001F4BC"
+  description: Banks, brokerages, property and insurance.
+- title: Contacts
+  slug: contacts
+  icon: "emoji:\U0001F4C7"
+  description: Important people and organizations.
+- title: "Admin \u2013 Rollout"
+  slug: admin-rollout
+  icon: "emoji:\U0001F6E0"
+  description: Your private setup tasks and progress (remove before sharing).

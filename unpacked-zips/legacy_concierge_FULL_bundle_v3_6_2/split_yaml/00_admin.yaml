@@ -1,0 +1,13 @@
+pages:
+- title: Admin – Release Notes
+  icon: emoji:🗒️
+  role: owner
+  description: Version history for this template (safe to delete before sharing).
+- title: Admin – Rollout Cockpit
+  icon: emoji:🧭
+  description: Quick access to the Setup & Acceptance DB with guidance for useful
+    views.
+- title: Admin – Diagnostics
+  icon: emoji:🔍
+  description: 'Checks that help you finish setup: missing icons/covers and pages
+    still carrying helpers.'

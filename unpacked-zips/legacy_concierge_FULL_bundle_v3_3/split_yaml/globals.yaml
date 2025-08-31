@@ -1,0 +1,482 @@
+globals:
+  constants:
+    OWNER_NAME: '[]'
+    EXECUTOR_NAME: '[]'
+    CITY: '[]'
+    LAWYER_NAME: '[]'
+  icons_map:
+    home: 🏠
+    family-view: 👨‍👩‍👧‍👦
+    executor-view: 🧭
+    essentials: 📁
+    life-story: 📖
+    finishing: ✅
+  covers_map:
+    life-story: https://cdn.example.com/headers/soft-sepia.jpg
+    family-view: https://cdn.example.com/headers/warm-light.jpg
+    executor-quickstart: https://cdn.example.com/headers/compass-simple.jpg
+    memories: https://cdn.example.com/headers/photo-soft.jpg
+    finishing: https://cdn.example.com/headers/quiet-horizon.jpg
+  strings:
+    caution_notes:
+      legal: These pages and samples are for organizing and clarity. They are not legal, financial, or medical advice.
+      letter: This is a sample letter to help you get started. Adjust details for your situation.
+    pages:
+      home:
+        header: Home / Welcome
+        description: A quiet place for “Home / Welcome.” Simple links and short notes you can return to whenever you like.
+        owner_instructions: '[#INSTR][#COUNT 1/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Home / Welcome”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      map:
+        header: Template Map (All Pages Index)
+        description: A quiet place for “Template Map (All Pages Index).” Simple links and short notes you can return to whenever you like.
+        owner_instructions: '[#INSTR][#COUNT 2/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Template Map (All Pages Index)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      peace-of-mind:
+        header: Peace of Mind Overview
+        description: A quiet place for “Peace of Mind Overview.” Simple links and short notes you can return to whenever you like.
+        owner_instructions: '[#INSTR][#COUNT 3/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Peace of Mind Overview”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      essentials:
+        header: Important Documents & Essentials
+        description: This page is here so you can take a small step with “Important Documents & Essentials,” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 4/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Important Documents & Essentials”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      executors-contacts:
+        header: Executors & Key Contacts
+        description: This page is here so you can take a small step with “Executors & Key Contacts,” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 5/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Executors & Key Contacts”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      financial-accounts:
+        header: Financial Accounts Index
+        description: This page is here so you can take a small step with “Financial Accounts Index,” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 6/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Financial Accounts Index”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      insurance:
+        header: Insurance Policies Index
+        description: This page is here so you can take a small step with “Insurance Policies Index,” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 7/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Insurance Policies Index”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      taxes:
+        header: Taxes & Documents Checklist
+        description: This page is here so you can take a small step with “Taxes & Documents Checklist,” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 8/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Taxes & Documents Checklist”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      business:
+        header: Business Interests / LLCs
+        description: This page is here so you can take a small step with “Business Interests / LLCs,” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 9/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Business Interests / LLCs”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      property:
+        header: Property & Inventory
+        description: This page is here so you can take a small step with “Property & Inventory,” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 10/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Property & Inventory”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      vehicles:
+        header: Vehicles & Titles
+        description: This page is here so you can take a small step with “Vehicles & Titles,” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 11/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Vehicles & Titles”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      keepsakes:
+        header: Keepsakes & Gifts
+        description: Words and gentle pointers gathered for “Keepsakes & Gifts.” Nothing here asks anything of you—take what helps and leave the rest.
+        owner_instructions: '[#INSTR][#COUNT 12/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Keepsakes & Gifts”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      digital-legacy:
+        header: Digital Legacy
+        description: This page is here so you can take a small step with “Digital Legacy,” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 13/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Digital Legacy”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      devices:
+        header: Devices & Access (Non-secret pointers)
+        description: This page is here so you can take a small step with “Devices & Access (Non-secret pointers),” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 14/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Devices & Access (Non-secret pointers)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      executor-quickstart:
+        header: Executor QuickStart (One-Pager)
+        description: A brief path for the first few steps. Personalize a letter or two, then check the essentials. Pause whenever you need—there isn’t one right order.
+        owner_instructions: '[#INSTR][#COUNT 15/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Executor QuickStart (One-Pager)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      executor-card:
+        header: Executor Contact Card
+        description: This page is here so you can take a small step with “Executor Contact Card,” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 16/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Executor Contact Card”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      executor-view:
+        header: Executor View (Dashboard)
+        description: This page is here so you can take a small step with “Executor View (Dashboard),” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 17/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Executor View (Dashboard)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      family-view:
+        header: Family View (Dashboard)
+        description: A gentle place for stories, photos, and simple answers. Nothing on this page is urgent. Stay for a moment, or return later.
+        owner_instructions: '[#INSTR][#COUNT 18/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Family View (Dashboard)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      memories:
+        header: Memories & Letters
+        description: Words and gentle pointers gathered for “Memories & Letters.” Nothing here asks anything of you—take what helps and leave the rest.
+        owner_instructions: '[#INSTR][#COUNT 19/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Memories & Letters”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LETTER
+      photos:
+        header: Memories — Photo Albums (Gallery)
+        description: Words and gentle pointers gathered for “Memories — Photo Albums (Gallery).” Nothing here asks anything of you—take what helps and leave the rest.
+        owner_instructions: '[#INSTR][#COUNT 20/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Memories — Photo Albums (Gallery)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      letters-index:
+        header: Memories — Letters Index
+        description: Words and gentle pointers gathered for “Memories — Letters Index.” Nothing here asks anything of you—take what helps and leave the rest.
+        owner_instructions: '[#INSTR][#COUNT 21/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Memories — Letters Index”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LETTER
+      life-story:
+        header: Life Story & Guidance
+        description: Words and gentle pointers gathered for “Life Story & Guidance.” Nothing here asks anything of you—take what helps and leave the rest.
+        owner_instructions: '[#INSTR][#COUNT 22/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Life Story & Guidance”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      grief-support:
+        header: Grief Support Resources
+        description: Words and gentle pointers gathered for “Grief Support Resources.” Nothing here asks anything of you—take what helps and leave the rest.
+        owner_instructions: '[#INSTR][#COUNT 23/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Grief Support Resources”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      family-faq:
+        header: Family FAQ / Getting Started
+        description: Words and gentle pointers gathered for “Family FAQ / Getting Started.” Nothing here asks anything of you—take what helps and leave the rest.
+        owner_instructions: '[#INSTR][#COUNT 24/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Family FAQ / Getting Started”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      medical:
+        header: Medical & Healthcare Preferences
+        description: This page is here so you can take a small step with “Medical & Healthcare Preferences,” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 25/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Medical & Healthcare Preferences”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LEGAL
+      living-will:
+        header: Living Will / Advance Care Directives
+        description: This page is here so you can take a small step with “Living Will / Advance Care Directives,” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 26/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Living Will / Advance Care Directives”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LEGAL
+      donation-wishes:
+        header: Donation & Personal Wishes
+        description: Words and gentle pointers gathered for “Donation & Personal Wishes.” Nothing here asks anything of you—take what helps and leave the rest.
+        owner_instructions: '[#INSTR][#COUNT 27/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Donation & Personal Wishes”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      notifications:
+        header: Notifications Plan
+        description: This page is here so you can take a small step with “Notifications Plan,” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 28/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Notifications Plan”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      letters-db:
+        header: Sample Letters Library (DB parent view)
+        description: A quiet place for “Sample Letters Library (DB parent view).” Simple links and short notes you can return to whenever you like.
+        owner_instructions: '[#INSTR][#COUNT 29/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Sample Letters Library (DB parent view)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LETTER
+      qr-reference:
+        header: QR Codes Reference
+        description: A quiet place for “QR Codes Reference.” Simple links and short notes you can return to whenever you like.
+        owner_instructions: '[#INSTR][#COUNT 30/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“QR Codes Reference”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      qr-print:
+        header: QR Card Printables (How-To)
+        description: This page is here so you can take a small step with “QR Card Printables (How-To),” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 31/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“QR Card Printables (How-To)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      qr-packages:
+        header: QR Packages (Reference)
+        description: A quiet place for “QR Packages (Reference).” Simple links and short notes you can return to whenever you like.
+        owner_instructions: '[#INSTR][#COUNT 32/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“QR Packages (Reference)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      qr-letters:
+        header: QR Distribution Letters
+        description: This page is here so you can take a small step with “QR Distribution Letters,” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 33/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“QR Distribution Letters”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LETTER
+      prompts-letters:
+        header: Prompt Library — Letters & Stories
+        description: A quiet place for “Prompt Library — Letters & Stories.” Simple links and short notes you can return to whenever you like.
+        owner_instructions: '[#INSTR][#COUNT 34/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Prompt Library — Letters & Stories”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LETTER
+      prompts-tribute:
+        header: Prompt Library — Life Story & Tribute
+        description: A quiet place for “Prompt Library — Life Story & Tribute.” Simple links and short notes you can return to whenever you like.
+        owner_instructions: '[#INSTR][#COUNT 35/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Prompt Library — Life Story & Tribute”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      prompts-executor:
+        header: Prompt Library — Executor & Summary Aids
+        description: A quiet place for “Prompt Library — Executor & Summary Aids.” Simple links and short notes you can return to whenever you like.
+        owner_instructions: '[#INSTR][#COUNT 36/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Prompt Library — Executor & Summary Aids”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      prompts-rewrite:
+        header: Prompt Library — Combine & Rewrite
+        description: A quiet place for “Prompt Library — Combine & Rewrite.” Simple links and short notes you can return to whenever you like.
+        owner_instructions: '[#INSTR][#COUNT 37/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Prompt Library — Combine & Rewrite”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      prompts-translate:
+        header: Prompt Library — Translate
+        description: A quiet place for “Prompt Library — Translate.” Simple links and short notes you can return to whenever you like.
+        owner_instructions: '[#INSTR][#COUNT 38/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Prompt Library — Translate”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      flow-process:
+        header: Process Flow (Mermaid)
+        description: This page is here so you can take a small step with “Process Flow (Mermaid),” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 39/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Process Flow (Mermaid)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      flow-contacts:
+        header: Contacts & Roles Map (Mermaid)
+        description: This page is here so you can take a small step with “Contacts & Roles Map (Mermaid),” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 40/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Contacts & Roles Map (Mermaid)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      flow-activation:
+        header: Executor Activation Flow (Mermaid)
+        description: This page is here so you can take a small step with “Executor Activation Flow (Mermaid),” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 41/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Executor Activation Flow (Mermaid)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      guidance:
+        header: Guidance Library (Resources)
+        description: Words and gentle pointers gathered for “Guidance Library (Resources).” Nothing here asks anything of you—take what helps and leave the rest.
+        owner_instructions: '[#INSTR][#COUNT 42/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Guidance Library (Resources)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      tone:
+        header: Copy & Tone Guide
+        description: A quiet place for “Copy & Tone Guide.” Simple links and short notes you can return to whenever you like.
+        owner_instructions: '[#INSTR][#COUNT 43/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Copy & Tone Guide”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      disclaimer:
+        header: Legal Disclaimer (Standalone Page)
+        description: A quiet place for “Legal Disclaimer (Standalone Page).” Simple links and short notes you can return to whenever you like.
+        owner_instructions: '[#INSTR][#COUNT 44/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Legal Disclaimer (Standalone Page)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LEGAL
+      diagnostics:
+        header: Diagnostics
+        description: A quiet place for “Diagnostics.” Simple links and short notes you can return to whenever you like.
+        owner_instructions: '[#INSTR][#COUNT 45/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Diagnostics”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      tracker:
+        header: Build Tracker (DB)
+        description: A quiet place for “Build Tracker (DB).” Simple links and short notes you can return to whenever you like.
+        owner_instructions: '[#INSTR][#COUNT 46/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Build Tracker (DB)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      finishing:
+        header: Manual Finishing Tasks
+        description: A quiet place for “Manual Finishing Tasks.” Simple links and short notes you can return to whenever you like.
+        owner_instructions: '[#INSTR][#COUNT 47/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Manual Finishing Tasks”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      dev-notes:
+        header: Developer Notes / Version & Changelog
+        description: A quiet place for “Developer Notes / Version & Changelog.” Simple links and short notes you can return to whenever you like.
+        owner_instructions: '[#INSTR][#COUNT 48/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Developer Notes / Version & Changelog”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      recovery:
+        header: System Check / Recovery Report
+        description: A quiet place for “System Check / Recovery Report.” Simple links and short notes you can return to whenever you like.
+        owner_instructions: '[#INSTR][#COUNT 49/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“System Check / Recovery Report”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      encouragements:
+        header: Encouragements
+        description: Words and gentle pointers gathered for “Encouragements.” Nothing here asks anything of you—take what helps and leave the rest.
+        owner_instructions: '[#INSTR][#COUNT 50/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Encouragements”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      icons-headers:
+        header: Icons & Headers Library
+        description: A quiet place for “Icons & Headers Library.” Simple links and short notes you can return to whenever you like.
+        owner_instructions: '[#INSTR][#COUNT 51/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Icons & Headers Library”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      mobile-test:
+        header: Mobile Test Checklist
+        description: A quiet place for “Mobile Test Checklist.” Simple links and short notes you can return to whenever you like.
+        owner_instructions: '[#INSTR][#COUNT 52/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Mobile Test Checklist”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      letters-family-view:
+        header: Memories — Letters (Family Library View)
+        description: Words and gentle pointers gathered for “Memories — Letters (Family Library View).” Nothing here asks anything of you—take what helps and leave the rest.
+        owner_instructions: '[#INSTR][#COUNT 53/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Memories — Letters (Family Library View)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LETTER
+      letters-brokerage-view:
+        header: Brokerage Letters (Library View)
+        description: This page is here so you can take a small step with “Brokerage Letters (Library View),” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 54/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Brokerage Letters (Library View)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LETTER
+      letters-bank-view:
+        header: Bank Letters (Library View)
+        description: This page is here so you can take a small step with “Bank Letters (Library View),” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 55/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Bank Letters (Library View)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LETTER
+      letters-insurance-view:
+        header: Insurance Letters (Library View)
+        description: This page is here so you can take a small step with “Insurance Letters (Library View),” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 56/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Insurance Letters (Library View)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LETTER
+      letters-utilities-view:
+        header: Utilities Letters (Library View)
+        description: This page is here so you can take a small step with “Utilities Letters (Library View),” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 57/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Utilities Letters (Library View)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LETTER
+      letters-community-view:
+        header: Community Letters (Library View)
+        description: This page is here so you can take a small step with “Community Letters (Library View),” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 58/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Community Letters (Library View)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LETTER
+      letters-executor-view:
+        header: Executor Letters (Library View)
+        description: This page is here so you can take a small step with “Executor Letters (Library View),” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 59/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Executor Letters (Library View)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LETTER
+      letters-family-announcements-view:
+        header: Family Letters (Library View)
+        description: Words and gentle pointers gathered for “Family Letters (Library View).” Nothing here asks anything of you—take what helps and leave the rest.
+        owner_instructions: '[#INSTR][#COUNT 60/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Family Letters (Library View)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LETTER
+      photos-captions-helper:
+        header: Photo Captions Helper
+        description: Words and gentle pointers gathered for “Photo Captions Helper.” Nothing here asks anything of you—take what helps and leave the rest.
+        owner_instructions: '[#INSTR][#COUNT 61/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Photo Captions Helper”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      executor-orientation:
+        header: When You First Open This
+        description: You can start here, or somewhere else that feels lighter. A few short steps are gathered below; take only what helps for now.
+        owner_instructions: '[#INSTR][#COUNT 17/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“When You First Open This”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      everything-done:
+        header: For When It Feels Complete
+        description: When the last small things are tended to, it’s okay to stop. Leave a quiet note here if you’d like, or simply close the page and rest.
+        owner_instructions: '[#INSTR][#COUNT 47/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“For When It Feels Complete”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: NONE
+      essentials-sample-doc-summary:
+        header: Sample Document Summary (Not Legal)
+        description: This page is here so you can take a small step with “Sample Document Summary (Not Legal),” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 4/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Sample Document Summary (Not Legal)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LEGAL
+      essentials-where-things-are:
+        header: Sample “Where Things Are” Note (Not Legal)
+        description: This page is here so you can take a small step with “Sample “Where Things Are” Note (Not Legal),” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 4/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Sample “Where Things Are” Note (Not Legal)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LEGAL
+      executors-note:
+        header: Sample Executors Note (Not Legal)
+        description: This page is here so you can take a small step with “Sample Executors Note (Not Legal),” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 5/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Sample Executors Note (Not Legal)”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LEGAL
+      letter-bank:
+        header: Bank Notification Letter
+        description: This page is here so you can take a small step with “Bank Notification Letter,” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 6/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Bank Notification Letter”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LETTER
+      letter-card:
+        header: Credit Card Company Letter
+        description: This page is here so you can take a small step with “Credit Card Company Letter,” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 6/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Credit Card Company Letter”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LETTER
+      letter-brokerage:
+        header: Brokerage / Investment Firm Letter
+        description: This page is here so you can take a small step with “Brokerage / Investment Firm Letter,” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 6/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Brokerage / Investment Firm Letter”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LETTER
+      letter-insurance:
+        header: Insurance Carrier Letter
+        description: This page is here so you can take a small step with “Insurance Carrier Letter,” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 7/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Insurance Carrier Letter”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LETTER
+      letter-tax:
+        header: Tax Notification Letter
+        description: This page is here so you can take a small step with “Tax Notification Letter,” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 8/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Tax Notification Letter”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LETTER
+      letter-employer:
+        header: Employer Notification Letter
+        description: This page is here so you can take a small step with “Employer Notification Letter,” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 28/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Employer Notification Letter”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LETTER
+      letter-community:
+        header: Community / Social Group Letter
+        description: This page is here so you can take a small step with “Community / Social Group Letter,” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 28/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Community / Social Group Letter”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LETTER
+      letter-family:
+        header: Family Announcement Letter
+        description: Words and gentle pointers gathered for “Family Announcement Letter.” Nothing here asks anything of you—take what helps and leave the rest.
+        owner_instructions: '[#INSTR][#COUNT 18/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Family Announcement Letter”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LETTER
+      letter-death-notice:
+        header: Short Death Notice / Newspaper Letter
+        description: This page is here so you can take a small step with “Short Death Notice / Newspaper Letter,” and let the rest wait until later. If something feels heavy, come back when it feels lighter.
+        owner_instructions: '[#INSTR][#COUNT 22/61] Read this once as if you were the person using it. Remove anything that feels like a chore. When it feels easy and kind, clear this note.'
+        ai_prompt: Write a warm, steady 80–140 word note for this page (“Short Death Notice / Newspaper Letter”). Avoid commands; prefer invitations. Keep the reading level simple.
+        disclaimer: LETTER
+  diagnostics_text:
+    messages:
+      cover_missing: ‘{page}’ could use a calm cover image. Soft colors or a simple photo work well.
+      icon_missing: ‘{page}’ is missing a small symbol. Choose something gentle—maybe a book or a heart.
+      instr_present: ‘{page}’ still shows a helper note. When it feels ready, you can remove it.
+      db_required_field: 'The database ‘{db}’ needs a few basics so this page stays dependable: {fields}.'
+    reminders:
+      family_no_tasks: Family pages should never feel like chores. If a page reads like a checklist, soften or move steps to executor pages.

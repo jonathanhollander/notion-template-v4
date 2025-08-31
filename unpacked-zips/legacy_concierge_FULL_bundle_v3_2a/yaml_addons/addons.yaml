@@ -1,0 +1,233 @@
+ordering:
+  top_pages:
+  - home
+  - map
+  - peace-of-mind
+  - essentials
+  - executors-contacts
+  - financial-accounts
+  - insurance
+  - taxes
+  - business
+  - property
+  - vehicles
+  - keepsakes
+  - digital-legacy
+  - devices
+  - executor-quickstart
+  - executor-card
+  - executor-view
+  - family-view
+  - memories
+  - photos
+  - letters-index
+  - life-story
+  - grief-support
+  - family-faq
+  - medical
+  - living-will
+  - donation-wishes
+  - notifications
+  - letters-db
+  - qr-reference
+  - qr-print
+  - qr-packages
+  - qr-letters
+  - prompts-letters
+  - prompts-tribute
+  - prompts-executor
+  - prompts-rewrite
+  - prompts-translate
+  - flow-process
+  - flow-contacts
+  - flow-activation
+  - guidance
+  - tone
+  - disclaimer
+  - diagnostics
+  - tracker
+  - finishing
+  - dev-notes
+  - recovery
+  - encouragements
+  - icons-headers
+  - mobile-test
+  - letters-family-view
+  - letters-brokerage-view
+  - letters-bank-view
+  - letters-insurance-view
+  - letters-utilities-view
+  - letters-community-view
+  - letters-executor-view
+  - letters-family-announcements-view
+  - photos-captions-helper
+  numbering:
+    home: 1
+    map: 2
+runbook:
+  by_page:
+    family-view:
+      do_now:
+      - Add 3–5 links you want family to see first.
+      - Write a warm 2–3 sentence intro.
+      done_when:
+      - Cover + icon set
+      - Owner instruction cleared
+    executor-quickstart:
+      do_now:
+      - Confirm the first-steps checklist matches your plan.
+      - Add attorney contact in Executors & Key Contacts.
+      done_when:
+      - Checklist finalized
+      - Owner instruction cleared
+nav:
+  see_also:
+    executor-quickstart:
+    - executors-contacts
+    - notifications
+    - financial-accounts
+    family-view:
+    - life-story
+    - memories
+    - family-faq
+    - grief-support
+assets:
+  base_url: https://your-cdn.example.com/headers/
+  icons:
+    essentials: 📁
+    family-view: 👨‍👩‍👧‍👦
+  covers:
+    life-story: headers/life-story.jpg
+    memories: headers/memories.jpg
+placeholders:
+  required:
+  - token: '[#INSTR]'
+    rule: must_be_removed_before_done
+  - token: '{OWNER_NAME}'
+    rule: must_be_replaced_if_present
+style:
+  tone:
+    avoid_words:
+    - expire
+    - corpse
+    - remains
+    - must
+    - immediately
+    prefer_words:
+    - pass away
+    - body
+    - can
+    - when you’re ready
+  length_guidelines:
+    intro_sentences: 2–4
+    letter_paragraphs: 2–3
+audience_hints:
+  family: Use warm, simple language. Keep steps optional.
+  executor: Be calm, practical. Put steps in order. Avoid jargon.
+views:
+  letters-db:
+    family_announcements_view:
+      database: sample_letters
+      filter:
+        Audience: Family
+        Category: Family
+      sort:
+      - property: Title
+        direction: ascending
+      layout: list
+      show_properties:
+      - Title
+      - Scenario
+sharing:
+  executor-quickstart:
+    who:
+    - Executor
+    how:
+    - Share page with email of executor
+    - 'Set permission: Can view'
+diagnostics_config:
+  ignore_pages:
+  - qr-reference
+  - admin-cockpit
+  ignore_db:
+  - rollout_tasks
+  - assets_inventory
+  - view_recipes
+  - share_recipes
+  - risks
+  - change_log
+  - questions
+  - strings_audit
+  - qr_audit
+  - post_deploy_qa
+  require_cover_on:
+  - life-story
+  - memories
+  - family-view
+  require_icon_on: ALL
+safety:
+  idempotency_key_strategy: slug
+  delete_protection:
+    pages:
+    - qr-reference
+  update_policy:
+    blocks: append_or_replace_by_label
+merge:
+  strings:
+    mode: overwrite
+    on_missing_key: warn
+  pages:
+    mode: preserve_blocks_with_label
+readability:
+  mobile_check:
+    ensure_headings_max: h2
+    avoid_wide_tables: true
+  print_check:
+    body_font_min_pt: 12
+    line_length_max_chars: 80
+purpose:
+  executor-quickstart: A calm starting point for the person helping settle affairs.
+  family-view: A warm hub for family to find stories, photos, and simple answers.
+redaction:
+  never_store:
+  - passwords
+  - 2FA codes
+  - full account numbers
+  store_as_pointer_on:
+  - financial-accounts
+  - devices
+disclaimers_map:
+  LEGAL:
+  - essentials
+  - medical
+  - living-will
+  - life-story-sample
+  LETTER:
+  - letter-bank
+  - letter-card
+  - letter-insurance
+status_tags:
+  default: To fill
+  map:
+    done: Done
+    needs_review: Needs review
+    missing_assets: Missing cover/icon
+registry:
+  slugs:
+    home: Home / Welcome
+    executor-quickstart: Executor QuickStart (One-Pager)
+cli:
+  verbosity: info
+  messages:
+    starting: Starting deploy…
+    creating_page: 'Creating page: {slug}'
+    seeding_db: 'Seeding database: {name}'
+    done: Deploy finished with {warnings} warnings.
+finalize:
+  must_clear_tokens:
+  - '[#INSTR]'
+  must_set_assets_on:
+  - life-story
+  - memories
+  - family-view
+  - executor-quickstart

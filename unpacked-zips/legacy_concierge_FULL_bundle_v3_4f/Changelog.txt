@@ -1,0 +1,11 @@
+Changelog v3.4f (from v3.4e)
+- Added gradient diamond icons (SVG + PNG, 32px & 64px) for role-based completion markers.
+- Integrated icons into YAML page definitions.
+- Applied cohesive covers (Muted Nature palette) to all pages.
+- Completed rewrite of page descriptions — no filler remains.
+- Standardized all 17 letters (spacing, closings, disclaimers).
+- Disclaimers applied across all executor/legal/financial subsections (Taxes, Business, Vehicles, etc.).
+- Expanded diagnostics rules to enforce disclaimers, prevent checklists on family pages, and check DB seed presence.
+- Acceptance criteria expanded to all ~60 pages.
+- Sample data added for Business Interests, Keepsakes, and QR Codes in addition to prior DBs.
+- Builder’s Console now shows live Diagnostics DB view.

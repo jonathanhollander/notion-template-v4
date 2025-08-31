@@ -1,0 +1,10 @@
+<!doctype html><html><body>
+<h2>Select Menu Page</h2>
+<p>Paste the <b>Menu</b> page ID (32 chars, from the URL) or its block ID.</p>
+<form method="post" action="/generate">
+  <input type="hidden" name="token" value="{{token}}">
+  <label>Menu Page ID</label><input name="menu_page_id" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" required>
+  <label>Pack ID</label><input name="pack_id" value="complete">
+  <button type="submit">Generate & Save QR Codes</button>
+</form>
+</body></html>

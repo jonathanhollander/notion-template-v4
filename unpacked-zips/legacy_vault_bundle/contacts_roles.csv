@@ -1,0 +1,4 @@
+Name,Role,Relation,Priority,Phone,Email,Notes
+EXAMPLE — Jane Doe,Executor,Sibling,High,+1 (555) 111-2222,jane@example.com,Primary executor.
+EXAMPLE — David Doe,Lawyer,Advisor,High,+1 (555) 333-4444,david.law@example.com,Estate attorney.
+EXAMPLE — Sarah Doe,Beneficiary,Spouse/Partner,High,+1 (555) 555-6666,sarah@example.com,Spouse and beneficiary.

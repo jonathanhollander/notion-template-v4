@@ -1,0 +1,32 @@
+copy_registry:
+  preparation-hub:
+    description: A steady starting place. Work at your pace; each step waits for you.
+  executor-hub:
+    description: Practical steps for carrying out wishes. Keep documents together
+      and note what you complete.
+    disclaimer: These pages are practical guidance only and not legal advice. Confirm
+      local requirements.
+  family-hub:
+    description: A gentle place for photos, notes, and memories that matter.
+  legal-living-will:
+    description: A soft, non-legal sample to help you consider choices. Speak with
+      your attorney for a valid document.
+    disclaimer: Sample only; not legal advice.
+  qr-family-essentials:
+    description: QR links for the few pages your family may need quickly. Share only
+      when ready.
+  qr-executor-full:
+    description: QR links to every section your executor will need. Keep this secure.
+  executor-checklist:
+    description: Start here after the passing. Some steps are time-sensitive; move
+      steadily, one task at a time.
+    disclaimer: This is practical guidance, not legal advice.
+  life-insurance:
+    description: Add policy documents and confirm beneficiaries. Note claim phone
+      numbers and hours.
+    disclaimer: Policies differ by carrier; verify requirements.
+  subscriptions:
+    description: List recurring charges so nothing continues unnoticed. Capture login
+      details and next billing dates.
+  messages-for-family:
+    description: Short notes you’d like loved ones to read, in your own words.

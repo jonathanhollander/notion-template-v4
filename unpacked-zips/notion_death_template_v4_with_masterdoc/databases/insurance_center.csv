@@ -1,0 +1,3 @@
+Policy_Type,Carrier,Policy_Number,Beneficiary,Agent_Name,Agent_Contact,Claims_Process_URL,Notes
+Life,Guardian,LIFE-10293,Spouse,Pat Rowan,prowan@agency.com,https://carrier.example.com/claims,Certified copy of death certificate required
+Homeowners,People's Trust,PT-88921,,Agency Team,support@pti.agency,https://pti.agency/claims,See deductible details

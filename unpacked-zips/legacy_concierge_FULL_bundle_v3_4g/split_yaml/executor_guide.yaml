@@ -1,0 +1,27 @@
+page:
+  title: Executor Guide
+  icon: assets/icons/diamonds/sage_filled.svg
+  cover: https://images.unsplash.com/photo-1500530855697-b586d89ba3ee
+  description: This guide holds the tasks that need clarity. Follow each section steadily.
+    Nothing more, nothing less.
+  disclaimer: This page helps organize information. For legal effect, speak with a
+    licensed professional.
+  acceptance:
+  - Cover present
+  - Icon present
+  - Disclaimer (if required)
+  - Helper notes cleared
+  - Seeded rows present (if DB)
+  subpages:
+  - title: Financial Accounts
+    icon: assets/icons/diamonds/sage_filled.svg
+  - title: Insurance
+    icon: assets/icons/diamonds/sage_filled.svg
+  - title: Taxes
+    icon: assets/icons/diamonds/sage_filled.svg
+  - title: Property
+    icon: assets/icons/diamonds/sage_filled.svg
+  - title: Vehicles
+    icon: assets/icons/diamonds/sage_filled.svg
+  - title: Business Interests
+    icon: assets/icons/diamonds/sage_filled.svg

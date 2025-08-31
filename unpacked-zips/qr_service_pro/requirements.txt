@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+jinja2
+itsdangerous
+qrcode
+Pillow
+stripe
+sqlalchemy
+alembic
+python-multipart
+pyjwt
+reportlab
+python-dotenv

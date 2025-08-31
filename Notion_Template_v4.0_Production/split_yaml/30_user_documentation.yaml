@@ -1,0 +1,559 @@
+# User Documentation
+complexity: complex
+
+pages:
+- title: User Manual Hub
+  parent: Preparation Hub
+  icon: emoji:📖
+  description: Comprehensive user documentation and guides
+  role: owner
+  blocks:
+    - type: heading_1
+      content: 📖 Estate Planning User Manual
+    - type: paragraph
+      content: Complete documentation system providing detailed guidance for all aspects of estate planning management, from basic setup to advanced features.
+    
+    - type: heading_2
+      content: Getting Started Guide
+    - type: toggle
+      content: Initial Setup (First 24 Hours)
+      blocks:
+        - type: numbered_list_item
+          content: "Review system overview and three-hub architecture (Preparation, Executor, Family)"
+        - type: numbered_list_item
+          content: "Complete initial assessment questionnaire to determine complexity level"
+        - type: numbered_list_item
+          content: "Set up professional team contacts (attorney, financial advisor, CPA)"
+        - type: numbered_list_item
+          content: "Begin asset inventory with high-value items first"
+        - type: numbered_list_item
+          content: "Configure family access levels and sharing preferences"
+        - type: numbered_list_item
+          content: "Schedule initial attorney consultation within first week"
+    
+    - type: toggle
+      content: First Week Checklist
+      blocks:
+        - type: bulleted_list_item
+          content: "📋 Complete personal information profile"
+        - type: bulleted_list_item
+          content: "💰 Begin comprehensive asset documentation"
+        - type: bulleted_list_item
+          content: "👥 Add family members and assign appropriate access levels"
+        - type: bulleted_list_item
+          content: "⚖️ Schedule professional consultations"
+        - type: bulleted_list_item
+          content: "📱 Test mobile access and notification preferences"
+        - type: bulleted_list_item
+          content: "🎯 Set initial goals and timeline expectations"
+    
+    - type: toggle
+      content: First Month Objectives
+      blocks:
+        - type: bulleted_list_item
+          content: "📄 Draft primary estate planning documents (will, POA)"
+        - type: bulleted_list_item
+          content: "🏦 Complete financial account beneficiary reviews"
+        - type: bulleted_list_item
+          content: "🏠 Obtain professional property valuations"
+        - type: bulleted_list_item
+          content: "👔 Establish regular professional coordination schedule"
+        - type: bulleted_list_item
+          content: "👨‍👩‍👧‍👦 Conduct first family estate planning discussion"
+        - type: bulleted_list_item
+          content: "📊 Review progress analytics and adjust timeline if needed"
+    
+    - type: heading_2
+      content: Feature Documentation
+    - type: toggle
+      content: Database Management
+      blocks:
+        - type: paragraph
+          content: "Complete guide to using the 11 integrated databases:"
+        - type: bulleted_list_item
+          content: "📊 Estate Analytics: Track completion metrics and performance indicators"
+        - type: bulleted_list_item
+          content: "👔 Professional Coordination: Manage attorney, CPA, advisor relationships"
+        - type: bulleted_list_item
+          content: "💰 Financial Assets: Document bank accounts, investments, real estate"
+        - type: bulleted_list_item
+          content: "📄 Legal Documents: Track will, trusts, powers of attorney"
+        - type: bulleted_list_item
+          content: "👥 Family Access: Manage family member permissions and roles"
+        - type: bulleted_list_item
+          content: "🎭 Memory Preservation: Store family stories and important memories"
+        - type: bulleted_list_item
+          content: "🚨 Crisis Management: Emergency procedures and contact protocols"
+    
+    - type: toggle
+      content: Progress Tracking Features
+      blocks:
+        - type: paragraph
+          content: "Understanding and using the progress visualization system:"
+        - type: bulleted_list_item
+          content: "📊 Real-time Progress Bars: Visual completion indicators with live updates"
+        - type: bulleted_list_item
+          content: "🎯 Milestone Tracking: Major achievement markers and celebration points"
+        - type: bulleted_list_item
+          content: "⚡ Velocity Analytics: Task completion speed and efficiency metrics"
+        - type: bulleted_list_item
+          content: "🚨 Bottleneck Detection: Automatic identification of process delays"
+        - type: bulleted_list_item
+          content: "📈 Trend Analysis: Historical patterns and future projections"
+    
+    - type: heading_2
+      content: Advanced Features Guide
+    - type: toggle
+      content: Automation System
+      blocks:
+        - type: paragraph
+          content: "Understanding and configuring the automation features:"
+        - type: bulleted_list_item
+          content: "🤖 Auto-Task Generation: How intelligent task creation works"
+        - type: bulleted_list_item
+          content: "⏰ Smart Reminders: Customizing notification timing and frequency"
+        - type: bulleted_list_item
+          content: "🔔 Alert Configuration: Setting up appropriate alert levels"
+        - type: bulleted_list_item
+          content: "📊 Performance Optimization: Using analytics to improve efficiency"
+    
+    - type: toggle
+      content: Multi-Language Features
+      blocks:
+        - type: paragraph
+          content: "Using the international language support system:"
+        - type: bulleted_list_item
+          content: "🌐 Language Selection: How to change languages and regional settings"
+        - type: bulleted_list_item
+          content: "↩️ RTL Support: Using Arabic, Hebrew, and Urdu language features"
+        - type: bulleted_list_item
+          content: "🎭 Cultural Adaptations: Understanding region-specific legal considerations"
+        - type: bulleted_list_item
+          content: "🔤 Translation Quality: How to request improvements or report issues"
+
+- title: Administrator Guide
+  parent: Executor Hub
+  icon: emoji:⚙️
+  description: Complete administrator documentation and advanced configuration
+  role: executor
+  blocks:
+    - type: heading_1
+      content: ⚙️ Administrator Guide
+    - type: paragraph
+      content: Comprehensive administrator documentation for estate planning system management, configuration, and advanced features.
+    
+    - type: heading_2
+      content: System Administration
+    - type: toggle
+      content: User Management
+      blocks:
+        - type: paragraph
+          content: "Managing user accounts, roles, and permissions:"
+        - type: bulleted_list_item
+          content: "👤 User Creation: Adding new family members and professional contacts"
+        - type: bulleted_list_item
+          content: "🔐 Role Assignment: Owner, executor, family, professional role configuration"
+        - type: bulleted_list_item
+          content: "🛡️ Permission Management: Controlling access to sensitive information"
+        - type: bulleted_list_item
+          content: "📊 Access Monitoring: Tracking user activity and system usage"
+        - type: bulleted_list_item
+          content: "🔄 Account Maintenance: Updating contact information and preferences"
+    
+    - type: toggle
+      content: Database Administration
+      blocks:
+        - type: paragraph
+          content: "Managing the 11 integrated databases and their relationships:"
+        - type: bulleted_list_item
+          content: "🔗 Relationship Configuration: Setting up cross-database connections"
+        - type: bulleted_list_item
+          content: "📊 Formula Management: Maintaining rollup calculations and aggregations"
+        - type: bulleted_list_item
+          content: "🔄 Data Synchronization: Ensuring consistency across all databases"
+        - type: bulleted_list_item
+          content: "📈 Performance Monitoring: Tracking database response times and health"
+        - type: bulleted_list_item
+          content: "💾 Backup Procedures: Regular data backup and recovery protocols"
+    
+    - type: toggle
+      content: System Configuration
+      blocks:
+        - type: paragraph
+          content: "Advanced system settings and customization options:"
+        - type: bulleted_list_item
+          content: "🔧 API Configuration: Notion API settings and rate limit management"
+        - type: bulleted_list_item
+          content: "⚡ Performance Tuning: Optimizing system responsiveness and efficiency"
+        - type: bulleted_list_item
+          content: "🛡️ Security Settings: Configuring access controls and audit logging"
+        - type: bulleted_list_item
+          content: "🌐 Multi-language Setup: Managing translation keys and cultural adaptations"
+        - type: bulleted_list_item
+          content: "🤖 Automation Rules: Configuring workflow automation and alert systems"
+    
+    - type: heading_2
+      content: Troubleshooting and Maintenance
+    - type: toggle
+      content: Common Administrative Issues
+      blocks:
+        - type: paragraph
+          content: "Solutions for frequent administrative challenges:"
+        - type: bulleted_list_item
+          content: "🔄 Sync Failures: Database synchronization troubleshooting steps"
+        - type: bulleted_list_item
+          content: "⚡ Performance Issues: System optimization and resource management"
+        - type: bulleted_list_item
+          content: "🔐 Access Problems: Permission troubleshooting and user support"
+        - type: bulleted_list_item
+          content: "📊 Formula Errors: Rollup calculation debugging and correction"
+        - type: bulleted_list_item
+          content: "🔔 Notification Issues: Alert system troubleshooting and configuration"
+    
+    - type: toggle
+      content: Maintenance Procedures
+      blocks:
+        - type: paragraph
+          content: "Regular maintenance tasks to keep the system running optimally:"
+        - type: numbered_list_item
+          content: "Weekly: Review system performance metrics and user activity logs"
+        - type: numbered_list_item
+          content: "Monthly: Update professional contact information and verify access"
+        - type: numbered_list_item
+          content: "Quarterly: Comprehensive system backup and security audit"
+        - type: numbered_list_item
+          content: "Annually: Full system review, user feedback collection, and feature updates"
+    
+    - type: heading_2
+      content: Advanced Configuration Options
+    - type: callout
+      icon: emoji:🔧
+      content: "Custom Workflows: Create specialized workflows for unique estate planning situations"
+      color: blue_background
+    - type: callout
+      icon: emoji:📊
+      content: "Analytics Customization: Configure custom metrics and reporting dashboards"
+      color: green_background
+    - type: callout
+      icon: emoji:🤖
+      content: "Automation Rules: Set up complex automation scenarios and trigger conditions"
+      color: yellow_background
+    - type: callout
+      icon: emoji:🔒
+      content: "Security Configuration: Advanced access controls and audit trail management"
+      color: red_background
+
+- title: API Documentation Center
+  parent: Executor Hub
+  icon: emoji:🔗
+  description: Technical API documentation and integration guides
+  role: executor
+  blocks:
+    - type: heading_1
+      content: 🔗 API Documentation Center
+    - type: paragraph
+      content: Comprehensive technical documentation for API integration, system customization, and advanced automation development.
+    
+    - type: heading_2
+      content: Notion API Integration
+    - type: callout
+      icon: emoji:🔗
+      content: "API Version: 2025-09-03 (Current) | Rate Limit: 2.5 requests/second"
+      color: blue_background
+    - type: toggle
+      content: Authentication and Setup
+      blocks:
+        - type: code
+          content: |
+            # Environment Setup
+            NOTION_TOKEN=your_integration_token_here
+            NOTION_PARENT_PAGEID=your_parent_page_id_here
+            
+            # Python Example
+            import requests
+            headers = {
+                "Authorization": f"Bearer {NOTION_TOKEN}",
+                "Notion-Version": "2025-09-03",
+                "Content-Type": "application/json"
+            }
+    
+    - type: toggle
+      content: Core API Endpoints
+      blocks:
+        - type: code
+          content: |
+            # Page Operations
+            GET    /pages/{page_id}                    # Retrieve page
+            POST   /pages                             # Create page
+            PATCH  /pages/{page_id}                   # Update page
+            
+            # Database Operations  
+            GET    /databases/{database_id}           # Retrieve database
+            POST   /databases/{database_id}/query     # Query database
+            POST   /databases                         # Create database
+            
+            # Block Operations
+            GET    /blocks/{block_id}/children        # Get block children
+            PATCH  /blocks/{block_id}/children        # Append block children
+    
+    - type: toggle
+      content: Rate Limiting and Error Handling
+      blocks:
+        - type: code
+          content: |
+            # Rate Limiting Implementation
+            import time
+            
+            def rate_limited_request(url, data=None, max_retries=3):
+                for attempt in range(max_retries):
+                    response = requests.post(url, headers=headers, json=data)
+                    
+                    if response.status_code == 429:  # Rate limited
+                        retry_after = int(response.headers.get('Retry-After', 2))
+                        time.sleep(retry_after)
+                        continue
+                        
+                    if response.status_code in [200, 201]:
+                        return response.json()
+                        
+                    time.sleep(2 ** attempt)  # Exponential backoff
+                
+                raise Exception(f"Request failed after {max_retries} attempts")
+    
+    - type: heading_2
+      content: Database Schema Reference
+    - type: toggle
+      content: Estate Analytics Database
+      blocks:
+        - type: code
+          content: |
+            # Estate Analytics Schema
+            {
+              "title": "Estate Analytics",
+              "properties": {
+                "Metric Name": {"title": {}},
+                "Current Value": {"number": {"format": "number"}},
+                "Target Value": {"number": {"format": "number"}},
+                "Progress %": {"formula": {"expression": "prop(\"Current Value\") / prop(\"Target Value\") * 100"}},
+                "Status": {"select": {"options": ["On Track", "Behind", "Complete", "At Risk"]}},
+                "Last Updated": {"last_edited_time": {}},
+                "Owner": {"people": {}},
+                "Category": {"select": {"options": ["Legal", "Financial", "Professional", "Family"]}}
+              }
+            }
+    
+    - type: toggle
+      content: Professional Coordination Database
+      blocks:
+        - type: code
+          content: |
+            # Professional Coordination Schema
+            {
+              "title": "Professional Coordination",
+              "properties": {
+                "Professional Name": {"title": {}},
+                "Service Type": {"select": {"options": ["Attorney", "CPA", "Financial Advisor", "Insurance Agent", "Funeral Director"]}},
+                "Contact Information": {"rich_text": {}},
+                "Phone": {"phone_number": {}},
+                "Email": {"email": {}},
+                "Firm/Company": {"rich_text": {}},
+                "Status": {"select": {"options": ["Active", "Inactive", "Pending", "Completed"]}},
+                "Last Contact Date": {"date": {}},
+                "Next Action Required": {"rich_text": {}},
+                "Notes": {"rich_text": {}}
+              }
+            }
+    
+    - type: heading_2
+      content: Integration Examples
+    - type: toggle
+      content: Python Integration Example
+      blocks:
+        - type: code
+          content: |
+            # Complete Estate Planning Integration
+            import requests
+            import json
+            from datetime import datetime
+            
+            class EstateAPIClient:
+                def __init__(self, token, parent_page_id):
+                    self.token = token
+                    self.parent_page_id = parent_page_id
+                    self.base_url = "https://api.notion.com/v1"
+                    self.headers = {
+                        "Authorization": f"Bearer {token}",
+                        "Notion-Version": "2025-09-03",
+                        "Content-Type": "application/json"
+                    }
+                
+                def create_task(self, title, description, priority="medium"):
+                    """Create a new estate planning task"""
+                    page_data = {
+                        "parent": {"page_id": self.parent_page_id},
+                        "properties": {
+                            "title": {"title": [{"text": {"content": title}}]}
+                        },
+                        "children": [{
+                            "object": "block",
+                            "type": "paragraph",
+                            "paragraph": {
+                                "rich_text": [{"text": {"content": description}}]
+                            }
+                        }]
+                    }
+                    
+                    response = requests.post(
+                        f"{self.base_url}/pages", 
+                        headers=self.headers, 
+                        json=page_data
+                    )
+                    return response.json()
+    
+    - type: heading_2
+      content: Best Practices for API Usage
+    - type: bulleted_list_item
+      content: "⚡ Rate Limiting: Always implement exponential backoff for 429 responses"
+    - type: bulleted_list_item
+      content: "🔒 Security: Never log API tokens or sensitive data in plain text"
+    - type: bulleted_list_item
+      content: "🔄 Idempotency: Use unique identifiers to prevent duplicate operations"
+    - type: bulleted_list_item
+      content: "📊 Error Handling: Implement comprehensive error handling and logging"
+    - type: bulleted_list_item
+      content: "💾 Data Validation: Validate all data before sending to API"
+    - type: bulleted_list_item
+      content: "🎯 Efficiency: Batch operations when possible to minimize API calls"
+
+- title: Video Production Scripts
+  parent: Family Hub
+  icon: emoji:🎬
+  description: Scripts and guidelines for educational video content
+  role: family
+  blocks:
+    - type: heading_1
+      content: 🎬 Educational Video Scripts
+    - type: paragraph
+      content: Professional scripts and production guidelines for creating comprehensive estate planning educational videos.
+    
+    - type: heading_2
+      content: Introduction Video Series (5 Videos)
+    - type: toggle
+      content: Video 1: Estate Planning System Overview (5 minutes)
+      blocks:
+        - type: paragraph
+          content: "Script outline for system introduction video:"
+        - type: callout
+          icon: emoji:🎬
+          content: "Opening: 'Welcome to your comprehensive estate planning system. In the next 5 minutes, you'll understand how this system protects your family's future.'"
+          color: blue_background
+        - type: bulleted_list_item
+          content: "0:00-1:00: Introduction and overview of three-hub architecture"
+        - type: bulleted_list_item
+          content: "1:00-2:30: Preparation Hub walkthrough and key features"
+        - type: bulleted_list_item
+          content: "2:30-3:30: Executor Hub overview and professional coordination"
+        - type: bulleted_list_item
+          content: "3:30-4:30: Family Hub introduction and accessibility features"
+        - type: bulleted_list_item
+          content: "4:30-5:00: Next steps and getting started guidance"
+    
+    - type: toggle
+      content: Video 2: Family Access and Roles (4 minutes)
+      blocks:
+        - type: paragraph
+          content: "Script for explaining family member access and responsibilities:"
+        - type: callout
+          icon: emoji:🎬
+          content: "Opening: 'Your family's role in estate planning is crucial. Let's explore how everyone can contribute and stay informed.'"
+          color: green_background
+        - type: bulleted_list_item
+          content: "0:00-1:00: Overview of family roles and access levels"
+        - type: bulleted_list_item
+          content: "1:00-2:00: How to access and navigate the Family Hub"
+        - type: bulleted_list_item
+          content: "2:00-3:00: Understanding progress updates and how to help"
+        - type: bulleted_list_item
+          content: "3:00-4:00: Communication tools and asking questions"
+    
+    - type: toggle
+      content: Video 3: Understanding Your Estate Plan (8 minutes)
+      blocks:
+        - type: paragraph
+          content: "Educational content about estate planning fundamentals:"
+        - type: callout
+          icon: emoji:🎬
+          content: "Opening: 'Estate planning isn't just about documents—it's about protecting the people you love. Here's what you need to know.'"
+          color: yellow_background
+        - type: bulleted_list_item
+          content: "0:00-2:00: What is estate planning and why it matters"
+        - type: bulleted_list_item
+          content: "2:00-4:00: Key documents explained (will, trust, power of attorney)"
+        - type: bulleted_list_item
+          content: "4:00-6:00: Professional team roles and how they help"
+        - type: bulleted_list_item
+          content: "6:00-8:00: Timeline expectations and next steps"
+    
+    - type: heading_2
+      content: Technical How-To Series (4 Videos)
+    - type: toggle
+      content: Video 4: Using the Progress Dashboard (3 minutes)
+      blocks:
+        - type: paragraph
+          content: "Technical walkthrough of progress tracking features:"
+        - type: bulleted_list_item
+          content: "0:00-0:30: Accessing the progress dashboard"
+        - type: bulleted_list_item
+          content: "0:30-1:30: Understanding progress bars and completion percentages"
+        - type: bulleted_list_item
+          content: "1:30-2:30: Using analytics and trend information"
+        - type: bulleted_list_item
+          content: "2:30-3:00: Customizing your progress view"
+    
+    - type: toggle
+      content: Video 5: Mobile Access and Notifications (4 minutes)
+      blocks:
+        - type: paragraph
+          content: "Guide to mobile features and notification management:"
+        - type: bulleted_list_item
+          content: "0:00-1:00: Accessing the system on mobile devices"
+        - type: bulleted_list_item
+          content: "1:00-2:30: Setting up and customizing notifications"
+        - type: bulleted_list_item
+          content: "2:30-3:30: Using mobile features for quick updates"
+        - type: bulleted_list_item
+          content: "3:30-4:00: Best practices for mobile estate planning management"
+    
+    - type: heading_2
+      content: Production Guidelines
+    - type: callout
+      icon: emoji:🎥
+      content: "Video Quality: 1080p minimum, professional lighting, clear audio"
+      color: blue_background
+    - type: callout
+      icon: emoji:♿
+      content: "Accessibility: Closed captions, audio descriptions, transcript provided"
+      color: green_background
+    - type: callout
+      icon: emoji:🌐
+      content: "Multi-language: Consider Spanish and French versions for international users"
+      color: yellow_background
+    - type: callout
+      icon: emoji:📱
+      content: "Mobile Optimization: Ensure videos display well on mobile devices"
+      color: purple_background
+    
+    - type: heading_2
+      content: Video Production Checklist
+    - type: bulleted_list_item
+      content: "☐ Script review and approval by estate planning professional"
+    - type: bulleted_list_item
+      content: "☐ Technical accuracy verification with system administrator"
+    - type: bulleted_list_item
+      content: "☐ Professional video production with quality audio"
+    - type: bulleted_list_item
+      content: "☐ Closed caption creation for accessibility compliance"
+    - type: bulleted_list_item
+      content: "☐ Mobile device testing and optimization"
+    - type: bulleted_list_item
+      content: "☐ Multi-language version planning and production timeline"

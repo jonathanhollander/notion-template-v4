@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+psycopg[binary]
+stripe
+requests
+jinja2
+notion-client
+qrcode[pil]

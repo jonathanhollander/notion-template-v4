@@ -1,0 +1,209 @@
+pages:
+- title: ⚙️ Admin / Rollout Cockpit
+  slug: admin-cockpit
+  type: page
+  audience: shared
+  is_admin: true
+  disclaimer: NONE
+  blocks:
+  - h1: Rollout Cockpit
+  - p: Temporary admin space for building and polishing. Delete this entire branch before shipping.
+  - callout: 'Progress: See the ''Rollout Tasks'' and ''Strings Audit'' views below.'
+  - divider: ''
+  - h2: Quick Links
+  - bulleted_list:
+    - '[Rollout Tasks](notion://link-to-db:rollout-tasks)'
+    - '[Assets Inventory](notion://link-to-db:assets-inventory)'
+    - '[View Recipes](notion://link-to-db:view-recipes)'
+    - '[Share Recipes](notion://link-to-db:share-recipes)'
+    - '[Strings Audit](notion://link-to-db:strings-audit)'
+    - '[Diagnostics](notion://slug/diagnostics)'
+  - divider: ''
+  - h2: Delete Before Shipment
+  - p: When everything is green, delete **Admin / Rollout** and all subpages.
+- title: Cleanup Notes (Delete Me)
+  slug: admin-cleanup
+  type: subpage
+  parent: admin-cockpit
+  is_admin: true
+  blocks:
+  - h3: Delete the entire Admin branch
+  - numbered_list:
+    - Select **Admin / Rollout Cockpit**.
+    - Shift-click to select all Admin subpages & databases.
+    - Right-click → Delete.
+    - Empty Trash.
+  - callout: Confirm Diagnostics is green **after** deleting Admin.
+db:
+  schemas:
+    rollout_tasks:
+      properties:
+        Title: title
+        Phase: select
+        Scope: multi_select
+        Priority: select
+        Status: select
+        Owner: rich_text
+        Related Page: rich_text
+        Notes: rich_text
+        Due: date
+        is_admin: checkbox
+    assets_inventory:
+      properties:
+        Item: title
+        Type: select
+        Source: url
+        Status: select
+        Notes: rich_text
+        is_admin: checkbox
+    view_recipes:
+      properties:
+        Page: title
+        Database: rich_text
+        View Name: rich_text
+        Filter: rich_text
+        Sort: rich_text
+        Layout: select
+        Show Properties: rich_text
+        Notes: rich_text
+        is_admin: checkbox
+    share_recipes:
+      properties:
+        Page: title
+        Who: rich_text
+        Permission: select
+        Steps: rich_text
+        Notes: rich_text
+        is_admin: checkbox
+    risks:
+      properties:
+        Risk: title
+        Severity: select
+        Status: select
+        Owner: rich_text
+        Notes: rich_text
+        is_admin: checkbox
+    change_log:
+      properties:
+        Change: title
+        When: date
+        Area: select
+        Notes: rich_text
+        is_admin: checkbox
+    questions:
+      properties:
+        Question: title
+        Owner: rich_text
+        Status: select
+        Notes: rich_text
+        is_admin: checkbox
+    strings_audit:
+      properties:
+        Page (slug): title
+        Needs Polish: select
+        Reviewer: rich_text
+        Notes: rich_text
+        is_admin: checkbox
+    qr_audit:
+      properties:
+        Target Page: title
+        Placeholder Present: select
+        Image Linked: select
+        Notes: rich_text
+        is_admin: checkbox
+    post_deploy_qa:
+      properties:
+        Check: title
+        Area: select
+        Status: select
+        Notes: rich_text
+        is_admin: checkbox
+  seeds:
+    rollout_tasks:
+    - Title: Create top-level pages
+      Phase: Build
+      Scope:
+      - Pages
+      Priority: P0
+      Status: Doing
+      Owner: You
+      Related Page: ALL
+      is_admin: true
+    - Title: Seed sample letters
+      Phase: Seed
+      Scope:
+      - DBs
+      - Strings
+      Priority: P1
+      Status: To Do
+      Owner: You
+      Related Page: letters-db
+      is_admin: true
+    - Title: Set icons/covers on key pages
+      Phase: Polish
+      Scope:
+      - Assets
+      Priority: P1
+      Status: To Do
+      Owner: You
+      Related Page: life-story, memories, family-view
+      is_admin: true
+    - Title: Create manual DB views
+      Phase: Polish
+      Scope:
+      - Views
+      Priority: P1
+      Status: To Do
+      Owner: You
+      Related Page: letters-db
+      is_admin: true
+    - Title: Run final diagnostics
+      Phase: QA
+      Scope:
+      - Pages
+      Priority: P0
+      Status: To Do
+      Owner: You
+      Related Page: diagnostics
+      is_admin: true
+    - Title: Delete Admin branch
+      Phase: Ship
+      Scope:
+      - Pages
+      Priority: P0
+      Status: To Do
+      Owner: You
+      Related Page: admin-cockpit
+      is_admin: true
+    assets_inventory:
+    - Item: life-story cover
+      Type: Cover
+      Source: ''
+      Status: Missing
+      is_admin: true
+    - Item: family-view icon
+      Type: Icon
+      Source: 👨‍👩‍👧‍👦
+      Status: Added
+      is_admin: true
+    view_recipes:
+    - Page: letters-db
+      Database: sample_letters
+      View Name: Family Announcements
+      Filter: Audience=Family AND Category=Family
+      Sort: Title A→Z
+      Layout: List
+      Show Properties: Title, Scenario
+      is_admin: true
+    share_recipes:
+    - Page: executor-quickstart
+      Who: Executor
+      Permission: Can view
+      Steps: Share page → Invite → Enter email → Set permission
+      is_admin: true
+    strings_audit:
+    - Page (slug): family-view
+      Needs Polish: 'Yes'
+      Reviewer: You
+      Notes: Tighten welcome to 2–3 sentences.
+      is_admin: true

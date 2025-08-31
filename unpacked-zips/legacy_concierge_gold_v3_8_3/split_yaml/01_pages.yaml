@@ -1,0 +1,6 @@
+
+pages:
+  - title: "Preparation Hub"
+    slug: "prep-hub"
+    icon: "🗂"
+    description: "Central hub for setup."

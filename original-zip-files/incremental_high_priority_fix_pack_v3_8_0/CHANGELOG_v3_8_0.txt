@@ -1,0 +1,17 @@
+Legacy Concierge v3.8.0 — High-Priority Fix Pack
+Date: 2025-08-30T08:16:51Z
+
+Fixes included (mapped to the 10-audit items):
+1) Asset handling: honors icon_file/cover_file with ASSET_BASE_URL and external icons/covers.
+2) Relation wiring: page indexed immediately; DB seeding consults Page Index for true relations.
+3) Hubs: insert explicit view placeholders + guidance (until Notion API supports saved views).
+4) Synced blocks: ensure library referenced in main flow; idempotency via structured markers.
+5) Letters content: ensure add_letter_legal_content() invoked in main flow.
+6) Rollups: database schema creation supports 'rollup' type (relation_property, rollup_property, function).
+7) Automated views: best-effort admin helper blocks with markers (no duplicates).
+8) Idempotency strengthening: exact structured markers instead of substring checks where possible.
+9) Navigation: add_nav_links() and add_mobile_tip() invoked in main.
+10) YAML consistency: slug persisted to Page Index; basic YAML validation warnings.
+
+Notes:
+- Saved Views and Linked DB embeds remain partially manual due to current Notion API limitations. Helper blocks and markers are inserted automatically to eliminate guesswork.

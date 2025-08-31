@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>My QR Codes</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="topbar">
+        <h1>My QR Codes</h1>
+        <div><a href="/logout">Log out</a></div>
+      </div>
+      <p>Credits remaining: <strong>{{ user.credits_remaining }}</strong></p>
+
+      <h2>Buy credits</h2>
+      <form method="post" action="/create-checkout-session" class="buttons">
+        <button type="submit" name="bundle" value="qr10">$9.99 → Add 10 QRs</button>
+        {% if not user.trial_redeemed %}
+        <button type="submit" name="bundle" value="trial20">$1 → 20 QRs (signup deal)</button>
+        {% else %}
+        <button type="button" disabled>Trial redeemed</button>
+        {% endif %}
+      </form>
+
+      <h2>Create a new QR</h2>
+      <form method="post" action="/qr/new">
+        <label>Label</label>
+        <input type="text" name="label" placeholder="Family Portal" required>
+        <label>Notion Page Link (copy link in Notion)</label>
+        <input type="url" name="target_url" placeholder="https://www.notion.so/..." required>
+        <label>Style</label>
+        <select name="style">
+          <option value="plain">Plain</option>
+          <option value="border">Border</option>
+          <option value="caption">Caption (adds label below)</option>
+        </select>
+        <label>Caption (used only if style = caption)</label>
+        <input type="text" name="caption" placeholder="Scan to open our Family Portal">
+        <button type="submit">Create QR</button>
+      </form>
+
+      <div class="row-between">
+        <h2>Your Saved QRs</h2>
+        <a class="button" href="/print-sheet.pdf">Download print sheet (PDF)</a>
+      </div>
+
+      <table>
+        <tr><th>Label</th><th>Created</th><th>Scans</th><th>QR</th><th>Links</th></tr>
+        {% for qr in qrs %}
+        <tr>
+          <td>{{ qr.label }}</td>
+          <td>{{ qr.created_at }}</td>
+          <td>{{ qr.scan_count }}</td>
+          <td>
+            <img src="/{{ qr.image_path_png }}" style="height:110px; display:block; margin-bottom:6px">
+            <div>
+              <a href="/qr/{{ qr.id }}.png" download>PNG</a> &middot;
+              <a href="/qr/{{ qr.id }}.svg" download>SVG</a>
+            </div>
+          </td>
+          <td>
+            <div><a href="/r/{{ qr.id }}" target="_blank">Short link</a></div>
+            <small>/r/{{ qr.id }}</small>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </body>
+</html>

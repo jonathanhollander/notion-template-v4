@@ -1,0 +1,20 @@
+pages:
+- title: ⚙️ Admin / Rollout Cockpit
+  slug: admin-cockpit
+  type: page
+  audience: shared
+  is_admin: true
+  blocks:
+  - callout: ⚠️ Admin only. Delete this branch before sharing.
+  - p: Temporary space for building and polishing.
+- title: Cleanup Notes (Delete Me)
+  slug: admin-cleanup
+  type: subpage
+  parent: admin-cockpit
+  is_admin: true
+  blocks:
+  - numbered_list:
+    - Select Admin / Rollout Cockpit.
+    - Select all Admin subpages & databases.
+    - Delete.
+    - Empty Trash.

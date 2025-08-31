@@ -1,0 +1,642 @@
+globals:
+  constants:
+    OWNER_NAME: '[]'
+    EXECUTOR_NAME: '[]'
+    CITY: '[]'
+    LAWYER_NAME: '[]'
+  icons_map:
+    home: 🏠
+    family-view: 👨‍👩‍👧‍👦
+    executor-view: 🧭
+    essentials: 📁
+    life-story: 📖
+  covers_map: {}
+  strings:
+    caution_notes:
+      legal: This template and the sample content are for organizational purposes only. They are not legal, financial, or medical advice.
+      letter: This is a sample letter. Update details to fit your circumstances. It is not legal advice.
+    pages:
+      home:
+        header: Home / Welcome
+        description: This page offers a helpful overview and links related to “Home / Welcome.”
+        owner_instructions: '[#INSTR][#COUNT 1/61] Add what’s relevant on this page (“Home / Welcome”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Home / Welcome.” Reference any tables or lists above.
+        disclaimer: NONE
+      map:
+        header: Template Map (All Pages Index)
+        description: This page offers a helpful overview and links related to “Template Map (All Pages Index).”
+        owner_instructions: '[#INSTR][#COUNT 2/61] Add what’s relevant on this page (“Template Map (All Pages Index)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Template Map (All Pages Index).” Reference any tables or lists above.
+        disclaimer: NONE
+      peace-of-mind:
+        header: Peace of Mind Overview
+        description: This page offers a helpful overview and links related to “Peace of Mind Overview.”
+        owner_instructions: '[#INSTR][#COUNT 3/61] Add what’s relevant on this page (“Peace of Mind Overview”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Peace of Mind Overview.” Reference any tables or lists above.
+        disclaimer: NONE
+      essentials:
+        header: Important Documents & Essentials
+        description: This page gives a calm, practical outline for the executor to follow for “Important Documents & Essentials.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 4/61] Add what’s relevant on this page (“Important Documents & Essentials”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Important Documents & Essentials.” Reference any tables or lists above.
+        disclaimer: NONE
+      executors-contacts:
+        header: Executors & Key Contacts
+        description: This page gives a calm, practical outline for the executor to follow for “Executors & Key Contacts.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 5/61] Add what’s relevant on this page (“Executors & Key Contacts”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Executors & Key Contacts.” Reference any tables or lists above.
+        disclaimer: NONE
+      financial-accounts:
+        header: Financial Accounts Index
+        description: This page gives a calm, practical outline for the executor to follow for “Financial Accounts Index.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 6/61] Add what’s relevant on this page (“Financial Accounts Index”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Financial Accounts Index.” Reference any tables or lists above.
+        disclaimer: NONE
+      insurance:
+        header: Insurance Policies Index
+        description: This page gives a calm, practical outline for the executor to follow for “Insurance Policies Index.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 7/61] Add what’s relevant on this page (“Insurance Policies Index”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Insurance Policies Index.” Reference any tables or lists above.
+        disclaimer: NONE
+      taxes:
+        header: Taxes & Documents Checklist
+        description: This page gives a calm, practical outline for the executor to follow for “Taxes & Documents Checklist.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 8/61] Add what’s relevant on this page (“Taxes & Documents Checklist”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Taxes & Documents Checklist.” Reference any tables or lists above.
+        disclaimer: NONE
+      business:
+        header: Business Interests / LLCs
+        description: This page gives a calm, practical outline for the executor to follow for “Business Interests / LLCs.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 9/61] Add what’s relevant on this page (“Business Interests / LLCs”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Business Interests / LLCs.” Reference any tables or lists above.
+        disclaimer: NONE
+      property:
+        header: Property & Inventory
+        description: This page gives a calm, practical outline for the executor to follow for “Property & Inventory.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 10/61] Add what’s relevant on this page (“Property & Inventory”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Property & Inventory.” Reference any tables or lists above.
+        disclaimer: NONE
+      vehicles:
+        header: Vehicles & Titles
+        description: This page gives a calm, practical outline for the executor to follow for “Vehicles & Titles.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 11/61] Add what’s relevant on this page (“Vehicles & Titles”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Vehicles & Titles.” Reference any tables or lists above.
+        disclaimer: NONE
+      keepsakes:
+        header: Keepsakes & Gifts
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Keepsakes & Gifts.”
+        owner_instructions: '[#INSTR][#COUNT 12/61] Add what’s relevant on this page (“Keepsakes & Gifts”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Keepsakes & Gifts.” Reference any tables or lists above.
+        disclaimer: NONE
+      digital-legacy:
+        header: Digital Legacy
+        description: This page gives a calm, practical outline for the executor to follow for “Digital Legacy.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 13/61] Add what’s relevant on this page (“Digital Legacy”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Digital Legacy.” Reference any tables or lists above.
+        disclaimer: NONE
+      devices:
+        header: Devices & Access (Non-secret pointers)
+        description: This page gives a calm, practical outline for the executor to follow for “Devices & Access (Non-secret pointers).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 14/61] Add what’s relevant on this page (“Devices & Access (Non-secret pointers)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Devices & Access (Non-secret pointers).” Reference any tables or lists above.
+        disclaimer: NONE
+      executor-quickstart:
+        header: Executor QuickStart (One-Pager)
+        description: This page gives a calm, practical outline for the executor to follow for “Executor QuickStart (One-Pager).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 15/61] Add what’s relevant on this page (“Executor QuickStart (One-Pager)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Executor QuickStart (One-Pager).” Reference any tables or lists above.
+        disclaimer: NONE
+      executor-card:
+        header: Executor Contact Card
+        description: This page gives a calm, practical outline for the executor to follow for “Executor Contact Card.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 16/61] Add what’s relevant on this page (“Executor Contact Card”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Executor Contact Card.” Reference any tables or lists above.
+        disclaimer: NONE
+      executor-view:
+        header: Executor View (Dashboard)
+        description: This page gives a calm, practical outline for the executor to follow for “Executor View (Dashboard).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 17/61] Add what’s relevant on this page (“Executor View (Dashboard)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Executor View (Dashboard).” Reference any tables or lists above.
+        disclaimer: NONE
+      family-view:
+        header: Family View (Dashboard)
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Family View (Dashboard).”
+        owner_instructions: '[#INSTR][#COUNT 18/61] Add what’s relevant on this page (“Family View (Dashboard)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Family View (Dashboard).” Reference any tables or lists above.
+        disclaimer: NONE
+      memories:
+        header: Memories & Letters
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Memories & Letters.”
+        owner_instructions: '[#INSTR][#COUNT 19/61] Add what’s relevant on this page (“Memories & Letters”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Memories & Letters.” Reference any tables or lists above.
+        disclaimer: LETTER
+      photos:
+        header: Memories — Photo Albums (Gallery)
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Memories — Photo Albums (Gallery).”
+        owner_instructions: '[#INSTR][#COUNT 20/61] Add what’s relevant on this page (“Memories — Photo Albums (Gallery)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Memories — Photo Albums (Gallery).” Reference any tables or lists above.
+        disclaimer: NONE
+      letters-index:
+        header: Memories — Letters Index
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Memories — Letters Index.”
+        owner_instructions: '[#INSTR][#COUNT 21/61] Add what’s relevant on this page (“Memories — Letters Index”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Memories — Letters Index.” Reference any tables or lists above.
+        disclaimer: LETTER
+      life-story:
+        header: Life Story & Guidance
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Life Story & Guidance.”
+        owner_instructions: '[#INSTR][#COUNT 22/61] Add what’s relevant on this page (“Life Story & Guidance”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Life Story & Guidance.” Reference any tables or lists above.
+        disclaimer: NONE
+      grief-support:
+        header: Grief Support Resources
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Grief Support Resources.”
+        owner_instructions: '[#INSTR][#COUNT 23/61] Add what’s relevant on this page (“Grief Support Resources”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Grief Support Resources.” Reference any tables or lists above.
+        disclaimer: NONE
+      family-faq:
+        header: Family FAQ / Getting Started
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Family FAQ / Getting Started.”
+        owner_instructions: '[#INSTR][#COUNT 24/61] Add what’s relevant on this page (“Family FAQ / Getting Started”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Family FAQ / Getting Started.” Reference any tables or lists above.
+        disclaimer: NONE
+      medical:
+        header: Medical & Healthcare Preferences
+        description: This page gives a calm, practical outline for the executor to follow for “Medical & Healthcare Preferences.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 25/61] Add what’s relevant on this page (“Medical & Healthcare Preferences”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Medical & Healthcare Preferences.” Reference any tables or lists above.
+        disclaimer: LEGAL
+      living-will:
+        header: Living Will / Advance Care Directives
+        description: This page gives a calm, practical outline for the executor to follow for “Living Will / Advance Care Directives.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 26/61] Add what’s relevant on this page (“Living Will / Advance Care Directives”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Living Will / Advance Care Directives.” Reference any tables or lists above.
+        disclaimer: LEGAL
+      donation-wishes:
+        header: Donation & Personal Wishes
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Donation & Personal Wishes.”
+        owner_instructions: '[#INSTR][#COUNT 27/61] Add what’s relevant on this page (“Donation & Personal Wishes”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Donation & Personal Wishes.” Reference any tables or lists above.
+        disclaimer: NONE
+      notifications:
+        header: Notifications Plan
+        description: This page gives a calm, practical outline for the executor to follow for “Notifications Plan.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 28/61] Add what’s relevant on this page (“Notifications Plan”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Notifications Plan.” Reference any tables or lists above.
+        disclaimer: NONE
+      letters-db:
+        header: Sample Letters Library (DB parent view)
+        description: This page offers a helpful overview and links related to “Sample Letters Library (DB parent view).”
+        owner_instructions: '[#INSTR][#COUNT 29/61] Add what’s relevant on this page (“Sample Letters Library (DB parent view)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Sample Letters Library (DB parent view).” Reference any tables or lists above.
+        disclaimer: LETTER
+      qr-reference:
+        header: QR Codes Reference
+        description: This page offers a helpful overview and links related to “QR Codes Reference.”
+        owner_instructions: '[#INSTR][#COUNT 30/61] Add what’s relevant on this page (“QR Codes Reference”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “QR Codes Reference.” Reference any tables or lists above.
+        disclaimer: NONE
+      qr-print:
+        header: QR Card Printables (How-To)
+        description: This page gives a calm, practical outline for the executor to follow for “QR Card Printables (How-To).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 31/61] Add what’s relevant on this page (“QR Card Printables (How-To)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “QR Card Printables (How-To).” Reference any tables or lists above.
+        disclaimer: NONE
+      qr-packages:
+        header: QR Packages (Reference)
+        description: This page offers a helpful overview and links related to “QR Packages (Reference).”
+        owner_instructions: '[#INSTR][#COUNT 32/61] Add what’s relevant on this page (“QR Packages (Reference)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “QR Packages (Reference).” Reference any tables or lists above.
+        disclaimer: NONE
+      qr-letters:
+        header: QR Distribution Letters
+        description: This page gives a calm, practical outline for the executor to follow for “QR Distribution Letters.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 33/61] Add what’s relevant on this page (“QR Distribution Letters”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “QR Distribution Letters.” Reference any tables or lists above.
+        disclaimer: LETTER
+      prompts-letters:
+        header: Prompt Library — Letters & Stories
+        description: This page offers a helpful overview and links related to “Prompt Library — Letters & Stories.”
+        owner_instructions: '[#INSTR][#COUNT 34/61] Add what’s relevant on this page (“Prompt Library — Letters & Stories”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Prompt Library — Letters & Stories.” Reference any tables or lists above.
+        disclaimer: LETTER
+      prompts-tribute:
+        header: Prompt Library — Life Story & Tribute
+        description: This page offers a helpful overview and links related to “Prompt Library — Life Story & Tribute.”
+        owner_instructions: '[#INSTR][#COUNT 35/61] Add what’s relevant on this page (“Prompt Library — Life Story & Tribute”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Prompt Library — Life Story & Tribute.” Reference any tables or lists above.
+        disclaimer: NONE
+      prompts-executor:
+        header: Prompt Library — Executor & Summary Aids
+        description: This page offers a helpful overview and links related to “Prompt Library — Executor & Summary Aids.”
+        owner_instructions: '[#INSTR][#COUNT 36/61] Add what’s relevant on this page (“Prompt Library — Executor & Summary Aids”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Prompt Library — Executor & Summary Aids.” Reference any tables or lists above.
+        disclaimer: NONE
+      prompts-rewrite:
+        header: Prompt Library — Combine & Rewrite
+        description: This page offers a helpful overview and links related to “Prompt Library — Combine & Rewrite.”
+        owner_instructions: '[#INSTR][#COUNT 37/61] Add what’s relevant on this page (“Prompt Library — Combine & Rewrite”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Prompt Library — Combine & Rewrite.” Reference any tables or lists above.
+        disclaimer: NONE
+      prompts-translate:
+        header: Prompt Library — Translate
+        description: This page offers a helpful overview and links related to “Prompt Library — Translate.”
+        owner_instructions: '[#INSTR][#COUNT 38/61] Add what’s relevant on this page (“Prompt Library — Translate”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Prompt Library — Translate.” Reference any tables or lists above.
+        disclaimer: NONE
+      flow-process:
+        header: Process Flow (Mermaid)
+        description: This page gives a calm, practical outline for the executor to follow for “Process Flow (Mermaid).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 39/61] Add what’s relevant on this page (“Process Flow (Mermaid)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Process Flow (Mermaid).” Reference any tables or lists above.
+        disclaimer: NONE
+      flow-contacts:
+        header: Contacts & Roles Map (Mermaid)
+        description: This page gives a calm, practical outline for the executor to follow for “Contacts & Roles Map (Mermaid).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 40/61] Add what’s relevant on this page (“Contacts & Roles Map (Mermaid)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Contacts & Roles Map (Mermaid).” Reference any tables or lists above.
+        disclaimer: NONE
+      flow-activation:
+        header: Executor Activation Flow (Mermaid)
+        description: This page gives a calm, practical outline for the executor to follow for “Executor Activation Flow (Mermaid).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 41/61] Add what’s relevant on this page (“Executor Activation Flow (Mermaid)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Executor Activation Flow (Mermaid).” Reference any tables or lists above.
+        disclaimer: NONE
+      guidance:
+        header: Guidance Library (Resources)
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Guidance Library (Resources).”
+        owner_instructions: '[#INSTR][#COUNT 42/61] Add what’s relevant on this page (“Guidance Library (Resources)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Guidance Library (Resources).” Reference any tables or lists above.
+        disclaimer: NONE
+      tone:
+        header: Copy & Tone Guide
+        description: This page offers a helpful overview and links related to “Copy & Tone Guide.”
+        owner_instructions: '[#INSTR][#COUNT 43/61] Add what’s relevant on this page (“Copy & Tone Guide”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Copy & Tone Guide.” Reference any tables or lists above.
+        disclaimer: NONE
+      disclaimer:
+        header: Legal Disclaimer (Standalone Page)
+        description: This page offers a helpful overview and links related to “Legal Disclaimer (Standalone Page).”
+        owner_instructions: '[#INSTR][#COUNT 44/61] Add what’s relevant on this page (“Legal Disclaimer (Standalone Page)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Legal Disclaimer (Standalone Page).” Reference any tables or lists above.
+        disclaimer: LEGAL
+      diagnostics:
+        header: Diagnostics
+        description: This page offers a helpful overview and links related to “Diagnostics.”
+        owner_instructions: '[#INSTR][#COUNT 45/61] Add what’s relevant on this page (“Diagnostics”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Diagnostics.” Reference any tables or lists above.
+        disclaimer: NONE
+      tracker:
+        header: Build Tracker (DB)
+        description: This page offers a helpful overview and links related to “Build Tracker (DB).”
+        owner_instructions: '[#INSTR][#COUNT 46/61] Add what’s relevant on this page (“Build Tracker (DB)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Build Tracker (DB).” Reference any tables or lists above.
+        disclaimer: NONE
+      finishing:
+        header: Manual Finishing Tasks
+        description: This page offers a helpful overview and links related to “Manual Finishing Tasks.”
+        owner_instructions: '[#INSTR][#COUNT 47/61] Add what’s relevant on this page (“Manual Finishing Tasks”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Manual Finishing Tasks.” Reference any tables or lists above.
+        disclaimer: NONE
+      dev-notes:
+        header: Developer Notes / Version & Changelog
+        description: This page offers a helpful overview and links related to “Developer Notes / Version & Changelog.”
+        owner_instructions: '[#INSTR][#COUNT 48/61] Add what’s relevant on this page (“Developer Notes / Version & Changelog”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Developer Notes / Version & Changelog.” Reference any tables or lists above.
+        disclaimer: NONE
+      recovery:
+        header: System Check / Recovery Report
+        description: This page offers a helpful overview and links related to “System Check / Recovery Report.”
+        owner_instructions: '[#INSTR][#COUNT 49/61] Add what’s relevant on this page (“System Check / Recovery Report”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “System Check / Recovery Report.” Reference any tables or lists above.
+        disclaimer: NONE
+      encouragements:
+        header: Encouragements
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Encouragements.”
+        owner_instructions: '[#INSTR][#COUNT 50/61] Add what’s relevant on this page (“Encouragements”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Encouragements.” Reference any tables or lists above.
+        disclaimer: NONE
+      icons-headers:
+        header: Icons & Headers Library
+        description: This page offers a helpful overview and links related to “Icons & Headers Library.”
+        owner_instructions: '[#INSTR][#COUNT 51/61] Add what’s relevant on this page (“Icons & Headers Library”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Icons & Headers Library.” Reference any tables or lists above.
+        disclaimer: NONE
+      mobile-test:
+        header: Mobile Test Checklist
+        description: This page offers a helpful overview and links related to “Mobile Test Checklist.”
+        owner_instructions: '[#INSTR][#COUNT 52/61] Add what’s relevant on this page (“Mobile Test Checklist”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Mobile Test Checklist.” Reference any tables or lists above.
+        disclaimer: NONE
+      letters-family-view:
+        header: Memories — Letters (Family Library View)
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Memories — Letters (Family Library View).”
+        owner_instructions: '[#INSTR][#COUNT 53/61] Add what’s relevant on this page (“Memories — Letters (Family Library View)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Memories — Letters (Family Library View).” Reference any tables or lists above.
+        disclaimer: LETTER
+      letters-brokerage-view:
+        header: Brokerage Letters (Library View)
+        description: This page gives a calm, practical outline for the executor to follow for “Brokerage Letters (Library View).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 54/61] Add what’s relevant on this page (“Brokerage Letters (Library View)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Brokerage Letters (Library View).” Reference any tables or lists above.
+        disclaimer: LETTER
+      letters-bank-view:
+        header: Bank Letters (Library View)
+        description: This page gives a calm, practical outline for the executor to follow for “Bank Letters (Library View).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 55/61] Add what’s relevant on this page (“Bank Letters (Library View)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Bank Letters (Library View).” Reference any tables or lists above.
+        disclaimer: LETTER
+      letters-insurance-view:
+        header: Insurance Letters (Library View)
+        description: This page gives a calm, practical outline for the executor to follow for “Insurance Letters (Library View).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 56/61] Add what’s relevant on this page (“Insurance Letters (Library View)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Insurance Letters (Library View).” Reference any tables or lists above.
+        disclaimer: LETTER
+      letters-utilities-view:
+        header: Utilities Letters (Library View)
+        description: This page gives a calm, practical outline for the executor to follow for “Utilities Letters (Library View).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 57/61] Add what’s relevant on this page (“Utilities Letters (Library View)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Utilities Letters (Library View).” Reference any tables or lists above.
+        disclaimer: LETTER
+      letters-community-view:
+        header: Community Letters (Library View)
+        description: This page gives a calm, practical outline for the executor to follow for “Community Letters (Library View).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 58/61] Add what’s relevant on this page (“Community Letters (Library View)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Community Letters (Library View).” Reference any tables or lists above.
+        disclaimer: LETTER
+      letters-executor-view:
+        header: Executor Letters (Library View)
+        description: This page gives a calm, practical outline for the executor to follow for “Executor Letters (Library View).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 59/61] Add what’s relevant on this page (“Executor Letters (Library View)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Executor Letters (Library View).” Reference any tables or lists above.
+        disclaimer: LETTER
+      letters-family-announcements-view:
+        header: Family Letters (Library View)
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Family Letters (Library View).”
+        owner_instructions: '[#INSTR][#COUNT 60/61] Add what’s relevant on this page (“Family Letters (Library View)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Family Letters (Library View).” Reference any tables or lists above.
+        disclaimer: LETTER
+      photos-captions-helper:
+        header: Photo Captions Helper
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Photo Captions Helper.”
+        owner_instructions: '[#INSTR][#COUNT 61/61] Add what’s relevant on this page (“Photo Captions Helper”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Photo Captions Helper.” Reference any tables or lists above.
+        disclaimer: NONE
+      essentials-sample-doc-summary:
+        header: Sample Document Summary (Not Legal)
+        description: This page gives a calm, practical outline for the executor to follow for “Sample Document Summary (Not Legal).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 4/61] Add what’s relevant on this page (“Sample Document Summary (Not Legal)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Sample Document Summary (Not Legal).” Reference any tables or lists above.
+        disclaimer: LEGAL
+      essentials-where-things-are:
+        header: Sample “Where Things Are” Note (Not Legal)
+        description: This page gives a calm, practical outline for the executor to follow for “Sample “Where Things Are” Note (Not Legal).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 4/61] Add what’s relevant on this page (“Sample “Where Things Are” Note (Not Legal)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Sample “Where Things Are” Note (Not Legal).” Reference any tables or lists above.
+        disclaimer: LEGAL
+      executors-note:
+        header: Sample Executors Note (Not Legal)
+        description: This page gives a calm, practical outline for the executor to follow for “Sample Executors Note (Not Legal).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 5/61] Add what’s relevant on this page (“Sample Executors Note (Not Legal)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Sample Executors Note (Not Legal).” Reference any tables or lists above.
+        disclaimer: LEGAL
+      financial-accounts-sample:
+        header: Sample Accounts Overview (Not Legal)
+        description: This page gives a calm, practical outline for the executor to follow for “Sample Accounts Overview (Not Legal).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 6/61] Add what’s relevant on this page (“Sample Accounts Overview (Not Legal)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Sample Accounts Overview (Not Legal).” Reference any tables or lists above.
+        disclaimer: LEGAL
+      letter-bank:
+        header: Bank Notification Letter
+        description: This page gives a calm, practical outline for the executor to follow for “Bank Notification Letter.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 6/61] Add what’s relevant on this page (“Bank Notification Letter”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Bank Notification Letter.” Reference any tables or lists above.
+        disclaimer: LETTER
+      letter-card:
+        header: Credit Card Company Letter
+        description: This page gives a calm, practical outline for the executor to follow for “Credit Card Company Letter.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 6/61] Add what’s relevant on this page (“Credit Card Company Letter”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Credit Card Company Letter.” Reference any tables or lists above.
+        disclaimer: LETTER
+      letter-brokerage:
+        header: Brokerage / Investment Firm Letter
+        description: This page gives a calm, practical outline for the executor to follow for “Brokerage / Investment Firm Letter.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 6/61] Add what’s relevant on this page (“Brokerage / Investment Firm Letter”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Brokerage / Investment Firm Letter.” Reference any tables or lists above.
+        disclaimer: LETTER
+      insurance-sample:
+        header: Sample Policy Overview (Not Legal)
+        description: This page gives a calm, practical outline for the executor to follow for “Sample Policy Overview (Not Legal).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 7/61] Add what’s relevant on this page (“Sample Policy Overview (Not Legal)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Sample Policy Overview (Not Legal).” Reference any tables or lists above.
+        disclaimer: LEGAL
+      letter-insurance:
+        header: Insurance Carrier Letter
+        description: This page gives a calm, practical outline for the executor to follow for “Insurance Carrier Letter.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 7/61] Add what’s relevant on this page (“Insurance Carrier Letter”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Insurance Carrier Letter.” Reference any tables or lists above.
+        disclaimer: LETTER
+      taxes-sample:
+        header: Sample Tax Prep Packet (Not Legal)
+        description: This page gives a calm, practical outline for the executor to follow for “Sample Tax Prep Packet (Not Legal).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 8/61] Add what’s relevant on this page (“Sample Tax Prep Packet (Not Legal)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Sample Tax Prep Packet (Not Legal).” Reference any tables or lists above.
+        disclaimer: LEGAL
+      letter-tax:
+        header: Tax Notification Letter
+        description: This page gives a calm, practical outline for the executor to follow for “Tax Notification Letter.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 8/61] Add what’s relevant on this page (“Tax Notification Letter”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Tax Notification Letter.” Reference any tables or lists above.
+        disclaimer: LETTER
+      business-handover:
+        header: Sample Business Handover Note (Not Legal)
+        description: This page gives a calm, practical outline for the executor to follow for “Sample Business Handover Note (Not Legal).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 9/61] Add what’s relevant on this page (“Sample Business Handover Note (Not Legal)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Sample Business Handover Note (Not Legal).” Reference any tables or lists above.
+        disclaimer: LEGAL
+      property-inventory-note:
+        header: Sample Inventory Note (Not Legal)
+        description: This page gives a calm, practical outline for the executor to follow for “Sample Inventory Note (Not Legal).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 10/61] Add what’s relevant on this page (“Sample Inventory Note (Not Legal)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Sample Inventory Note (Not Legal).” Reference any tables or lists above.
+        disclaimer: LEGAL
+      vehicles-sample:
+        header: Sample Vehicle Note (Not Legal)
+        description: This page gives a calm, practical outline for the executor to follow for “Sample Vehicle Note (Not Legal).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 11/61] Add what’s relevant on this page (“Sample Vehicle Note (Not Legal)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Sample Vehicle Note (Not Legal).” Reference any tables or lists above.
+        disclaimer: LEGAL
+      keepsakes-sample:
+        header: Sample Keepsakes Sharing Note (Not Legal)
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Sample Keepsakes Sharing Note (Not Legal).”
+        owner_instructions: '[#INSTR][#COUNT 12/61] Add what’s relevant on this page (“Sample Keepsakes Sharing Note (Not Legal)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Sample Keepsakes Sharing Note (Not Legal).” Reference any tables or lists above.
+        disclaimer: LEGAL
+      devices-sample:
+        header: Sample Device Inventory Note (Not Legal)
+        description: This page gives a calm, practical outline for the executor to follow for “Sample Device Inventory Note (Not Legal).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 14/61] Add what’s relevant on this page (“Sample Device Inventory Note (Not Legal)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Sample Device Inventory Note (Not Legal).” Reference any tables or lists above.
+        disclaimer: LEGAL
+      executor-orientation:
+        header: Sample Executor Orientation Note (Not Legal)
+        description: This page gives a calm, practical outline for the executor to follow for “Sample Executor Orientation Note (Not Legal).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 15/61] Add what’s relevant on this page (“Sample Executor Orientation Note (Not Legal)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Sample Executor Orientation Note (Not Legal).” Reference any tables or lists above.
+        disclaimer: LEGAL
+      letter-executor:
+        header: Executor Notification Letter
+        description: This page gives a calm, practical outline for the executor to follow for “Executor Notification Letter.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 15/61] Add what’s relevant on this page (“Executor Notification Letter”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Executor Notification Letter.” Reference any tables or lists above.
+        disclaimer: LETTER
+      executor-card-sample:
+        header: Sample Contact Card Layout (Not Legal)
+        description: This page gives a calm, practical outline for the executor to follow for “Sample Contact Card Layout (Not Legal).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 16/61] Add what’s relevant on this page (“Sample Contact Card Layout (Not Legal)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Sample Contact Card Layout (Not Legal).” Reference any tables or lists above.
+        disclaimer: LEGAL
+      letter-family:
+        header: Family Announcement Letter
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Family Announcement Letter.”
+        owner_instructions: '[#INSTR][#COUNT 18/61] Add what’s relevant on this page (“Family Announcement Letter”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Family Announcement Letter.” Reference any tables or lists above.
+        disclaimer: LETTER
+      memories-sample:
+        header: Seeded Sample Memory Note (Not Legal)
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Seeded Sample Memory Note (Not Legal).”
+        owner_instructions: '[#INSTR][#COUNT 19/61] Add what’s relevant on this page (“Seeded Sample Memory Note (Not Legal)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Seeded Sample Memory Note (Not Legal).” Reference any tables or lists above.
+        disclaimer: NONE
+      life-story-sample:
+        header: Sample Life Story Note (Not Legal)
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Sample Life Story Note (Not Legal).”
+        owner_instructions: '[#INSTR][#COUNT 22/61] Add what’s relevant on this page (“Sample Life Story Note (Not Legal)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Sample Life Story Note (Not Legal).” Reference any tables or lists above.
+        disclaimer: LEGAL
+      letter-death-notice:
+        header: Short Death Notice / Newspaper Letter
+        description: This page gives a calm, practical outline for the executor to follow for “Short Death Notice / Newspaper Letter.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 22/61] Add what’s relevant on this page (“Short Death Notice / Newspaper Letter”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Short Death Notice / Newspaper Letter.” Reference any tables or lists above.
+        disclaimer: LETTER
+      grief-support-sample:
+        header: Sample Resource Sheet (Not Legal)
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Sample Resource Sheet (Not Legal).”
+        owner_instructions: '[#INSTR][#COUNT 23/61] Add what’s relevant on this page (“Sample Resource Sheet (Not Legal)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Sample Resource Sheet (Not Legal).” Reference any tables or lists above.
+        disclaimer: LEGAL
+      family-faq-sample:
+        header: Sample FAQ Note (Not Legal)
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Sample FAQ Note (Not Legal).”
+        owner_instructions: '[#INSTR][#COUNT 24/61] Add what’s relevant on this page (“Sample FAQ Note (Not Legal)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Sample FAQ Note (Not Legal).” Reference any tables or lists above.
+        disclaimer: LEGAL
+      letter-thanks:
+        header: Sympathy / Thank-You Letter
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Sympathy / Thank-You Letter.”
+        owner_instructions: '[#INSTR][#COUNT 24/61] Add what’s relevant on this page (“Sympathy / Thank-You Letter”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Sympathy / Thank-You Letter.” Reference any tables or lists above.
+        disclaimer: LETTER
+      medical-sample:
+        header: Sample Healthcare Preferences Note (Not Legal)
+        description: This page gives a calm, practical outline for the executor to follow for “Sample Healthcare Preferences Note (Not Legal).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 25/61] Add what’s relevant on this page (“Sample Healthcare Preferences Note (Not Legal)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Sample Healthcare Preferences Note (Not Legal).” Reference any tables or lists above.
+        disclaimer: LEGAL
+      living-will-sample:
+        header: Sample Advance Care Note (Not Legal)
+        description: This page gives a calm, practical outline for the executor to follow for “Sample Advance Care Note (Not Legal).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 26/61] Add what’s relevant on this page (“Sample Advance Care Note (Not Legal)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Sample Advance Care Note (Not Legal).” Reference any tables or lists above.
+        disclaimer: LEGAL
+      donation-wishes-sample:
+        header: Sample Donation & Personal Wishes Note (Not Legal)
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Sample Donation & Personal Wishes Note (Not Legal).”
+        owner_instructions: '[#INSTR][#COUNT 27/61] Add what’s relevant on this page (“Sample Donation & Personal Wishes Note (Not Legal)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Sample Donation & Personal Wishes Note (Not Legal).” Reference any tables or lists above.
+        disclaimer: LEGAL
+      notifications-scripts:
+        header: Sample Notification Scripts (Not Legal)
+        description: This page gives a calm, practical outline for the executor to follow for “Sample Notification Scripts (Not Legal).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 28/61] Add what’s relevant on this page (“Sample Notification Scripts (Not Legal)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Sample Notification Scripts (Not Legal).” Reference any tables or lists above.
+        disclaimer: LEGAL
+      letter-employer:
+        header: Employer Notification Letter
+        description: This page gives a calm, practical outline for the executor to follow for “Employer Notification Letter.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 28/61] Add what’s relevant on this page (“Employer Notification Letter”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Employer Notification Letter.” Reference any tables or lists above.
+        disclaimer: LETTER
+      letter-community:
+        header: Community / Social Group Letter
+        description: This page gives a calm, practical outline for the executor to follow for “Community / Social Group Letter.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 28/61] Add what’s relevant on this page (“Community / Social Group Letter”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Community / Social Group Letter.” Reference any tables or lists above.
+        disclaimer: LETTER
+      letter-thanks-db:
+        header: Sympathy / Thank You (Library view)
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Sympathy / Thank You (Library view).”
+        owner_instructions: '[#INSTR][#COUNT 29/61] Add what’s relevant on this page (“Sympathy / Thank You (Library view)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Sympathy / Thank You (Library view).” Reference any tables or lists above.
+        disclaimer: LETTER
+      letter-lawyer:
+        header: Lawyer Notification Letter
+        description: This page gives a calm, practical outline for the executor to follow for “Lawyer Notification Letter.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 29/61] Add what’s relevant on this page (“Lawyer Notification Letter”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Lawyer Notification Letter.” Reference any tables or lists above.
+        disclaimer: LETTER
+      letter-utility:
+        header: Utility Company Letter
+        description: This page gives a calm, practical outline for the executor to follow for “Utility Company Letter.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 29/61] Add what’s relevant on this page (“Utility Company Letter”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Utility Company Letter.” Reference any tables or lists above.
+        disclaimer: LETTER
+      qr-letter-pack-one:
+        header: QR Distribution Letter — Pack One
+        description: This page gives a calm, practical outline for the executor to follow for “QR Distribution Letter — Pack One.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 33/61] Add what’s relevant on this page (“QR Distribution Letter — Pack One”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “QR Distribution Letter — Pack One.” Reference any tables or lists above.
+        disclaimer: LETTER
+      qr-letter-pack-two:
+        header: QR Distribution Letter — Pack Two
+        description: This page gives a calm, practical outline for the executor to follow for “QR Distribution Letter — Pack Two.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 33/61] Add what’s relevant on this page (“QR Distribution Letter — Pack Two”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “QR Distribution Letter — Pack Two.” Reference any tables or lists above.
+        disclaimer: LETTER
+      qr-letter-email:
+        header: QR Distribution — Email Version
+        description: This page gives a calm, practical outline for the executor to follow for “QR Distribution — Email Version.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 33/61] Add what’s relevant on this page (“QR Distribution — Email Version”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “QR Distribution — Email Version.” Reference any tables or lists above.
+        disclaimer: LETTER
+      qr-letter-sms:
+        header: QR Distribution — SMS Version
+        description: This page gives a calm, practical outline for the executor to follow for “QR Distribution — SMS Version.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 33/61] Add what’s relevant on this page (“QR Distribution — SMS Version”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “QR Distribution — SMS Version.” Reference any tables or lists above.
+        disclaimer: LETTER
+      guidance-sample:
+        header: Sample Resource Note (Not Legal)
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Sample Resource Note (Not Legal).”
+        owner_instructions: '[#INSTR][#COUNT 42/61] Add what’s relevant on this page (“Sample Resource Note (Not Legal)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Sample Resource Note (Not Legal).” Reference any tables or lists above.
+        disclaimer: LEGAL
+      originals-location:
+        header: Where Originals Are Kept
+        description: This page gives a calm, practical outline for the executor to follow for “Where Originals Are Kept.” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 4/61] Add what’s relevant on this page (“Where Originals Are Kept”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Where Originals Are Kept.” Reference any tables or lists above.
+        disclaimer: LEGAL
+      helpers:
+        header: Who Can Help (Friends & Neighbors)
+        description: This page gives a calm, practical outline for the executor to follow for “Who Can Help (Friends & Neighbors).” It points to what’s needed and where to begin.
+        owner_instructions: '[#INSTR][#COUNT 5/61] Add what’s relevant on this page (“Who Can Help (Friends & Neighbors)”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Who Can Help (Friends & Neighbors).” Reference any tables or lists above.
+        disclaimer: NONE
+      comfort-notes:
+        header: Comfort Notes for Hard Days
+        description: This page was prepared with care to make things easier for family and close friends. It offers simple words and gentle guidance related to “Comfort Notes for Hard Days.”
+        owner_instructions: '[#INSTR][#COUNT 50/61] Add what’s relevant on this page (“Comfort Notes for Hard Days”) and clear this note when you feel it’s ready.'
+        ai_prompt: Using the sections on this page, create a short, warm summary for “Comfort Notes for Hard Days.” Reference any tables or lists above.
+        disclaimer: NONE

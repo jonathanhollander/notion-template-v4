@@ -1,0 +1,9 @@
+Changelog v3.4e (from v3.4d)
+- Letters: standardized all 17 with uniform closings, spacing, and disclaimers.
+- Page Descriptions: compassionate, role-specific text added to all ~60 pages/subpages (no filler).
+- Icons & Covers: applied to every page/subpage using neutral Unsplash links.
+- Disclaimers: added across all executor/legal/financial sections and all letters.
+- Diagnostics: expanded rules enforce disclaimers, no checklists on family pages, and seed data presence.
+- Acceptance: coverage expanded to all ~60 pages (covers, icons, disclaimers, helper notes cleared).
+- Sample Data: executor DBs (Insurance, Taxes, Property, Vehicles) seeded with examples.
+- Builder’s Console: upgraded with linked Diagnostics view and quick links for review.

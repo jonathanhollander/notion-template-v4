@@ -1,0 +1,6 @@
+Label,Target_Type,Target_URL,Audience,Expires_On,Link_Manager,QR_Style,Placement,Notes
+Shared Notion Portal (View-Only),Notion Page,https://notion.so/your-shared-portal,Family,,Short.io,Black standard,Printed card / Binder cover,Remove editor permissions; enable view-only
+Memorial Program (PDF),File Link,https://yourdomain.com/memorial_program.pdf,Guests,,Bitly,Black standard,Program back page,Host on a stable URL
+Emergency Contact Sheet,Notion Page,https://notion.so/emergency-contact-sheet,Executor,,Short.io,Black standard,Wallet card / Inside front cover,Contains NO passwords
+Photo Archive,Cloud Folder,https://drive.google.com/your-shared-album,Family,,Bitly,Black standard,Memorial page / slideshow,Set to view-only; watermark downloads if needed
+Condolence Form,Form,https://forms.gle/your-form,Guests,After event,Short.io,Black standard,Memorial venue signage,Auto-collect messages & photos

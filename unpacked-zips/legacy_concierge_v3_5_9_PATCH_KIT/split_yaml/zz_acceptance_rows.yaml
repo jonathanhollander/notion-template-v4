@@ -1,0 +1,8 @@
+acceptance:
+  rows:
+  - Page: Preparation Hub
+    Role: owner
+    Check: Review top-level instructions
+    Status: Pending
+    Est. Time (min): 15
+    Section: Top Level

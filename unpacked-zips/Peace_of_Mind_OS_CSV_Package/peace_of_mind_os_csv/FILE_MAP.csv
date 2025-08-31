@@ -1,0 +1,38 @@
+FILE_STEM,DESCRIPTION,CATEGORY
+README_IMPORT_STEPS,How to import each CSV into Notion & suggested property types,Guide
+HOME_CARDS,Cards shown on Home dashboard linking to each area,Home / Navigation
+PROGRESS_TRACKER,Global checklist that drives % complete,Meta / Tracking
+WELCOME_COPY,Warm onboarding text & micro‑encouragements,Home / Copy
+POSITIONING_COPY,Sales/brand messaging incl. subtle 'lawyer optional' angle,Marketing / Copy
+PERSONAL_INFO,Core identity & family details,Core Affairs / Database
+KEY_CONTACTS,"Family, advisors, emergency contacts",Core Affairs / Database
+FINANCIAL_ACCOUNTS,"Banks, investments, pensions",Core Affairs / Database
+DEBTS_AND_LOANS,"Mortgages, credit lines, obligations",Core Affairs / Database
+INSURANCE_POLICIES,"Life, health, property insurance",Core Affairs / Database
+SUBSCRIPTIONS,Recurring bills & cancelation plan,Core Affairs / Database
+PROPERTY_ASSETS,Real estate & household items of note,Core Affairs / Database
+VEHICLES,Cars & other vehicles,Core Affairs / Database
+HEALTH_AND_CARE,"Advance directives, proxies, medications",Core Affairs / Database
+PETS,Pet care plan,Core Affairs / Database
+FUNERAL_PREFERENCES,"Service wishes, music, readings",Funeral / Database
+FUNERAL_LOGISTICS,"Venue, schedule, vendors, tasks",Funeral / Database
+FUNERAL_BUDGET,Budget planner (quotes vs actuals),Funeral / Database
+FUNERAL_ATTENDEES,Guest list & outreach tracker,Funeral / Database
+OBITUARY_DRAFTS,Obituary copy drafts,Funeral / Copy
+DIGITAL_ACCOUNTS,"Online accounts, status, next steps",Digital Legacy / Database
+DEVICES,Devices & wipe/transfer instructions,Digital Legacy / Database
+DOMAINS_SITES,"Domains, hosting, transfer notes",Digital Legacy / Database
+DIGITAL_GUIDES,"How‑to guides for Apple, Google, Social",Digital Legacy / Guides
+ETHICAL_WILL,Values & beliefs prompts,Life & Legacy / Copy
+LEGACY_LETTERS,Letters for loved ones (by recipient),Life & Legacy / Copy
+REFLECTIONS,Acceptance & gratitude journaling,Life & Legacy / Journal
+GRATITUDE_JOURNAL,"Short, frequent gratitude notes",Life & Legacy / Journal
+BUCKET_LIST,Adventures done & yet to come,Life & Legacy / Planner
+LIFE_CALENDAR_GUIDE,Instructions to build a Memento Mori grid,Life & Legacy / Guide
+EXECUTOR_FIRST_48H,First steps checklists for loved ones,Executor Toolkit / Tasks
+EXECUTOR_TIMELINE,Roadmap of tasks by urgency,Executor Toolkit / Tasks
+CONTACT_WEB,Who’s who: family & advisors,Executor Toolkit / Directory
+BINDER_INDEX,What goes in the printable binder,Executor Toolkit / Index
+WALLET_CARD,Compact info text for wallet card,Executor Toolkit / Copy
+CULTURAL_PACKS_INDEX,Optional cultural/religious modules,Cultural / Index
+UPDATE_LOG,Annual refresh notes,Admin / Log

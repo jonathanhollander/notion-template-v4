@@ -1,0 +1,6 @@
+STEP_ORDER,TITLE,DETAILS
+1,Create ‘Peace of Mind OS’ page,New page in Notion with 🌿 icon.
+2,Import CSVs,/import → CSV for each database; keep as separate DBs.
+3,Set property types,"Match suggested types (Title, Select, Date, Checkbox, etc.)."
+4,Assemble Home,Use HOME_CARDS to build a gallery; add Progress board.
+5,Use built‑in AI prompts,"Open each writing page (Legacy Letters, Ethical Will, Obituary Drafts, Funeral Wishes, etc.). The first row includes **Instructions** and a **Suggested AI Prompt** shown in a code block with a copy button."

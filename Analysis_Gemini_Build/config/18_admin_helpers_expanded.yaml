@@ -1,0 +1,51 @@
+# 18_admin_helpers_expanded.yaml
+# Adds richer helper content with screenshot/link placeholders. Uses ADMIN_HELP_URL env (set in .env).
+
+pages:
+  - title: "Admin – Guided Helpers"
+    icon: "emoji:🧩"
+    description: "More detailed helpers for common manual steps. Delete before sharing."
+    body:
+      - type: callout
+        icon: "emoji:⚠️"
+        color: gray_background
+        text: "ADMIN_ONLY • HELPERS_MARKER • Replace the links below with your knowledge base or Loom."
+      - type: toggle
+        summary: "Create a Saved View (filter & sort)"
+        children:
+          - type: bulleted_list
+            items:
+              - "Open the database (e.g., Accounts)"
+              - "Click **+ Add a view** → Table/List/Board"
+              - "Add filters (e.g., Archive Flag != Archive)"
+              - "Set Sort by **Updated** desc"
+              - "Click **Save as default**"
+          - type: paragraph
+            text: "Guide: ${ADMIN_HELP_URL}/saved-views"
+          - type: paragraph
+            text: "Screenshot: ${ADMIN_HELP_URL}/img/saved-view.png"
+      - type: toggle
+        summary: "Add a Rollup"
+        children:
+          - type: bulleted_list
+            items:
+              - "Open **Estate Analytics**"
+              - "Add a property → **Rollup** → name it **UI: Liquid Assets**"
+              - "Relation: **Related Page** → Pages Index (filter to Account pages)"
+              - "Property: **Balance** → Function: **Sum**"
+          - type: paragraph
+            text: "Guide: ${ADMIN_HELP_URL}/rollups"
+          - type: paragraph
+            text: "Screenshot: ${ADMIN_HELP_URL}/img/rollup.png"
+      - type: toggle
+        summary: "Embed a Saved View in a Hub"
+        children:
+          - type: bulleted_list
+            items:
+              - "Create the Saved View first in the database"
+              - "Copy link to the view"
+              - "Paste in the Hub; choose **Create embed**"
+          - type: paragraph
+            text: "Guide: ${ADMIN_HELP_URL}/embeds"
+          - type: paragraph
+            text: "Screenshot: ${ADMIN_HELP_URL}/img/embed.png"

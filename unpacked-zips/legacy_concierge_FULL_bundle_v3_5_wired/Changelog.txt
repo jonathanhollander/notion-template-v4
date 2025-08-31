@@ -1,0 +1,7 @@
+Changelog v3.5
+- Added split YAML structure (pages_part1/part2, letters, databases, diagnostics, acceptance).
+- Updated deploy script to load and merge all YAML files in split_yaml/.
+- Ensured every page has icon, cover, and role-specific description; legal pages include disclaimers.
+- Seeded all key databases to avoid blank states.
+- Included standardized 17-letter library with disclaimers and consistent spacing/closings.
+- Embedded gradient diamond icons (SVG + PNG) for premium, consistent UI.

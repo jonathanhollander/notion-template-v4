@@ -1,0 +1,22 @@
+diagnostics:
+  rules:
+  - id: cover_present
+    severity: yellow
+    message: '{page}: add a calming cover image.'
+    applies_to: all
+  - id: icon_present
+    severity: yellow
+    message: '{page}: add a small icon marker.'
+    applies_to: all
+  - id: disclaimer_required
+    severity: red
+    message: '{page}: add legal disclaimer for executor/legal/financial content.'
+    applies_to: executor
+  - id: family_no_checklists
+    severity: yellow
+    message: '{page}: family pages should not read like checklists.'
+    applies_to: family
+  - id: db_seed_row
+    severity: yellow
+    message: '{page}: seed at least one example row.'
+    applies_to: databases

@@ -1,0 +1,194 @@
+# 08_ultra_premium_db_patch.yaml
+complexity: moderate
+# Ultra-Premium Phase A: Advanced DB Architecture
+db:
+  schemas:
+
+    Transactions:
+      properties:
+        Name: { type: title }
+        Date: { type: date }
+        Amount: { type: number }
+        Type:
+          type: select
+          options: [Deposit, Withdrawal, Transfer, Dividend, Interest, Fee]
+        Related Page:
+          type: relation
+        Note: { type: rich_text }
+        Archive Flag:
+          type: formula
+          formula: 'if(prop("Type") == "Fee" and prop("Amount") < 0, "Archive", if(prop("Amount") == 0, "Archive", "Active"))'
+
+    "Property Maintenance Logs":
+      properties:
+        Name: { type: title }
+        Date: { type: date }
+        Cost: { type: number }
+        Category:
+          type: select
+          options: [HVAC, Plumbing, Roofing, Landscaping, Electrical, General]
+        Vendor: { type: rich_text }
+        Related Page:
+          type: relation
+        Note: { type: rich_text }
+        Archive Flag:
+          type: formula
+          formula: 'if(prop("Cost") == 0, "Archive", "Active")'
+
+    "Insurance Claims":
+      properties:
+        Name: { type: title }
+        "Claim #": { type: rich_text }
+        Policy Type:
+          type: select
+          options: [Home, Auto, Life, Disability, Health, Other]
+        Status:
+          type: select
+          options: [Open, Submitted, In Review, Approved, Denied, Paid, Closed]
+        Date Filed: { type: date }
+        Estimated Amount: { type: number }
+        Related Page:
+          type: relation
+        Note: { type: rich_text }
+        Archive Flag:
+          type: formula
+          formula: 'if(prop("Status") == "Closed" or prop("Status") == "Paid", "Archive", "Active")'
+
+    "Estate Analytics":
+      properties:
+        Name: { type: title }
+        Manual Liquid Assets: { type: number }
+        Manual Real Property Value: { type: number }
+        Manual Insurance Coverage: { type: number }
+        "Total Liquid Assets":
+          type: formula
+          formula: 'if(empty(prop("UI: Liquid Assets")), prop("Manual Liquid Assets"), prop("UI: Liquid Assets"))'
+        "Total Real Property Value":
+          type: formula
+          formula: 'if(empty(prop("UI: Real Property Value")), prop("Manual Real Property Value"), prop("UI: Real Property Value"))'
+        "Total Insurance Coverage":
+          type: formula
+          formula: 'if(empty(prop("UI: Insurance Coverage")), prop("Manual Insurance Coverage"), prop("UI: Insurance Coverage"))'
+        "Total Estate Value":
+          type: formula
+          formula: 'prop("Total Liquid Assets") + prop("Total Real Property Value") + prop("Total Insurance Coverage")'
+        "Estate Tax Liability":
+          type: formula
+          formula: 'if(prop("Total Estate Value") > 13120000, (prop("Total Estate Value") - 13120000) * 0.40, 0)'
+        "Completion %":
+          type: formula
+          formula: 'if(empty(prop("UI: Tasks Done %")), 0, prop("UI: Tasks Done %"))'
+        "Progress Bar":
+          type: formula
+          formula: 'slice("██████████", 0, toNumber(round(prop("Completion %")/10))) + slice("──────────", 0, toNumber(10 - round(prop("Completion %")/10)))'
+
+  property_patches:
+    Accounts:
+      add_properties:
+        Archive Flag:
+          type: formula
+          formula: 'if(prop("Status") == "Closed", "Archive", "Active")'
+        "Account Progress %":
+          type: formula
+          formula: 'if(empty(prop("UI: Tasks Done %")), 0, prop("UI: Tasks Done %"))'
+        "Account Progress Bar":
+          type: formula
+          formula: 'slice("██████████", 0, toNumber(round(prop("Account Progress %")/10))) + slice("──────────", 0, toNumber(10 - round(prop("Account Progress %")/10)))'
+
+    Properties:
+      add_properties:
+        Archive Flag:
+          type: formula
+          formula: 'if(empty(prop("Deed Stored?")), "Active", "Archive")'
+        "Property Progress %":
+          type: formula
+          formula: 'if(empty(prop("UI: Tasks Done %")), 0, prop("UI: Tasks Done %"))'
+        "Property Progress Bar":
+          type: formula
+          formula: 'slice("██████████", 0, toNumber(round(prop("Property Progress %")/10))) + slice("──────────", 0, toNumber(10 - round(prop("Property Progress %")/10)))'
+
+    Insurance:
+      add_properties:
+        Archive Flag:
+          type: formula
+          formula: 'if(prop("Policy Active?") == "No", "Archive", "Active")'
+        "Insurance Progress %":
+          type: formula
+          formula: 'if(empty(prop("UI: Tasks Done %")), 0, prop("UI: Tasks Done %"))'
+        "Insurance Progress Bar":
+          type: formula
+          formula: 'slice("██████████", 0, toNumber(round(prop("Insurance Progress %")/10))) + slice("──────────", 0, toNumber(10 - round(prop("Insurance Progress %")/10)))'
+
+  seed_rows:
+    Transactions:
+      - Name: "Payroll Deposit"
+        Date: { start: "2025-07-31" }
+        Amount: 4200.00
+        Type: Deposit
+        Related Page Title: "Account – Checking (Everyday)"
+        Note: "Employer: Wayfinder Labs — monthly salary"
+      - Name: "Mortgage Payment"
+        Date: { start: "2025-08-01" }
+        Amount: -2750.00
+        Type: Withdrawal
+        Related Page Title: "Account – Checking (Everyday)"
+        Note: "Auto-debit to Home Mortgage Services"
+      - Name: "Brokerage Dividend"
+        Date: { start: "2025-08-15" }
+        Amount: 186.42
+        Type: Dividend
+        Related Page Title: "Account – Brokerage (Long-term)"
+        Note: "Vanguard Total Market ETF (VTI) quarterly distribution"
+      - Name: "Bank Fee"
+        Date: { start: "2025-08-20" }
+        Amount: -12.00
+        Type: Fee
+        Related Page Title: "Account – Checking (Everyday)"
+        Note: "Out-of-network ATM fee"
+
+    "Property Maintenance Logs":
+      - Name: "HVAC Seasonal Service"
+        Date: { start: "2025-05-10" }
+        Cost: 189.00
+        Category: HVAC
+        Vendor: "Comfort Air Co."
+        Related Page Title: "Property – Primary Residence (Maple St.)"
+        Note: "Filter change + coolant top-up"
+      - Name: "Roof Inspection"
+        Date: { start: "2025-06-22" }
+        Cost: 0
+        Category: Roofing
+        Vendor: "TopLine Roofing"
+        Related Page Title: "Property – Primary Residence (Maple St.)"
+        Note: "Annual inspection — no issues"
+      - Name: "Sprinkler Repair"
+        Date: { start: "2025-07-07" }
+        Cost: 120.00
+        Category: Landscaping
+        Vendor: "GreenLeaf"
+        Related Page Title: "Property – Primary Residence (Maple St.)"
+        Note: "Valve replacement; zone 3"
+
+    "Insurance Claims":
+      - Name: "Home Water Damage Claim"
+        "Claim #": "HMD-2025-0811"
+        Policy Type: Home
+        Status: Submitted
+        Date Filed: { start: "2025-08-11" }
+        Estimated Amount: 4800.00
+        Related Page Title: "Insurance – Homeowners (Maple St.)"
+        Note: "Dishwasher line leak; adjuster scheduled 08/14"
+      - Name: "Auto Glass Claim"
+        "Claim #": "AUTO-GL-2025-0802"
+        Policy Type: Auto
+        Status: Approved
+        Date Filed: { start: "2025-08-02" }
+        Estimated Amount: 395.00
+        Related Page Title: "Insurance – Auto (Civic)"
+        Note: "Windshield replacement – Safelite"
+
+    "Estate Analytics":
+      - Name: "Estate Overview"
+        Manual Liquid Assets: 55000
+        Manual Real Property Value: 650000
+        Manual Insurance Coverage: 250000

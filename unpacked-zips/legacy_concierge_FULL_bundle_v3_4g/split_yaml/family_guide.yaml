@@ -1,0 +1,24 @@
+page:
+  title: Family Guide
+  icon: assets/icons/diamonds/peach_filled.svg
+  cover: https://images.unsplash.com/photo-1519681393784-d120267933ba
+  description: These pages are for memories, stories, and support. Add as much or
+    as little as feels right. Nothing here is urgent.
+  disclaimer: null
+  acceptance:
+  - Cover present
+  - Icon present
+  - Disclaimer (if required)
+  - Helper notes cleared
+  - Seeded rows present (if DB)
+  subpages:
+  - title: Life Story
+    icon: assets/icons/diamonds/peach_filled.svg
+  - title: Memories
+    icon: assets/icons/diamonds/peach_filled.svg
+  - title: Keepsakes
+    icon: assets/icons/diamonds/peach_filled.svg
+  - title: Letters to Family
+    icon: assets/icons/diamonds/peach_filled.svg
+  - title: Grief Support
+    icon: assets/icons/diamonds/peach_filled.svg

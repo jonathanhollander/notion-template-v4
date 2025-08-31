@@ -1,0 +1,29 @@
+acceptance:
+  by_role:
+    executor:
+    - Cover present
+    - Icon present
+    - Disclaimer present
+    - No helper notes
+    - DB has seeds if applicable
+    family:
+    - Cover present
+    - Icon present
+    - Gentle description
+    - No checklist tone
+    owner:
+    - Cover present
+    - Icon present
+    - Description present
+  by_page:
+    Preparation Hub:
+    - Linked Progress DB visible
+    - Three statuses represented
+    - Helper note cleared
+    Executor Guide — A Steady Path:
+    - Disclaimer present
+    - Sections listed
+    - Tone is steady
+    Family Guide — A Gentle Space:
+    - Invitation present
+    - No task language

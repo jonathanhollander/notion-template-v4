@@ -1,0 +1,46 @@
+# 11_executor_task_profiles.yaml
+# Provides three executor task packs as pages with checklists (copy/adapt; delete non-applicable).
+pages:
+  - title: "Executor Task Packs"
+    icon: "emoji:🧰"
+    description: "Pick ONE pack based on Estate Complexity. Tasks are checklists you can copy into Executor Hub. Delete this page before sharing."
+    children:
+      - title: "Pack – Simple Estate"
+        icon: "emoji:🟦"
+        body:
+          - type: to_do
+            text: "Locate will and ID; store in Legal Documents"
+          - type: to_do
+            text: "Secure home, pets, vehicles"
+          - type: to_do
+            text: "Notify key accounts (bank, credit card, utilities)"
+          - type: to_do
+            text: "Open estate account (bank)"
+          - type: to_do
+            text: "Pay immediate expenses; track receipts"
+      - title: "Pack – Moderate Estate"
+        icon: "emoji:🟨"
+        body:
+          - type: to_do
+            text: "All Simple tasks"
+          - type: to_do
+            text: "File insurance claims (Home/Auto/Life); track in Insurance Claims DB"
+          - type: to_do
+            text: "Inventory assets & liabilities; reconcile against Accounts DB"
+          - type: to_do
+            text: "Notify employer(s); handle benefits & last paycheck"
+          - type: to_do
+            text: "Prepare preliminary distribution plan"
+      - title: "Pack – Complex Estate"
+        icon: "emoji:🟥"
+        body:
+          - type: to_do
+            text: "All Moderate tasks"
+          - type: to_do
+            text: "Coordinate with attorney/CPA; schedule standing check-ins"
+          - type: to_do
+            text: "Manage business interests; review operating agreements"
+          - type: to_do
+            text: "Real property: appraisals, maintenance logs, insurance"
+          - type: to_do
+            text: "Tax filings & deadlines calendar (estate, fiduciary income, property)"

@@ -1,0 +1,48 @@
+globals:
+  icons_map:
+    executor-guide: 🧭
+    family-guide: 👨‍👩‍👧‍👦
+    preparation-hub: 🗂️
+    essentials: 📁
+    life-story: 📖
+    finishing: ✅
+  covers_map:
+    preparation-hub: https://images.unsplash.com/photo-1523413651479-597eb2da0ad6?auto=format&fit=crop&w=1200&q=80
+    executor-guide: https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80
+    family-guide: https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80
+    life-story: https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1200&q=80
+    finishing: https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80
+  strings:
+    caution_notes:
+      legal: These pages help organize information and wishes. For legal effect, speak with a licensed professional.
+      letter: This is a sample letter to help you begin. Adjust details for your situation.
+    pages:
+      executor-guide:
+        header: Executor Guide
+        description: 'A steady guide for handling the first tasks: personalize letters, gather essentials, move step by step.'
+        owner_instructions: '[#INSTR] Review as if you were the executor. Clear when it feels direct but calm.'
+        ai_prompt: Draft an 80–120 word intro for Executor Guide in a clear, steady tone.
+        disclaimer: use_global.strings.caution_notes.legal
+      family-guide:
+        header: Family Guide
+        description: 'A gentle space for family: memories, letters, support. Nothing here is urgent—take what helps.'
+        owner_instructions: '[#INSTR] Read as if you were family. Clear when it feels warm and optional.'
+        ai_prompt: Draft an 80–120 word intro for Family Guide with gentle undertones.
+        disclaimer: NONE
+      preparation-hub:
+        header: Preparation Hub
+        description: This hub helps you set things up. One section at a time is enough.
+        owner_instructions: '[#INSTR] Keep statuses accurate in the linked progress DB. Clear when ready.'
+        ai_prompt: Write a short welcome for Preparation Hub that reassures without minimizing work.
+        disclaimer: NONE
+      everything-done:
+        header: For When It Feels Complete
+        description: When the last small steps are finished, pause here. You have carried through what mattered. Nothing more is required of you.
+        owner_instructions: '[#INSTR] If leaving a closing note, add it here. Clear when finished.'
+        ai_prompt: Draft a ceremonial closing note for executors/family.
+        disclaimer: NONE
+  diagnostics_text:
+    messages:
+      cover_missing: ‘{page}’ doesn’t yet have a cover. A calm photo or soft texture helps it feel like a place to pause and reflect.
+      icon_missing: ‘{page}’ has no icon. A small symbol makes scanning easier—pick something steady.
+      instr_present: ‘{page}’ still shows a helper note. When the page reads smoothly, remove it.

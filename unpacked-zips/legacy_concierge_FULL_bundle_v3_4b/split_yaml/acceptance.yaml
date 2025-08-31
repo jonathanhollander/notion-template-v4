@@ -1,0 +1,188 @@
+acceptance_criteria:
+  by_page:
+    home:
+    - Cover and icon set
+    - Helper note cleared
+    map:
+    - Cover and icon set
+    - Helper note cleared
+    peace-of-mind:
+    - Cover and icon set
+    - Helper note cleared
+    essentials:
+    - Cover and icon set
+    - Helper note cleared
+    executors-contacts:
+    - Cover and icon set
+    - Helper note cleared
+    financial-accounts:
+    - Cover and icon set
+    - Helper note cleared
+    insurance:
+    - Cover and icon set
+    - Helper note cleared
+    taxes:
+    - Cover and icon set
+    - Helper note cleared
+    business:
+    - Cover and icon set
+    - Helper note cleared
+    property:
+    - Cover and icon set
+    - Helper note cleared
+    vehicles:
+    - Cover and icon set
+    - Helper note cleared
+    keepsakes:
+    - Cover and icon set
+    - Helper note cleared
+    digital-legacy:
+    - Cover and icon set
+    - Helper note cleared
+    devices:
+    - Cover and icon set
+    - Helper note cleared
+    executor-quickstart:
+    - Cover and icon set
+    - Helper note cleared
+    executor-card:
+    - Cover and icon set
+    - Helper note cleared
+    executor-guide:
+    - Cover and icon set
+    - Helper note cleared
+    family-guide:
+    - Cover and icon set
+    - Helper note cleared
+    memories:
+    - Cover and icon set
+    - Helper note cleared
+    photos:
+    - Cover and icon set
+    - Helper note cleared
+    letters-index:
+    - Cover and icon set
+    - Helper note cleared
+    life-story:
+    - Cover and icon set
+    - Helper note cleared
+    grief-support:
+    - Cover and icon set
+    - Helper note cleared
+    family-faq:
+    - Cover and icon set
+    - Helper note cleared
+    medical:
+    - Cover and icon set
+    - Helper note cleared
+    living-will:
+    - Cover and icon set
+    - Helper note cleared
+    donation-wishes:
+    - Cover and icon set
+    - Helper note cleared
+    notifications:
+    - Cover and icon set
+    - Helper note cleared
+    letters-db:
+    - Cover and icon set
+    - Helper note cleared
+    qr-reference:
+    - Cover and icon set
+    - Helper note cleared
+    qr-print:
+    - Cover and icon set
+    - Helper note cleared
+    qr-packages:
+    - Cover and icon set
+    - Helper note cleared
+    qr-letters:
+    - Cover and icon set
+    - Helper note cleared
+    prompts-letters:
+    - Cover and icon set
+    - Helper note cleared
+    prompts-tribute:
+    - Cover and icon set
+    - Helper note cleared
+    prompts-executor:
+    - Cover and icon set
+    - Helper note cleared
+    prompts-rewrite:
+    - Cover and icon set
+    - Helper note cleared
+    prompts-translate:
+    - Cover and icon set
+    - Helper note cleared
+    flow-process:
+    - Cover and icon set
+    - Helper note cleared
+    flow-contacts:
+    - Cover and icon set
+    - Helper note cleared
+    flow-activation:
+    - Cover and icon set
+    - Helper note cleared
+    guidance:
+    - Cover and icon set
+    - Helper note cleared
+    tone:
+    - Cover and icon set
+    - Helper note cleared
+    disclaimer:
+    - Cover and icon set
+    - Helper note cleared
+    diagnostics:
+    - Cover and icon set
+    - Helper note cleared
+    owner-progress:
+    - Cover and icon set
+    - Helper note cleared
+    finishing:
+    - Cover and icon set
+    - Helper note cleared
+    dev-notes:
+    - Cover and icon set
+    - Helper note cleared
+    recovery:
+    - Cover and icon set
+    - Helper note cleared
+    encouragements:
+    - Cover and icon set
+    - Helper note cleared
+    icons-headers:
+    - Cover and icon set
+    - Helper note cleared
+    mobile-test:
+    - Cover and icon set
+    - Helper note cleared
+    letters-family-view:
+    - Cover and icon set
+    - Helper note cleared
+    letters-brokerage-view:
+    - Cover and icon set
+    - Helper note cleared
+    letters-bank-view:
+    - Cover and icon set
+    - Helper note cleared
+    letters-insurance-view:
+    - Cover and icon set
+    - Helper note cleared
+    letters-utilities-view:
+    - Cover and icon set
+    - Helper note cleared
+    letters-community-view:
+    - Cover and icon set
+    - Helper note cleared
+    letters-executor-view:
+    - Cover and icon set
+    - Helper note cleared
+    letters-family-announcements-view:
+    - Cover and icon set
+    - Helper note cleared
+    photos-captions-helper:
+    - Cover and icon set
+    - Helper note cleared
+    preparation-hub:
+    - Cover and icon set
+    - Helper note cleared

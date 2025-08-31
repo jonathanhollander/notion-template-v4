@@ -1,0 +1,24 @@
+page:
+  title: Preparation Hub
+  icon: assets/icons/diamonds/beige_filled.svg
+  cover: https://images.unsplash.com/photo-1506784983877-45594efa4cbe
+  description: "Start here. Essentials first, then move through other pages as you\u2019\
+    re ready."
+  disclaimer: null
+  acceptance:
+  - Cover present
+  - Icon present
+  - Disclaimer (if required)
+  - Helper notes cleared
+  - Seeded rows present (if DB)
+  subpages:
+  - title: Essentials
+    icon: assets/icons/diamonds/beige_filled.svg
+  - title: Executors & Key Contacts
+    icon: assets/icons/diamonds/beige_filled.svg
+  - title: Life Story
+    icon: assets/icons/diamonds/beige_filled.svg
+  - title: Memories
+    icon: assets/icons/diamonds/beige_filled.svg
+  - title: Letters & Notifications
+    icon: assets/icons/diamonds/beige_filled.svg

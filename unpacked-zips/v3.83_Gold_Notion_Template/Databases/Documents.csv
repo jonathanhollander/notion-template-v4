@@ -1,0 +1,5 @@
+Title,Type,Owner,Location,Status,Last Updated,Notes
+Last Will & Testament,Legal,Executor,drive://docs/will.pdf,Active,2025-08-01,Signed original stored with attorney.
+Living Will,Legal,Executor,drive://docs/living-will.pdf,Active,2025-07-15,Healthcare directives updated.
+Insurance Policies,Insurance,Policyholder,https://insurer.example.com,Active,2025-07-30,"Homeowners, Flood, Jewelry riders."
+Digital Assets Inventory,Digital,Policyholder,drive://sheets/digital-assets.xlsx,Draft,2025-07-28,Passwords stored in vault; see Accounts DB.

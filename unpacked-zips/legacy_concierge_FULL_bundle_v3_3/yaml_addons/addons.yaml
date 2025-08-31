@@ -1,0 +1,9 @@
+assets:
+  base_url: https://cdn.example.com/headers/
+cli:
+  verbosity: info
+  messages:
+    starting: Starting deploy…
+    creating_page: 'Creating page: {slug}'
+    seeding_db: 'Seeding database: {name}'
+    done: Deploy finished with {warnings} warnings.

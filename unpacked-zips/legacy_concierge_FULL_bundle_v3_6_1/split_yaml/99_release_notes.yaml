@@ -1,0 +1,34 @@
+release_notes: 'Legacy Concierge – Release Notes
+
+  v0.0: Initial concept & YAML skeleton.
+
+  v0.1: Basic page creation script; dry-run/deploy; icons & covers.
+
+  v0.2: Subpages & disclaimers; executor/family distinction; prompts begin.
+
+  v0.3: Compassionate instructions + sample legal text (non-legal).
+
+  v0.4: QR code packs defined (10-page family set, full executor set).
+
+  v0.5: Letters & samples; DB for letters + subpages.
+
+  v1.0: First full deployable template (60+ pages).
+
+  v3.5.4: One-way helpers (never reappear once deleted).
+
+  v3.5.5: Parent-aware deploy; respects manual nesting; override flags.
+
+  v3.5.6: Acceptance DB seeding from YAML; Letters Index de-dup.
+
+  v3.5.7: Unified Setup & Acceptance DB; section subtotals & totals.
+
+  v3.5.8: Collapsed helper toggles with step-by-step instructions.
+
+  v3.5.9: Live DB-driven rollout totals; auto-flip helper rows to Done; PageURL/Section
+  sync; hub view helpers; extra diagnostics; preflight.
+
+  v3.6.0: Content completion—expanded compassionate instructions, sample docs & letters,
+  DB seed rows across the board, realistic time estimates, and release notes shipped
+  as a page.
+
+  '

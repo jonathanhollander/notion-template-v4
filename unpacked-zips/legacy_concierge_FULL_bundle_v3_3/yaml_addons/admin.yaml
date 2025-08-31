@@ -1,0 +1,22 @@
+pages:
+- title: ⚙️ Admin / Rollout Cockpit
+  slug: admin-cockpit
+  type: page
+  audience: shared
+  is_admin: true
+  blocks:
+  - callout: ⚠️ Admin only. Delete this entire branch before sharing. Families and Executors should never see this.
+  - h1: Rollout Cockpit
+  - p: Temporary admin space for building and polishing.
+- title: Cleanup Notes (Delete Me)
+  slug: admin-cleanup
+  type: subpage
+  parent: admin-cockpit
+  is_admin: true
+  blocks:
+  - h3: Delete the entire Admin branch
+  - numbered_list:
+    - Select **Admin / Rollout Cockpit**.
+    - Shift-click to select all Admin subpages & databases.
+    - Right-click → Delete.
+    - Empty Trash.

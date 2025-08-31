@@ -1,0 +1,17 @@
+page:
+  title: "Executor Guide \u2014 A Steady Path"
+  icon: assets/icons/diamonds/sage_filled.svg
+  cover: https://images.unsplash.com/photo-1500530855697-b586d89ba3ee
+  description: "This guide is steady and directive. Each section gives you what is\
+    \ needed\u2014nothing more, nothing less."
+  disclaimer: This page helps organize information. For legal effect, speak with a
+    licensed professional.
+  sections:
+  - heading: Financial Accounts
+    type: H3
+  - divider: true
+  - heading: Insurance
+    type: H3
+  - divider: true
+  - heading: Taxes
+    type: H3

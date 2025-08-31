@@ -1,0 +1,10 @@
+page:
+  title: Builder's Console
+  icon: assets/icons/diamonds/beige_filled.svg
+  cover: https://images.unsplash.com/photo-1507525428034-b723cf961d3e
+  description: Admin setup page. Review diagnostics before sharing.
+  linked_views:
+  - Diagnostics DB
+  - Preparation Hub
+  - Executor Guide
+  - Family Guide

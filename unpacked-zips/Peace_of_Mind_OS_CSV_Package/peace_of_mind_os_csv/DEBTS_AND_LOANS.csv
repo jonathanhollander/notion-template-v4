@@ -1,0 +1,4 @@
+Lender,Type,Balance,Due_Date,Autopay,Notes
+Home Mortgage,Mortgage,240000,2025-08-22,True,Auto‑pay active; confirm insurance binder.
+Visa Rewards,Credit Card,3200,2025-08-22,False,Consider freezing account during estate period.
+Auto Loan,Auto,8600,2025-08-22,True,Title in file cabinet; lender portal online.

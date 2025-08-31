@@ -1,0 +1,34 @@
+db:
+  schemas:
+    sample_letters:
+      properties:
+        Title: title
+        Audience: select
+        Category: select
+        Scenario: rich_text
+        Body: rich_text
+        AI Prompt: rich_text
+        Section: select
+  seeds:
+    sample_letters:
+    - Title: Letter to My Family
+      Audience: Family
+      Category: Family
+      Scenario: First words to family
+      Body: I wanted you to have my words close by. Thank you for every ordinary day we shared. Please take your time with everything. Nothing needs to happen all at once. I love you, and I’m grateful for you.
+      AI Prompt: Warm, 120–160 words, simple language. Keep it loving and steady; avoid instructions.
+      Section: Memories & Letters
+    - Title: Bank Notification
+      Audience: Executor
+      Category: Financial / Bank
+      Scenario: Account handling
+      Body: Dear [Institution], I’m writing to inform you of [Full Name]’s passing. I’ll include any documents you need and follow your process step by step. Please let me know the simplest way to close or transfer the account. Thank you for your help.
+      AI Prompt: Keep factual but kind; 100–140 words; avoid legal advice language.
+      Section: Financial Accounts
+    - Title: Utility Company
+      Audience: Executor
+      Category: Utilities
+      Scenario: Service change
+      Body: Hello, I’m writing regarding services at [Address] for [Full Name], who has passed away. Please let me know the easiest way to transfer or discontinue service. I appreciate your guidance on any final balances or meter readings.
+      AI Prompt: Clear, courteous, under 140 words.
+      Section: Letters Library

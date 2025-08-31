@@ -1,0 +1,920 @@
+version: 2
+meta:
+  name: Legacy Concierge (Premium)
+  created: '2025-08-29'
+  notes: Use [#INSTR] tokens for deletable instructions; [#NOTE] for permanent notes.
+root:
+  title: Legacy Concierge (v2)
+  icon: 🕊️
+  cover: covers/home.jpg
+manifest:
+  pages:
+  - title: Home / Welcome
+    slug: home
+    icon: 🏠
+    cover: covers/home.jpg
+    track: true
+    insert_toc: false
+  - title: Template Map (All Pages Index)
+    slug: template-map
+    icon: 🗺️
+    cover: covers/overview.jpg
+    track: true
+    insert_toc: false
+  - title: Peace of Mind Overview
+    slug: overview
+    icon: 🌿
+    cover: covers/overview.jpg
+    track: true
+    insert_toc: false
+  - title: Estate & Essentials
+    slug: estate
+    icon: 📜
+    cover: covers/estate.jpg
+    track: true
+    insert_toc: false
+  - title: Executors & Key Contacts
+    slug: executors
+    icon: 📇
+    cover: covers/executors.jpg
+    track: true
+    insert_toc: false
+  - title: Digital Legacy
+    slug: digital
+    icon: 🌐
+    cover: covers/digital.jpg
+    track: true
+    insert_toc: false
+  - title: Memories & Letters
+    slug: memories
+    icon: 💌
+    cover: covers/memories.jpg
+    track: true
+    insert_toc: false
+  - title: Obituary & Guidance
+    slug: obituary
+    icon: 🕊️
+    cover: covers/obituary.jpg
+    track: true
+    insert_toc: false
+  - title: Guidance Library (Resources)
+    slug: guidance
+    icon: 📚
+    cover: covers/guidance.jpg
+    track: true
+    insert_toc: false
+  - title: Access & Sharing (Instructions Hub)
+    slug: access
+    icon: 🔏
+    cover: covers/access.jpg
+    track: true
+    insert_toc: false
+  - title: Executor View
+    slug: executor-view
+    icon: ⚖️
+    cover: covers/executor-view.jpg
+    track: true
+    insert_toc: false
+  - title: Family View
+    slug: family-view
+    icon: 👨‍👩‍👧
+    cover: covers/family-view.jpg
+    track: true
+    insert_toc: false
+  - title: QR Card Printables (How-To)
+    slug: qr-printables
+    icon: 🖨️
+    cover: covers/qr-printables.jpg
+    track: false
+    insert_toc: false
+  - title: Icons & Headers Library
+    slug: style-icons
+    icon: 🎨
+    cover: covers/style.jpg
+    track: false
+    insert_toc: false
+  - title: Prompt Library — Letters & Stories
+    slug: prompts-letters
+    icon: 🧠
+    cover: covers/prompts-letters.jpg
+    track: false
+    insert_toc: false
+  - title: Prompt Library — Obituary & Eulogy
+    slug: prompts-obit
+    icon: 🧠
+    cover: covers/prompts-obituary.jpg
+    track: false
+    insert_toc: false
+  - title: Prompt Library — Executor & Summary Aids
+    slug: prompts-executor
+    icon: 🧠
+    cover: covers/prompts-executor.jpg
+    track: false
+    insert_toc: false
+  - title: Prompt Library — Combine & Rewrite
+    slug: prompts-combine
+    icon: 🧠
+    cover: covers/prompts-combine.jpg
+    track: false
+    insert_toc: false
+  - title: Prompt Library — Translate (Per-Doc)
+    slug: prompts-translate
+    icon: 🧠
+    cover: covers/prompts-translate.jpg
+    track: false
+    insert_toc: false
+  - title: Process Flow (Mermaid)
+    slug: diagram-flow
+    icon: 🗂️
+    cover: covers/diagrams-flow.jpg
+    track: false
+    insert_toc: false
+  - title: Contacts & Roles Map (Mermaid)
+    slug: diagram-map
+    icon: 🧭
+    cover: covers/diagrams-map.jpg
+    track: false
+    insert_toc: false
+  - title: Executor Activation Flow (Mermaid)
+    slug: diagram-activation
+    icon: 🧭
+    cover: covers/diagrams-activation.jpg
+    track: false
+    insert_toc: false
+  - title: (Hidden) Ops
+    slug: ops
+    icon: 🛠️
+    cover: covers/ops.jpg
+    track: false
+    insert_toc: false
+  - title: Developer Notes / Version & Changelog
+    slug: dev-notes
+    icon: 🧾
+    cover: covers/ops.jpg
+    track: false
+    insert_toc: false
+  - title: System Check / Recovery Report
+    slug: system-check
+    icon: 🧪
+    cover: covers/ops.jpg
+    track: false
+    insert_toc: false
+  - title: Manual Finishing Tasks
+    slug: finishing
+    icon: 🧰
+    cover: covers/ops.jpg
+    track: true
+    insert_toc: false
+  - title: Copy & Tone Guide
+    slug: tone
+    icon: 🪶
+    cover: covers/style.jpg
+    track: false
+    insert_toc: false
+  - title: Legal Disclaimer
+    slug: legal
+    icon: ⚖️
+    cover: covers/style.jpg
+    track: false
+    insert_toc: false
+  - title: Diagnostics
+    slug: diagnostics
+    icon: 🩺
+    cover: covers/diagnostics.jpg
+    track: true
+    insert_toc: false
+  - title: Encouragements
+    slug: encouragements
+    icon: 💡
+    cover: covers/encouragements.jpg
+    track: false
+    insert_toc: false
+  - title: Family Pack Codes
+    slug: pack-family
+    icon: 👪
+    cover: covers/family-pack.jpg
+    track: true
+    insert_toc: false
+  - title: Full Pack Codes
+    slug: pack-full
+    icon: 🧩
+    cover: covers/full-pack.jpg
+    track: true
+    insert_toc: false
+  - title: Special Offer Pack Codes
+    slug: pack-offer
+    icon: 🏷️
+    cover: covers/special-offer.jpg
+    track: true
+    insert_toc: false
+  - title: QR Distribution Letters
+    slug: qr-letters
+    icon: ✉️
+    cover: covers/distribution-letters.jpg
+    track: true
+    insert_toc: false
+databases:
+  executors:
+    title: Executors & Key Contacts
+    icon: 📇
+    properties:
+      Name:
+        type: title
+      Role:
+        type: select
+        options:
+        - Executor
+        - Backup Executor
+        - Lawyer
+        - Insurance Agent
+        - Advisor
+        - Family
+      Phone:
+        type: phone_number
+      Email:
+        type: email
+      Notes:
+        type: rich_text
+      Last Updated:
+        type: last_edited_time
+  estate:
+    title: Estate & Essentials (DB)
+    icon: 📑
+    properties:
+      Name:
+        type: title
+      Type:
+        type: select
+        options:
+        - Will
+        - Deed
+        - Insurance
+        - ID
+        - Asset
+        - Account
+      Location / Link:
+        type: url
+      Executor:
+        type: relation
+        target: executors
+      Status:
+        type: select
+        options:
+        - Complete
+        - Pending
+      Include in Encouragements:
+        type: checkbox
+      Owner Sensitivity:
+        type: select
+        options:
+        - Low
+        - Medium
+        - High
+      Last Updated:
+        type: last_edited_time
+  digital:
+    title: Digital Legacy (DB)
+    icon: 🔐
+    properties:
+      Account:
+        type: title
+      Legacy Contact:
+        type: relation
+        target: executors
+      Instructions:
+        type: rich_text
+      Status:
+        type: select
+        options:
+        - Needs Setup
+        - In Progress
+        - Complete
+      Include in Encouragements:
+        type: checkbox
+      Last Updated:
+        type: last_edited_time
+      Setup Flag:
+        type: formula
+        expression: if(empty(prop('Legacy Contact')), '⚠ Needs Setup', 'Complete')
+  memories:
+    title: Memories & Letters (DB)
+    icon: 📚
+    properties:
+      Title:
+        type: title
+      Type:
+        type: select
+        options:
+        - Letter
+        - Story
+        - Photo
+        - Journal
+        - Video
+        - Audio
+      Recipient:
+        type: rich_text
+      Date:
+        type: date
+      Mood:
+        type: select
+        options:
+        - ❤️ grateful
+        - 🙂 calm
+        - 😐 neutral
+        - 😔 heavy
+      Include in Encouragements:
+        type: checkbox
+      Owner Sensitivity:
+        type: select
+        options:
+        - Low
+        - Medium
+        - High
+      Last Updated:
+        type: last_edited_time
+  obituary:
+    title: Obituary Builder (DB)
+    icon: 📰
+    properties:
+      Person's Name:
+        type: title
+      Draft:
+        type: rich_text
+      Notes:
+        type: rich_text
+      Final:
+        type: rich_text
+      Include in Encouragements:
+        type: checkbox
+      Last Updated:
+        type: last_edited_time
+  tasks:
+    title: Tasks & Deadlines (DB)
+    icon: 🗓️
+    properties:
+      Task:
+        type: title
+      Category:
+        type: select
+        options:
+        - Estate
+        - Digital
+        - Memories
+        - Guidance
+        - Admin
+      Related Estate Item:
+        type: relation
+        target: estate
+      Due:
+        type: date
+      Status:
+        type: select
+        options:
+        - Todo
+        - In Progress
+        - Done
+      Include in Encouragements:
+        type: checkbox
+      Last Updated:
+        type: last_edited_time
+  access_qr:
+    title: Access & QR (DB)
+    icon: 🔗
+    properties:
+      Audience:
+        type: select
+        options:
+        - Owner
+        - Executor
+        - Family
+      Pack:
+        type: select
+        options:
+        - Family Pack
+        - Full Pack
+        - Special Offer Pack
+      Target Page Link:
+        type: url
+      QR Image:
+        type: files
+      Access Level:
+        type: select
+        options:
+        - Public Link
+        - Invite-Only
+        - Workspace Only
+      Active:
+        type: checkbox
+      Notes:
+        type: rich_text
+      Last Updated:
+        type: last_edited_time
+  preferences:
+    title: User Preferences (DB)
+    icon: ⚙️
+    properties:
+      Profile:
+        type: title
+      Encouragement Mode:
+        type: select
+        options:
+        - Full
+        - Soft
+        - Hidden
+      Log Activity:
+        type: select
+        options:
+        - 'On'
+        - 'Off'
+      Last Updated:
+        type: last_edited_time
+  engagement_log:
+    title: Engagement Log (DB)
+    icon: 📈
+    properties:
+      Event:
+        type: title
+      Event Type:
+        type: select
+        options:
+        - View
+        - Add
+        - Edit
+        - Complete
+      Source:
+        type: rich_text
+      Item ID:
+        type: rich_text
+      Timestamp:
+        type: date
+      Last Updated:
+        type: last_edited_time
+  build_tracker:
+    title: Build Tracker (DB)
+    icon: 🧭
+    properties:
+      Page Title:
+        type: title
+      Page ID:
+        type: rich_text
+      Page Link:
+        type: url
+      Status:
+        type: select
+        options:
+        - Pending
+        - Complete
+      Open Instructions:
+        type: number
+      Missing Cover:
+        type: checkbox
+      Missing Icon:
+        type: checkbox
+      Missing Layout:
+        type: checkbox
+      Missing QR Entry:
+        type: checkbox
+      Gaps:
+        type: multi_select
+        options:
+        - Cover
+        - Icon
+        - Layout
+        - QR
+      Last Checked:
+        type: date
+      Notes:
+        type: rich_text
+seed:
+  executors:
+  - Name: Nancy Juckiewicz
+    Role: Executor
+    Phone: (555) 555-0134
+    Email: nancy@example.com
+  - Name: Art Delgado
+    Role: Lawyer
+    Email: art@example.com
+  preferences:
+  - Profile: Default Profile
+    Encouragement Mode: Full
+    Log Activity: 'On'
+  digital:
+  - Account: Apple ID
+    Instructions: iPhone → Settings → [your name] → Password & Security → Legacy Contact.
+    Status: Needs Setup
+  - Account: Facebook
+    Instructions: Settings → Memorialization Settings → Choose Legacy Contact.
+    Status: In Progress
+  - Account: Google
+    Instructions: myaccount.google.com → Data & Privacy → Inactive Account Manager.
+    Status: Needs Setup
+  memories:
+  - Title: Letter to My Children
+    Type: Letter
+    Recipient: Family
+    Mood: ❤️ grateful
+  tasks:
+  - Task: Add primary executor contact
+    Category: Estate
+    Status: Todo
+  - Task: Set up Apple Digital Legacy
+    Category: Digital
+    Status: Todo
+  access_qr:
+  - Audience: Executor
+    Pack: Family Pack
+    Active: false
+  - Audience: Family
+    Pack: Family Pack
+    Active: false
+pages:
+- title: Home / Welcome
+  icon: 🏠
+  cover: covers/home.jpg
+  layout_hint: Keep this page light; use the checklist then delete the instructions.
+  instructions:
+  - '[#INSTR] Read the 5-item checklist, complete each, then delete this block.'
+  - '[#INSTR:COVER] Replace the default cover with a calming gradient.'
+  blocks:
+  - type: h2
+    text: Welcome
+  - type: paragraph
+    text: This space brings order, comfort, and clarity for you and your loved ones.
+  - type: callout
+    emoji: 🤖
+    text: Use Notion AI here (page, not DB). Paste results below.
+  - type: paragraph
+    text: 'Prompt idea: Draft a gentle welcome note that sets the tone for this space.'
+  - type: paragraph
+    text: ▼ Paste AI output here ▼
+  - type: divider
+  - type: h2
+    text: Getting Started
+  - type: todo
+    text: Add your primary executor to ‘Executors & Key Contacts’.
+  - type: todo
+    text: Upload/link core documents in ‘Estate & Essentials (DB)’.
+  - type: todo
+    text: Set up Apple Digital Legacy / Facebook Memorialization.
+  - type: todo
+    text: Write one short memory or letter.
+  - type: todo
+    text: Upload purchased QR images for Executor & Family packs.
+- title: Template Map (All Pages Index)
+  icon: 🗺️
+  cover: covers/overview.jpg
+  instructions:
+  - '[#INSTR] Verify that all top-level pages below are linked. Delete when done.'
+  blocks:
+  - type: paragraph
+    text: '[#NOTE] This index is auto-populated by the deploy script if mostly empty.'
+- title: Peace of Mind Overview
+  icon: 🌿
+  cover: covers/overview.jpg
+  layout_hint: Show 4 linked views (Estate, Digital, Memories, Tasks) with one-line
+    descriptions under each.
+  instructions:
+  - '[#INSTR:LAYOUT] Create 4 linked views here: Estate (Gallery by Type), Digital
+    (Board by Status), Memories (Gallery), Tasks (Table due asc).'
+  blocks:
+  - type: h2
+    text: At a Glance
+  - type: code
+    language: mermaid
+    text: 'flowchart LR
+
+      A[Setup] --> B[Executor Ready]
+
+      B --> C[Estate Docs Added]
+
+      C --> D[Digital Legacy Secured]
+
+      D --> E[Memories & Letters Created]
+
+      E --> F[Guidance & Support Ready]
+
+      '
+- title: Estate & Essentials
+  icon: 📜
+  cover: covers/estate.jpg
+  layout_hint: 'Gallery view → Group by Type → Card preview: Page icon → Show Name,
+    Status, Executor.'
+  instructions:
+  - '[#INSTR:LAYOUT] Add a Gallery linked view of the Estate DB grouped by Type; properties:
+    Name, Status, Executor.'
+  blocks:
+  - type: h2
+    text: Estate & Essentials
+  - type: paragraph
+    text: Upload a PDF or link to cloud storage. Assign an Executor when relevant.
+  - type: link_to_database
+    database: estate
+- title: Executors & Key Contacts
+  icon: 📇
+  cover: covers/executors.jpg
+  layout_hint: 'Table view → Visible: Name, Role, Email, Phone.'
+  instructions:
+  - '[#INSTR] Add your executor and lawyer contacts; delete this block when saved.'
+  blocks:
+  - type: h2
+    text: Executors & Key Contacts
+  - type: link_to_database
+    database: executors
+- title: Digital Legacy
+  icon: 🌐
+  cover: covers/digital.jpg
+  layout_hint: Board view → Group by Status (Needs Setup / In Progress / Complete).
+  instructions:
+  - '[#INSTR:LAYOUT] Add a Board linked view of Digital Legacy grouped by Status;
+    card: Account, Legacy Contact.'
+  blocks:
+  - type: h2
+    text: Digital Legacy
+  - type: link_to_database
+    database: digital
+- title: Memories & Letters
+  icon: 💌
+  cover: covers/memories.jpg
+  layout_hint: 'Gallery view → Card preview: Page cover → Properties: Title, Type,
+    Date, Mood.'
+  instructions:
+  - '[#INSTR:LAYOUT] Add a Gallery linked view of Memories with card preview = page
+    cover; props Title, Type, Date, Mood.'
+  blocks:
+  - type: h2
+    text: Memories & Letters
+  - type: link_to_database
+    database: memories
+- title: Obituary & Guidance
+  icon: 🕊️
+  cover: covers/obituary.jpg
+  layout_hint: 'Table view → Visible: Person’s Name, Draft (wrap), Notes, Final.'
+  instructions:
+  - '[#INSTR:LAYOUT] Add a Table linked view of Obituary; visible: Name, Draft, Notes,
+    Final.'
+  blocks:
+  - type: h2
+    text: Obituary & Guidance
+  - type: link_to_database
+    database: obituary
+- title: Guidance Library (Resources)
+  icon: 📚
+  cover: covers/guidance.jpg
+  blocks:
+  - type: paragraph
+    text: Plain-English resource hub; consult professionals for legal/tax advice.
+- title: Access & Sharing (Instructions Hub)
+  icon: 🔏
+  cover: covers/access.jpg
+  layout_hint: 'Table view to Access & QR DB. Permanent note: Pages are sanitized;
+    never expose secrets.'
+  instructions:
+  - '[#INSTR:SHARE] Create share links for Executor View and Family View pages; paste
+    links in Access & QR DB rows.'
+  - '[#INSTR] Upload the purchased QR code images into the ''QR Image'' field for
+    each row.'
+  blocks:
+  - type: h2
+    text: Access & Sharing
+  - type: link_to_database
+    database: access_qr
+  - type: paragraph
+    text: '[#NOTE] Use your vendor dashboard to update destinations later; no rotation
+      logic needed here.'
+- title: Executor View
+  icon: ⚖️
+  cover: covers/executor-view.jpg
+  layout_hint: 'Show linked views: Estate (filtered; hide High sensitivity), Digital
+    (Status != Complete), Tasks (Status != Done).'
+  instructions:
+  - '[#INSTR:LAYOUT] Add linked views with the filters above; keep this page sanitized.'
+  blocks:
+  - type: h2
+    text: Executor Dashboard
+  - type: paragraph
+    text: '[#NOTE] If you reached this page by mistake, contact the owner.'
+- title: Family View
+  icon: 👨‍👩‍👧
+  cover: covers/family-view.jpg
+  layout_hint: Linked views for Memories & Letters and Obituary highlights; exclude
+    estate details.
+  instructions:
+  - '[#INSTR:LAYOUT] Add linked views for Memories (Mood visible) and Obituary (Final
+    only).'
+  blocks:
+  - type: h2
+    text: Family Dashboard
+  - type: paragraph
+    text: '[#NOTE] This page intentionally hides sensitive items.'
+- title: QR Card Printables (How-To)
+  icon: 🖨️
+  cover: covers/qr-printables.jpg
+  blocks:
+  - type: paragraph
+    text: Tips for card layout, printing, and laminating.
+- title: Icons & Headers Library
+  icon: 🎨
+  cover: covers/style.jpg
+  blocks:
+  - type: paragraph
+    text: Place your chosen icon references here. Emoji placeholders are used in v2.
+- title: Prompt Library — Letters & Stories
+  icon: 🧠
+  cover: covers/prompts-letters.jpg
+  blocks:
+  - type: paragraph
+    text: Run Notion AI here and paste results where needed.
+- title: Prompt Library — Obituary & Eulogy
+  icon: 🧠
+  cover: covers/prompts-obituary.jpg
+  blocks:
+  - type: paragraph
+    text: Draft a 200–300 word obituary from notes.
+- title: Prompt Library — Executor & Summary Aids
+  icon: 🧠
+  cover: covers/prompts-executor.jpg
+  blocks:
+  - type: paragraph
+    text: Summarize this policy and list three next steps for my executor.
+- title: Prompt Library — Combine & Rewrite
+  icon: 🧠
+  cover: covers/prompts-combine.jpg
+  blocks:
+  - type: paragraph
+    text: Combine these two letters into one warmly worded note.
+- title: Prompt Library — Translate (Per-Doc)
+  icon: 🧠
+  cover: covers/prompts-translate.jpg
+  blocks:
+  - type: paragraph
+    text: Translate this letter; maintain tone and respect.
+- title: Process Flow (Mermaid)
+  icon: 🗂️
+  cover: covers/diagrams-flow.jpg
+  blocks:
+  - type: code
+    language: mermaid
+    text: 'flowchart LR
+
+      A[Setup] --> B[Executor Ready]
+
+      B --> C[Estate Docs Added]
+
+      C --> D[Digital Legacy Secured]
+
+      D --> E[Memories & Letters Created]
+
+      E --> F[Guidance & Support Ready]
+
+      '
+- title: Contacts & Roles Map (Mermaid)
+  icon: 🧭
+  cover: covers/diagrams-map.jpg
+  blocks:
+  - type: code
+    language: mermaid
+    text: 'graph TD
+
+      Owner --> Executor
+
+      Executor --> Lawyer
+
+      Executor --> Insurance_Agent
+
+      Executor --> Family
+
+      '
+- title: Executor Activation Flow (Mermaid)
+  icon: 🧭
+  cover: covers/diagrams-activation.jpg
+  blocks:
+  - type: code
+    language: mermaid
+    text: 'sequenceDiagram
+
+      participant QR as QR Scan
+
+      participant NV as Notion View
+
+      participant EX as Executor
+
+      QR->>NV: Open Executor View
+
+      NV-->>EX: Show tasks + estate overview
+
+      EX->>NV: Mark steps complete
+
+      NV-->>EX: Next steps & contacts
+
+      '
+- title: (Hidden) Ops
+  icon: 🛠️
+  cover: covers/ops.jpg
+  blocks:
+  - type: paragraph
+    text: Internal utilities and logs. Hide from casual users.
+- title: Developer Notes / Version & Changelog
+  icon: 🧾
+  cover: covers/ops.jpg
+  blocks:
+  - type: paragraph
+    text: 'Version: v2.0. Record schema or content changes here.'
+- title: System Check / Recovery Report
+  icon: 🧪
+  cover: covers/ops.jpg
+  blocks:
+  - type: paragraph
+    text: If a linked view breaks, re-add from the DB; verify filters and properties.
+- title: Manual Finishing Tasks
+  icon: 🧰
+  cover: covers/ops.jpg
+  instructions:
+  - '[#INSTR] Add page covers & icons consistently (replace placeholders).'
+  - '[#INSTR] Create linked views (Gallery/Board/Table) as instructed on each page.'
+  - '[#INSTR] Upload purchased QR PNGs to Access & QR (DB).'
+  - '[#INSTR] Walk through the Template Map and test every link on mobile.'
+  blocks:
+  - type: paragraph
+    text: When all instructions are deleted across pages, Build Tracker shows Complete.
+- title: Copy & Tone Guide
+  icon: 🪶
+  cover: covers/style.jpg
+  blocks:
+  - type: paragraph
+    text: Use compassionate, factual language. Avoid pressure; provide clarity and
+      calm.
+- title: Legal Disclaimer
+  icon: ⚖️
+  cover: covers/style.jpg
+  blocks:
+  - type: paragraph
+    text: This is not legal advice. Consult licensed professionals for estate, tax,
+      or legal matters.
+- title: Diagnostics
+  icon: 🩺
+  cover: covers/diagnostics.jpg
+  instructions:
+  - '[#INSTR] Review gaps and follow Page Link to fix. Delete this when all gaps resolved.'
+  blocks:
+  - type: h2
+    text: Diagnostics & Build Tracking
+  - type: paragraph
+    text: This page surfaces what's missing (instructions left, covers/icons, layout
+      creation, QR entries).
+  - type: link_to_database
+    database: build_tracker
+- title: Encouragements
+  icon: 💡
+  cover: covers/encouragements.jpg
+  blocks:
+  - type: paragraph
+    text: Items flagged as 'Include in Encouragements' from multiple DBs.
+- title: Family Pack Codes
+  icon: 👪
+  cover: covers/family-pack.jpg
+  instructions:
+  - '[#INSTR] Add rows in Access & QR DB tagged Pack = Family Pack for these pages
+    and upload purchased QR images; delete when done.'
+  blocks:
+  - type: paragraph
+    text: Filtered index of family-facing codes (set linked view manually).
+- title: Full Pack Codes
+  icon: 🧩
+  cover: covers/full-pack.jpg
+  instructions:
+  - '[#INSTR] Add rows in Access & QR DB tagged Pack = Full Pack for every page; upload
+    purchased QR images; delete when done.'
+  blocks:
+  - type: paragraph
+    text: Filtered index of full-pack codes (set linked view manually).
+- title: Special Offer Pack Codes
+  icon: 🏷️
+  cover: covers/special-offer.jpg
+  instructions:
+  - '[#INSTR] Add rows in Access & QR DB tagged Pack = Special Offer Pack according
+    to your offer; upload purchased QR images; delete when done.'
+  blocks:
+  - type: paragraph
+    text: Filtered index of special-offer codes (set linked view manually).
+- title: QR Distribution Letters
+  icon: ✉️
+  cover: covers/distribution-letters.jpg
+  instructions:
+  - '[#INSTR] Copy the letter below, personalize names, and paste QR images/links.
+    Delete when sent.'
+  blocks:
+  - type: h2
+    text: Letter for Family Pack
+  - type: paragraph
+    text: Dear [Name], Here are helpful links for our family space. Use your phone
+      to scan the QR or tap the link. [Insert Family Pack QRs/links].
+  - type: h2
+    text: Letter for Full Pack
+  - type: paragraph
+    text: Dear [Name], This set includes QR codes for every page in the workspace.
+      [Insert Full Pack QRs/links].
+  - type: h2
+    text: Letter for Special Offer Pack
+  - type: paragraph
+    text: Dear [Name], This is a limited special-offer set of QR codes. [Insert Offer
+      Pack QRs/links].

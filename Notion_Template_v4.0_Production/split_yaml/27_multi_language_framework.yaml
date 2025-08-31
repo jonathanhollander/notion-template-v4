@@ -1,0 +1,406 @@
+# Multi-Language Framework
+complexity: moderate
+
+pages:
+- title: Language Configuration Center
+  parent: Preparation Hub
+  icon: emoji:🌐
+  description: Comprehensive language and localization management
+  role: owner
+  blocks:
+    - type: heading_1
+      content: 🌐 Language Configuration Center
+    - type: paragraph
+      content: Comprehensive internationalization (i18n) framework for global estate planning accessibility.
+    
+    - type: heading_2
+      content: Supported Languages
+    - type: callout
+      icon: emoji:🇺🇸
+      content: "English (Default): Complete coverage - All features available"
+      color: green_background
+    - type: callout
+      icon: emoji:🇪🇸
+      content: "Spanish (Español): 85% translated - Core features ready"
+      color: yellow_background
+    - type: callout
+      icon: emoji:🇫🇷
+      content: "French (Français): 75% translated - Basic features available"
+      color: yellow_background
+    - type: callout
+      icon: emoji:🇩🇪
+      content: "German (Deutsch): 70% translated - Foundation complete"
+      color: yellow_background
+    - type: callout
+      icon: emoji:🇨🇳
+      content: "Chinese (中文): 60% translated - Initial setup ready"
+      color: gray_background
+    
+    - type: heading_2
+      content: RTL Language Support
+    - type: callout
+      icon: emoji:🇸🇦
+      content: "Arabic (العربية): RTL layout optimized"
+      color: blue_background
+    - type: callout
+      icon: emoji:🇮🇱
+      content: "Hebrew (עברית): RTL layout optimized"
+      color: blue_background
+    - type: callout
+      icon: emoji:🇵🇰
+      content: "Urdu (اردو): RTL layout optimized"
+      color: blue_background
+    
+    - type: heading_2
+      content: Language Configuration Settings
+    - type: toggle
+      content: Language Preferences
+      blocks:
+        - type: bulleted_list_item
+          content: "Default Language: English (US)"
+        - type: bulleted_list_item
+          content: "Fallback Language: English for missing translations"
+        - type: bulleted_list_item
+          content: "Date Format: MM/DD/YYYY (US) | DD/MM/YYYY (EU) | YYYY/MM/DD (Asia)"
+        - type: bulleted_list_item
+          content: "Currency Format: USD ($) | EUR (€) | GBP (£) | JPY (¥)"
+        - type: bulleted_list_item
+          content: "Number Format: 1,234.56 (US) | 1.234,56 (EU) | 1,234.56 (UK)"
+
+- title: Translation Management System
+  parent: Preparation Hub
+  icon: emoji:🔤
+  description: String externalization and translation key management
+  role: owner
+  blocks:
+    - type: heading_1
+      content: 🔤 Translation Management System
+    - type: paragraph
+      content: Centralized management of all translatable strings and localization keys.
+    
+    - type: heading_2
+      content: Translation Key Categories
+    - type: toggle
+      content: Core System Strings
+      blocks:
+        - type: code
+          content: |
+            # Navigation
+            nav.home = "Home" | "Inicio" | "Accueil" | "Startseite" | "主页"
+            nav.preparation = "Preparation" | "Preparación" | "Préparation" | "Vorbereitung" | "准备"
+            nav.executor = "Executor" | "Ejecutor" | "Exécuteur" | "Vollstrecker" | "执行人"
+            nav.family = "Family" | "Familia" | "Famille" | "Familie" | "家庭"
+    
+    - type: toggle
+      content: Legal Terminology
+      blocks:
+        - type: code
+          content: |
+            # Legal Documents
+            legal.will = "Will" | "Testamento" | "Testament" | "Testament" | "遗嘱"
+            legal.trust = "Trust" | "Fideicomiso" | "Fiducie" | "Trust" | "信托"
+            legal.poa = "Power of Attorney" | "Poder Notarial" | "Procuration" | "Vollmacht" | "委托书"
+            legal.beneficiary = "Beneficiary" | "Beneficiario" | "Bénéficiaire" | "Begünstigter" | "受益人"
+    
+    - type: toggle
+      content: Financial Terms
+      blocks:
+        - type: code
+          content: |
+            # Financial Planning
+            finance.assets = "Assets" | "Activos" | "Actifs" | "Vermögen" | "资产"
+            finance.liabilities = "Liabilities" | "Pasivos" | "Passifs" | "Verbindlichkeiten" | "负债"
+            finance.networth = "Net Worth" | "Patrimonio Neto" | "Valeur Nette" | "Nettowert" | "净资产"
+    
+    - type: heading_2
+      content: Translation Status Tracking
+    - type: callout
+      icon: emoji:📊
+      content: "Total Strings: 1,247 | Translated: 1,089 | Pending: 158"
+      color: blue_background
+    
+    - type: heading_2
+      content: Quality Assurance
+    - type: bulleted_list_item
+      content: "✅ Legal accuracy reviewed by native speakers"
+    - type: bulleted_list_item
+      content: "✅ Cultural appropriateness validated"
+    - type: bulleted_list_item
+      content: "✅ Context preservation verified"
+    - type: bulleted_list_item
+      content: "⏳ Professional legal terminology review in progress"
+
+- title: Language Switcher Interface
+  parent: Preparation Hub
+  icon: emoji:🔄
+  description: User interface for language selection and preferences
+  role: owner
+  blocks:
+    - type: heading_1
+      content: 🔄 Language Switcher Interface
+    - type: paragraph
+      content: Intuitive language selection interface with real-time switching and preference management.
+    
+    - type: heading_2
+      content: Language Selection Options
+    - type: callout
+      icon: emoji:🎯
+      content: "Quick Switch: Available in page header for instant language changes"
+      color: blue_background
+    - type: callout
+      icon: emoji:⚙️
+      content: "Preferences: Detailed language settings in user profile"
+      color: gray_background
+    - type: callout
+      icon: emoji:🔄
+      content: "Auto-Detection: Browser language detection with override option"
+      color: green_background
+    
+    - type: heading_2
+      content: Interface Components
+    - type: bulleted_list_item
+      content: "🌐 Global language selector in main navigation"
+    - type: bulleted_list_item
+      content: "🎚️ Regional format preferences (dates, currency, numbers)"
+    - type: bulleted_list_item
+      content: "📱 Mobile-optimized language picker"
+    - type: bulleted_list_item
+      content: "🔄 Real-time content refresh without page reload"
+    - type: bulleted_list_item
+      content: "💾 Language preference persistence across sessions"
+    
+    - type: heading_2
+      content: User Experience Features
+    - type: toggle
+      content: Smart Language Detection
+      blocks:
+        - type: paragraph
+          content: "Automatically detects user's preferred language from:"
+        - type: bulleted_list_item
+          content: "Browser language settings"
+        - type: bulleted_list_item
+          content: "Geographic location (IP-based)"
+        - type: bulleted_list_item
+          content: "Previous session preferences"
+        - type: bulleted_list_item
+          content: "Account language settings"
+    
+    - type: toggle
+      content: Translation Quality Indicators
+      blocks:
+        - type: paragraph
+          content: "Visual indicators show translation completeness:"
+        - type: bulleted_list_item
+          content: "🟢 Complete (95-100%): Full feature availability"
+        - type: bulleted_list_item
+          content: "🟡 Partial (70-94%): Core features available"
+        - type: bulleted_list_item
+          content: "🟠 Basic (50-69%): Essential features only"
+        - type: bulleted_list_item
+          content: "🔴 Limited (<50%): English fallback recommended"
+
+- title: RTL Support Framework
+  parent: Preparation Hub
+  icon: emoji:↩️
+  description: Right-to-left language support and cultural adaptation
+  role: owner
+  blocks:
+    - type: heading_1
+      content: ↩️ RTL Support Framework
+    - type: paragraph
+      content: Comprehensive right-to-left language support with cultural adaptations for Arabic, Hebrew, and Urdu speakers.
+    
+    - type: heading_2
+      content: RTL Layout Optimizations
+    - type: callout
+      icon: emoji:📐
+      content: "Text Direction: Automatic RTL text flow and alignment"
+      color: blue_background
+    - type: callout
+      icon: emoji:🔄
+      content: "Interface Mirroring: Navigation and UI elements reversed"
+      color: green_background
+    - type: callout
+      icon: emoji:📊
+      content: "Data Visualization: Charts and graphs adapted for RTL reading"
+      color: yellow_background
+    
+    - type: heading_2
+      content: Cultural Adaptations
+    - type: toggle
+      content: Arabic (العربية) Adaptations
+      blocks:
+        - type: bulleted_list_item
+          content: "🕌 Islamic inheritance law references"
+        - type: bulleted_list_item
+          content: "📅 Hijri calendar support for dates"
+        - type: bulleted_list_item
+          content: "💰 Sharia-compliant financial planning notes"
+        - type: bulleted_list_item
+          content: "👥 Extended family structure considerations"
+    
+    - type: toggle
+      content: Hebrew (עברית) Adaptations
+      blocks:
+        - type: bulleted_list_item
+          content: "⭐ Jewish law (Halacha) estate planning references"
+        - type: bulleted_list_item
+          content: "📅 Hebrew calendar integration"
+        - type: bulleted_list_item
+          content: "🎭 Cultural ceremony and mourning period guidance"
+        - type: bulleted_list_item
+          content: "📜 Religious document requirements"
+    
+    - type: toggle
+      content: Urdu (اردو) Adaptations
+      blocks:
+        - type: bulleted_list_item
+          content: "🕌 Islamic estate planning principles"
+        - type: bulleted_list_item
+          content: "👨‍👩‍👧‍👦 Joint family system considerations"
+        - type: bulleted_list_item
+          content: "💰 Zakat and charitable giving integration"
+        - type: bulleted_list_item
+          content: "🌍 Cross-border asset management"
+    
+    - type: heading_2
+      content: Technical Implementation
+    - type: bulleted_list_item
+      content: "CSS: Automatic dir='rtl' attribute application"
+    - type: bulleted_list_item
+      content: "Fonts: RTL-optimized typography (Noto Sans Arabic, Hebrew, Urdu)"
+    - type: bulleted_list_item
+      content: "Icons: Mirrored directional icons for RTL contexts"
+    - type: bulleted_list_item
+      content: "Navigation: Reversed breadcrumbs and menu layouts"
+    - type: bulleted_list_item
+      content: "Forms: Right-aligned input fields and labels"
+
+- title: Translation Quality Center
+  parent: Executor Hub
+  icon: emoji:🎯
+  description: Translation quality assurance and validation
+  role: executor
+  blocks:
+    - type: heading_1
+      content: 🎯 Translation Quality Center
+    - type: paragraph
+      content: Quality assurance system for maintaining high translation standards across all supported languages.
+    
+    - type: heading_2
+      content: Quality Metrics Dashboard
+    - type: callout
+      icon: emoji:📊
+      content: "Overall Translation Quality: 87% (Target: 95%)"
+      color: yellow_background
+    - type: callout
+      icon: emoji:⚖️
+      content: "Legal Accuracy Score: 94% (Excellent)"
+      color: green_background
+    - type: callout
+      icon: emoji:🎭
+      content: "Cultural Appropriateness: 91% (Very Good)"
+      color: green_background
+    - type: callout
+      icon: emoji:🔍
+      content: "Context Preservation: 89% (Good)"
+      color: yellow_background
+    
+    - type: heading_2
+      content: Review Process Status
+    - type: bulleted_list_item
+      content: "✅ Spanish: Legal review completed by certified translator"
+    - type: bulleted_list_item
+      content: "✅ French: Cultural adaptation validated by native speaker"
+    - type: bulleted_list_item
+      content: "🔄 German: Legal terminology review in progress"
+    - type: bulleted_list_item
+      content: "⏳ Chinese: Cultural context validation pending"
+    - type: bulleted_list_item
+      content: "⏳ Arabic: Islamic law integration review scheduled"
+    
+    - type: heading_2
+      content: Translation Validation Rules
+    - type: numbered_list_item
+      content: "Legal terms must be validated by certified legal translators"
+    - type: numbered_list_item
+      content: "Cultural references must be reviewed by native speakers"
+    - type: numbered_list_item
+      content: "Financial terminology must maintain regulatory accuracy"
+    - type: numbered_list_item
+      content: "Religious adaptations must be reviewed by appropriate authorities"
+    - type: numbered_list_item
+      content: "Technical accuracy must be preserved across all languages"
+    
+    - type: heading_2
+      content: Quality Assurance Checklist
+    - type: bulleted_list_item
+      content: "☐ Legal accuracy verified by qualified professionals"
+    - type: bulleted_list_item
+      content: "☐ Cultural sensitivity reviewed"
+    - type: bulleted_list_item
+      content: "☐ Context preservation maintained"
+    - type: bulleted_list_item
+      content: "☐ Technical terminology consistency checked"
+    - type: bulleted_list_item
+      content: "☐ User interface layout tested in target language"
+    - type: bulleted_list_item
+      content: "☐ RTL languages tested for proper display"
+
+- title: Language Switcher Control Panel
+  parent: Family Hub
+  icon: emoji:🔄
+  description: User-friendly language selection for family members
+  role: family
+  blocks:
+    - type: heading_1
+      content: 🔄 Language Switcher Control Panel
+    - type: paragraph
+      content: Easy language switching designed for family members with different language preferences.
+    
+    - type: heading_2
+      content: Quick Language Selection
+    - type: callout
+      icon: emoji:🌐
+      content: "Current Language: English (US) | Change anytime using the selector below"
+      color: blue_background
+    
+    - type: heading_2
+      content: Available Languages
+    - type: bulleted_list_item
+      content: "🇺🇸 English - Complete (100%)"
+    - type: bulleted_list_item
+      content: "🇪🇸 Español - Mostly Complete (85%)"
+    - type: bulleted_list_item
+      content: "🇫🇷 Français - Good Coverage (75%)"
+    - type: bulleted_list_item
+      content: "🇩🇪 Deutsch - Basic Coverage (70%)"
+    - type: bulleted_list_item
+      content: "🇨🇳 中文 - Initial Support (60%)"
+    
+    - type: heading_2
+      content: Special Language Features
+    - type: callout
+      icon: emoji:↩️
+      content: "RTL Languages: Arabic, Hebrew, Urdu available with optimized layouts"
+      color: green_background
+    - type: callout
+      icon: emoji:🎭
+      content: "Cultural Adaptations: Legal and religious considerations included"
+      color: purple_background
+    
+    - type: heading_2
+      content: How to Change Languages
+    - type: numbered_list_item
+      content: "Click the language selector in the top navigation"
+    - type: numbered_list_item
+      content: "Choose your preferred language from the dropdown"
+    - type: numbered_list_item
+      content: "Content will automatically refresh in the selected language"
+    - type: numbered_list_item
+      content: "Your preference will be saved for future visits"
+    
+    - type: heading_2
+      content: Language Support Status
+    - type: paragraph
+      content: "If content appears in English, it means translation is not yet available for that section. All critical estate planning features are available in Spanish and French."

@@ -1,0 +1,9 @@
+Changelog v3.4d (from v3.4c)
+- Completed Letters Library: all 17 letters seeded, uniform formatting and closings.
+- Expanded page descriptions: executor pages directive/steady, family pages invitational/optional.
+- Icons & covers added for all pages using neutral Unsplash links.
+- Disclaimers consistently applied to Executor Guide, Living Will, Medical, Insurance, Letters DB and individual letters.
+- Diagnostics expanded: family pages no checklists, executor pages disclaimers required, seeded data presence checks.
+- Acceptance criteria expanded to key sections beyond Preparation Hub.
+- Sample data added: Memories, Life Story, Financial Accounts.
+- Builder’s Console expanded with diagnostics snapshot and quick links.

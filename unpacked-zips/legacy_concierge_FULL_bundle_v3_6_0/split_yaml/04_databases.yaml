@@ -1,0 +1,106 @@
+db:
+  schemas:
+    Accounts:
+      properties:
+        Name: title
+        Institution: text
+        Type: select
+        'Account #': text
+        Notes: text
+      seed_rows:
+      - Name: Checking – Main
+        Institution: Acme Bank
+        Type:
+          _select: Bank
+        'Account #': '****1234'
+        Notes: Primary household account.
+      - Name: Credit Card – Travel
+        Institution: Acme Bank
+        Type:
+          _select: Credit
+        'Account #': '****5678'
+        Notes: Auto-pay on 5th.
+    Property:
+      properties:
+        Name: title
+        Type: select
+        Identifier: text
+        Notes: text
+      seed_rows:
+      - Name: Home – 14 Maple St
+        Type:
+          _select: Real Estate
+        Identifier: 'Deed #A77'
+        Notes: Deed in Documents/Real Estate.
+      - Name: Car – 2019 Sedan
+        Type:
+          _select: Vehicle
+        Identifier: VIN 1ABC...
+        Notes: Title in glove box.
+    Insurance:
+      properties:
+        Policy: title
+        Carrier: text
+        Type: select
+        'Policy #': text
+        Notes: text
+      seed_rows:
+      - Policy: Life – Term
+        Carrier: North Star Life
+        Type:
+          _select: Life
+        'Policy #': L-4451
+        Notes: Beneficiaries listed in file.
+    Contacts:
+      properties:
+        Name: title
+        Role: select
+        Email: text
+        Phone: text
+        Notes: text
+      seed_rows:
+      - Name: Jordan Patel
+        Role:
+          _select: Attorney
+        Email: jordan@example.com
+        Phone: +1 555-123-0001
+        Notes: Estate attorney.
+      - Name: Taylor Chen
+        Role:
+          _select: Executor
+        Email: taylor@example.com
+        Phone: +1 555-222-1100
+        Notes: Primary executor.
+    Subscriptions:
+      properties:
+        Service: title
+        Category: select
+        Account Email: text
+        Notes: text
+      seed_rows:
+      - Service: Netflix
+        Category:
+          _select: Streaming
+        Account Email: me@example.com
+        Notes: Cancel or transfer.
+      - Service: Electric Utility
+        Category:
+          _select: Utility
+        Account Email: me@example.com
+        Notes: Final meter read.
+    Keepsakes:
+      properties:
+        Title: title
+        Story: text
+        Where: text
+      seed_rows:
+      - Title: Grandpa’s Watch
+        Story: Given on my 18th birthday.
+        Where: Top dresser drawer.
+    Letters Index:
+      properties:
+        Title: title
+        Audience: select
+        Category: select
+        URL: url
+      seed_rows: []

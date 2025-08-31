@@ -1,0 +1,15 @@
+pages:
+- title: Builder’s Console
+  slug: builders-console
+  type: page
+  audience: shared
+  is_admin: true
+  blocks:
+  - callout: ⚠️ For setup only. Delete this branch before sharing.
+  - h2: Readiness Checklist
+  - bulleted_list:
+    - Icons and covers added to key pages.
+    - Helper notes removed from public/executor/family pages.
+    - Letters personalized where needed.
+    - Disclaimers present only where appropriate.
+    - Diagnostics run clean; mobile/print skim check complete.

@@ -1,0 +1,11 @@
+Legacy Concierge — GOLD v3.8.1
+Built: 2025-08-30T08:21:22Z
+
+Closes remaining MEDIUM-HIGH audit items:
+ • Implements missing functions: link_to_page_block, upsert_page, get_children, insert_children.
+ • Relation schema now uses required 'type: single_property' for relations (fallback safe).
+ • Synced blocks: safer reference insertion with error handling.
+ • Formula validator warns about overly complex expressions (heuristic).
+ • Search fallback logs ambiguity/misses instead of failing silently.
+ • Asset host preflight HEAD checks (first few assets) for early warnings.
+ • Main flow: validates YAML, assets, creates pages/DBs, indexes, seeds, synced, nav, helpers, rollout summary.

@@ -1,0 +1,7 @@
+{% extends "base.html" %}{% block content %}
+<h1>{{ promo.name }}</h1>
+<p class="small">Special offer · Set: {{ promo.qr_set|upper }}</p>
+<div class="card">
+  <form action="/checkout/{{ promo.id }}" method="post"><button class="btn">Get this offer →</button></form>
+</div>
+{% endblock %}

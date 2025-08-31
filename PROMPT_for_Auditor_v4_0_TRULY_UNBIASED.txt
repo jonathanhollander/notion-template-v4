@@ -1,0 +1,19 @@
+# DEPLOYMENT SYSTEM AUDIT REQUEST
+
+## Materials Provided
+- deploy.py (main script)
+- 22 YAML files in split_yaml directory
+- auditor_compliance_check.sh
+- validate_deployment.py
+- CSV files in csv directory
+
+## Request
+Please examine the provided deployment system and tell me:
+
+1. What does this system do?
+2. What features does it implement?
+3. Does it work?
+4. What's missing or broken?
+5. Is it ready for production use?
+
+Provide your findings in whatever format you prefer. Be thorough.

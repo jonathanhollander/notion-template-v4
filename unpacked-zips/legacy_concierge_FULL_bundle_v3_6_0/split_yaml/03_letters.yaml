@@ -1,0 +1,36 @@
+letters:
+- Title: Bank Notification – Deceased Account Holder
+  Audience: Bank
+  Category: Financial
+  Body: Dear {BankName}, I’m writing to inform you of the passing of {FullName}. I’m
+    assisting with the estate and would appreciate guidance on required documents...
+- Title: Credit Card Closure Request
+  Audience: Credit Card
+  Category: Financial
+  Body: Hello {Issuer}, Please close the account ending in {Last4} for {FullName},
+    who has passed away. Attached are the documents you requested...
+- Title: Utility Account Transfer/Closure
+  Audience: Utility
+  Category: Household
+  Body: To {UtilityName}, Please transfer or close services for the account at {ServiceAddress}.
+    The account holder, {FullName}, has passed away...
+- Title: Insurance Claim Notification
+  Audience: Insurance
+  Category: Insurance
+  Body: Dear Claims Department, This is to notify you of a claim for policy {PolicyNumber}
+    for {FullName}. Please advise on next steps...
+- Title: Employer HR Notification
+  Audience: Employer
+  Category: Employment
+  Body: Dear HR, I’m writing regarding {FullName}. Would you guide us through any
+    benefits, payroll, or COBRA steps that apply?
+- Title: Subscription Cancellation (General)
+  Audience: Provider
+  Category: Digital
+  Body: Hello, Please cancel the subscription for {Service} associated with {Email}.
+    The account holder {FullName} has passed away...
+- Title: Social Media Memorialization
+  Audience: Platform
+  Category: Digital
+  Body: Hello {Platform}, Please memorialize or close the account for {FullName}.
+    I can provide documentation as needed...

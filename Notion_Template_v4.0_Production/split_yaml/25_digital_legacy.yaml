@@ -1,0 +1,338 @@
+pages:
+complexity: moderate
+- title: Digital Legacy Management
+  icon: emoji:💻
+  description: Manage your digital afterlife across all platforms
+  role: owner
+  slug: digital-legacy-management
+  cover: https://images.unsplash.com/photo-1516865131505-4dabf2efc692
+  
+- title: Google Inactive Account Manager
+  parent: Digital Legacy Management  
+  icon: emoji:🔍
+  description: Set up Google's inactive account manager for Gmail, Photos, Drive, and YouTube
+  role: owner
+  slug: google-inactive-account
+  blocks:
+  - type: heading_1
+    content: Google Inactive Account Manager Setup
+  - type: paragraph
+    content: Google allows you to decide what happens to your data if your account becomes inactive.
+  - type: heading_2
+    content: Steps to Configure
+  - type: numbered_list_item
+    content: Go to myaccount.google.com/inactive
+  - type: numbered_list_item
+    content: Set the inactivity period (3, 6, 12, or 18 months)
+  - type: numbered_list_item
+    content: Add up to 10 trusted contacts to notify
+  - type: numbered_list_item
+    content: Choose data to share with specific people
+  - type: numbered_list_item
+    content: Optionally set account for deletion after sharing
+  - type: heading_2
+    content: Data You Can Share
+  - type: bulleted_list_item
+    content: Gmail messages and attachments
+  - type: bulleted_list_item
+    content: Google Photos albums and memories
+  - type: bulleted_list_item
+    content: Google Drive documents and files
+  - type: bulleted_list_item
+    content: YouTube videos and channel
+  - type: bulleted_list_item
+    content: Calendar events and contacts
+  - type: callout
+    icon: emoji:⚠️
+    content: Important - Update your trusted contacts annually to ensure current information
+    color: yellow_background
+
+- title: Apple Legacy Contact
+  parent: Digital Legacy Management
+  icon: emoji:🍎
+  description: Designate someone to access your Apple ID data after death
+  role: owner
+  slug: apple-legacy-contact
+  blocks:
+  - type: heading_1
+    content: Apple Legacy Contact Setup
+  - type: paragraph
+    content: iOS 15.2+ and macOS 12.1+ allow you to designate Legacy Contacts who can access your account data after you pass away.
+  - type: heading_2
+    content: How to Add a Legacy Contact
+  - type: numbered_list_item
+    content: On iPhone/iPad - Settings > [Your Name] > Sign-In & Security > Legacy Contact
+  - type: numbered_list_item
+    content: On Mac - System Settings > [Your Name] > Sign-In & Security > Legacy Contact
+  - type: numbered_list_item
+    content: Tap "Add Legacy Contact"
+  - type: numbered_list_item
+    content: Choose from your contacts (must have Apple ID)
+  - type: numbered_list_item
+    content: Share the access key with them (print or save PDF)
+  - type: heading_2
+    content: What Legacy Contacts Can Access
+  - type: bulleted_list_item
+    content: Photos and videos
+  - type: bulleted_list_item
+    content: Messages and mail
+  - type: bulleted_list_item  
+    content: Notes and files
+  - type: bulleted_list_item
+    content: Voice memos and Safari bookmarks
+  - type: bulleted_list_item
+    content: Contacts and calendars
+  - type: callout
+    icon: emoji:🔐
+    content: Legacy Contacts cannot access Keychain passwords or licensed media
+    color: gray_background
+
+- title: Facebook Memorialization
+  parent: Digital Legacy Management
+  icon: emoji:👤
+  description: Set up memorialization or deletion preferences for Facebook
+  role: owner
+  slug: facebook-memorialization
+  blocks:
+  - type: heading_1
+    content: Facebook Memorialization Settings
+  - type: paragraph
+    content: Choose what happens to your Facebook account when you pass away.
+  - type: heading_2
+    content: Option 1 - Memorialized Account
+  - type: paragraph
+    content: Your profile becomes a memorial with "Remembering" shown next to your name
+  - type: numbered_list_item
+    content: Go to Settings & Privacy > Settings > General > Memorialization Settings
+  - type: numbered_list_item
+    content: Choose a legacy contact to manage your memorialized account
+  - type: numbered_list_item
+    content: Legacy contact can write pinned tribute post
+  - type: numbered_list_item
+    content: Legacy contact can update profile and cover photos
+  - type: numbered_list_item
+    content: Legacy contact can download your data archive
+  - type: heading_2
+    content: Option 2 - Account Deletion
+  - type: numbered_list_item
+    content: In Memorialization Settings, select "Delete Account"
+  - type: numbered_list_item
+    content: Account and all data permanently deleted upon death verification
+  - type: callout
+    icon: emoji:📝
+    content: Facebook requires proof of death (death certificate or obituary) to memorialize or delete
+    color: blue_background
+
+- title: Instagram Memorial
+  parent: Digital Legacy Management
+  icon: emoji:📸
+  description: Request memorialization of Instagram accounts
+  role: owner
+  slug: instagram-memorial
+  blocks:
+  - type: heading_1
+    content: Instagram Memorialization Process
+  - type: paragraph
+    content: Instagram can memorialize accounts of deceased users to preserve their legacy.
+  - type: heading_2
+    content: What Happens to Memorialized Accounts
+  - type: bulleted_list_item
+    content: "Memorialized" appears next to the name
+  - type: bulleted_list_item
+    content: Posts remain visible to current audience
+  - type: bulleted_list_item
+    content: No one can log into the account
+  - type: bulleted_list_item
+    content: Account won't appear in Explore or recommendations
+  - type: heading_2
+    content: How Family Can Request Memorialization
+  - type: numbered_list_item
+    content: Visit help.instagram.com/contact/1474899482730688
+  - type: numbered_list_item
+    content: Provide deceased person's name and username
+  - type: numbered_list_item
+    content: Upload proof of death
+  - type: numbered_list_item
+    content: Provide your relationship to deceased
+  - type: callout
+    icon: emoji:💡
+    content: Consider downloading your Instagram data backup regularly via Settings > Security > Download Data
+    color: gray_background
+
+- title: LinkedIn Legacy Settings
+  parent: Digital Legacy Management
+  icon: emoji:💼
+  description: Manage your professional profile legacy
+  role: owner
+  slug: linkedin-legacy
+  blocks:
+  - type: heading_1
+    content: LinkedIn Account Management After Death
+  - type: paragraph
+    content: LinkedIn can close accounts of deceased members to protect their professional legacy.
+  - type: heading_2
+    content: Preparing Your LinkedIn Legacy
+  - type: numbered_list_item
+    content: Download your data - Settings & Privacy > Data Privacy > Get a copy of your data
+  - type: numbered_list_item
+    content: Save important connections and recommendations
+  - type: numbered_list_item
+    content: Document your LinkedIn URL for family reference
+  - type: heading_2
+    content: How Family Can Close Your Account
+  - type: numbered_list_item
+    content: Visit linkedin.com/help/linkedin/ask/TS-RDMLP
+  - type: numbered_list_item
+    content: Select "Deceased LinkedIn member"
+  - type: numbered_list_item
+    content: Provide member's name, profile URL, email
+  - type: numbered_list_item
+    content: Upload death certificate or obituary
+  - type: numbered_list_item
+    content: Account closed within 5 business days
+  - type: callout
+    icon: emoji:📊
+    content: Export your LinkedIn connections as a CSV file to preserve professional network for family
+    color: gray_background
+
+- title: Password Manager Legacy Access
+  parent: Digital Legacy Management
+  icon: emoji:🔑
+  description: Set up emergency access for password managers
+  role: owner
+  slug: password-manager-legacy
+  blocks:
+  - type: heading_1
+    content: Password Manager Emergency Access
+  - type: paragraph
+    content: Most password managers offer emergency access features for trusted contacts.
+  - type: heading_2
+    content: 1Password - Emergency Kit
+  - type: bulleted_list_item
+    content: Generate Emergency Kit PDF with account details
+  - type: bulleted_list_item
+    content: Store securely (safe deposit box or with attorney)
+  - type: bulleted_list_item
+    content: Kit includes Secret Key and account password instructions
+  - type: heading_2
+    content: LastPass - Emergency Access
+  - type: bulleted_list_item
+    content: Settings > Emergency Access > Add contact
+  - type: bulleted_list_item
+    content: Set waiting period (0 hours to 30 days)
+  - type: bulleted_list_item
+    content: Contact requests access, you're notified
+  - type: bulleted_list_item
+    content: Access granted after waiting period if not declined
+  - type: heading_2
+    content: Bitwarden - Emergency Access
+  - type: bulleted_list_item
+    content: Settings > Emergency Access > Add trusted contact
+  - type: bulleted_list_item
+    content: Choose View or Takeover access level
+  - type: bulleted_list_item
+    content: Set wait time (1-90 days)
+  - type: heading_2
+    content: Dashlane - Emergency Contacts
+  - type: bulleted_list_item
+    content: Settings > Security > Emergency > Add contact
+  - type: bulleted_list_item
+    content: Contact must have Dashlane account
+  - type: bulleted_list_item
+    content: Full vault access after approval period
+  - type: callout
+    icon: emoji:🛡️
+    content: Never share master password directly - use official emergency access features
+    color: red_background
+
+- title: Cryptocurrency Wallet Access
+  parent: Digital Legacy Management
+  icon: emoji:🪙
+  description: Secure methods for crypto inheritance
+  role: owner
+  slug: crypto-wallet-access
+  blocks:
+  - type: heading_1
+    content: Cryptocurrency Inheritance Planning
+  - type: paragraph
+    content: Without proper planning, cryptocurrency assets may be permanently lost.
+  - type: heading_2
+    content: Essential Information to Document
+  - type: bulleted_list_item
+    content: List of all wallets and exchanges used
+  - type: bulleted_list_item
+    content: Wallet addresses (public keys)
+  - type: bulleted_list_item
+    content: Location of hardware wallets
+  - type: bulleted_list_item
+    content: Recovery seed phrase storage location (NEVER digital)
+  - type: heading_2
+    content: Secure Storage Methods
+  - type: numbered_list_item
+    content: Hardware Wallet + Steel Backup
+  - type: numbered_list_item
+    content: Split seed phrase between attorney and bank vault
+  - type: numbered_list_item
+    content: Shamir's Secret Sharing (splits key into parts)
+  - type: numbered_list_item
+    content: Multi-signature wallet requiring multiple keys
+  - type: heading_2
+    content: Recovery Instructions for Heirs
+  - type: bulleted_list_item
+    content: Step-by-step wallet recovery guide
+  - type: bulleted_list_item
+    content: Exchange account recovery process
+  - type: bulleted_list_item
+    content: Tax reporting requirements
+  - type: bulleted_list_item
+    content: Trusted crypto advisor contact
+  - type: callout
+    icon: emoji:⚠️
+    content: CRITICAL - Never store seed phrases digitally or in plain text. Use physical security only.
+    color: red_background
+
+- title: Domain and Hosting Management  
+  parent: Digital Legacy Management
+  icon: emoji:🌐
+  description: Transfer or maintain websites and domains
+  role: owner
+  slug: domain-hosting-management
+  blocks:
+  - type: heading_1
+    content: Domain and Hosting Legacy Planning
+  - type: paragraph
+    content: Ensure your digital properties can be maintained or transferred appropriately.
+  - type: heading_2
+    content: Domain Registration Details
+  - type: bulleted_list_item
+    content: List all domain names owned
+  - type: bulleted_list_item
+    content: Registrar names and account access
+  - type: bulleted_list_item
+    content: Renewal dates and auto-renewal status
+  - type: bulleted_list_item
+    content: DNS settings documentation
+  - type: heading_2
+    content: Web Hosting Information
+  - type: bulleted_list_item
+    content: Hosting provider details
+  - type: bulleted_list_item
+    content: Server/plan specifications
+  - type: bulleted_list_item
+    content: Monthly/annual costs
+  - type: bulleted_list_item
+    content: Backup procedures
+  - type: heading_2
+    content: Transfer Instructions
+  - type: numbered_list_item
+    content: Domain transfer unlock codes
+  - type: numbered_list_item
+    content: Two-factor authentication backup codes
+  - type: numbered_list_item
+    content: Technical contact for assistance
+  - type: numbered_list_item
+    content: Content management system access
+  - type: callout
+    icon: emoji:📅
+    content: Set calendar reminders for domain renewals to prevent accidental expiration
+    color: yellow_background

@@ -1,0 +1,1 @@
+- Daily schedule → Query Notion DB (Deliver Date=today & Status!=sent) → Send Email → Update Status=sent

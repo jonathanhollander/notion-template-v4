@@ -1,0 +1,633 @@
+pages:
+- title: Home / Welcome
+  slug: home
+  type: page
+  audience: shared
+  disclaimer: use_global.strings.pages.home.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.home.header
+  - p: use_global.strings.pages.home.description
+  - callout: use_global.strings.pages.home.owner_instructions
+  - callout: use_global.strings.pages.home.ai_prompt
+- title: Template Map (All Pages Index)
+  slug: map
+  type: page
+  audience: shared
+  disclaimer: use_global.strings.pages.map.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.map.header
+  - p: use_global.strings.pages.map.description
+  - callout: use_global.strings.pages.map.owner_instructions
+  - callout: use_global.strings.pages.map.ai_prompt
+- title: Peace of Mind Overview
+  slug: peace-of-mind
+  type: page
+  audience: shared
+  disclaimer: use_global.strings.pages.peace-of-mind.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.peace-of-mind.header
+  - p: use_global.strings.pages.peace-of-mind.description
+  - callout: use_global.strings.pages.peace-of-mind.owner_instructions
+  - callout: use_global.strings.pages.peace-of-mind.ai_prompt
+- title: Important Documents & Essentials
+  slug: essentials
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.essentials.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.essentials.header
+  - p: use_global.strings.pages.essentials.description
+  - callout: use_global.strings.pages.essentials.owner_instructions
+  - callout: use_global.strings.pages.essentials.ai_prompt
+- title: Executors & Key Contacts
+  slug: executors-contacts
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.executors-contacts.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.executors-contacts.header
+  - p: use_global.strings.pages.executors-contacts.description
+  - callout: use_global.strings.pages.executors-contacts.owner_instructions
+  - callout: use_global.strings.pages.executors-contacts.ai_prompt
+- title: Financial Accounts Index
+  slug: financial-accounts
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.financial-accounts.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.financial-accounts.header
+  - p: use_global.strings.pages.financial-accounts.description
+  - callout: use_global.strings.pages.financial-accounts.owner_instructions
+  - callout: use_global.strings.pages.financial-accounts.ai_prompt
+- title: Insurance Policies Index
+  slug: insurance
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.insurance.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.insurance.header
+  - p: use_global.strings.pages.insurance.description
+  - callout: use_global.strings.pages.insurance.owner_instructions
+  - callout: use_global.strings.pages.insurance.ai_prompt
+- title: Taxes & Documents Checklist
+  slug: taxes
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.taxes.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.taxes.header
+  - p: use_global.strings.pages.taxes.description
+  - callout: use_global.strings.pages.taxes.owner_instructions
+  - callout: use_global.strings.pages.taxes.ai_prompt
+- title: Business Interests / LLCs
+  slug: business
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.business.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.business.header
+  - p: use_global.strings.pages.business.description
+  - callout: use_global.strings.pages.business.owner_instructions
+  - callout: use_global.strings.pages.business.ai_prompt
+- title: Property & Inventory
+  slug: property
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.property.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.property.header
+  - p: use_global.strings.pages.property.description
+  - callout: use_global.strings.pages.property.owner_instructions
+  - callout: use_global.strings.pages.property.ai_prompt
+- title: Vehicles & Titles
+  slug: vehicles
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.vehicles.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.vehicles.header
+  - p: use_global.strings.pages.vehicles.description
+  - callout: use_global.strings.pages.vehicles.owner_instructions
+  - callout: use_global.strings.pages.vehicles.ai_prompt
+- title: Keepsakes & Gifts
+  slug: keepsakes
+  type: page
+  audience: family
+  disclaimer: use_global.strings.pages.keepsakes.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.keepsakes.header
+  - p: use_global.strings.pages.keepsakes.description
+  - callout: use_global.strings.pages.keepsakes.owner_instructions
+  - callout: use_global.strings.pages.keepsakes.ai_prompt
+- title: Digital Legacy
+  slug: digital-legacy
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.digital-legacy.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.digital-legacy.header
+  - p: use_global.strings.pages.digital-legacy.description
+  - callout: use_global.strings.pages.digital-legacy.owner_instructions
+  - callout: use_global.strings.pages.digital-legacy.ai_prompt
+- title: Devices & Access (Non-secret pointers)
+  slug: devices
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.devices.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.devices.header
+  - p: use_global.strings.pages.devices.description
+  - callout: use_global.strings.pages.devices.owner_instructions
+  - callout: use_global.strings.pages.devices.ai_prompt
+- title: Executor QuickStart (One-Pager)
+  slug: executor-quickstart
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.executor-quickstart.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.executor-quickstart.header
+  - p: use_global.strings.pages.executor-quickstart.description
+  - callout: use_global.strings.pages.executor-quickstart.owner_instructions
+  - callout: use_global.strings.pages.executor-quickstart.ai_prompt
+- title: Executor Contact Card
+  slug: executor-card
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.executor-card.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.executor-card.header
+  - p: use_global.strings.pages.executor-card.description
+  - callout: use_global.strings.pages.executor-card.owner_instructions
+  - callout: use_global.strings.pages.executor-card.ai_prompt
+- title: Executor Guide
+  slug: executor-guide
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.executor-guide.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.executor-guide.header
+  - p: use_global.strings.pages.executor-guide.description
+  - callout: use_global.strings.pages.executor-guide.owner_instructions
+  - callout: use_global.strings.pages.executor-guide.ai_prompt
+- title: Family Guide
+  slug: family-guide
+  type: page
+  audience: family
+  disclaimer: use_global.strings.pages.family-guide.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.family-guide.header
+  - p: use_global.strings.pages.family-guide.description
+  - callout: use_global.strings.pages.family-guide.owner_instructions
+  - callout: use_global.strings.pages.family-guide.ai_prompt
+- title: Memories & Letters
+  slug: memories
+  type: page
+  audience: family
+  disclaimer: use_global.strings.pages.memories.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.memories.header
+  - p: use_global.strings.pages.memories.description
+  - callout: use_global.strings.pages.memories.owner_instructions
+  - callout: use_global.strings.pages.memories.ai_prompt
+- title: Memories — Photo Albums (Gallery)
+  slug: photos
+  type: page
+  audience: family
+  disclaimer: use_global.strings.pages.photos.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.photos.header
+  - p: use_global.strings.pages.photos.description
+  - callout: use_global.strings.pages.photos.owner_instructions
+  - callout: use_global.strings.pages.photos.ai_prompt
+- title: Memories — Letters Index
+  slug: letters-index
+  type: page
+  audience: family
+  disclaimer: use_global.strings.pages.letters-index.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.letters-index.header
+  - p: use_global.strings.pages.letters-index.description
+  - callout: use_global.strings.pages.letters-index.owner_instructions
+  - callout: use_global.strings.pages.letters-index.ai_prompt
+- title: Life Story & Guidance
+  slug: life-story
+  type: page
+  audience: family
+  disclaimer: use_global.strings.pages.life-story.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.life-story.header
+  - p: use_global.strings.pages.life-story.description
+  - callout: use_global.strings.pages.life-story.owner_instructions
+  - callout: use_global.strings.pages.life-story.ai_prompt
+- title: Grief Support Resources
+  slug: grief-support
+  type: page
+  audience: family
+  disclaimer: use_global.strings.pages.grief-support.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.grief-support.header
+  - p: use_global.strings.pages.grief-support.description
+  - callout: use_global.strings.pages.grief-support.owner_instructions
+  - callout: use_global.strings.pages.grief-support.ai_prompt
+- title: Family FAQ / Getting Started
+  slug: family-faq
+  type: page
+  audience: family
+  disclaimer: use_global.strings.pages.family-faq.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.family-faq.header
+  - p: use_global.strings.pages.family-faq.description
+  - callout: use_global.strings.pages.family-faq.owner_instructions
+  - callout: use_global.strings.pages.family-faq.ai_prompt
+- title: Medical & Healthcare Preferences
+  slug: medical
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.medical.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.medical.header
+  - p: use_global.strings.pages.medical.description
+  - callout: use_global.strings.pages.medical.owner_instructions
+  - callout: use_global.strings.pages.medical.ai_prompt
+- title: Living Will / Advance Care Directives
+  slug: living-will
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.living-will.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.living-will.header
+  - p: use_global.strings.pages.living-will.description
+  - callout: use_global.strings.pages.living-will.owner_instructions
+  - callout: use_global.strings.pages.living-will.ai_prompt
+- title: Donation & Personal Wishes
+  slug: donation-wishes
+  type: page
+  audience: family
+  disclaimer: use_global.strings.pages.donation-wishes.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.donation-wishes.header
+  - p: use_global.strings.pages.donation-wishes.description
+  - callout: use_global.strings.pages.donation-wishes.owner_instructions
+  - callout: use_global.strings.pages.donation-wishes.ai_prompt
+- title: Notifications Plan
+  slug: notifications
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.notifications.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.notifications.header
+  - p: use_global.strings.pages.notifications.description
+  - callout: use_global.strings.pages.notifications.owner_instructions
+  - callout: use_global.strings.pages.notifications.ai_prompt
+- title: Sample Letters Library (DB parent view)
+  slug: letters-db
+  type: page
+  audience: shared
+  disclaimer: use_global.strings.pages.letters-db.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.letters-db.header
+  - p: use_global.strings.pages.letters-db.description
+  - callout: use_global.strings.pages.letters-db.owner_instructions
+  - callout: use_global.strings.pages.letters-db.ai_prompt
+- title: QR Codes Reference
+  slug: qr-reference
+  type: page
+  audience: shared
+  disclaimer: use_global.strings.pages.qr-reference.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.qr-reference.header
+  - p: use_global.strings.pages.qr-reference.description
+  - callout: use_global.strings.pages.qr-reference.owner_instructions
+  - callout: use_global.strings.pages.qr-reference.ai_prompt
+- title: QR Card Printables (How-To)
+  slug: qr-print
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.qr-print.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.qr-print.header
+  - p: use_global.strings.pages.qr-print.description
+  - callout: use_global.strings.pages.qr-print.owner_instructions
+  - callout: use_global.strings.pages.qr-print.ai_prompt
+- title: QR Packages (Reference)
+  slug: qr-packages
+  type: page
+  audience: shared
+  disclaimer: use_global.strings.pages.qr-packages.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.qr-packages.header
+  - p: use_global.strings.pages.qr-packages.description
+  - callout: use_global.strings.pages.qr-packages.owner_instructions
+  - callout: use_global.strings.pages.qr-packages.ai_prompt
+- title: QR Distribution Letters
+  slug: qr-letters
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.qr-letters.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.qr-letters.header
+  - p: use_global.strings.pages.qr-letters.description
+  - callout: use_global.strings.pages.qr-letters.owner_instructions
+  - callout: use_global.strings.pages.qr-letters.ai_prompt
+- title: Prompt Library — Letters & Stories
+  slug: prompts-letters
+  type: page
+  audience: shared
+  disclaimer: use_global.strings.pages.prompts-letters.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.prompts-letters.header
+  - p: use_global.strings.pages.prompts-letters.description
+  - callout: use_global.strings.pages.prompts-letters.owner_instructions
+  - callout: use_global.strings.pages.prompts-letters.ai_prompt
+- title: Prompt Library — Life Story & Tribute
+  slug: prompts-tribute
+  type: page
+  audience: shared
+  disclaimer: use_global.strings.pages.prompts-tribute.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.prompts-tribute.header
+  - p: use_global.strings.pages.prompts-tribute.description
+  - callout: use_global.strings.pages.prompts-tribute.owner_instructions
+  - callout: use_global.strings.pages.prompts-tribute.ai_prompt
+- title: Prompt Library — Executor & Summary Aids
+  slug: prompts-executor
+  type: page
+  audience: shared
+  disclaimer: use_global.strings.pages.prompts-executor.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.prompts-executor.header
+  - p: use_global.strings.pages.prompts-executor.description
+  - callout: use_global.strings.pages.prompts-executor.owner_instructions
+  - callout: use_global.strings.pages.prompts-executor.ai_prompt
+- title: Prompt Library — Combine & Rewrite
+  slug: prompts-rewrite
+  type: page
+  audience: shared
+  disclaimer: use_global.strings.pages.prompts-rewrite.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.prompts-rewrite.header
+  - p: use_global.strings.pages.prompts-rewrite.description
+  - callout: use_global.strings.pages.prompts-rewrite.owner_instructions
+  - callout: use_global.strings.pages.prompts-rewrite.ai_prompt
+- title: Prompt Library — Translate
+  slug: prompts-translate
+  type: page
+  audience: shared
+  disclaimer: use_global.strings.pages.prompts-translate.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.prompts-translate.header
+  - p: use_global.strings.pages.prompts-translate.description
+  - callout: use_global.strings.pages.prompts-translate.owner_instructions
+  - callout: use_global.strings.pages.prompts-translate.ai_prompt
+- title: Process Flow (Mermaid)
+  slug: flow-process
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.flow-process.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.flow-process.header
+  - p: use_global.strings.pages.flow-process.description
+  - callout: use_global.strings.pages.flow-process.owner_instructions
+  - callout: use_global.strings.pages.flow-process.ai_prompt
+- title: Contacts & Roles Map (Mermaid)
+  slug: flow-contacts
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.flow-contacts.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.flow-contacts.header
+  - p: use_global.strings.pages.flow-contacts.description
+  - callout: use_global.strings.pages.flow-contacts.owner_instructions
+  - callout: use_global.strings.pages.flow-contacts.ai_prompt
+- title: Executor Activation Flow (Mermaid)
+  slug: flow-activation
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.flow-activation.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.flow-activation.header
+  - p: use_global.strings.pages.flow-activation.description
+  - callout: use_global.strings.pages.flow-activation.owner_instructions
+  - callout: use_global.strings.pages.flow-activation.ai_prompt
+- title: Guidance Library (Resources)
+  slug: guidance
+  type: page
+  audience: family
+  disclaimer: use_global.strings.pages.guidance.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.guidance.header
+  - p: use_global.strings.pages.guidance.description
+  - callout: use_global.strings.pages.guidance.owner_instructions
+  - callout: use_global.strings.pages.guidance.ai_prompt
+- title: Copy & Tone Guide
+  slug: tone
+  type: page
+  audience: shared
+  disclaimer: use_global.strings.pages.tone.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.tone.header
+  - p: use_global.strings.pages.tone.description
+  - callout: use_global.strings.pages.tone.owner_instructions
+  - callout: use_global.strings.pages.tone.ai_prompt
+- title: Legal Disclaimer (Standalone Page)
+  slug: disclaimer
+  type: page
+  audience: shared
+  disclaimer: use_global.strings.pages.disclaimer.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.disclaimer.header
+  - p: use_global.strings.pages.disclaimer.description
+  - callout: use_global.strings.pages.disclaimer.owner_instructions
+  - callout: use_global.strings.pages.disclaimer.ai_prompt
+- title: Diagnostics
+  slug: diagnostics
+  type: page
+  audience: shared
+  disclaimer: use_global.strings.pages.diagnostics.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.diagnostics.header
+  - p: use_global.strings.pages.diagnostics.description
+  - callout: use_global.strings.pages.diagnostics.owner_instructions
+  - callout: use_global.strings.pages.diagnostics.ai_prompt
+- title: Preparation Progress (DB)
+  slug: owner-progress
+  type: page
+  audience: shared
+  disclaimer: use_global.strings.pages.owner-progress.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.owner-progress.header
+  - p: use_global.strings.pages.owner-progress.description
+  - callout: use_global.strings.pages.owner-progress.owner_instructions
+  - callout: use_global.strings.pages.owner-progress.ai_prompt
+- title: Manual Finishing Tasks
+  slug: finishing
+  type: page
+  audience: shared
+  disclaimer: use_global.strings.pages.finishing.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.finishing.header
+  - p: use_global.strings.pages.finishing.description
+  - callout: use_global.strings.pages.finishing.owner_instructions
+  - callout: use_global.strings.pages.finishing.ai_prompt
+- title: Developer Notes / Version & Changelog
+  slug: dev-notes
+  type: page
+  audience: shared
+  disclaimer: use_global.strings.pages.dev-notes.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.dev-notes.header
+  - p: use_global.strings.pages.dev-notes.description
+  - callout: use_global.strings.pages.dev-notes.owner_instructions
+  - callout: use_global.strings.pages.dev-notes.ai_prompt
+- title: System Check / Recovery Report
+  slug: recovery
+  type: page
+  audience: shared
+  disclaimer: use_global.strings.pages.recovery.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.recovery.header
+  - p: use_global.strings.pages.recovery.description
+  - callout: use_global.strings.pages.recovery.owner_instructions
+  - callout: use_global.strings.pages.recovery.ai_prompt
+- title: Encouragements
+  slug: encouragements
+  type: page
+  audience: family
+  disclaimer: use_global.strings.pages.encouragements.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.encouragements.header
+  - p: use_global.strings.pages.encouragements.description
+  - callout: use_global.strings.pages.encouragements.owner_instructions
+  - callout: use_global.strings.pages.encouragements.ai_prompt
+- title: Icons & Headers Library
+  slug: icons-headers
+  type: page
+  audience: shared
+  disclaimer: use_global.strings.pages.icons-headers.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.icons-headers.header
+  - p: use_global.strings.pages.icons-headers.description
+  - callout: use_global.strings.pages.icons-headers.owner_instructions
+  - callout: use_global.strings.pages.icons-headers.ai_prompt
+- title: Mobile Test Checklist
+  slug: mobile-test
+  type: page
+  audience: shared
+  disclaimer: use_global.strings.pages.mobile-test.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.mobile-test.header
+  - p: use_global.strings.pages.mobile-test.description
+  - callout: use_global.strings.pages.mobile-test.owner_instructions
+  - callout: use_global.strings.pages.mobile-test.ai_prompt
+- title: Memories — Letters (Family Library View)
+  slug: letters-family-view
+  type: page
+  audience: family
+  disclaimer: use_global.strings.pages.letters-family-view.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.letters-family-view.header
+  - p: use_global.strings.pages.letters-family-view.description
+  - callout: use_global.strings.pages.letters-family-view.owner_instructions
+  - callout: use_global.strings.pages.letters-family-view.ai_prompt
+- title: Brokerage Letters (Library View)
+  slug: letters-brokerage-view
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.letters-brokerage-view.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.letters-brokerage-view.header
+  - p: use_global.strings.pages.letters-brokerage-view.description
+  - callout: use_global.strings.pages.letters-brokerage-view.owner_instructions
+  - callout: use_global.strings.pages.letters-brokerage-view.ai_prompt
+- title: Bank Letters (Library View)
+  slug: letters-bank-view
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.letters-bank-view.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.letters-bank-view.header
+  - p: use_global.strings.pages.letters-bank-view.description
+  - callout: use_global.strings.pages.letters-bank-view.owner_instructions
+  - callout: use_global.strings.pages.letters-bank-view.ai_prompt
+- title: Insurance Letters (Library View)
+  slug: letters-insurance-view
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.letters-insurance-view.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.letters-insurance-view.header
+  - p: use_global.strings.pages.letters-insurance-view.description
+  - callout: use_global.strings.pages.letters-insurance-view.owner_instructions
+  - callout: use_global.strings.pages.letters-insurance-view.ai_prompt
+- title: Utilities Letters (Library View)
+  slug: letters-utilities-view
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.letters-utilities-view.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.letters-utilities-view.header
+  - p: use_global.strings.pages.letters-utilities-view.description
+  - callout: use_global.strings.pages.letters-utilities-view.owner_instructions
+  - callout: use_global.strings.pages.letters-utilities-view.ai_prompt
+- title: Community Letters (Library View)
+  slug: letters-community-view
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.letters-community-view.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.letters-community-view.header
+  - p: use_global.strings.pages.letters-community-view.description
+  - callout: use_global.strings.pages.letters-community-view.owner_instructions
+  - callout: use_global.strings.pages.letters-community-view.ai_prompt
+- title: Executor Letters (Library View)
+  slug: letters-executor-view
+  type: page
+  audience: executor
+  disclaimer: use_global.strings.pages.letters-executor-view.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.letters-executor-view.header
+  - p: use_global.strings.pages.letters-executor-view.description
+  - callout: use_global.strings.pages.letters-executor-view.owner_instructions
+  - callout: use_global.strings.pages.letters-executor-view.ai_prompt
+- title: Family Letters (Library View)
+  slug: letters-family-announcements-view
+  type: page
+  audience: family
+  disclaimer: use_global.strings.pages.letters-family-announcements-view.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.letters-family-announcements-view.header
+  - p: use_global.strings.pages.letters-family-announcements-view.description
+  - callout: use_global.strings.pages.letters-family-announcements-view.owner_instructions
+  - callout: use_global.strings.pages.letters-family-announcements-view.ai_prompt
+- title: Photo Captions Helper
+  slug: photos-captions-helper
+  type: page
+  audience: family
+  disclaimer: use_global.strings.pages.photos-captions-helper.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.photos-captions-helper.header
+  - p: use_global.strings.pages.photos-captions-helper.description
+  - callout: use_global.strings.pages.photos-captions-helper.owner_instructions
+  - callout: use_global.strings.pages.photos-captions-helper.ai_prompt
+- title: Preparation Hub
+  slug: preparation-hub
+  type: page
+  audience: shared
+  disclaimer: use_global.strings.pages.preparation-hub.disclaimer
+  blocks:
+  - h2: use_global.strings.pages.preparation-hub.header
+  - p: use_global.strings.pages.preparation-hub.description
+  - h3: Suggested order
+  - bulleted_list:
+    - Essentials
+    - Executors & Key Contacts
+    - Financial Accounts
+    - Insurance
+    - Living Will / Medical
+    - Letters & Notifications
+    - Life Story / Memories
+  - callout: The progress view below is linked to the Preparation Progress database.
+  - linked_db:
+      name: owner_progress
+  - callout: use_global.strings.pages.preparation-hub.owner_instructions
+  - callout: use_global.strings.pages.preparation-hub.ai_prompt

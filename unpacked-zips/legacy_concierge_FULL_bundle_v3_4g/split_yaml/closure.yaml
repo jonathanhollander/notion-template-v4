@@ -1,0 +1,20 @@
+page:
+  title: Closure
+  icon: assets/icons/diamonds/sage_filled.svg
+  cover: https://images.unsplash.com/photo-1520975918318-3e0e75b7d63c
+  description: Final steps and reflections to bring affairs to a calm close.
+  disclaimer: This page helps organize information. For legal effect, speak with a
+    licensed professional.
+  acceptance:
+  - Cover present
+  - Icon present
+  - Disclaimer (if required)
+  - Helper notes cleared
+  - Seeded rows present (if DB)
+  subpages:
+  - title: Notifications
+    icon: assets/icons/diamonds/sage_filled.svg
+  - title: Digital Legacy
+    icon: assets/icons/diamonds/sage_filled.svg
+  - title: Subscriptions
+    icon: assets/icons/diamonds/sage_filled.svg

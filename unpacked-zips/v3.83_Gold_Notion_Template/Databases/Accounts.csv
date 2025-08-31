@@ -1,0 +1,4 @@
+Title,Provider,Account ID,URL,2FA,Recovery,Notes
+Apple ID,Apple,apple-id@example.com,https://appleid.apple.com/,Yes,Trusted device,See 'Apple ID instructions' page.
+Bank - Checking,First National,****1234,https://bank.example.com,Yes,Phone + Email,Executor on file.
+Social Media - Twitter,Twitter,@username,https://twitter.com,Yes,Email reset,Archive requested.

@@ -1,0 +1,210 @@
+subpages:
+- title: When You First Open This
+  slug: executor-orientation
+  type: subpage
+  parent: executor-guide
+  audience: executor
+  disclaimer: use_global.strings.pages.executor-orientation.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.executor-orientation.header
+  - p: use_global.strings.pages.executor-orientation.description
+  - callout: use_global.strings.pages.executor-orientation.owner_instructions
+  - callout: use_global.strings.pages.executor-orientation.ai_prompt
+- title: For When It Feels Complete
+  slug: everything-done
+  type: subpage
+  parent: finishing
+  audience: shared
+  disclaimer: use_global.strings.pages.everything-done.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.everything-done.header
+  - p: use_global.strings.pages.everything-done.description
+  - callout: use_global.strings.pages.everything-done.owner_instructions
+  - callout: use_global.strings.pages.everything-done.ai_prompt
+- title: Bank Notification Letter
+  slug: letter-bank
+  type: subpage
+  parent: financial-accounts
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-bank.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-bank.header
+  - p: use_global.strings.pages.letter-bank.description
+  - callout: use_global.strings.pages.letter-bank.owner_instructions
+  - callout: use_global.strings.pages.letter-bank.ai_prompt
+- title: Credit Card Company Letter
+  slug: letter-card
+  type: subpage
+  parent: financial-accounts
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-card.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-card.header
+  - p: use_global.strings.pages.letter-card.description
+  - callout: use_global.strings.pages.letter-card.owner_instructions
+  - callout: use_global.strings.pages.letter-card.ai_prompt
+- title: Brokerage / Investment Firm Letter
+  slug: letter-brokerage
+  type: subpage
+  parent: financial-accounts
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-brokerage.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-brokerage.header
+  - p: use_global.strings.pages.letter-brokerage.description
+  - callout: use_global.strings.pages.letter-brokerage.owner_instructions
+  - callout: use_global.strings.pages.letter-brokerage.ai_prompt
+- title: Insurance Carrier Letter
+  slug: letter-insurance
+  type: subpage
+  parent: insurance
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-insurance.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-insurance.header
+  - p: use_global.strings.pages.letter-insurance.description
+  - callout: use_global.strings.pages.letter-insurance.owner_instructions
+  - callout: use_global.strings.pages.letter-insurance.ai_prompt
+- title: Tax Notification Letter
+  slug: letter-tax
+  type: subpage
+  parent: taxes
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-tax.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-tax.header
+  - p: use_global.strings.pages.letter-tax.description
+  - callout: use_global.strings.pages.letter-tax.owner_instructions
+  - callout: use_global.strings.pages.letter-tax.ai_prompt
+- title: Employer Notification Letter
+  slug: letter-employer
+  type: subpage
+  parent: notifications
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-employer.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-employer.header
+  - p: use_global.strings.pages.letter-employer.description
+  - callout: use_global.strings.pages.letter-employer.owner_instructions
+  - callout: use_global.strings.pages.letter-employer.ai_prompt
+- title: Utility Company Letter
+  slug: letter-utilities
+  type: subpage
+  parent: notifications
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-utilities.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-utilities.header
+  - p: use_global.strings.pages.letter-utilities.description
+  - callout: use_global.strings.pages.letter-utilities.owner_instructions
+  - callout: use_global.strings.pages.letter-utilities.ai_prompt
+- title: Community / Social Group Letter
+  slug: letter-community
+  type: subpage
+  parent: notifications
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-community.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-community.header
+  - p: use_global.strings.pages.letter-community.description
+  - callout: use_global.strings.pages.letter-community.owner_instructions
+  - callout: use_global.strings.pages.letter-community.ai_prompt
+- title: Executor Cover Note / Authority
+  slug: letter-executor-authority
+  type: subpage
+  parent: executors-contacts
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-executor-authority.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-executor-authority.header
+  - p: use_global.strings.pages.letter-executor-authority.description
+  - callout: use_global.strings.pages.letter-executor-authority.owner_instructions
+  - callout: use_global.strings.pages.letter-executor-authority.ai_prompt
+- title: Landlord / Property Management Letter
+  slug: letter-landlord
+  type: subpage
+  parent: property
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-landlord.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-landlord.header
+  - p: use_global.strings.pages.letter-landlord.description
+  - callout: use_global.strings.pages.letter-landlord.owner_instructions
+  - callout: use_global.strings.pages.letter-landlord.ai_prompt
+- title: Medical Providers / Health Insurance Letter
+  slug: letter-medical-providers
+  type: subpage
+  parent: insurance
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-medical-providers.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-medical-providers.header
+  - p: use_global.strings.pages.letter-medical-providers.description
+  - callout: use_global.strings.pages.letter-medical-providers.owner_instructions
+  - callout: use_global.strings.pages.letter-medical-providers.ai_prompt
+- title: Mortgage / Lender Letter
+  slug: letter-mortgage
+  type: subpage
+  parent: financial-accounts
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-mortgage.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-mortgage.header
+  - p: use_global.strings.pages.letter-mortgage.description
+  - callout: use_global.strings.pages.letter-mortgage.owner_instructions
+  - callout: use_global.strings.pages.letter-mortgage.ai_prompt
+- title: Pension / Retirement / Social Security Letter
+  slug: letter-pension
+  type: subpage
+  parent: financial-accounts
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-pension.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-pension.header
+  - p: use_global.strings.pages.letter-pension.description
+  - callout: use_global.strings.pages.letter-pension.owner_instructions
+  - callout: use_global.strings.pages.letter-pension.ai_prompt
+- title: Subscriptions / Digital Services Letter
+  slug: letter-digital
+  type: subpage
+  parent: notifications
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-digital.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-digital.header
+  - p: use_global.strings.pages.letter-digital.description
+  - callout: use_global.strings.pages.letter-digital.owner_instructions
+  - callout: use_global.strings.pages.letter-digital.ai_prompt
+- title: Family Announcement Letter
+  slug: letter-family
+  type: subpage
+  parent: family-guide
+  audience: family
+  disclaimer: use_global.strings.pages.letter-family.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-family.header
+  - p: use_global.strings.pages.letter-family.description
+  - callout: use_global.strings.pages.letter-family.owner_instructions
+  - callout: use_global.strings.pages.letter-family.ai_prompt
+- title: Short Death Notice / Newspaper Draft
+  slug: letter-death-notice
+  type: subpage
+  parent: life-story
+  audience: family
+  disclaimer: use_global.strings.pages.letter-death-notice.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-death-notice.header
+  - p: use_global.strings.pages.letter-death-notice.description
+  - callout: use_global.strings.pages.letter-death-notice.owner_instructions
+  - callout: use_global.strings.pages.letter-death-notice.ai_prompt
+- title: Letter to My Family
+  slug: letter-to-family
+  type: subpage
+  parent: memories
+  audience: family
+  disclaimer: use_global.strings.pages.letter-to-family.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-to-family.header
+  - p: use_global.strings.pages.letter-to-family.description
+  - callout: use_global.strings.pages.letter-to-family.owner_instructions
+  - callout: use_global.strings.pages.letter-to-family.ai_prompt

@@ -1,0 +1,15 @@
+body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; background:#f6f9fc; color:#2f3b4a; }
+.container { max-width: 960px; margin: 2rem auto; background:white; padding:2rem; border-radius:14px; box-shadow:0 12px 24px rgba(2,15,35,.08); }
+h1 { margin:0 0 1rem 0; }
+h2 { margin-top:2rem; }
+form { display:grid; grid-template-columns: 1fr 1fr; gap:12px; align-items:flex-end; margin-bottom:1rem; }
+form.buttons { grid-template-columns: auto auto; }
+label { grid-column: 1 / -1; font-weight:600; margin-top: 4px; }
+input, select, button { padding:.8rem 1rem; border-radius:10px; border:1px solid #d7e0ea; background:#fff; }
+button { background:#2f4858; color:white; border:none; cursor:pointer; }
+button:hover { filter:brightness(.96); }
+table { width:100%; border-collapse:collapse; margin-top:1rem; }
+th, td { padding:.7rem .5rem; border-bottom:1px solid #e6edf3; text-align:left; vertical-align:top; }
+.topbar { display:flex; justify-content:space-between; align-items:center; }
+a.button { display:inline-block; background:#2f4858; color:#fff; padding:.6rem 1rem; border-radius:8px; text-decoration:none; }
+.row-between { display:flex; justify-content:space-between; align-items:center; }

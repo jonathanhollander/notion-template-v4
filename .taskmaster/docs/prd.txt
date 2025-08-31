@@ -1,0 +1,179 @@
+# Estate Planning Concierge v4.0 Master Gold Build - Product Requirements Document
+
+## Project Overview
+Refactor and consolidate 4 AI-generated builds (Claude, ChatGPT, Gemini, Qwen) into a single v4.0 master gold build for the Estate Planning Concierge Notion template deployment system. The system must pass all auditor validation tests and successfully deploy a complete estate planning workspace to Notion.
+
+## Core Philosophy
+The Estate Planning Concierge follows an "Empathy + Control + Trust" design philosophy:
+- Empathy: Gentle, compassionate language for families during difficult times
+- Control: Owner maintains full control over what information is shared and when
+- Trust: Secure, reliable system that protects sensitive estate information
+
+## Critical Technical Requirements
+
+### API Compatibility
+- Update Notion API version from 2022-06-28 to 2025-09-03
+- Support both secret_ and ntn_ token prefixes
+- Implement proper rate limiting (2.5 RPS) with exponential backoff
+- Handle all HTTP status codes including 429, 500, 502, 503, 504
+
+### Deployment Architecture
+- Deploy 100+ pages organized in 3 main hubs (Preparation, Executor, Family)
+- Create 11 databases with proper schemas and seed data
+- Implement 18 letter templates with placeholders
+- Deploy 62 acceptance checklist items for validation
+- Support dry-run, validate-only, and production deployment modes
+
+### Data Structures
+- 7 core databases: Accounts, Property, Insurance, Contacts, Subscriptions, Keepsakes, Letters Index
+- 4 advanced databases: Transactions, Property Maintenance, Insurance Claims, Estate Analytics
+- Formula properties for archive flags and progress bars
+- Multi-select properties with proper array handling
+- Relations using Pages Index DB pattern
+
+### Critical Fixes Required (from auditor reports)
+1. Fix relation resolution - replace custom title matching with proper API calls
+2. Implement robust synced blocks with SYNC_KEY mapping
+3. Add comprehensive error handling with detailed logging
+4. Ensure complete idempotency with marker-based deduplication
+5. Validate all formula expressions before deployment
+6. Handle rich text formatting (italic, gray, bold annotations)
+
+## Feature Requirements by Component
+
+### Pages Structure (100+ pages)
+- 3 Main Hubs with role-based access (owner, executor, family)
+- 40 Executor tasks in standardized format
+- 9 Executor guides for government/financial processes
+- 6 Digital asset management pages
+- 4 Family memorial pages
+- 4 Admin pages for setup and diagnostics
+
+### Database Features
+- Accounts DB with institution, balance, beneficiary tracking
+- Property DB with deed, title, valuation data
+- Insurance DB with policy details and claim tracking
+- Contacts DB with role-based categorization
+- Subscriptions DB for recurring services
+- Keepsakes DB for memories and stories
+- Letters Index DB linking to letter templates
+- Advanced analytics with rollup formulas
+
+### Letter System
+- 18 pre-written templates for common scenarios
+- Placeholder system with {{variable}} syntax
+- Status tracking (Draft, Ready, Sent, Follow-up)
+- Legal disclaimers per letter type
+- Database-driven management
+
+### UI/UX Features
+- Grid dashboard layouts for hubs
+- Hero blocks with role-based coloring
+- Navigation links (Back/Next) between pages
+- Mobile-responsive tips and layouts
+- Helper toggles for guidance (removable)
+- Synced blocks for consistent disclaimers
+
+### Automation Features
+- Estate value rollup calculations
+- Tax liability formulas
+- Progress percentage tracking
+- Archive flag automation
+- Completion status formulas
+
+## Validation Requirements
+
+### Auditor Test Coverage
+- All 62 acceptance checklist items must pass
+- Relation resolution must work correctly
+- Synced blocks must maintain consistency
+- Error handling must be comprehensive
+- Idempotency must be verified
+- Formula validation must pass
+- Rich text formatting must render correctly
+- Database seeding must complete without errors
+
+### Performance Requirements
+- Full deployment in 2-3 minutes
+- Handle 100+ pages without timeout
+- Process 11 databases with schemas
+- Seed all data rows successfully
+- Maintain 2.5 RPS rate limit
+
+### Error Recovery
+- Graceful handling of API failures
+- Retry logic with exponential backoff
+- Detailed error logging
+- Rollback capability on failure
+- Validation mode for pre-flight checks
+
+## Implementation Phases
+
+### Phase 1: Core Infrastructure
+- Set up project structure and dependencies
+- Implement updated Notion API client
+- Create deployment script framework
+- Add validation and dry-run modes
+
+### Phase 2: Data Models
+- Define all YAML schemas
+- Implement database creation logic
+- Add relation resolution system
+- Create formula validators
+
+### Phase 3: Page Generation
+- Implement page creation with hierarchy
+- Add hero blocks and navigation
+- Create grid dashboard layouts
+- Implement role-based access
+
+### Phase 4: Database Population
+- Create database schemas
+- Implement seed data loading
+- Add relation binding
+- Validate formula properties
+
+### Phase 5: Advanced Features
+- Implement synced blocks system
+- Add letter template processing
+- Create analytics rollups
+- Add progress tracking
+
+### Phase 6: Testing and Validation
+- Run all auditor tests
+- Validate against acceptance criteria
+- Performance testing
+- Error recovery testing
+- End-to-end deployment test
+
+## Success Criteria
+1. All 62 acceptance checklist items marked "Done"
+2. Successful deployment of all 100+ pages
+3. All 11 databases created with correct schemas
+4. All seed data properly inserted
+5. Relations correctly resolved
+6. Synced blocks functioning
+7. Error handling comprehensive
+8. Deployment completes in under 3 minutes
+9. All auditor tests pass
+10. System ready for production use
+
+## Risk Mitigation
+- Implement comprehensive logging
+- Add rollback capabilities
+- Create backup before deployment
+- Validate all operations before execution
+- Test with smaller subsets first
+- Document all known issues
+- Provide clear error messages
+- Include troubleshooting guide
+
+## Deliverables
+1. Consolidated v4.0 deploy.py script
+2. All 22 YAML configuration files
+3. Deployment documentation
+4. Validation test suite
+5. Troubleshooting guide
+6. Feature-to-YAML mapping document
+7. Auditor test results
+8. Performance benchmarks

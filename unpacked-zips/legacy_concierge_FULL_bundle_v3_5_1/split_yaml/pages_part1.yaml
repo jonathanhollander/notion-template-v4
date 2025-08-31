@@ -1,0 +1,238 @@
+pages:
+- index: 1
+  title: Preparation Hub
+  role: owner
+  icon: assets/icons/diamonds/beige_filled.svg
+  cover: https://images.unsplash.com/photo-1517245386807-bb43f82c33c4
+  description: Use this to keep shared information organized and easy to find.
+  disclaimer: null
+- index: 2
+  title: Executor Guide — A Steady Path
+  role: executor
+  icon: assets/icons/diamonds/sage_filled.svg
+  cover: https://images.unsplash.com/photo-1507525428034-b723cf961d3e
+  description: Keep details here so closures and transfers don’t stall. Take one section
+    at a time.
+  disclaimer: This page helps organize information. For legal effect, speak with a
+    licensed professional.
+- index: 3
+  title: Family Guide — A Gentle Space
+  role: family
+  icon: assets/icons/diamonds/peach_filled.svg
+  cover: https://images.unsplash.com/photo-1519681393784-d120267933ba
+  description: Add fragments or full stories when it feels right. Nothing here is
+    urgent.
+  disclaimer: null
+- index: 4
+  title: Essentials
+  role: executor
+  icon: assets/icons/diamonds/sage_filled.svg
+  cover: https://images.unsplash.com/photo-1507525428034-b723cf961d3e
+  description: Keep details here so closures and transfers don’t stall. Take one section
+    at a time.
+  disclaimer: This page helps organize information. For legal effect, speak with a
+    licensed professional.
+- index: 5
+  title: Executors & Key Contacts
+  role: executor
+  icon: assets/icons/diamonds/sage_filled.svg
+  cover: https://images.unsplash.com/photo-1507525428034-b723cf961d3e
+  description: Keep details here so closures and transfers don’t stall. Take one section
+    at a time.
+  disclaimer: This page helps organize information. For legal effect, speak with a
+    licensed professional.
+- index: 6
+  title: Financial Accounts
+  role: executor
+  icon: assets/icons/diamonds/sage_filled.svg
+  cover: https://images.unsplash.com/photo-1507525428034-b723cf961d3e
+  description: Keep details here so closures and transfers don’t stall. Take one section
+    at a time.
+  disclaimer: This page helps organize information. For legal effect, speak with a
+    licensed professional.
+- index: 7
+  title: Insurance
+  role: executor
+  icon: assets/icons/diamonds/sage_filled.svg
+  cover: https://images.unsplash.com/photo-1507525428034-b723cf961d3e
+  description: Keep details here so closures and transfers don’t stall. Take one section
+    at a time.
+  disclaimer: This page helps organize information. For legal effect, speak with a
+    licensed professional.
+- index: 8
+  title: Taxes & Returns
+  role: executor
+  icon: assets/icons/diamonds/sage_filled.svg
+  cover: https://images.unsplash.com/photo-1507525428034-b723cf961d3e
+  description: Keep details here so closures and transfers don’t stall. Take one section
+    at a time.
+  disclaimer: This page helps organize information. For legal effect, speak with a
+    licensed professional.
+- index: 9
+  title: Property & Real Estate
+  role: executor
+  icon: assets/icons/diamonds/sage_filled.svg
+  cover: https://images.unsplash.com/photo-1507525428034-b723cf961d3e
+  description: Keep details here so closures and transfers don’t stall. Take one section
+    at a time.
+  disclaimer: This page helps organize information. For legal effect, speak with a
+    licensed professional.
+- index: 10
+  title: Vehicles & Titles
+  role: executor
+  icon: assets/icons/diamonds/sage_filled.svg
+  cover: https://images.unsplash.com/photo-1507525428034-b723cf961d3e
+  description: Keep details here so closures and transfers don’t stall. Take one section
+    at a time.
+  disclaimer: This page helps organize information. For legal effect, speak with a
+    licensed professional.
+- index: 11
+  title: Business Interests
+  role: executor
+  icon: assets/icons/diamonds/sage_filled.svg
+  cover: https://images.unsplash.com/photo-1507525428034-b723cf961d3e
+  description: Keep details here so closures and transfers don’t stall. Take one section
+    at a time.
+  disclaimer: This page helps organize information. For legal effect, speak with a
+    licensed professional.
+- index: 12
+  title: Digital Accounts & Passwords
+  role: executor
+  icon: assets/icons/diamonds/sage_filled.svg
+  cover: https://images.unsplash.com/photo-1507525428034-b723cf961d3e
+  description: Keep details here so closures and transfers don’t stall. Take one section
+    at a time.
+  disclaimer: This page helps organize information. For legal effect, speak with a
+    licensed professional.
+- index: 13
+  title: Utilities & Services
+  role: executor
+  icon: assets/icons/diamonds/sage_filled.svg
+  cover: https://images.unsplash.com/photo-1507525428034-b723cf961d3e
+  description: Keep details here so closures and transfers don’t stall. Take one section
+    at a time.
+  disclaimer: This page helps organize information. For legal effect, speak with a
+    licensed professional.
+- index: 14
+  title: Subscriptions & Memberships
+  role: executor
+  icon: assets/icons/diamonds/sage_filled.svg
+  cover: https://images.unsplash.com/photo-1507525428034-b723cf961d3e
+  description: Keep details here so closures and transfers don’t stall. Take one section
+    at a time.
+  disclaimer: This page helps organize information. For legal effect, speak with a
+    licensed professional.
+- index: 15
+  title: Legal Documents
+  role: executor
+  icon: assets/icons/diamonds/sage_filled.svg
+  cover: https://images.unsplash.com/photo-1507525428034-b723cf961d3e
+  description: Keep details here so closures and transfers don’t stall. Take one section
+    at a time.
+  disclaimer: This page helps organize information. For legal effect, speak with a
+    licensed professional.
+- index: 16
+  title: Letters & Notifications
+  role: executor
+  icon: assets/icons/diamonds/sage_filled.svg
+  cover: https://images.unsplash.com/photo-1507525428034-b723cf961d3e
+  description: Keep details here so closures and transfers don’t stall. Take one section
+    at a time.
+  disclaimer: This page helps organize information. For legal effect, speak with a
+    licensed professional.
+- index: 17
+  title: Funeral & Service Wishes
+  role: executor
+  icon: assets/icons/diamonds/sage_filled.svg
+  cover: https://images.unsplash.com/photo-1507525428034-b723cf961d3e
+  description: Keep details here so closures and transfers don’t stall. Take one section
+    at a time.
+  disclaimer: This page helps organize information. For legal effect, speak with a
+    licensed professional.
+- index: 18
+  title: Assets Inventory
+  role: executor
+  icon: assets/icons/diamonds/sage_filled.svg
+  cover: https://images.unsplash.com/photo-1507525428034-b723cf961d3e
+  description: Keep details here so closures and transfers don’t stall. Take one section
+    at a time.
+  disclaimer: This page helps organize information. For legal effect, speak with a
+    licensed professional.
+- index: 19
+  title: Liabilities Inventory
+  role: executor
+  icon: assets/icons/diamonds/sage_filled.svg
+  cover: https://images.unsplash.com/photo-1507525428034-b723cf961d3e
+  description: Keep details here so closures and transfers don’t stall. Take one section
+    at a time.
+  disclaimer: This page helps organize information. For legal effect, speak with a
+    licensed professional.
+- index: 20
+  title: Life Story
+  role: family
+  icon: assets/icons/diamonds/peach_filled.svg
+  cover: https://images.unsplash.com/photo-1519681393784-d120267933ba
+  description: Add fragments or full stories when it feels right. Nothing here is
+    urgent.
+  disclaimer: null
+- index: 21
+  title: Memories
+  role: family
+  icon: assets/icons/diamonds/peach_filled.svg
+  cover: https://images.unsplash.com/photo-1519681393784-d120267933ba
+  description: Add fragments or full stories when it feels right. Nothing here is
+    urgent.
+  disclaimer: null
+- index: 22
+  title: Keepsakes & Mementos
+  role: family
+  icon: assets/icons/diamonds/peach_filled.svg
+  cover: https://images.unsplash.com/photo-1519681393784-d120267933ba
+  description: Add fragments or full stories when it feels right. Nothing here is
+    urgent.
+  disclaimer: null
+- index: 23
+  title: Letters to Family
+  role: family
+  icon: assets/icons/diamonds/peach_filled.svg
+  cover: https://images.unsplash.com/photo-1519681393784-d120267933ba
+  description: Add fragments or full stories when it feels right. Nothing here is
+    urgent.
+  disclaimer: null
+- index: 24
+  title: Grief & Support
+  role: family
+  icon: assets/icons/diamonds/peach_filled.svg
+  cover: https://images.unsplash.com/photo-1519681393784-d120267933ba
+  description: Add fragments or full stories when it feels right. Nothing here is
+    urgent.
+  disclaimer: null
+- index: 25
+  title: Celebration & Tributes
+  role: family
+  icon: assets/icons/diamonds/peach_filled.svg
+  cover: https://images.unsplash.com/photo-1519681393784-d120267933ba
+  description: Add fragments or full stories when it feels right. Nothing here is
+    urgent.
+  disclaimer: null
+- index: 26
+  title: Contacts Directory
+  role: owner
+  icon: assets/icons/diamonds/beige_filled.svg
+  cover: https://images.unsplash.com/photo-1517245386807-bb43f82c33c4
+  description: Use this to keep shared information organized and easy to find.
+  disclaimer: null
+- index: 27
+  title: Document Vault
+  role: owner
+  icon: assets/icons/diamonds/beige_filled.svg
+  cover: https://images.unsplash.com/photo-1517245386807-bb43f82c33c4
+  description: Use this to keep shared information organized and easy to find.
+  disclaimer: null
+- index: 28
+  title: Calendar & Timeline
+  role: owner
+  icon: assets/icons/diamonds/beige_filled.svg
+  cover: https://images.unsplash.com/photo-1517245386807-bb43f82c33c4
+  description: Use this to keep shared information organized and easy to find.
+  disclaimer: null

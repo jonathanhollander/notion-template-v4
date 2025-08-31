@@ -1,0 +1,9 @@
+Changelog v3.4g (from v3.4f)
+- Integrated icons across all ~60 pages (role-based diamonds).
+- Applied Muted Nature covers to all pages.
+- Compassionate descriptions added to every page and subpage.
+- Disclaimers visible on executor/legal/financial sections.
+- Acceptance criteria written for all pages.
+- Diagnostics expanded (disclaimers enforced, no family checklists, DB seeds check).
+- Sample data completed for Business Interests, Keepsakes, QR Codes and more.
+- Builder’s Console includes linked Diagnostics DB view.

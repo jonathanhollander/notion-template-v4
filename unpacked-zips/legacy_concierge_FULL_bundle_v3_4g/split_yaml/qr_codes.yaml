@@ -1,0 +1,14 @@
+page:
+  title: QR Codes
+  icon: assets/icons/diamonds/beige_filled.svg
+  cover: https://images.unsplash.com/photo-1585238342024-78d91a7c77d2
+  description: QR codes link directly to pages in this workspace for sharing with
+    family or executor.
+  disclaimer: null
+  acceptance:
+  - Cover present
+  - Icon present
+  - Disclaimer (if required)
+  - Helper notes cleared
+  - Seeded rows present (if DB)
+  subpages: []

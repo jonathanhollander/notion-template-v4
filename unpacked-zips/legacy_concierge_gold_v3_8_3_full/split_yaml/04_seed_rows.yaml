@@ -1,0 +1,70 @@
+db:
+  seed_rows:
+    Accounts:
+    - Name: Everyday Checking
+      Institution: Community Bank
+      Type: Checking
+      Balance: 1250.23
+      Note: Primary bill-pay account.
+    - Name: High-Yield Savings
+      Institution: Community Bank
+      Type: Savings
+      Balance: 8200.0
+      Note: Emergency fund.
+    Insurance:
+    - Name: Term Life Policy
+      Carrier: Acme Life
+      'Policy #': TL-8842-1
+      Coverage: 500000
+      Beneficiaries:
+      - Spouse
+      - Child A
+      Note: 10-year level term.
+    Contacts:
+    - Name: Jordan Miles
+      Role: Attorney
+      Email: jordan@example.com
+      Phone: +1 (555) 010-2201
+      Note: Estate counsel.
+    - Name: Lee Parker
+      Role: Executor
+      Email: lee@example.com
+      Phone: +1 (555) 010-2202
+      Note: Primary executor.
+    Subscriptions:
+    - Name: Electric Utility
+      Provider: Metro Electric
+      Amount: 68.4
+      Cycle: Monthly
+      Status: Active
+      Note: Paperless billing.
+    - Name: Water Utility
+      Provider: City Water
+      Amount: 29.7
+      Cycle: Quarterly
+      Status: Active
+      Note: Auto-pay enabled.
+    Letters:
+    - Name: Notice to Bank of Death
+      Audience: Bank
+      Status: Draft
+      Last Sent: ''
+      Note: Use account list for details.
+    - Name: Credit Card Closure Request
+      Audience: Card Issuer
+      Status: Draft
+      Last Sent: ''
+      Note: Reference statement for last charges.
+    Setup & Acceptance:
+    - Task: Create 'Active Only' view in Accounts
+      Where: Accounts DB
+      How: 'Filter: Status not Archived; Save view name: ''Active Only'''
+      Done when: View exists with correct filter
+      Status: Todo
+      ETA (hrs): 0.3
+    - Task: Upload icon set to ASSET_BASE_URL
+      Where: Admin
+      How: Host PNG/SVG; set ASSET_BASE_URL env
+      Done when: Icons/covers render on hubs
+      Status: Todo
+      ETA (hrs): 0.5

@@ -1,0 +1,307 @@
+acceptance_criteria:
+  by_page:
+    home:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    map:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    peace-of-mind:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    essentials:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    executors-contacts:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    financial-accounts:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    insurance:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    taxes:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    business:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    property:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    vehicles:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    keepsakes:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    digital-legacy:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    devices:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    executor-quickstart:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    executor-card:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    executor-view:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    family-view:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    memories:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    photos:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    letters-index:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    life-story:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    grief-support:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    family-faq:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    medical:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    living-will:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    donation-wishes:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    notifications:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    letters-db:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    qr-reference:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    qr-print:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    qr-packages:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    qr-letters:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    prompts-letters:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    prompts-tribute:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    prompts-executor:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    prompts-rewrite:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    prompts-translate:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    flow-process:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    flow-contacts:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    flow-activation:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    guidance:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    tone:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    disclaimer:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    diagnostics:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    tracker:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    finishing:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    dev-notes:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    recovery:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    encouragements:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    icons-headers:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    mobile-test:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    letters-family-view:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    letters-brokerage-view:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    letters-bank-view:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    letters-insurance-view:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    letters-utilities-view:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    letters-community-view:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    letters-executor-view:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    letters-family-announcements-view:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'
+    photos-captions-helper:
+    - Cover and icon set
+    - Instruction note cleared
+    - 'If DB applies: required fields present'
+    - 'If letters apply: sample present'

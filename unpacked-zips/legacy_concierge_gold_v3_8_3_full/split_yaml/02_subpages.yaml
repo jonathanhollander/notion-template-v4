@@ -1,0 +1,34 @@
+pages:
+- title: Bank Accounts
+  slug: bank-accounts
+  icon: "emoji:\U0001F3E6"
+  description: List of bank accounts and access details.
+  children:
+  - title: Checking
+    slug: bank-checking
+    icon: "emoji:\U0001F3F7"
+    description: Primary checking account notes.
+  - title: Savings
+    slug: bank-savings
+    icon: "emoji:\U0001F4B0"
+    description: Savings accounts overview.
+- title: Brokerage
+  slug: brokerage
+  icon: "emoji:\U0001F4C8"
+  description: Investment accounts and holdings.
+- title: Insurance
+  slug: insurance
+  icon: "emoji:\U0001F6E1"
+  description: Policies and beneficiaries.
+- title: Property
+  slug: property
+  icon: "emoji:\U0001F3E0"
+  description: Real property details and documents.
+- title: Subscriptions
+  slug: subscriptions
+  icon: "emoji:\U0001F9FE"
+  description: Recurring subscriptions and services.
+- title: Credit Cards
+  slug: credit-cards
+  icon: "emoji:\U0001F4B3"
+  description: Cards and support contact info.

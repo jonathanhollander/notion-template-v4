@@ -1,0 +1,5 @@
+pages:
+- title: Admin – Release Notes
+  icon: emoji:🗒️
+  role: owner
+  description: Version history of this template. Safe to delete before final sharing.

@@ -1,0 +1,296 @@
+pages:
+- title: Executor Task 01
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 02
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 03
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 04
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 05
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 06
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 07
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 08
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 09
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 10
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 11
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 12
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 13
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 14
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 15
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 16
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 17
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 18
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 19
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 20
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 21
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 22
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 23
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 24
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 25
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 26
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 27
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 28
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 29
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 30
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 31
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 32
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 33
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 34
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 35
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 36
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 37
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 38
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 39
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Executor Task 40
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+- title: Guide – SSA Notification
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+- title: Guide – IRS Final Return Notes
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+- title: Guide – DMV Title Transfer
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+- title: Guide – USPS Mail Forwarding
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+- title: Guide – Mortgage Servicer
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+- title: Guide – Landlord/HOA
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+- title: Guide – Pension/401(k) Administrator
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+- title: Guide – Brokerage Transfer
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+- title: Guide – Credit Bureaus (Equifax/Experian/TransUnion)
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+- title: Digital Assets – Passwords & Access Hints
+  parent: Property & Assets
+  icon: emoji:💾
+  role: owner
+  description: Where to find and how to handle this item.
+- title: Digital Assets – Email Accounts
+  parent: Property & Assets
+  icon: emoji:💾
+  role: owner
+  description: Where to find and how to handle this item.
+- title: Digital Assets – Cloud Storage
+  parent: Property & Assets
+  icon: emoji:💾
+  role: owner
+  description: Where to find and how to handle this item.
+- title: Digital Assets – Photo Archives
+  parent: Property & Assets
+  icon: emoji:💾
+  role: owner
+  description: Where to find and how to handle this item.
+- title: Digital Assets – Domain Names
+  parent: Property & Assets
+  icon: emoji:💾
+  role: owner
+  description: Where to find and how to handle this item.
+- title: Digital Assets – Crypto Wallets
+  parent: Property & Assets
+  icon: emoji:💾
+  role: owner
+  description: Where to find and how to handle this item.
+- title: Letters of Sympathy (Optional)
+  parent: Family Hub
+  icon: emoji:📝
+  role: family
+  description: Optional items to help the family remember and gather.
+- title: Memorial Playlist
+  parent: Family Hub
+  icon: emoji:📝
+  role: family
+  description: Optional items to help the family remember and gather.
+- title: Photo Collage Plan
+  parent: Family Hub
+  icon: emoji:📝
+  role: family
+  description: Optional items to help the family remember and gather.
+- title: Memorial Guestbook
+  parent: Family Hub
+  icon: emoji:📝
+  role: family
+  description: Optional items to help the family remember and gather.

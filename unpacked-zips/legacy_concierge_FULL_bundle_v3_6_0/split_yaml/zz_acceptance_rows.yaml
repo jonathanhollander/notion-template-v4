@@ -1,0 +1,296 @@
+acceptance:
+  rows:
+  - Page: Preparation Hub
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Top Level
+  - Page: Executor Hub
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Top Level
+  - Page: Family Hub
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Top Level
+  - Page: Legal Documents
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Financial Accounts
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Top Level
+  - Page: Property & Assets
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Top Level
+  - Page: Insurance
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Top Level
+  - Page: Subscriptions
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Top Level
+  - Page: Letters
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Top Level
+  - Page: Memories & Keepsakes
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Top Level
+  - Page: Contacts
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: QR Codes
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Living Will – Sample Document
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 75
+    Section: Legal Documents
+  - Page: Power of Attorney – Sample
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 75
+    Section: Legal Documents
+  - Page: Advance Directive – Sample
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 75
+    Section: Legal Documents
+  - Page: Trust – Sample Outline
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 75
+    Section: Legal Documents
+  - Page: Executor Checklist
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Executor Hub
+  - Page: Bank & Account Access Notes
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Executor Hub
+  - Page: Funeral & Memorial Preferences
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Executor Hub
+  - Page: Messages for Family
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Family Hub
+  - Page: Keepsakes Index
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Family Hub
+  - Page: Primary Bank Accounts
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Financial Accounts
+  - Page: Credit Cards
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Financial Accounts
+  - Page: Brokerage & Retirement
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Financial Accounts
+  - Page: Real Estate
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Property & Assets
+  - Page: Vehicles
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Property & Assets
+  - Page: Digital Assets
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Property & Assets
+  - Page: Life Insurance
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Insurance
+  - Page: Homeowners/Renters
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Insurance
+  - Page: Health Insurance
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Insurance
+  - Page: Streaming Services
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Subscriptions
+  - Page: Utilities
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Subscriptions
+  - Page: Online Services
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Subscriptions
+  - Page: QR – Family Essentials
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 25
+    Section: QR Codes
+  - Page: QR – Full Access for Executor
+    Role: owner
+    Check: Review page content, personalize details, and remove helpers when done.
+    Status: Pending
+    Est. Time (min): 25
+    Section: QR Codes
+  - Page: Letter — Bank Notification – Deceased Account Holder
+    Role: owner
+    Check: Adapt the draft letter and verify recipient details.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Credit Card Closure Request
+    Role: owner
+    Check: Adapt the draft letter and verify recipient details.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Utility Account Transfer/Closure
+    Role: owner
+    Check: Adapt the draft letter and verify recipient details.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Insurance Claim Notification
+    Role: owner
+    Check: Adapt the draft letter and verify recipient details.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Employer HR Notification
+    Role: owner
+    Check: Adapt the draft letter and verify recipient details.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Subscription Cancellation (General)
+    Role: owner
+    Check: Adapt the draft letter and verify recipient details.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Social Media Memorialization
+    Role: owner
+    Check: Adapt the draft letter and verify recipient details.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: 'DB Setup: Accounts'
+    Role: owner
+    Check: Add views (Table, Board by Status) and a Page Template for this DB.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Database Setup
+  - Page: 'DB Setup: Property'
+    Role: owner
+    Check: Add views (Table, Board by Status) and a Page Template for this DB.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Database Setup
+  - Page: 'DB Setup: Insurance'
+    Role: owner
+    Check: Add views (Table, Board by Status) and a Page Template for this DB.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Database Setup
+  - Page: 'DB Setup: Contacts'
+    Role: owner
+    Check: Add views (Table, Board by Status) and a Page Template for this DB.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Database Setup
+  - Page: 'DB Setup: Subscriptions'
+    Role: owner
+    Check: Add views (Table, Board by Status) and a Page Template for this DB.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Database Setup
+  - Page: 'DB Setup: Keepsakes'
+    Role: owner
+    Check: Add views (Table, Board by Status) and a Page Template for this DB.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Database Setup
+  - Page: 'DB Setup: Letters Index'
+    Role: owner
+    Check: Add views (Table, Board by Status) and a Page Template for this DB.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Database Setup

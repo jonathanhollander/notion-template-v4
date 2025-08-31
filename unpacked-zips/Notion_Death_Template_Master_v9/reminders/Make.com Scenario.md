@@ -1,0 +1,1 @@
+- Daily @7am → Query due items → Create Google Calendar event → Optional email

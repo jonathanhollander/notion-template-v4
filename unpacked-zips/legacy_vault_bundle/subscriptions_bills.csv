@@ -1,0 +1,4 @@
+Service,Cost,Interval,Action After Death,Notes
+EXAMPLE — Netflix,15.49,Monthly,Cancel,Use executor email templates.
+EXAMPLE — iCloud+,2.99,Monthly,Keep Temporarily,Keep until photo export complete.
+EXAMPLE — Xfinity,89.0,Monthly,Cancel,Return equipment to store.

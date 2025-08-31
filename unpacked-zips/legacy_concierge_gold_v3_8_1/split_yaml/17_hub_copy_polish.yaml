@@ -1,0 +1,24 @@
+# 17_hub_copy_polish.yaml
+# Refines hub copy to be empathetic and action-forward, and reminds the admin how to embed live views.
+
+pages:
+  - title: "Preparation Hub"
+    body:
+      - type: callout
+        icon: "emoji:🧭"
+        color: gray_background
+        text: "This hub keeps you steady as you prepare. Start with the first page in Setup & Acceptance. Small steps are enough."
+
+  - title: "Executor Hub"
+    body:
+      - type: callout
+        icon: "emoji:🧭"
+        color: gray_background
+        text: "This space helps you carry out wishes with clarity. Use the checklists and letters here; when in doubt, do the next right task."
+
+  - title: "Family Hub"
+    body:
+      - type: callout
+        icon: "emoji:🧭"
+        color: gray_background
+        text: "Care for yourself first. When you’re ready, this hub gathers updates and shared notes in one place."

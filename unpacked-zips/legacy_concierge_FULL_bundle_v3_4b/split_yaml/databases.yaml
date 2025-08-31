@@ -1,0 +1,33 @@
+db:
+  schemas:
+    sample_letters:
+      properties:
+        Title: title
+        Audience: select
+        Category: select
+        Scenario: rich_text
+        Body: rich_text
+        AI Prompt: rich_text
+        Section: select
+    owner_progress:
+      properties:
+        Page: title
+        Status: select
+        Notes: rich_text
+      options:
+        Status:
+        - Done
+        - In Progress
+        - Needs Attention
+      seed_rows:
+      - Page: Essentials
+        Status: In Progress
+        Notes: Add document locations.
+      - Page: Executors & Key Contacts
+        Status: Needs Attention
+        Notes: Add attorney and backup contact.
+      - Page: Letters & Notifications
+        Status: Needs Attention
+        Notes: Personalize 2–3 letters.
+  seeds:
+    sample_letters: []

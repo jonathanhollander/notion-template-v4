@@ -1,0 +1,90 @@
+db:
+  schemas:
+    owner_progress:
+      properties:
+        Page: title
+        Status: select
+        Notes: rich_text
+      options:
+        Status:
+        - Done
+        - In Progress
+        - Needs Attention
+      seed_rows:
+      - Page: Essentials
+        Status: Done
+        Notes: All essentials documented.
+      - Page: Executors & Key Contacts
+        Status: In Progress
+        Notes: Attorney added; backup pending.
+      - Page: Letters & Notifications
+        Status: Needs Attention
+        Notes: Personalize two letters.
+    insurance_db:
+      properties:
+        Provider: title
+        Policy Number: rich_text
+        Notes: rich_text
+      seed_rows:
+      - Provider: Sample Insurance
+        Policy Number: '123456'
+        Notes: Term life policy
+    tax_db:
+      properties:
+        Agency: title
+        Type: select
+        Notes: rich_text
+      seed_rows:
+      - Agency: IRS
+        Type: Federal
+        Notes: Final return required
+    property_db:
+      properties:
+        Address: title
+        Type: select
+        Notes: rich_text
+      seed_rows:
+      - Address: 123 Sample St.
+        Type: Home
+        Notes: Primary residence
+    vehicles_db:
+      properties:
+        Make/Model: title
+        VIN: rich_text
+        Notes: rich_text
+      seed_rows:
+      - Make/Model: Toyota Camry
+        VIN: VIN12345
+        Notes: Title in glove box
+    business_db:
+      properties:
+        Entity: title
+        Role: select
+        Notes: rich_text
+      seed_rows:
+      - Entity: Sample LLC
+        Role: Member
+        Notes: Operating agreement on file
+    memories_db:
+      properties:
+        Memory: title
+        Notes: rich_text
+      seed_rows:
+      - Memory: Sunday dinners
+        Notes: The small rituals mattered.
+    keepsakes_db:
+      properties:
+        Item: title
+        Where: rich_text
+        Notes: rich_text
+      seed_rows:
+      - Item: Wedding ring
+        Where: Top drawer
+        Notes: Pass down to [Name].
+    life_story_db:
+      properties:
+        Chapter: title
+        Notes: rich_text
+      seed_rows:
+      - Chapter: A beginning
+        Notes: Write in fragments or full pages.

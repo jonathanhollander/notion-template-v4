@@ -1,0 +1,225 @@
+db:
+  schemas:
+    owner_progress:
+      properties:
+        Page: title
+        Status: select
+        Notes: rich_text
+      options:
+        Status:
+        - Done
+        - In Progress
+        - Needs Attention
+      seed_rows:
+      - Page: Essentials
+        Status: Done
+        Notes: All essentials documented.
+      - Page: Executors & Key Contacts
+        Status: In Progress
+        Notes: Attorney added; backup pending.
+      - Page: Life Story
+        Status: In Progress
+        Notes: First memory written.
+      - Page: Letters & Notifications
+        Status: Needs Attention
+        Notes: Personalize 2–3 letters.
+      - Page: Memories
+        Status: Needs Attention
+        Notes: Add at least one keepsake note.
+    sample_letters:
+      properties:
+        Title: title
+        Audience: select
+        Category: select
+        Body: rich_text
+    insurance_db:
+      properties:
+        Provider: title
+        Policy Number: rich_text
+        Notes: rich_text
+      seed_rows:
+      - Provider: Sample Insurance
+        Policy Number: '123456'
+        Notes: Term life policy
+    tax_db:
+      properties:
+        Agency: title
+        Type: select
+        Notes: rich_text
+      seed_rows:
+      - Agency: IRS
+        Type: Federal
+        Notes: Final return required
+    property_db:
+      properties:
+        Address: title
+        Type: select
+        Notes: rich_text
+      seed_rows:
+      - Address: 123 Sample St.
+        Type: Home
+        Notes: Primary residence
+    vehicles_db:
+      properties:
+        Make/Model: title
+        VIN: rich_text
+        Notes: rich_text
+      seed_rows:
+      - Make/Model: Toyota Camry
+        VIN: VIN12345
+        Notes: Title in glove box
+    memories_db:
+      properties:
+        Memory: title
+        Notes: rich_text
+      seed_rows:
+      - Memory: Family dinners
+        Notes: Always on Sundays
+  seeds:
+    sample_letters:
+    - Title: Bank Notification
+      Audience: Executor
+      Category: Financial
+      Body: 'Dear [Bank],
+
+        I am writing to inform you of the passing of [Name]. I am executor and have enclosed the death certificate. Please advise steps to close or transfer accounts.
+
+
+        Thank you for your guidance.'
+    - Title: Credit Card Company
+      Audience: Executor
+      Category: Financial
+      Body: 'Dear [Company],
+
+        Please note the passing of [Name]. Kindly close the account and stop further charges. Enclosed is the death certificate. Please confirm any remaining balance.
+
+
+        Thank you for your assistance.'
+    - Title: Brokerage / Investment Firm
+      Audience: Executor
+      Category: Financial
+      Body: 'Dear [Firm],
+
+        I am executor for [Name]. Enclosed is the death certificate. Please advise on procedure for transferring or closing accounts.
+
+
+        Thank you for your support.'
+    - Title: Insurance Carrier
+      Audience: Executor
+      Category: Insurance
+      Body: 'Dear [Insurance Company],
+
+        Please note the passing of [Name], policy holder. Enclosed is the death certificate. Kindly provide the forms or steps to process the claim.
+
+
+        Thank you for your guidance.'
+    - Title: Medical Providers / Health Insurance
+      Audience: Executor
+      Category: Medical
+      Body: 'Dear [Provider],
+
+        This letter notifies you of the passing of [Name]. Enclosed is the death certificate. Please confirm any documentation required to close records.
+
+
+        Thank you for your support.'
+    - Title: Mortgage / Lender
+      Audience: Executor
+      Category: Financial
+      Body: 'Dear [Lender],
+
+        I am executor for [Name]. Enclosed is the death certificate. Please confirm the current balance and steps for continuing or settling the loan.
+
+
+        Thank you for your guidance.'
+    - Title: Pension / Retirement / Social Security
+      Audience: Executor
+      Category: Financial
+      Body: 'Dear [Agency],
+
+        I am notifying you of the passing of [Name]. Enclosed is the death certificate. Please advise on survivor benefits or closing the account.
+
+
+        Thank you.'
+    - Title: Tax Notification
+      Audience: Executor
+      Category: Legal
+      Body: 'Dear [Tax Agency],
+
+        I am notifying you of the passing of [Name]. Enclosed is the death certificate. Please advise on final return requirements.
+
+
+        Thank you.'
+    - Title: Employer Notification
+      Audience: Executor
+      Category: Employment
+      Body: 'Dear [HR Department],
+
+        I am writing regarding [Name], who has passed away. Enclosed is the death certificate. Please advise on final pay, benefits, or retirement plans.
+
+
+        Thank you for your assistance.'
+    - Title: Utility Company
+      Audience: Executor
+      Category: Services
+      Body: 'Dear [Utility Company],
+
+        Please note the passing of [Name], account holder at [Address]. Enclosed is the death certificate. Kindly advise how to transfer or close service and settle the final bill.
+
+
+        Thank you.'
+    - Title: Subscriptions / Digital Services
+      Audience: Executor
+      Category: Services
+      Body: 'Dear [Service],
+
+        This letter is to notify you of the passing of [Name]. Please close the account and stop further charges. Enclosed is the death certificate.
+
+
+        Thank you.'
+    - Title: Community / Social Group
+      Audience: Executor
+      Category: Community
+      Body: 'Dear [Group],
+
+        I am writing to notify you of the passing of [Name], a member of your organization. Enclosed is the death certificate. Please update your records.
+
+
+        Thank you.'
+    - Title: Executor Authority Note
+      Audience: Executor
+      Category: Legal
+      Body: 'To Whom It May Concern,
+
+        I am the named executor for [Name]. Enclosed is the death certificate and my proof of authority. Please work with me on estate matters.
+
+
+        Thank you.'
+    - Title: Landlord / Property Management
+      Audience: Executor
+      Category: Housing
+      Body: 'Dear [Landlord],
+
+        This letter is to inform you of the passing of [Name], tenant at [Address]. Enclosed is the death certificate. Please confirm steps for lease termination and final accounting.
+
+
+        Thank you.'
+    - Title: Letter to My Family
+      Audience: Family
+      Category: Personal
+      Body: 'I wanted you to have my words close by. Thank you for every ordinary day we shared. Nothing needs to happen all at once.
+
+
+        I love you, and I am grateful for you.'
+    - Title: Family Announcement
+      Audience: Family
+      Category: Personal
+      Body: 'Dear friends and family,
+
+        With sadness we share that [Name] has passed away. Services will be held at [Location/Date]. We’re grateful for your support.
+
+
+        Thank you.'
+    - Title: Short Death Notice / Newspaper Draft
+      Audience: Family
+      Category: Personal
+      Body: '[Name], [Age], of [City], passed away on [Date]. Survived by [Family]. Service at [Location/Date]. Memorial contributions may be made to [Charity].'

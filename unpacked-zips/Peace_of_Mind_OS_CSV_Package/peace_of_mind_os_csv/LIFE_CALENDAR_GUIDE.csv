@@ -1,0 +1,9 @@
+Section,Body_MD
+Overview,"A life calendar shows each week of an 80‑year life as a small square.
+In Notion, create a database with 80×52 = 4,160 rows only if you wish — or keep it simple with yearly rows.
+Color or mark weeks/years with milestones and memories.
+"
+Quick Start,"Simple approach: Create a database with one row per **year**.
+Columns: *Year Number*, *Age*, *Highlights (Text)*, *Starred (Checkbox)*.
+Add highlights like: moved cities, new friends, favorite trips.
+"

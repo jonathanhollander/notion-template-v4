@@ -1,0 +1,63 @@
+<!doctype html><meta name="viewport" content="width=device-width, initial-scale=1">
+<div id="card" style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+            border:1px solid #eee;border-radius:12px;padding:14px;background:#fff;
+            box-shadow:0 1px 2px rgba(0,0,0,.04);">
+  <div style="font-size:14px;color:#666;margin-bottom:8px;">Gentle companion</div>
+  <div id="txt" style="font-size:16px;line-height:1.45">{{ text }}</div>
+  <div style="margin-top:10px;font-size:12px;color:#999;">Updated {{ updated }}</div>
+</div>
+<script>
+(function(){
+  const wid = "{{ wid }}";
+  const sessionId = crypto.randomUUID();
+  const params = new URLSearchParams(location.search);
+  const audience = params.get('audience') || 'family';
+  const section = params.get('section') || '';
+  const ua = navigator.userAgent || '';
+  const isMobile = /Mobi|Android/i.test(ua);
+  const isTablet = /iPad|Tablet/i.test(ua);
+  const device = isMobile ? 'mobile' : (isTablet ? 'tablet' : 'desktop');
+  const lang = navigator.language || (navigator.languages && navigator.languages[0]) || '';
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+  const dpr = window.devicePixelRatio || 1;
+  const sw = window.screen?.width || 0, sh = window.screen?.height || 0;
+  const browser = ua.includes('Chrome') ? 'chrome' :
+                  (ua.includes('Safari') && !ua.includes('Chrome')) ? 'safari' :
+                  (ua.includes('Firefox') ? 'firefox' :
+                  (ua.includes('Edg') ? 'edge' : 'other'));
+  const rm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const contrast = (window.matchMedia && (
+       window.matchMedia('(forced-colors: active)').matches ? 'forced' :
+       window.matchMedia('(prefers-contrast: more)').matches ? 'more' :
+       (window.matchMedia('(prefers-contrast: less)').matches ? 'less' : 'normal')
+  )) || 'unknown';
+  const navConn = (navigator.connection || {});
+  const downlink = navConn.downlink || null;
+  const effType = navConn.effectiveType || null;
+  const saveData = !!navConn.saveData;
+  const referer = document.referrer || '';
+  const t0 = performance.now();
+  window.addEventListener('load', () => {
+    const renderMs = Math.round(performance.now() - t0);
+    fetch('/collect/session-start', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        wid, session_id: sessionId, audience, section_hint: section,
+        referer_url: referer, render_ms: renderMs,
+        language_pref: lang, timezone: tz, device_type: device,
+        browser, os: (navigator.platform || ''),
+        screen_w: sw, screen_h: sh, dpr,
+        a11y_reduced_motion: rm, a11y_contrast: contrast,
+        net_downlink: downlink, net_effective_type: effType, net_save_data: saveData
+      })
+    }).catch(()=>{});
+  });
+  window.addEventListener('beforeunload', () => {
+    fetch('/collect/session-end', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      keepalive: true,
+      body: JSON.stringify({ wid, session_id: sessionId })
+    });
+  });
+})();
+</script>

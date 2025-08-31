@@ -1,0 +1,512 @@
+globals:
+  constants:
+    OWNER_NAME: '[]'
+    EXECUTOR_NAME: '[]'
+    CITY: '[]'
+    LAWYER_NAME: '[]'
+  icons_map:
+    home: 🏠
+    family-view: 👨‍👩‍👧‍👦
+    executor-view: 🧭
+    essentials: 📁
+    life-story: 📖
+    finishing: ✅
+  covers_map:
+    life-story: https://cdn.example.com/headers/soft-sepia.jpg
+    family-view: https://cdn.example.com/headers/warm-light.jpg
+    executor-quickstart: https://cdn.example.com/headers/compass-simple.jpg
+    memories: https://cdn.example.com/headers/photo-soft.jpg
+    finishing: https://cdn.example.com/headers/quiet-horizon.jpg
+  strings:
+    caution_notes:
+      legal: These pages are for organization and clarity. For legal, medical, or financial advice, please consult a licensed professional.
+      letter: This sample letter is a starting point. Adjust details for your situation.
+    pages:
+      home:
+        header: Home / Welcome
+        description: A quiet page for “Home / Welcome.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR][#COUNT 1/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Home / Welcome” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      map:
+        header: Template Map (All Pages Index)
+        description: A quiet page for “Template Map (All Pages Index).” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR][#COUNT 2/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Template Map (All Pages Index)” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      peace-of-mind:
+        header: Peace of Mind Overview
+        description: A quiet page for “Peace of Mind Overview.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR][#COUNT 3/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Peace of Mind Overview” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      essentials:
+        header: Important Documents & Essentials
+        description: Clear steps and short wording for “Important Documents & Essentials.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 4/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Important Documents & Essentials” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      executors-contacts:
+        header: Executors & Key Contacts
+        description: Clear steps and short wording for “Executors & Key Contacts.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 5/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Executors & Key Contacts” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      financial-accounts:
+        header: Financial Accounts Index
+        description: Clear steps and short wording for “Financial Accounts Index.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 6/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Financial Accounts Index” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      insurance:
+        header: Insurance Policies Index
+        description: Clear steps and short wording for “Insurance Policies Index.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 7/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Insurance Policies Index” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      taxes:
+        header: Taxes & Documents Checklist
+        description: Clear steps and short wording for “Taxes & Documents Checklist.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 8/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Taxes & Documents Checklist” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      business:
+        header: Business Interests / LLCs
+        description: Clear steps and short wording for “Business Interests / LLCs.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 9/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Business Interests / LLCs” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      property:
+        header: Property & Inventory
+        description: Clear steps and short wording for “Property & Inventory.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 10/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Property & Inventory” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      vehicles:
+        header: Vehicles & Titles
+        description: Clear steps and short wording for “Vehicles & Titles.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 11/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Vehicles & Titles” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      keepsakes:
+        header: Keepsakes & Gifts
+        description: Notes and keepsakes gathered for “Keepsakes & Gifts.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR][#COUNT 12/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Keepsakes & Gifts” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      digital-legacy:
+        header: Digital Legacy
+        description: Clear steps and short wording for “Digital Legacy.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 13/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Digital Legacy” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      devices:
+        header: Devices & Access (Non-secret pointers)
+        description: Clear steps and short wording for “Devices & Access (Non-secret pointers).” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 14/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Devices & Access (Non-secret pointers)” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      executor-quickstart:
+        header: Executor QuickStart (One-Pager)
+        description: A short path for first steps. Personalize one or two letters, then check the essentials. Pause whenever you need.
+        owner_instructions: '[#INSTR][#COUNT 15/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Executor QuickStart (One-Pager)” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      executor-card:
+        header: Executor Contact Card
+        description: Clear steps and short wording for “Executor Contact Card.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 16/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Executor Contact Card” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      executor-view:
+        header: Executor View (Dashboard)
+        description: Clear steps and short wording for “Executor View (Dashboard).” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 17/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Executor View (Dashboard)” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      family-view:
+        header: Family View (Dashboard)
+        description: A gentle space for stories, photos, and simple answers. Nothing here asks anything of you.
+        owner_instructions: '[#INSTR][#COUNT 18/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Family View (Dashboard)” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      memories:
+        header: Memories & Letters
+        description: Notes and keepsakes gathered for “Memories & Letters.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR][#COUNT 19/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Memories & Letters” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      photos:
+        header: Memories — Photo Albums (Gallery)
+        description: Notes and keepsakes gathered for “Memories — Photo Albums (Gallery).” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR][#COUNT 20/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Memories — Photo Albums (Gallery)” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      letters-index:
+        header: Memories — Letters Index
+        description: Notes and keepsakes gathered for “Memories — Letters Index.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR][#COUNT 21/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Memories — Letters Index” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      life-story:
+        header: Life Story & Guidance
+        description: Notes and keepsakes gathered for “Life Story & Guidance.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR][#COUNT 22/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Life Story & Guidance” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      grief-support:
+        header: Grief Support Resources
+        description: Notes and keepsakes gathered for “Grief Support Resources.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR][#COUNT 23/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Grief Support Resources” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      family-faq:
+        header: Family FAQ / Getting Started
+        description: Notes and keepsakes gathered for “Family FAQ / Getting Started.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR][#COUNT 24/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Family FAQ / Getting Started” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      medical:
+        header: Medical & Healthcare Preferences
+        description: Clear steps and short wording for “Medical & Healthcare Preferences.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 25/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Medical & Healthcare Preferences” matching the audience and keeping directions minimal.
+        disclaimer: LEGAL
+      living-will:
+        header: Living Will / Advance Care Directives
+        description: Clear steps and short wording for “Living Will / Advance Care Directives.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 26/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Living Will / Advance Care Directives” matching the audience and keeping directions minimal.
+        disclaimer: LEGAL
+      donation-wishes:
+        header: Donation & Personal Wishes
+        description: Notes and keepsakes gathered for “Donation & Personal Wishes.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR][#COUNT 27/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Donation & Personal Wishes” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      notifications:
+        header: Notifications Plan
+        description: Clear steps and short wording for “Notifications Plan.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 28/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Notifications Plan” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      letters-db:
+        header: Sample Letters Library (DB parent view)
+        description: A quiet page for “Sample Letters Library (DB parent view).” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR][#COUNT 29/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Sample Letters Library (DB parent view)” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      qr-reference:
+        header: QR Codes Reference
+        description: A quiet page for “QR Codes Reference.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR][#COUNT 30/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “QR Codes Reference” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      qr-print:
+        header: QR Card Printables (How-To)
+        description: Clear steps and short wording for “QR Card Printables (How-To).” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 31/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “QR Card Printables (How-To)” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      qr-packages:
+        header: QR Packages (Reference)
+        description: A quiet page for “QR Packages (Reference).” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR][#COUNT 32/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “QR Packages (Reference)” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      qr-letters:
+        header: QR Distribution Letters
+        description: Clear steps and short wording for “QR Distribution Letters.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 33/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “QR Distribution Letters” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      prompts-letters:
+        header: Prompt Library — Letters & Stories
+        description: A quiet page for “Prompt Library — Letters & Stories.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR][#COUNT 34/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Prompt Library — Letters & Stories” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      prompts-tribute:
+        header: Prompt Library — Life Story & Tribute
+        description: A quiet page for “Prompt Library — Life Story & Tribute.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR][#COUNT 35/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Prompt Library — Life Story & Tribute” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      prompts-executor:
+        header: Prompt Library — Executor & Summary Aids
+        description: A quiet page for “Prompt Library — Executor & Summary Aids.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR][#COUNT 36/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Prompt Library — Executor & Summary Aids” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      prompts-rewrite:
+        header: Prompt Library — Combine & Rewrite
+        description: A quiet page for “Prompt Library — Combine & Rewrite.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR][#COUNT 37/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Prompt Library — Combine & Rewrite” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      prompts-translate:
+        header: Prompt Library — Translate
+        description: A quiet page for “Prompt Library — Translate.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR][#COUNT 38/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Prompt Library — Translate” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      flow-process:
+        header: Process Flow (Mermaid)
+        description: Clear steps and short wording for “Process Flow (Mermaid).” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 39/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Process Flow (Mermaid)” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      flow-contacts:
+        header: Contacts & Roles Map (Mermaid)
+        description: Clear steps and short wording for “Contacts & Roles Map (Mermaid).” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 40/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Contacts & Roles Map (Mermaid)” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      flow-activation:
+        header: Executor Activation Flow (Mermaid)
+        description: Clear steps and short wording for “Executor Activation Flow (Mermaid).” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 41/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Executor Activation Flow (Mermaid)” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      guidance:
+        header: Guidance Library (Resources)
+        description: Notes and keepsakes gathered for “Guidance Library (Resources).” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR][#COUNT 42/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Guidance Library (Resources)” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      tone:
+        header: Copy & Tone Guide
+        description: A quiet page for “Copy & Tone Guide.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR][#COUNT 43/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Copy & Tone Guide” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      disclaimer:
+        header: Legal Disclaimer (Standalone Page)
+        description: A quiet page for “Legal Disclaimer (Standalone Page).” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR][#COUNT 44/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Legal Disclaimer (Standalone Page)” matching the audience and keeping directions minimal.
+        disclaimer: LEGAL
+      diagnostics:
+        header: Diagnostics
+        description: A quiet page for “Diagnostics.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR][#COUNT 45/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Diagnostics” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      tracker:
+        header: Build Tracker (DB)
+        description: A quiet page for “Build Tracker (DB).” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR][#COUNT 46/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Build Tracker (DB)” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      finishing:
+        header: Manual Finishing Tasks
+        description: A quiet page for “Manual Finishing Tasks.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR][#COUNT 47/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Manual Finishing Tasks” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      dev-notes:
+        header: Developer Notes / Version & Changelog
+        description: A quiet page for “Developer Notes / Version & Changelog.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR][#COUNT 48/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Developer Notes / Version & Changelog” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      recovery:
+        header: System Check / Recovery Report
+        description: A quiet page for “System Check / Recovery Report.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR][#COUNT 49/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “System Check / Recovery Report” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      encouragements:
+        header: Encouragements
+        description: Notes and keepsakes gathered for “Encouragements.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR][#COUNT 50/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Encouragements” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      icons-headers:
+        header: Icons & Headers Library
+        description: A quiet page for “Icons & Headers Library.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR][#COUNT 51/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Icons & Headers Library” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      mobile-test:
+        header: Mobile Test Checklist
+        description: A quiet page for “Mobile Test Checklist.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR][#COUNT 52/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Mobile Test Checklist” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      letters-family-view:
+        header: Memories — Letters (Family Library View)
+        description: Notes and keepsakes gathered for “Memories — Letters (Family Library View).” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR][#COUNT 53/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Memories — Letters (Family Library View)” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      letters-brokerage-view:
+        header: Brokerage Letters (Library View)
+        description: Clear steps and short wording for “Brokerage Letters (Library View).” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 54/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Brokerage Letters (Library View)” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      letters-bank-view:
+        header: Bank Letters (Library View)
+        description: Clear steps and short wording for “Bank Letters (Library View).” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 55/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Bank Letters (Library View)” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      letters-insurance-view:
+        header: Insurance Letters (Library View)
+        description: Clear steps and short wording for “Insurance Letters (Library View).” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 56/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Insurance Letters (Library View)” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      letters-utilities-view:
+        header: Utilities Letters (Library View)
+        description: Clear steps and short wording for “Utilities Letters (Library View).” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 57/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Utilities Letters (Library View)” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      letters-community-view:
+        header: Community Letters (Library View)
+        description: Clear steps and short wording for “Community Letters (Library View).” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 58/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Community Letters (Library View)” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      letters-executor-view:
+        header: Executor Letters (Library View)
+        description: Clear steps and short wording for “Executor Letters (Library View).” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 59/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Executor Letters (Library View)” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      letters-family-announcements-view:
+        header: Family Letters (Library View)
+        description: Notes and keepsakes gathered for “Family Letters (Library View).” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR][#COUNT 60/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Family Letters (Library View)” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      photos-captions-helper:
+        header: Photo Captions Helper
+        description: Notes and keepsakes gathered for “Photo Captions Helper.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR][#COUNT 61/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Photo Captions Helper” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      executor-orientation:
+        header: When You First Open This
+        description: If you’ve just opened this, begin with one or two pages that feel most important. Personalize any letter you need now, and let the rest wait.
+        owner_instructions: '[#INSTR][#COUNT 17/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “When You First Open This” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      everything-done:
+        header: For When It Feels Complete
+        description: When the last small tasks are settled, you can stop. If you’d like, leave a brief note here for anyone who may return later.
+        owner_instructions: '[#INSTR][#COUNT 47/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “For When It Feels Complete” matching the audience and keeping directions minimal.
+        disclaimer: NONE
+      letter-bank:
+        header: Bank Notification Letter
+        description: Clear steps and short wording for “Bank Notification Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 6/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Bank Notification Letter” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      letter-card:
+        header: Credit Card Company Letter
+        description: Clear steps and short wording for “Credit Card Company Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 6/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Credit Card Company Letter” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      letter-brokerage:
+        header: Brokerage / Investment Firm Letter
+        description: Clear steps and short wording for “Brokerage / Investment Firm Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 6/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Brokerage / Investment Firm Letter” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      letter-insurance:
+        header: Insurance Carrier Letter
+        description: Clear steps and short wording for “Insurance Carrier Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 7/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Insurance Carrier Letter” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      letter-tax:
+        header: Tax Notification Letter
+        description: Clear steps and short wording for “Tax Notification Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 8/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Tax Notification Letter” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      letter-employer:
+        header: Employer Notification Letter
+        description: Clear steps and short wording for “Employer Notification Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 28/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Employer Notification Letter” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      letter-utilities:
+        header: Utility Company Letter
+        description: Clear steps and short wording for “Utility Company Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 28/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Utility Company Letter” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      letter-community:
+        header: Community / Social Group Letter
+        description: Clear steps and short wording for “Community / Social Group Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 28/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Community / Social Group Letter” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      letter-executor-authority:
+        header: Executor Cover Note / Authority
+        description: Clear steps and short wording for “Executor Cover Note / Authority.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 5/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Executor Cover Note / Authority” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      letter-landlord:
+        header: Landlord / Property Management Letter
+        description: Clear steps and short wording for “Landlord / Property Management Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 10/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Landlord / Property Management Letter” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      letter-medical-providers:
+        header: Medical Providers / Health Insurance Letter
+        description: Clear steps and short wording for “Medical Providers / Health Insurance Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 7/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Medical Providers / Health Insurance Letter” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      letter-mortgage:
+        header: Mortgage / Lender Letter
+        description: Clear steps and short wording for “Mortgage / Lender Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 6/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Mortgage / Lender Letter” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      letter-pension:
+        header: Pension / Retirement / Social Security Letter
+        description: Clear steps and short wording for “Pension / Retirement / Social Security Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 6/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Pension / Retirement / Social Security Letter” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      letter-digital:
+        header: Subscriptions / Digital Services Letter
+        description: Clear steps and short wording for “Subscriptions / Digital Services Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR][#COUNT 28/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Subscriptions / Digital Services Letter” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      letter-family:
+        header: Family Announcement Letter
+        description: Notes and keepsakes gathered for “Family Announcement Letter.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR][#COUNT 18/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Family Announcement Letter” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      letter-death-notice:
+        header: Short Death Notice / Newspaper Draft
+        description: Notes and keepsakes gathered for “Short Death Notice / Newspaper Draft.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR][#COUNT 22/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Short Death Notice / Newspaper Draft” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+      letter-to-family:
+        header: Letter to My Family
+        description: Notes and keepsakes gathered for “Letter to My Family.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR][#COUNT 19/61] Read once as your user. Remove friction. When it feels clear and kind, remove this note.'
+        ai_prompt: Draft a steady, respectful 80–140 word intro for “Letter to My Family” matching the audience and keeping directions minimal.
+        disclaimer: LETTER
+  diagnostics_text:
+    messages:
+      cover_missing: ‘{page}’ might feel warmer with a calm cover image.
+      icon_missing: ‘{page}’ is missing an icon. Choose something simple and steady.
+      instr_present: ‘{page}’ still shows a helper note. When the page reads smoothly, remove it.
+      db_required_field: '‘{db}’ needs a few basics for reliability: {fields}.'
+    reminders:
+      family_no_tasks: Family pages should not feel like chores. Move steps to executor pages where possible.

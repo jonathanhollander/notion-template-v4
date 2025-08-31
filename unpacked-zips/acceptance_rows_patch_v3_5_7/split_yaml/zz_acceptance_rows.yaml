@@ -1,0 +1,510 @@
+acceptance:
+  rows:
+  - Page: Preparation Hub
+    Role: owner
+    Check: Scan this section for clarity and completeness; tidy headings and links.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Top Level
+  - Page: Executor Guide — A Steady Path
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Family Guide — A Gentle Space
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Essentials
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Executors & Key Contacts
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Financial Accounts
+    Role: owner
+    Check: Confirm details are accurate, attach reference docs, and link to related
+      accounts.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Top Level
+  - Page: Insurance
+    Role: owner
+    Check: Confirm details are accurate, attach reference docs, and link to related
+      accounts.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Top Level
+  - Page: Taxes & Returns
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Property & Real Estate
+    Role: owner
+    Check: List items, upload key documents/photos, and verify values or identifiers.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Top Level
+  - Page: Vehicles & Titles
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Business Interests
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Digital Accounts & Passwords
+    Role: owner
+    Check: Confirm details are accurate, attach reference docs, and link to related
+      accounts.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Top Level
+  - Page: Utilities & Services
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Subscriptions & Memberships
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Legal Documents
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Letters & Notifications
+    Role: owner
+    Check: Review and adapt the letter text, fill placeholders, and verify recipient
+      details.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Top Level
+  - Page: Funeral & Service Wishes
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Assets Inventory
+    Role: owner
+    Check: List items, upload key documents/photos, and verify values or identifiers.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Top Level
+  - Page: Liabilities Inventory
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Life Story
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Memories
+    Role: owner
+    Check: Add a few examples to demonstrate tone; confirm privacy context.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Top Level
+  - Page: Keepsakes & Mementos
+    Role: owner
+    Check: Add a few examples to demonstrate tone; confirm privacy context.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Top Level
+  - Page: Letters to Family
+    Role: owner
+    Check: Review and adapt the letter text, fill placeholders, and verify recipient
+      details.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Top Level
+  - Page: Grief & Support
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Celebration & Tributes
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Contacts Directory
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Document Vault
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Calendar & Timeline
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Template Map
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: QR Codes
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Everything Done
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Living Will (Sample — Not Legal)
+    Role: owner
+    Check: Review the sample language carefully and personalize where appropriate
+      (not legal advice).
+    Status: Pending
+    Est. Time (min): 60
+    Section: Legal Documents
+  - Page: Last Will (Sample — Not Legal)
+    Role: owner
+    Check: Review the sample language carefully and personalize where appropriate
+      (not legal advice).
+    Status: Pending
+    Est. Time (min): 60
+    Section: Legal Documents
+  - Page: Power of Attorney (Sample — Not Legal)
+    Role: owner
+    Check: Review the sample language carefully and personalize where appropriate
+      (not legal advice).
+    Status: Pending
+    Est. Time (min): 60
+    Section: Legal Documents
+  - Page: Healthcare Proxy (Sample — Not Legal)
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Legal Documents
+  - Page: Disposition Wishes (Sample — Not Legal)
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Legal Documents
+  - Page: 'Banking: Checking Accounts'
+    Role: owner
+    Check: Confirm details are accurate, attach reference docs, and link to related
+      accounts.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Top Level
+  - Page: 'Banking: Savings & CDs'
+    Role: owner
+    Check: Confirm details are accurate, attach reference docs, and link to related
+      accounts.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Top Level
+  - Page: Brokerage & Investments
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Retirement Accounts
+    Role: owner
+    Check: Confirm details are accurate, attach reference docs, and link to related
+      accounts.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Top Level
+  - Page: 'Insurance: Health'
+    Role: owner
+    Check: Confirm details are accurate, attach reference docs, and link to related
+      accounts.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Top Level
+  - Page: 'Insurance: Life'
+    Role: owner
+    Check: Confirm details are accurate, attach reference docs, and link to related
+      accounts.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Top Level
+  - Page: 'Insurance: Home/Auto'
+    Role: owner
+    Check: Confirm details are accurate, attach reference docs, and link to related
+      accounts.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Top Level
+  - Page: Loans & Lines of Credit
+    Role: owner
+    Check: Confirm details are accurate, attach reference docs, and link to related
+      accounts.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Top Level
+  - Page: 'Tax: Federal'
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: 'Tax: State'
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: 'Property: Primary Residence'
+    Role: owner
+    Check: List items, upload key documents/photos, and verify values or identifiers.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Top Level
+  - Page: 'Property: Other Real Estate'
+    Role: owner
+    Check: List items, upload key documents/photos, and verify values or identifiers.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Top Level
+  - Page: 'Vehicles: Primary'
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: 'Vehicles: Secondary'
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: 'Business: Ownership Interests'
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: 'Business: Key Contacts'
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Memorial Ideas
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Music & Readings
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Photos & Albums
+    Role: owner
+    Check: Prepare and finalize this page with the provided guidance.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Thank-You Notes
+    Role: owner
+    Check: Add a few examples to demonstrate tone; confirm privacy context.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Top Level
+  - Page: Letter — Bank Notification
+    Role: owner
+    Check: Review and adapt the letter text, fill placeholders, and verify addresses.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Credit Card Company
+    Role: owner
+    Check: Review and adapt the letter text, fill placeholders, and verify addresses.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Brokerage / Investment Firm
+    Role: owner
+    Check: Review and adapt the letter text, fill placeholders, and verify addresses.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Insurance Carrier
+    Role: owner
+    Check: Review and adapt the letter text, fill placeholders, and verify addresses.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Medical Providers / Health Insurance
+    Role: owner
+    Check: Review and adapt the letter text, fill placeholders, and verify addresses.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Mortgage / Lender
+    Role: owner
+    Check: Review and adapt the letter text, fill placeholders, and verify addresses.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Pension / Retirement / Social Security
+    Role: owner
+    Check: Review and adapt the letter text, fill placeholders, and verify addresses.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Tax Notification
+    Role: owner
+    Check: Review and adapt the letter text, fill placeholders, and verify addresses.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Employer Notification
+    Role: owner
+    Check: Review and adapt the letter text, fill placeholders, and verify addresses.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Utility Company
+    Role: owner
+    Check: Review and adapt the letter text, fill placeholders, and verify addresses.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Subscriptions / Digital Services
+    Role: owner
+    Check: Review and adapt the letter text, fill placeholders, and verify addresses.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Community / Social Group
+    Role: owner
+    Check: Review and adapt the letter text, fill placeholders, and verify addresses.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Executor Authority Note
+    Role: owner
+    Check: Review and adapt the letter text, fill placeholders, and verify addresses.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Landlord / Property Management
+    Role: owner
+    Check: Review and adapt the letter text, fill placeholders, and verify addresses.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Letter to My Family
+    Role: owner
+    Check: Review and adapt the letter text, fill placeholders, and verify addresses.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Family Announcement
+    Role: owner
+    Check: Review and adapt the letter text, fill placeholders, and verify addresses.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Short Death Notice / Newspaper Draft
+    Role: owner
+    Check: Review and adapt the letter text, fill placeholders, and verify addresses.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: 'DB Setup: owner_progress'
+    Role: owner
+    Check: Add preferred database views and page templates for this DB (manual step).
+    Status: Pending
+    Est. Time (min): 20
+    Section: Database Setup
+  - Page: 'DB Setup: insurance_db'
+    Role: owner
+    Check: Confirm details are accurate, attach reference docs, and link to related
+      accounts.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Database Setup
+  - Page: 'DB Setup: tax_db'
+    Role: owner
+    Check: Add preferred database views and page templates for this DB (manual step).
+    Status: Pending
+    Est. Time (min): 20
+    Section: Database Setup
+  - Page: 'DB Setup: property_db'
+    Role: owner
+    Check: List items, upload key documents/photos, and verify values or identifiers.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Database Setup
+  - Page: 'DB Setup: vehicles_db'
+    Role: owner
+    Check: Add preferred database views and page templates for this DB (manual step).
+    Status: Pending
+    Est. Time (min): 20
+    Section: Database Setup
+  - Page: 'DB Setup: business_db'
+    Role: owner
+    Check: Add preferred database views and page templates for this DB (manual step).
+    Status: Pending
+    Est. Time (min): 20
+    Section: Database Setup
+  - Page: 'DB Setup: memories_db'
+    Role: owner
+    Check: Add a few examples to demonstrate tone; confirm privacy context.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Database Setup
+  - Page: 'DB Setup: keepsakes_db'
+    Role: owner
+    Check: Add a few examples to demonstrate tone; confirm privacy context.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Database Setup
+  - Page: 'DB Setup: life_story_db'
+    Role: owner
+    Check: Add preferred database views and page templates for this DB (manual step).
+    Status: Pending
+    Est. Time (min): 20
+    Section: Database Setup

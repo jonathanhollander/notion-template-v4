@@ -1,0 +1,9 @@
+<!doctype html><html><body>
+<h1>QR Packs</h1>
+<form method="post" action="/checkout">
+  <select name="pack_id">
+    {% for p in packs %}<option value="{{p.id}}">{{p.name}}</option>{% endfor %}
+  </select>
+  <button type="submit">Buy</button>
+</form>
+</body></html>

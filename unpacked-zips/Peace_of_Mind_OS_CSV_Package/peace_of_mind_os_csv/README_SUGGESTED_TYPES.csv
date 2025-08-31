@@ -1,0 +1,35 @@
+ORDER,FILE,SUGGESTED_TYPES
+1,HOME_CARDS,Name: Title; Icon: Text; Summary: Text; Target_DB: Text; Suggested_View: Text
+2,PROGRESS_TRACKER,Item: Title; Area: Select; Helpful_Text: Text; Done: Checkbox
+3,PERSONAL_INFO,Name: Title; Relationship: Select; Notes: Text; Important_Docs_Location: Text
+4,KEY_CONTACTS,Name: Title; Relationship: Select; Phone: Phone; Email: Email; Notes: Text
+5,FINANCIAL_ACCOUNTS,Institution: Title; Type: Select; Account_Ends_With: Text; Contact: Text; Next_Step: Select; Notes: Text
+6,DEBTS_AND_LOANS,Lender: Title; Type: Select; Balance: Number; Due_Date: Date; Autopay: Checkbox; Notes: Text
+7,INSURANCE_POLICIES,Provider: Title; Type: Select; Policy_Number: Text; Beneficiaries: Text; Renewal_Date: Date; Notes: Text
+8,SUBSCRIPTIONS,Service: Title; Plan: Select; Renewal_Date: Date; Auto_Renews: Checkbox; Cancel_Steps: Text; Notes: Text
+9,PROPERTY_ASSETS,Item: Title; Location: Text; Est_Value: Number; Heir_Intended: Text; Notes: Text
+10,VEHICLES,Vehicle: Title; VIN_Last4: Text; Title_Location: Text; Notes: Text
+11,HEALTH_AND_CARE,Item: Title; Type: Select; Contact: Text; Notes: Text
+12,PETS,Name: Title; Species: Select; Caregiver: Text; Vet_Contact: Text; Notes: Text
+13,FUNERAL_PREFERENCES,Topic: Title; Choice: Text; Notes: Text
+14,FUNERAL_LOGISTICS,Task: Title; Category: Select; Owner: Text; Due: Date; Status: Select; Notes: Text
+15,FUNERAL_BUDGET,Line_Item: Title; Category: Select; Quote: Number; Actual: Number; Vendor: Text; Notes: Text
+16,FUNERAL_ATTENDEES,Name: Title; Relationship: Select; Contact: Text; RSVP: Select; Notes: Text
+17,OBITUARY_DRAFTS,Title: Title; Body_MD: Text; Last_Updated: Date
+18,DIGITAL_ACCOUNTS,Service: Title; Category: Select; Priority: Select; Status: Select; Next_Step: Select; Notes: Text
+19,DEVICES,Device: Title; Owner: Text; Action: Select; Notes: Text
+20,DOMAINS_SITES,Domain_or_Site: Title; Registrar_or_Host: Text; Renewal_Date: Date; Transfer_Notes: Text
+21,DIGITAL_GUIDES,Guide: Title; Body_MD: Text; Last_Updated: Date
+22,ETHICAL_WILL,Section: Title; Prompt: Text; Draft_MD: Text; Last_Updated: Date
+23,LEGACY_LETTERS,Recipient: Title; Relationship: Select; Draft_MD: Text; Delivery_Timing: Select; Last_Updated: Date
+24,REFLECTIONS,Entry: Title; Mood: Select; Body_MD: Text; Date: Date
+25,GRATITUDE_JOURNAL,Entry: Title; Body_MD: Text; Date: Date
+26,BUCKET_LIST,Item: Title; Category: Select; Status: Select; Notes: Text
+27,LIFE_CALENDAR_GUIDE,Section: Title; Body_MD: Text
+28,EXECUTOR_FIRST_48H,Task: Title; Priority: Select; Owner: Text; Status: Select; Notes: Text
+29,EXECUTOR_TIMELINE,Task: Title; Urgency: Select; Owner: Text; Status: Select; Notes: Text
+30,CONTACT_WEB,Name: Title; Role: Select; Phone: Phone; Email: Email; Notes: Text
+31,BINDER_INDEX,Doc_Name: Title; Where_to_Find: Text; Notes: Text
+32,WALLET_CARD,Card_Title: Title; Body_Text: Text
+33,CULTURAL_PACKS_INDEX,Pack_Name: Title; Coverage: Text; Notes: Text
+34,UPDATE_LOG,Entry: Title; Notes: Text; Date: Date

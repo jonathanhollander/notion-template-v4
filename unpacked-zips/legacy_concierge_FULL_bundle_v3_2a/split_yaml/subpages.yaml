@@ -1,0 +1,474 @@
+subpages:
+- title: Sample Document Summary (Not Legal)
+  slug: essentials-sample-doc-summary
+  type: subpage
+  parent: essentials
+  audience: executor
+  disclaimer: use_global.strings.pages.essentials-sample-doc-summary.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.essentials-sample-doc-summary.header
+  - p: use_global.strings.pages.essentials-sample-doc-summary.description
+  - callout: use_global.strings.pages.essentials-sample-doc-summary.owner_instructions
+  - callout: use_global.strings.pages.essentials-sample-doc-summary.ai_prompt
+- title: Sample “Where Things Are” Note (Not Legal)
+  slug: essentials-where-things-are
+  type: subpage
+  parent: essentials
+  audience: executor
+  disclaimer: use_global.strings.pages.essentials-where-things-are.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.essentials-where-things-are.header
+  - p: use_global.strings.pages.essentials-where-things-are.description
+  - callout: use_global.strings.pages.essentials-where-things-are.owner_instructions
+  - callout: use_global.strings.pages.essentials-where-things-are.ai_prompt
+- title: Sample Executors Note (Not Legal)
+  slug: executors-note
+  type: subpage
+  parent: executors-contacts
+  audience: executor
+  disclaimer: use_global.strings.pages.executors-note.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.executors-note.header
+  - p: use_global.strings.pages.executors-note.description
+  - callout: use_global.strings.pages.executors-note.owner_instructions
+  - callout: use_global.strings.pages.executors-note.ai_prompt
+- title: Sample Accounts Overview (Not Legal)
+  slug: financial-accounts-sample
+  type: subpage
+  parent: financial-accounts
+  audience: executor
+  disclaimer: use_global.strings.pages.financial-accounts-sample.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.financial-accounts-sample.header
+  - p: use_global.strings.pages.financial-accounts-sample.description
+  - callout: use_global.strings.pages.financial-accounts-sample.owner_instructions
+  - callout: use_global.strings.pages.financial-accounts-sample.ai_prompt
+- title: Bank Notification Letter
+  slug: letter-bank
+  type: subpage
+  parent: financial-accounts
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-bank.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-bank.header
+  - p: use_global.strings.pages.letter-bank.description
+  - callout: use_global.strings.pages.letter-bank.owner_instructions
+  - callout: use_global.strings.pages.letter-bank.ai_prompt
+- title: Credit Card Company Letter
+  slug: letter-card
+  type: subpage
+  parent: financial-accounts
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-card.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-card.header
+  - p: use_global.strings.pages.letter-card.description
+  - callout: use_global.strings.pages.letter-card.owner_instructions
+  - callout: use_global.strings.pages.letter-card.ai_prompt
+- title: Brokerage / Investment Firm Letter
+  slug: letter-brokerage
+  type: subpage
+  parent: financial-accounts
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-brokerage.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-brokerage.header
+  - p: use_global.strings.pages.letter-brokerage.description
+  - callout: use_global.strings.pages.letter-brokerage.owner_instructions
+  - callout: use_global.strings.pages.letter-brokerage.ai_prompt
+- title: Sample Policy Overview (Not Legal)
+  slug: insurance-sample
+  type: subpage
+  parent: insurance
+  audience: executor
+  disclaimer: use_global.strings.pages.insurance-sample.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.insurance-sample.header
+  - p: use_global.strings.pages.insurance-sample.description
+  - callout: use_global.strings.pages.insurance-sample.owner_instructions
+  - callout: use_global.strings.pages.insurance-sample.ai_prompt
+- title: Insurance Carrier Letter
+  slug: letter-insurance
+  type: subpage
+  parent: insurance
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-insurance.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-insurance.header
+  - p: use_global.strings.pages.letter-insurance.description
+  - callout: use_global.strings.pages.letter-insurance.owner_instructions
+  - callout: use_global.strings.pages.letter-insurance.ai_prompt
+- title: Sample Tax Prep Packet (Not Legal)
+  slug: taxes-sample
+  type: subpage
+  parent: taxes
+  audience: executor
+  disclaimer: use_global.strings.pages.taxes-sample.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.taxes-sample.header
+  - p: use_global.strings.pages.taxes-sample.description
+  - callout: use_global.strings.pages.taxes-sample.owner_instructions
+  - callout: use_global.strings.pages.taxes-sample.ai_prompt
+- title: Tax Notification Letter
+  slug: letter-tax
+  type: subpage
+  parent: taxes
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-tax.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-tax.header
+  - p: use_global.strings.pages.letter-tax.description
+  - callout: use_global.strings.pages.letter-tax.owner_instructions
+  - callout: use_global.strings.pages.letter-tax.ai_prompt
+- title: Sample Business Handover Note (Not Legal)
+  slug: business-handover
+  type: subpage
+  parent: business
+  audience: executor
+  disclaimer: use_global.strings.pages.business-handover.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.business-handover.header
+  - p: use_global.strings.pages.business-handover.description
+  - callout: use_global.strings.pages.business-handover.owner_instructions
+  - callout: use_global.strings.pages.business-handover.ai_prompt
+- title: Sample Inventory Note (Not Legal)
+  slug: property-inventory-note
+  type: subpage
+  parent: property
+  audience: executor
+  disclaimer: use_global.strings.pages.property-inventory-note.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.property-inventory-note.header
+  - p: use_global.strings.pages.property-inventory-note.description
+  - callout: use_global.strings.pages.property-inventory-note.owner_instructions
+  - callout: use_global.strings.pages.property-inventory-note.ai_prompt
+- title: Sample Vehicle Note (Not Legal)
+  slug: vehicles-sample
+  type: subpage
+  parent: vehicles
+  audience: executor
+  disclaimer: use_global.strings.pages.vehicles-sample.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.vehicles-sample.header
+  - p: use_global.strings.pages.vehicles-sample.description
+  - callout: use_global.strings.pages.vehicles-sample.owner_instructions
+  - callout: use_global.strings.pages.vehicles-sample.ai_prompt
+- title: Sample Keepsakes Sharing Note (Not Legal)
+  slug: keepsakes-sample
+  type: subpage
+  parent: keepsakes
+  audience: family
+  disclaimer: use_global.strings.pages.keepsakes-sample.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.keepsakes-sample.header
+  - p: use_global.strings.pages.keepsakes-sample.description
+  - callout: use_global.strings.pages.keepsakes-sample.owner_instructions
+  - callout: use_global.strings.pages.keepsakes-sample.ai_prompt
+- title: Sample Device Inventory Note (Not Legal)
+  slug: devices-sample
+  type: subpage
+  parent: devices
+  audience: executor
+  disclaimer: use_global.strings.pages.devices-sample.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.devices-sample.header
+  - p: use_global.strings.pages.devices-sample.description
+  - callout: use_global.strings.pages.devices-sample.owner_instructions
+  - callout: use_global.strings.pages.devices-sample.ai_prompt
+- title: Sample Executor Orientation Note (Not Legal)
+  slug: executor-orientation
+  type: subpage
+  parent: executor-quickstart
+  audience: executor
+  disclaimer: use_global.strings.pages.executor-orientation.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.executor-orientation.header
+  - p: use_global.strings.pages.executor-orientation.description
+  - callout: use_global.strings.pages.executor-orientation.owner_instructions
+  - callout: use_global.strings.pages.executor-orientation.ai_prompt
+- title: Executor Notification Letter
+  slug: letter-executor
+  type: subpage
+  parent: executor-quickstart
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-executor.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-executor.header
+  - p: use_global.strings.pages.letter-executor.description
+  - callout: use_global.strings.pages.letter-executor.owner_instructions
+  - callout: use_global.strings.pages.letter-executor.ai_prompt
+- title: Sample Contact Card Layout (Not Legal)
+  slug: executor-card-sample
+  type: subpage
+  parent: executor-card
+  audience: executor
+  disclaimer: use_global.strings.pages.executor-card-sample.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.executor-card-sample.header
+  - p: use_global.strings.pages.executor-card-sample.description
+  - callout: use_global.strings.pages.executor-card-sample.owner_instructions
+  - callout: use_global.strings.pages.executor-card-sample.ai_prompt
+- title: Family Announcement Letter
+  slug: letter-family
+  type: subpage
+  parent: family-view
+  audience: family
+  disclaimer: use_global.strings.pages.letter-family.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-family.header
+  - p: use_global.strings.pages.letter-family.description
+  - callout: use_global.strings.pages.letter-family.owner_instructions
+  - callout: use_global.strings.pages.letter-family.ai_prompt
+- title: Seeded Sample Memory Note (Not Legal)
+  slug: memories-sample
+  type: subpage
+  parent: memories
+  audience: family
+  disclaimer: use_global.strings.pages.memories-sample.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.memories-sample.header
+  - p: use_global.strings.pages.memories-sample.description
+  - callout: use_global.strings.pages.memories-sample.owner_instructions
+  - callout: use_global.strings.pages.memories-sample.ai_prompt
+- title: Sample Life Story Note (Not Legal)
+  slug: life-story-sample
+  type: subpage
+  parent: life-story
+  audience: family
+  disclaimer: use_global.strings.pages.life-story-sample.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.life-story-sample.header
+  - p: use_global.strings.pages.life-story-sample.description
+  - callout: use_global.strings.pages.life-story-sample.owner_instructions
+  - callout: use_global.strings.pages.life-story-sample.ai_prompt
+- title: Short Death Notice / Newspaper Letter
+  slug: letter-death-notice
+  type: subpage
+  parent: life-story
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-death-notice.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-death-notice.header
+  - p: use_global.strings.pages.letter-death-notice.description
+  - callout: use_global.strings.pages.letter-death-notice.owner_instructions
+  - callout: use_global.strings.pages.letter-death-notice.ai_prompt
+- title: Sample Resource Sheet (Not Legal)
+  slug: grief-support-sample
+  type: subpage
+  parent: grief-support
+  audience: family
+  disclaimer: use_global.strings.pages.grief-support-sample.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.grief-support-sample.header
+  - p: use_global.strings.pages.grief-support-sample.description
+  - callout: use_global.strings.pages.grief-support-sample.owner_instructions
+  - callout: use_global.strings.pages.grief-support-sample.ai_prompt
+- title: Sample FAQ Note (Not Legal)
+  slug: family-faq-sample
+  type: subpage
+  parent: family-faq
+  audience: family
+  disclaimer: use_global.strings.pages.family-faq-sample.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.family-faq-sample.header
+  - p: use_global.strings.pages.family-faq-sample.description
+  - callout: use_global.strings.pages.family-faq-sample.owner_instructions
+  - callout: use_global.strings.pages.family-faq-sample.ai_prompt
+- title: Sympathy / Thank-You Letter
+  slug: letter-thanks
+  type: subpage
+  parent: family-faq
+  audience: family
+  disclaimer: use_global.strings.pages.letter-thanks.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-thanks.header
+  - p: use_global.strings.pages.letter-thanks.description
+  - callout: use_global.strings.pages.letter-thanks.owner_instructions
+  - callout: use_global.strings.pages.letter-thanks.ai_prompt
+- title: Sample Healthcare Preferences Note (Not Legal)
+  slug: medical-sample
+  type: subpage
+  parent: medical
+  audience: executor
+  disclaimer: use_global.strings.pages.medical-sample.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.medical-sample.header
+  - p: use_global.strings.pages.medical-sample.description
+  - callout: use_global.strings.pages.medical-sample.owner_instructions
+  - callout: use_global.strings.pages.medical-sample.ai_prompt
+- title: Sample Advance Care Note (Not Legal)
+  slug: living-will-sample
+  type: subpage
+  parent: living-will
+  audience: executor
+  disclaimer: use_global.strings.pages.living-will-sample.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.living-will-sample.header
+  - p: use_global.strings.pages.living-will-sample.description
+  - callout: use_global.strings.pages.living-will-sample.owner_instructions
+  - callout: use_global.strings.pages.living-will-sample.ai_prompt
+- title: Sample Donation & Personal Wishes Note (Not Legal)
+  slug: donation-wishes-sample
+  type: subpage
+  parent: donation-wishes
+  audience: family
+  disclaimer: use_global.strings.pages.donation-wishes-sample.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.donation-wishes-sample.header
+  - p: use_global.strings.pages.donation-wishes-sample.description
+  - callout: use_global.strings.pages.donation-wishes-sample.owner_instructions
+  - callout: use_global.strings.pages.donation-wishes-sample.ai_prompt
+- title: Sample Notification Scripts (Not Legal)
+  slug: notifications-scripts
+  type: subpage
+  parent: notifications
+  audience: executor
+  disclaimer: use_global.strings.pages.notifications-scripts.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.notifications-scripts.header
+  - p: use_global.strings.pages.notifications-scripts.description
+  - callout: use_global.strings.pages.notifications-scripts.owner_instructions
+  - callout: use_global.strings.pages.notifications-scripts.ai_prompt
+- title: Employer Notification Letter
+  slug: letter-employer
+  type: subpage
+  parent: notifications
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-employer.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-employer.header
+  - p: use_global.strings.pages.letter-employer.description
+  - callout: use_global.strings.pages.letter-employer.owner_instructions
+  - callout: use_global.strings.pages.letter-employer.ai_prompt
+- title: Community / Social Group Letter
+  slug: letter-community
+  type: subpage
+  parent: notifications
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-community.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-community.header
+  - p: use_global.strings.pages.letter-community.description
+  - callout: use_global.strings.pages.letter-community.owner_instructions
+  - callout: use_global.strings.pages.letter-community.ai_prompt
+- title: Sympathy / Thank You (Library view)
+  slug: letter-thanks-db
+  type: subpage
+  parent: letters-db
+  audience: family
+  disclaimer: use_global.strings.pages.letter-thanks-db.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-thanks-db.header
+  - p: use_global.strings.pages.letter-thanks-db.description
+  - callout: use_global.strings.pages.letter-thanks-db.owner_instructions
+  - callout: use_global.strings.pages.letter-thanks-db.ai_prompt
+- title: Lawyer Notification Letter
+  slug: letter-lawyer
+  type: subpage
+  parent: letters-db
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-lawyer.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-lawyer.header
+  - p: use_global.strings.pages.letter-lawyer.description
+  - callout: use_global.strings.pages.letter-lawyer.owner_instructions
+  - callout: use_global.strings.pages.letter-lawyer.ai_prompt
+- title: Utility Company Letter
+  slug: letter-utility
+  type: subpage
+  parent: letters-db
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-utility.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-utility.header
+  - p: use_global.strings.pages.letter-utility.description
+  - callout: use_global.strings.pages.letter-utility.owner_instructions
+  - callout: use_global.strings.pages.letter-utility.ai_prompt
+- title: QR Distribution Letter — Pack One
+  slug: qr-letter-pack-one
+  type: subpage
+  parent: qr-letters
+  audience: executor
+  disclaimer: use_global.strings.pages.qr-letter-pack-one.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.qr-letter-pack-one.header
+  - p: use_global.strings.pages.qr-letter-pack-one.description
+  - callout: use_global.strings.pages.qr-letter-pack-one.owner_instructions
+  - callout: use_global.strings.pages.qr-letter-pack-one.ai_prompt
+- title: QR Distribution Letter — Pack Two
+  slug: qr-letter-pack-two
+  type: subpage
+  parent: qr-letters
+  audience: executor
+  disclaimer: use_global.strings.pages.qr-letter-pack-two.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.qr-letter-pack-two.header
+  - p: use_global.strings.pages.qr-letter-pack-two.description
+  - callout: use_global.strings.pages.qr-letter-pack-two.owner_instructions
+  - callout: use_global.strings.pages.qr-letter-pack-two.ai_prompt
+- title: QR Distribution — Email Version
+  slug: qr-letter-email
+  type: subpage
+  parent: qr-letters
+  audience: executor
+  disclaimer: use_global.strings.pages.qr-letter-email.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.qr-letter-email.header
+  - p: use_global.strings.pages.qr-letter-email.description
+  - callout: use_global.strings.pages.qr-letter-email.owner_instructions
+  - callout: use_global.strings.pages.qr-letter-email.ai_prompt
+- title: QR Distribution — SMS Version
+  slug: qr-letter-sms
+  type: subpage
+  parent: qr-letters
+  audience: executor
+  disclaimer: use_global.strings.pages.qr-letter-sms.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.qr-letter-sms.header
+  - p: use_global.strings.pages.qr-letter-sms.description
+  - callout: use_global.strings.pages.qr-letter-sms.owner_instructions
+  - callout: use_global.strings.pages.qr-letter-sms.ai_prompt
+- title: Sample Resource Note (Not Legal)
+  slug: guidance-sample
+  type: subpage
+  parent: guidance
+  audience: family
+  disclaimer: use_global.strings.pages.guidance-sample.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.guidance-sample.header
+  - p: use_global.strings.pages.guidance-sample.description
+  - callout: use_global.strings.pages.guidance-sample.owner_instructions
+  - callout: use_global.strings.pages.guidance-sample.ai_prompt
+- title: Where Originals Are Kept
+  slug: originals-location
+  type: subpage
+  parent: essentials
+  audience: executor
+  disclaimer: use_global.strings.pages.originals-location.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.originals-location.header
+  - p: use_global.strings.pages.originals-location.description
+  - callout: use_global.strings.pages.originals-location.owner_instructions
+  - callout: use_global.strings.pages.originals-location.ai_prompt
+- title: Who Can Help (Friends & Neighbors)
+  slug: helpers
+  type: subpage
+  parent: executors-contacts
+  audience: executor
+  disclaimer: use_global.strings.pages.helpers.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.helpers.header
+  - p: use_global.strings.pages.helpers.description
+  - callout: use_global.strings.pages.helpers.owner_instructions
+  - callout: use_global.strings.pages.helpers.ai_prompt
+- title: Comfort Notes for Hard Days
+  slug: comfort-notes
+  type: subpage
+  parent: encouragements
+  audience: family
+  disclaimer: use_global.strings.pages.comfort-notes.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.comfort-notes.header
+  - p: use_global.strings.pages.comfort-notes.description
+  - callout: use_global.strings.pages.comfort-notes.owner_instructions
+  - callout: use_global.strings.pages.comfort-notes.ai_prompt

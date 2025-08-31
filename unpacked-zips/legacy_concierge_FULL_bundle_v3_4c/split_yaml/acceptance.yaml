@@ -1,0 +1,5 @@
+acceptance_criteria:
+  by_page:
+    preparation-hub:
+    - Cover and icon set
+    - Helper note cleared

@@ -1,0 +1,14 @@
+File,Path
+contacts_roles.csv,/mnt/data/contacts_roles.csv
+legal_documents.csv,/mnt/data/legal_documents.csv
+financial_assets.csv,/mnt/data/financial_assets.csv
+subscriptions_bills.csv,/mnt/data/subscriptions_bills.csv
+digital_accounts.csv,/mnt/data/digital_accounts.csv
+executor_tasks.csv,/mnt/data/executor_tasks.csv
+medical_meds.csv,/mnt/data/medical_meds.csv
+final_wishes.csv,/mnt/data/final_wishes.csv
+heirlooms.csv,/mnt/data/heirlooms.csv
+messages_loved_ones.csv,/mnt/data/messages_loved_ones.csv
+memories_stories.csv,/mnt/data/memories_stories.csv
+executor_expenses.csv,/mnt/data/executor_expenses.csv
+README_Legacy_Vault_CSVs.txt,/mnt/data/README_Legacy_Vault_CSVs.txt

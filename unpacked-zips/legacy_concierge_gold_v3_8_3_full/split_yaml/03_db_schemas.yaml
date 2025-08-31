@@ -1,0 +1,41 @@
+db:
+  schemas:
+    Accounts:
+      Name: title
+      Institution: rich_text
+      Type: select
+      Balance: number
+      Note: rich_text
+    Insurance:
+      Name: title
+      Carrier: rich_text
+      'Policy #': rich_text
+      Coverage: number
+      Beneficiaries: multi_select
+      Note: rich_text
+    Contacts:
+      Name: title
+      Role: select
+      Email: rich_text
+      Phone: rich_text
+      Note: rich_text
+    Subscriptions:
+      Name: title
+      Provider: rich_text
+      Amount: number
+      Cycle: select
+      Status: select
+      Note: rich_text
+    Letters:
+      Name: title
+      Audience: select
+      Status: select
+      Last Sent: rich_text
+      Note: rich_text
+    Setup & Acceptance:
+      Task: title
+      Where: rich_text
+      How: rich_text
+      Done when: rich_text
+      Status: select
+      ETA (hrs): number

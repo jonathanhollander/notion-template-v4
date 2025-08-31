@@ -1,0 +1,155 @@
+subpages:
+- title: When You First Open This
+  slug: executor-orientation
+  type: subpage
+  parent: executor-view
+  audience: executor
+  disclaimer: use_global.strings.pages.executor-orientation.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.executor-orientation.header
+  - p: use_global.strings.pages.executor-orientation.description
+  - callout: use_global.strings.pages.executor-orientation.owner_instructions
+  - callout: use_global.strings.pages.executor-orientation.ai_prompt
+- title: For When It Feels Complete
+  slug: everything-done
+  type: subpage
+  parent: finishing
+  audience: shared
+  disclaimer: use_global.strings.pages.everything-done.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.everything-done.header
+  - p: use_global.strings.pages.everything-done.description
+  - callout: use_global.strings.pages.everything-done.owner_instructions
+  - callout: use_global.strings.pages.everything-done.ai_prompt
+- title: Sample Document Summary (Not Legal)
+  slug: essentials-sample-doc-summary
+  type: subpage
+  parent: essentials
+  audience: executor
+  disclaimer: use_global.strings.pages.essentials-sample-doc-summary.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.essentials-sample-doc-summary.header
+  - p: use_global.strings.pages.essentials-sample-doc-summary.description
+  - callout: use_global.strings.pages.essentials-sample-doc-summary.owner_instructions
+  - callout: use_global.strings.pages.essentials-sample-doc-summary.ai_prompt
+- title: Sample “Where Things Are” Note (Not Legal)
+  slug: essentials-where-things-are
+  type: subpage
+  parent: essentials
+  audience: executor
+  disclaimer: use_global.strings.pages.essentials-where-things-are.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.essentials-where-things-are.header
+  - p: use_global.strings.pages.essentials-where-things-are.description
+  - callout: use_global.strings.pages.essentials-where-things-are.owner_instructions
+  - callout: use_global.strings.pages.essentials-where-things-are.ai_prompt
+- title: Sample Executors Note (Not Legal)
+  slug: executors-note
+  type: subpage
+  parent: executors-contacts
+  audience: executor
+  disclaimer: use_global.strings.pages.executors-note.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.executors-note.header
+  - p: use_global.strings.pages.executors-note.description
+  - callout: use_global.strings.pages.executors-note.owner_instructions
+  - callout: use_global.strings.pages.executors-note.ai_prompt
+- title: Bank Notification Letter
+  slug: letter-bank
+  type: subpage
+  parent: financial-accounts
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-bank.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-bank.header
+  - p: use_global.strings.pages.letter-bank.description
+  - callout: use_global.strings.pages.letter-bank.owner_instructions
+  - callout: use_global.strings.pages.letter-bank.ai_prompt
+- title: Credit Card Company Letter
+  slug: letter-card
+  type: subpage
+  parent: financial-accounts
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-card.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-card.header
+  - p: use_global.strings.pages.letter-card.description
+  - callout: use_global.strings.pages.letter-card.owner_instructions
+  - callout: use_global.strings.pages.letter-card.ai_prompt
+- title: Brokerage / Investment Firm Letter
+  slug: letter-brokerage
+  type: subpage
+  parent: financial-accounts
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-brokerage.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-brokerage.header
+  - p: use_global.strings.pages.letter-brokerage.description
+  - callout: use_global.strings.pages.letter-brokerage.owner_instructions
+  - callout: use_global.strings.pages.letter-brokerage.ai_prompt
+- title: Insurance Carrier Letter
+  slug: letter-insurance
+  type: subpage
+  parent: insurance
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-insurance.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-insurance.header
+  - p: use_global.strings.pages.letter-insurance.description
+  - callout: use_global.strings.pages.letter-insurance.owner_instructions
+  - callout: use_global.strings.pages.letter-insurance.ai_prompt
+- title: Tax Notification Letter
+  slug: letter-tax
+  type: subpage
+  parent: taxes
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-tax.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-tax.header
+  - p: use_global.strings.pages.letter-tax.description
+  - callout: use_global.strings.pages.letter-tax.owner_instructions
+  - callout: use_global.strings.pages.letter-tax.ai_prompt
+- title: Employer Notification Letter
+  slug: letter-employer
+  type: subpage
+  parent: notifications
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-employer.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-employer.header
+  - p: use_global.strings.pages.letter-employer.description
+  - callout: use_global.strings.pages.letter-employer.owner_instructions
+  - callout: use_global.strings.pages.letter-employer.ai_prompt
+- title: Community / Social Group Letter
+  slug: letter-community
+  type: subpage
+  parent: notifications
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-community.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-community.header
+  - p: use_global.strings.pages.letter-community.description
+  - callout: use_global.strings.pages.letter-community.owner_instructions
+  - callout: use_global.strings.pages.letter-community.ai_prompt
+- title: Family Announcement Letter
+  slug: letter-family
+  type: subpage
+  parent: family-view
+  audience: family
+  disclaimer: use_global.strings.pages.letter-family.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-family.header
+  - p: use_global.strings.pages.letter-family.description
+  - callout: use_global.strings.pages.letter-family.owner_instructions
+  - callout: use_global.strings.pages.letter-family.ai_prompt
+- title: Short Death Notice / Newspaper Letter
+  slug: letter-death-notice
+  type: subpage
+  parent: life-story
+  audience: executor
+  disclaimer: use_global.strings.pages.letter-death-notice.disclaimer
+  blocks:
+  - h3: use_global.strings.pages.letter-death-notice.header
+  - p: use_global.strings.pages.letter-death-notice.description
+  - callout: use_global.strings.pages.letter-death-notice.owner_instructions
+  - callout: use_global.strings.pages.letter-death-notice.ai_prompt

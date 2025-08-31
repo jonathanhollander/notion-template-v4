@@ -1,0 +1,22 @@
+# 15_mode_guidance.yaml
+complexity: moderate
+# Beginner/Advanced guidance pages per Hub (non-intrusive; easy to delete).
+pages:
+  - title: "Preparation Hub – Beginner Tips"
+    icon: "emoji:🌿"
+    description: "Short steps, fewer details. Use this if you want to move gently and steadily."
+    body:
+      - type: bulleted_list
+        items:
+          - "Start with Setup & Acceptance — one page at a time"
+          - "Leave Rollups for later; manual numbers are fine"
+          - "Use the Samples as a guide; keep it simple"
+  - title: "Preparation Hub – Advanced Tools"
+    icon: "emoji:🧠"
+    description: "For power users comfortable with databases and views."
+    body:
+      - type: bulleted_list
+        items:
+          - "Add the UI rollups and tie them into Estate Analytics"
+          - "Create filtered Saved Views for each major DB"
+          - "Use progress formulas and archive filters to keep lists clean"

@@ -1,0 +1,15 @@
+diagnostics:
+  rules:
+  - page_has_cover
+  - page_has_icon
+  - no_open_INSTR_on_launch_pages
+  - db_required_fields_present
+  config:
+    ignore_pages:
+    - admin-cockpit
+    - qr-reference
+    require_cover_on:
+    - life-story
+    - memories
+    - family-view
+    require_icon_on: ALL

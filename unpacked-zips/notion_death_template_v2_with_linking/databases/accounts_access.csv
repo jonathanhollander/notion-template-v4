@@ -1,0 +1,3 @@
+Type,Institution,Username,MFA,Recovery,Notes
+Brokerage,Fidelity,(store in password manager),Y,Executor with provider,Never store live passwords in Notion
+Bank,Chase,(store in password manager),Y,Bank branch,See Document Locator for account docs

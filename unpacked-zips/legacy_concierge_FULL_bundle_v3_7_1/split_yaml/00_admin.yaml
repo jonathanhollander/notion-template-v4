@@ -1,0 +1,25 @@
+pages:
+- title: Admin – Release Notes
+  icon: emoji:🗒️
+  role: owner
+  description: Version history for this template (safe to delete before sharing).
+  icon_file: assets/icons/admin-release-notes-icon.svg
+  cover_file: assets/covers/admin-release-notes-cover.svg
+  icon_png: assets/icons_png/preparation-hub-icon.png
+  cover_png: assets/covers_png/preparation-hub-cover.png
+- title: Admin – Rollout Cockpit
+  icon: emoji:🧭
+  description: Quick access to the Setup & Acceptance DB with guidance for useful
+    views.
+  icon_file: assets/icons/admin-rollout-cockpit-icon.svg
+  cover_file: assets/covers/admin-rollout-cockpit-cover.svg
+  icon_png: assets/icons_png/executor-hub-icon.png
+  cover_png: assets/covers_png/executor-hub-cover.png
+- title: Admin – Diagnostics
+  icon: emoji:🔍
+  description: 'Checks that help you finish setup: missing icons/covers and pages
+    still carrying helpers.'
+  icon_file: assets/icons/admin-diagnostics-icon.svg
+  cover_file: assets/covers/admin-diagnostics-cover.svg
+  icon_png: assets/icons_png/legal-documents-icon.png
+  cover_png: assets/covers_png/legal-documents-cover.png

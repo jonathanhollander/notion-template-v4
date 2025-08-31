@@ -1,0 +1,7 @@
+v3.8.3
+- Preflight expanded (assets, slugs, placeholder scan, manual task spec checks)
+- Slug-based relations & relations report
+- Admin DBs: Views To Create, Rollups To Configure, Deployment Ledger
+- Throttled requests + retries; basic rollback
+- Hub/mobile callouts (subtle), nav back-link callouts
+- Artifacts emitted for audit-parsable evidence

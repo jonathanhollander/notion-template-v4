@@ -1,0 +1,236 @@
+pages:
+- title: Preparation Hub
+  icon: emoji:🧭
+  description: Your personal starting place to set everything in motion.
+  role: owner
+  slug: preparation-hub
+  icon_file: assets/icons/preparation-hub-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/preparation-hub-cover.svg
+- title: Executor Hub
+  icon: emoji:🧑‍⚖️
+  description: Resources your executor will use to honor your wishes.
+  role: executor
+  disclaimer: This section offers practical guidance; it is not legal advice.
+  slug: executor-hub
+  icon_file: assets/icons/executor-hub-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/executor-hub-cover.svg
+- title: Family Hub
+  icon: emoji:👪
+  description: Gentle guidance and memories for family.
+  role: family
+  slug: family-hub
+  icon_file: assets/icons/family-hub-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/family-hub-cover.svg
+- title: Legal Documents
+  icon: emoji:📜
+  description: Important documents and samples (not legal advice).
+  role: owner
+  icon_file: assets/icons/legal-documents-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/legal-documents-cover.svg
+- title: Financial Accounts
+  icon: emoji:💳
+  description: Accounts, cards, and institutions to settle and notify.
+  role: owner
+  icon_file: assets/icons/financial-accounts-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/financial-accounts-cover.svg
+- title: Property & Assets
+  icon: emoji:🏠
+  description: Homes, vehicles, valuables, and digital assets.
+  role: owner
+  icon_file: assets/icons/property-assets-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/property-assets-cover.svg
+- title: Insurance
+  icon: emoji:🛡️
+  description: Policies and claims info.
+  role: owner
+  icon_file: assets/icons/insurance-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/insurance-cover.svg
+- title: Subscriptions
+  icon: emoji:🧾
+  description: Recurring services to cancel or transfer.
+  role: owner
+  icon_file: assets/icons/subscriptions-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/subscriptions-cover.svg
+- title: Letters
+  icon: emoji:✉️
+  description: Ready-to-adapt letters for banks, utilities, and more.
+  role: owner
+  icon_file: assets/icons/letters-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/letters-cover.svg
+- title: Memories & Keepsakes
+  icon: emoji:📷
+  description: Notes, photos, and stories worth saving.
+  role: family
+  icon_file: assets/icons/memories-keepsakes-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/memories-keepsakes-cover.svg
+- title: Contacts
+  icon: emoji:📇
+  description: People and organizations who matter in this process.
+  role: owner
+  icon_file: assets/icons/contacts-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/contacts-cover.svg
+- title: QR Codes
+  icon: emoji:🔗
+  description: Pages linked by printed QR codes.
+  role: owner
+  icon_file: assets/icons/qr-codes-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/qr-codes-cover.svg
+- title: Living Will – Sample Document
+  parent: Legal Documents
+  icon: emoji:📄
+  description: A gentle example to help you think through choices.
+  role: owner
+  disclaimer: Sample language only; not legal advice.
+  slug: legal-living-will
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Power of Attorney – Sample
+  parent: Legal Documents
+  icon: emoji:📄
+  description: Sample wording to discuss with your attorney.
+  role: owner
+  disclaimer: Sample only; not legal advice.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Advance Directive – Sample
+  parent: Legal Documents
+  icon: emoji:📄
+  role: owner
+  description: Guidance to capture your preferences.
+  disclaimer: Sample only; not legal advice.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Trust – Sample Outline
+  parent: Legal Documents
+  icon: emoji:📄
+  role: owner
+  description: Common sections to consider with counsel.
+  disclaimer: Informational only; not legal advice.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Executor Checklist
+  parent: Executor Hub
+  icon: emoji:✅
+  role: executor
+  description: A practical list of the first tasks to complete.
+  disclaimer: Checklist is informational; confirm local requirements.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Bank & Account Access Notes
+  parent: Executor Hub
+  icon: emoji:🏦
+  role: executor
+  description: Where to find account details and documents.
+  disclaimer: Handle credentials securely.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Funeral & Memorial Preferences
+  parent: Executor Hub
+  icon: emoji:🕊️
+  role: executor
+  description: Notes to guide thoughtful arrangements.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Messages for Family
+  parent: Family Hub
+  icon: emoji:💬
+  role: family
+  description: Short notes you’d like loved ones to read.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Keepsakes Index
+  parent: Family Hub
+  icon: emoji:🎁
+  role: family
+  description: A list of items with stories attached.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Primary Bank Accounts
+  parent: Financial Accounts
+  icon: emoji:🏦
+  role: owner
+  description: Main checking/savings with contact details.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Credit Cards
+  parent: Financial Accounts
+  icon: emoji:💳
+  role: owner
+  description: Active cards and closure notes.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Brokerage & Retirement
+  parent: Financial Accounts
+  icon: emoji:📈
+  role: owner
+  description: Investment and retirement accounts.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Real Estate
+  parent: Property & Assets
+  icon: emoji:🏡
+  role: owner
+  description: Properties with addresses, contacts, documents.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Vehicles
+  parent: Property & Assets
+  icon: emoji:🚗
+  role: owner
+  description: Cars, motorcycles—VINs, titles, insurers.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Digital Assets
+  parent: Property & Assets
+  icon: emoji:💾
+  role: owner
+  description: Domains, wallets, important logins.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Life Insurance
+  parent: Insurance
+  icon: emoji:🧾
+  role: owner
+  description: Policies, beneficiaries, contact paths.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Homeowners/Renters
+  parent: Insurance
+  icon: emoji:🏠
+  role: owner
+  description: Policy numbers, adjuster contacts.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Health Insurance
+  parent: Insurance
+  icon: emoji:🏥
+  role: owner
+  description: Carrier, member IDs, claims steps.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Streaming Services
+  parent: Subscriptions
+  icon: emoji:📺
+  role: owner
+  description: Netflix, Spotify, etc.—how to cancel.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Utilities
+  parent: Subscriptions
+  icon: emoji:💡
+  role: owner
+  description: Electric, gas, water—account numbers, final meter reads.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Online Services
+  parent: Subscriptions
+  icon: emoji:🌐
+  role: owner
+  description: Web tools with billing attached.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: QR – Family Essentials
+  parent: QR Codes
+  icon: emoji:🔖
+  role: owner
+  description: A small set of pages for family to access quickly.
+  slug: qr-family-essentials
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: QR – Full Access for Executor
+  parent: QR Codes
+  icon: emoji:🧩
+  role: owner
+  description: Links to all sections your executor will need.
+  slug: qr-executor-full
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80

@@ -1,0 +1,330 @@
+db:
+  schemas:
+    Accounts:
+      properties:
+        Name: title
+        Institution: text
+        Type: select
+        'Account #': text
+        Notes: text
+        Related Page:
+          type: relation
+          database_id_ref: pages
+          by_title: true
+        Tags:
+          type: multi_select
+          options:
+          - Critical
+          - Tax
+          - Transfer
+          - Beneficiaries
+        Note:
+          type: rich_text
+      seed_rows:
+      - Name: Bank Accounts
+        Institution: ''
+        Type: Bank
+        'Account #': ''
+        Notes: List each account; add closure/transfer steps.
+        Related Page Title: Financial Accounts
+      - Name: Retirement Accounts
+        Institution: ''
+        Type: Retirement
+        'Account #': ''
+        Notes: Add beneficiaries; rollover instructions.
+        Related Page Title: Financial Accounts
+      - Name: Brokerage – Taxable (Individual)
+        Institution: ''
+        Type: Brokerage
+        'Account #': ''
+        Notes: DTC transfer form; cost basis statements; TOD (transfer-on-death) designation;
+          medallion signature guarantee if required.
+        Related Page Title: Financial Accounts
+      - Name: Brokerage – Taxable (Joint)
+        Institution: ''
+        Type: Brokerage
+        'Account #': ''
+        Notes: Joint tenancy details; survivorship; DTC transfer; cost basis docs;
+          beneficiary/TOD where applicable.
+        Related Page Title: Financial Accounts
+      - Name: Brokerage – Traditional IRA
+        Institution: ''
+        Type: Retirement
+        'Account #': ''
+        Notes: Custodian transfer/rollover process; beneficiary designation; RMD considerations
+          if applicable.
+        Related Page Title: Financial Accounts
+      - Name: Brokerage – Roth IRA
+        Institution: ''
+        Type: Retirement
+        'Account #': ''
+        Notes: Custodian transfer/rollover; beneficiary designation; tax treatment
+          notes.
+        Related Page Title: Financial Accounts
+      - Name: Brokerage – 529 College Savings
+        Institution: ''
+        Type: Education
+        'Account #': ''
+        Notes: Plan administrator; successor owner/beneficiary change process; distribution
+          rules.
+        Related Page Title: Financial Accounts
+      - Name: Credit Cards
+        Institution: ''
+        Type: Credit Card
+        'Account #': ''
+        Notes: Cancel cards; reconcile statements; disable autopay.
+        Related Page Title: Financial Accounts
+    Property:
+      properties:
+        Name: title
+        Type: select
+        Identifier: text
+        Notes: text
+      seed_rows:
+      - Name: Primary Residence
+        Type: Real Estate
+        Identifier: ''
+        Notes: Deed/mortgage details; utility handoff.
+      - Name: Vehicle
+        Type: Vehicle
+        Identifier: ''
+        Notes: Title; registration; insurance carrier.
+      - Name: Safe Deposit Box
+        Type: Asset
+        Identifier: ''
+        Notes: Location; access rules; key custody.
+    Insurance:
+      properties:
+        Policy: title
+        Carrier: text
+        Type: select
+        'Policy #': text
+        Notes: text
+        Related Page:
+          type: relation
+          database_id_ref: pages
+          by_title: true
+        Tags:
+          type: multi_select
+          options:
+          - Life
+          - Health
+          - Property
+          - Auto
+          - Claims
+        Note:
+          type: rich_text
+      seed_rows:
+      - Name: Life Insurance
+        Type: Life
+        Carrier: ''
+        'Policy #': ''
+        Notes: Claim initiation steps; beneficiary process.
+        Related Page Title: Insurance
+      - Name: Health Insurance
+        Type: Health
+        Carrier: ''
+        'Policy #': ''
+        Notes: Coverage end date; outstanding claims.
+        Related Page Title: Insurance
+      - Name: Home Insurance
+        Type: Home
+        Carrier: ''
+        'Policy #': ''
+        Notes: Property coverage; claims contact.
+        Related Page Title: Insurance
+      - Name: Auto Insurance
+        Type: Auto
+        Carrier: ''
+        'Policy #': ''
+        Notes: Cancel/transfer policy; proof of sale for vehicle.
+        Related Page Title: Insurance
+    Contacts:
+      properties:
+        Name: title
+        Role: select
+        Email: text
+        Phone: text
+        Notes: text
+        Tags:
+          type: multi_select
+          options:
+          - Legal
+          - Executor
+          - Finance
+          - Family
+          - Urgent
+        Note:
+          type: rich_text
+      seed_rows:
+      - Name: Attorney
+        Role: Attorney
+        Email: ''
+        Phone: ''
+        Notes: Primary legal point of contact.
+        Tags:
+        - Legal
+      - Name: Executor
+        Role: Executor
+        Email: ''
+        Phone: ''
+        Notes: Primary executor contact.
+        Tags:
+        - Executor
+      - Name: Accountant/Tax
+        Role: Accountant/Tax
+        Email: ''
+        Phone: ''
+        Notes: Year-of-death return; filings.
+        Tags:
+        - Finance
+      - Name: Primary Family Contact
+        Role: Family
+        Email: ''
+        Phone: ''
+        Notes: Coordinator for family communications.
+        Tags:
+        - Family
+    Subscriptions:
+      properties:
+        Service: title
+        Category: select
+        Account Email: text
+        Notes: text
+        Tags:
+          type: multi_select
+          options:
+          - Critical
+          - Recurring
+          - Optional
+        Note:
+          type: rich_text
+      seed_rows:
+      - Name: Utilities
+        Type: Utilities
+        Provider: ''
+        'Account #': ''
+        Notes: Electric, gas, water, internet, phone.
+        Tags:
+        - Critical
+        - Recurring
+      - Name: Digital Services
+        Type: Digital
+        Provider: ''
+        'Account #': ''
+        Notes: Streaming, storage, software subscriptions.
+        Tags:
+        - Recurring
+      - Name: Memberships
+        Type: Membership
+        Provider: ''
+        'Account #': ''
+        Notes: Gyms, clubs, associations.
+        Tags:
+        - Optional
+    Keepsakes:
+      properties:
+        Title: title
+        Story: text
+        Where: text
+        Tags:
+          type: multi_select
+          options:
+          - Photos
+          - Stories
+          - Letters
+      seed_rows:
+      - Title: Photos
+        Story: ''
+        Where: Add location of albums/drives.
+      - Title: Stories
+        Story: Write a memory that matters — a moment, a lesson, a laugh.
+        Where: ''
+      - Title: Letters
+        Story: If you’d like, add a note for someone special.
+        Where: ''
+    Letters Index:
+      properties:
+        Title: title
+        Audience: select
+        Category:
+          type: multi_select
+          options:
+          - Banking
+          - Credit Cards
+          - Utilities
+          - Insurance
+          - Mortgage
+          - Employment
+          - Government
+          - Benefits
+          - Subscriptions
+          - Brokerage
+        URL: url
+        Related Page:
+          type: relation
+          database_id_ref: pages
+          by_title: true
+        Note:
+          type: rich_text
+      seed_rows:
+      - Title: Letter – Banks
+        Audience: Institution
+        Category: Banking
+        URL: ''
+        Related Page Title: Letter – Banks
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Credit Card Issuers
+        Audience: Institution
+        Category: Credit Cards
+        URL: ''
+        Related Page Title: Letter – Credit Card Issuers
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Utilities
+        Audience: Institution
+        Category: Utilities
+        URL: ''
+        Related Page Title: Letter – Utilities
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Insurance Companies
+        Audience: Institution
+        Category: Insurance
+        URL: ''
+        Related Page Title: Letter – Insurance Companies
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Mortgage/Servicer
+        Audience: Institution
+        Category: Mortgage
+        URL: ''
+        Related Page Title: Letter – Mortgage/Servicer
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Employer/HR
+        Audience: Employer
+        Category: Employment
+        URL: ''
+        Related Page Title: Letter – Employer/HR
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Social Security Administration
+        Audience: Agency
+        Category: Government
+        URL: ''
+        Related Page Title: Letter – Social Security Administration
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Pension/Benefits
+        Audience: Plan
+        Category: Benefits
+        URL: ''
+        Related Page Title: Letter – Pension/Benefits
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Subscriptions & Services
+        Audience: Provider
+        Category: Subscriptions
+        URL: ''
+        Related Page Title: Letter – Subscriptions & Services
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Brokerage Firms
+        Audience: Institution
+        Category: Brokerage
+        URL: ''
+        Related Page Title: Letter – Brokerage Firms
+        Note: This entry links to the letter’s page. Review and tailor before sending.

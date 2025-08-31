@@ -1,0 +1,15 @@
+Recipient,Relationship,Draft_MD,Delivery_Timing,Last_Updated,Media_Link,Instructions_MD,AI_Prompt_Code
+Alex,Partner/Spouse,"My love,
+Thank you for our ordinary days — the walks, the coffee, the quiet laughter. 
+If the world feels heavy, remember: you gave me a life I loved. 
+Always yours.
+",Anytime,2025-08-22,link_to_video_message.mp4,"💡 **Instructions:** Use this space to write heartfelt letters to your loved ones. Keep it warm and personal, not formal or legalistic.","```prompt
+Write a warm, loving letter to [recipient], who is my [relationship]. 
+The letter should feel personal, simple, and compassionate. Include a memory of [memory or moment], 
+share encouragement for their future, and close with affection. 
+Keep it 150–250 words, plain language, no clichés, and no legal tone.
+```"
+Jamie,Child,"Sweetheart,
+You are braver than you think. When life is confusing, do one kind thing — for yourself or someone else — and let the next step appear.
+With all my love.
+",Milestone (18th birthday),2025-08-22,,,

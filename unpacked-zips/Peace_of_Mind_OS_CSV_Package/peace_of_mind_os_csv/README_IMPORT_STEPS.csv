@@ -1,0 +1,8 @@
+STEP_ORDER,TITLE,DETAILS
+1,Create a new Notion page called “Peace of Mind OS”,Open Notion → New Page → give it this name and icon 🌿.
+2,Import each CSV as a database,In Notion: • /import → CSV → choose a file. Repeat for all CSVs you want. You can keep them as separate databases and then link them on the Home page.
+3,Set suggested property types,"After importing, convert columns per the SUGGESTED_TYPES table below (Text, Select/Multi‑select, Date, Checkbox, URL, Number, Email, Phone)."
+4,Assemble Home Dashboard,Use HOME_CARDS.csv to create a gallery board. Make a Link to Database for each imported DB and filter per card.
+5,Warm copy & onboarding,Import WELCOME_COPY.csv and POSITIONING_COPY.csv into a simple database or paste text into a Notion page for rich formatting.
+6,Progress tracking,Import PROGRESS_TRACKER.csv. Create rollups or manual checks to estimate overall % completion (simple method: count of checked items / total).
+7,Optional: PDF Binder,"After filling data, export relevant views to PDF to create your printable “Peace of Mind Binder.”"

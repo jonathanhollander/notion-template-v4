@@ -1,0 +1,565 @@
+# Automation Features
+complexity: complex
+
+pages:
+- title: Automation Control Center
+  parent: Preparation Hub
+  icon: emoji:🤖
+  description: Comprehensive workflow automation and intelligent task management
+  role: owner
+  blocks:
+    - type: heading_1
+      content: 🤖 Automation Control Center
+    - type: paragraph
+      content: Advanced automation system that intelligently manages tasks, sends reminders, and optimizes workflow efficiency for estate planning processes.
+    
+    - type: heading_2
+      content: Active Automation Rules
+    - type: callout
+      icon: emoji:⚡
+      content: "Auto-Task Generation: ✅ Active - 12 tasks auto-created this month"
+      color: green_background
+    - type: callout
+      icon: emoji:⏰
+      content: "Deadline Reminders: ✅ Active - 24 reminders sent, 89% response rate"
+      color: green_background
+    - type: callout
+      icon: emoji:🔔
+      content: "Status Notifications: ✅ Active - Real-time updates to all stakeholders"
+      color: green_background
+    - type: callout
+      icon: emoji:📊
+      content: "Progress Alerts: ✅ Active - Smart milestone and bottleneck detection"
+      color: green_background
+    
+    - type: heading_2
+      content: Intelligent Task Generation
+    - type: toggle
+      content: Auto-Generated Task Categories
+      blocks:
+        - type: paragraph
+          content: "AI-powered task creation based on patterns and dependencies:"
+        - type: bulleted_list_item
+          content: "📄 Document Follow-ups: Auto-creates review tasks after document completion"
+        - type: bulleted_list_item
+          content: "👥 Professional Coordination: Generates check-in tasks with team members"
+        - type: bulleted_list_item
+          content: "📅 Calendar Integration: Creates appointment and deadline reminder tasks"
+        - type: bulleted_list_item
+          content: "🔍 Quality Assurance: Generates verification tasks for critical milestones"
+        - type: bulleted_list_item
+          content: "📊 Reporting Tasks: Auto-creates monthly and quarterly review tasks"
+    
+    - type: toggle
+      content: Smart Task Prioritization
+      blocks:
+        - type: paragraph
+          content: "Automated priority adjustment based on multiple factors:"
+        - type: bulleted_list_item
+          content: "⏰ Deadline Proximity: Increases priority as deadlines approach"
+        - type: bulleted_list_item
+          content: "🔗 Dependency Chain: Elevates priority for tasks blocking others"
+        - type: bulleted_list_item
+          content: "👔 Professional Availability: Adjusts based on professional schedules"
+        - type: bulleted_list_item
+          content: "🎯 Impact Assessment: Prioritizes high-impact estate planning tasks"
+        - type: bulleted_list_item
+          content: "📊 Historical Patterns: Uses completion data to optimize scheduling"
+    
+    - type: heading_2
+      content: Notification & Alert System
+    - type: callout
+      icon: emoji:📧
+      content: "Email Alerts: Automated notifications for deadlines, completions, and issues"
+      color: blue_background
+    - type: callout
+      icon: emoji:📱
+      content: "Mobile Notifications: Push notifications for urgent items and reminders"
+      color: green_background
+    - type: callout
+      icon: emoji:🔔
+      content: "In-App Alerts: Real-time notifications within the estate planning system"
+      color: yellow_background
+    - type: callout
+      icon: emoji:📊
+      content: "Dashboard Badges: Visual indicators of new activities and required actions"
+      color: purple_background
+    
+    - type: heading_2
+      content: Automation Rules Configuration
+    - type: numbered_list_item
+      content: "Document Completion → Auto-generate review task (3-day reminder)"
+    - type: numbered_list_item
+      content: "Professional Response Overdue → Escalation alert (5-day threshold)"
+    - type: numbered_list_item
+      content: "Milestone Achieved → Celebration notification + next phase preparation"
+    - type: numbered_list_item
+      content: "Bottleneck Detected → Alert executor + suggest alternative approaches"
+    - type: numbered_list_item
+      content: "Family Task Assigned → Send notification + reminder sequence"
+    - type: numbered_list_item
+      content: "Monthly Review Due → Auto-create comprehensive review task"
+    
+    - type: heading_2
+      content: Automation Performance Metrics
+    - type: callout
+      icon: emoji:⚡
+      content: "Task Automation Success: 94% (Tasks completed without manual intervention)"
+      color: green_background
+    - type: callout
+      icon: emoji:🎯
+      content: "Reminder Effectiveness: 89% (Actions taken within 24 hours of reminder)"
+      color: green_background
+    - type: callout
+      icon: emoji:🔄
+      content: "Workflow Efficiency: +34% (Time saved through automation)"
+      color: blue_background
+
+- title: Smart Reminder System
+  parent: Executor Hub
+  icon: emoji:⏰
+  description: Intelligent deadline and notification management
+  role: executor
+  blocks:
+    - type: heading_1
+      content: ⏰ Smart Reminder System
+    - type: paragraph
+      content: Intelligent reminder and notification system that learns from patterns and optimizes timing for maximum effectiveness.
+    
+    - type: heading_2
+      content: Active Reminder Categories
+    - type: callout
+      icon: emoji:📅
+      content: "Critical Deadlines: 3 active reminders (legal document review due in 5 days)"
+      color: red_background
+    - type: callout
+      icon: emoji:👔
+      content: "Professional Follow-ups: 7 pending (attorney response, CPA meeting, advisor review)"
+      color: yellow_background
+    - type: callout
+      icon: emoji:👨‍👩‍👧‍👦
+      content: "Family Coordination: 2 upcoming (family meeting, access testing)"
+      color: blue_background
+    - type: callout
+      icon: emoji:📊
+      content: "Progress Reviews: 1 scheduled (monthly analytics review next week)"
+      color: green_background
+    
+    - type: heading_2
+      content: Intelligent Reminder Features
+    - type: toggle
+      content: Adaptive Timing
+      blocks:
+        - type: paragraph
+          content: "Smart reminder timing based on individual response patterns:"
+        - type: bulleted_list_item
+          content: "📊 Response Analysis: Learns optimal reminder timing for each person"
+        - type: bulleted_list_item
+          content: "⏰ Time Zone Awareness: Sends reminders at locally appropriate times"
+        - type: bulleted_list_item
+          content: "📱 Device Preferences: Uses preferred communication channel per person"
+        - type: bulleted_list_item
+          content: "🎯 Context Sensitivity: Adjusts reminder frequency based on task complexity"
+    
+    - type: toggle
+      content: Escalation Protocols
+      blocks:
+        - type: paragraph
+          content: "Automated escalation when initial reminders don't get responses:"
+        - type: numbered_list_item
+          content: "Day 1: Initial friendly reminder via preferred channel"
+        - type: numbered_list_item
+          content: "Day 3: Follow-up reminder with additional context and help"
+        - type: numbered_list_item
+          content: "Day 5: Escalation to backup contact or alternative approach"
+        - type: numbered_list_item
+          content: "Day 7: Alert to executor with suggested intervention strategies"
+        - type: numbered_list_item
+          content: "Day 10: System flags for manual review and direct outreach"
+    
+    - type: toggle
+      content: Smart Content Adaptation
+      blocks:
+        - type: paragraph
+          content: "Reminder content automatically adapts for maximum effectiveness:"
+        - type: bulleted_list_item
+          content: "📝 Personalization: Uses recipient's name, role, and preferences"
+        - type: bulleted_list_item
+          content: "🎯 Context Relevance: Includes specific task details and next steps"
+        - type: bulleted_list_item
+          content: "📊 Progress Updates: Shows completion status and remaining work"
+        - type: bulleted_list_item
+          content: "🔗 Quick Actions: Includes direct links to complete tasks"
+        - type: bulleted_list_item
+          content: "❓ Help Integration: Suggests relevant help resources and guidance"
+    
+    - type: heading_2
+      content: Reminder Effectiveness Analytics
+    - type: callout
+      icon: emoji:📊
+      content: "Response Rate: 89% (↑14% since implementing smart timing)"
+      color: green_background
+    - type: callout
+      icon: emoji:⚡
+      content: "Average Response Time: 1.3 days (↓2.1 days improvement)"
+      color: green_background
+    - type: callout
+      icon: emoji:🎯
+      content: "Task Completion Rate: 94% (↑8% with automated follow-ups)"
+      color: green_background
+    - type: callout
+      icon: emoji:💬
+      content: "User Satisfaction: 92% (Based on response feedback and surveys)"
+      color: blue_background
+    
+    - type: heading_2
+      content: Upcoming Reminders Schedule
+    - type: paragraph
+      content: "Next 7 days reminder schedule:"
+    - type: bulleted_list_item
+      content: "📅 Tomorrow: Attorney document review reminder (3rd follow-up)"
+    - type: bulleted_list_item
+      content: "📅 Day 3: Asset valuation appointment confirmation"
+    - type: bulleted_list_item
+      content: "📅 Day 5: Family meeting preparation reminder"
+    - type: bulleted_list_item
+      content: "📅 Day 7: Monthly progress review auto-generated"
+
+- title: Workflow Automation Hub
+  parent: Family Hub
+  icon: emoji:🔄
+  description: Automated processes and smart workflow management
+  role: family
+  blocks:
+    - type: heading_1
+      content: 🔄 Automated Workflow Helper
+    - type: paragraph
+      content: Smart automation that helps manage estate planning tasks automatically, so you can focus on the important decisions while the system handles routine coordination.
+    
+    - type: heading_2
+      content: What's Being Automated for You
+    - type: callout
+      icon: emoji:📅
+      content: "Appointment Reminders: Automatically reminds everyone about upcoming meetings"
+      color: blue_background
+    - type: callout
+      icon: emoji:📋
+      content: "Task Creation: Generates follow-up tasks when you complete major milestones"
+      color: green_background
+    - type: callout
+      icon: emoji:📊
+      content: "Progress Updates: Sends weekly progress summaries to all family members"
+      color: yellow_background
+    - type: callout
+      icon: emoji:🔔
+      content: "Important Alerts: Notifies when critical deadlines are approaching"
+      color: red_background
+    
+    - type: heading_2
+      content: How Automation Helps You
+    - type: bulleted_list_item
+      content: "⏰ Never Miss Deadlines: Automatic reminders for all important dates"
+    - type: bulleted_list_item
+      content: "📞 Stay Connected: Automated updates about professional meetings and decisions"
+    - type: bulleted_list_item
+      content: "📊 Track Progress: Weekly automated progress reports delivered to your email"
+    - type: bulleted_list_item
+      content: "🎯 Focus on What Matters: Routine coordination handled automatically"
+    - type: bulleted_list_item
+      content: "👥 Family Coordination: Automatic notifications when family input is needed"
+    
+    - type: heading_2
+      content: Automation Success Stories
+    - type: toggle
+      content: This Month's Automated Actions
+      blocks:
+        - type: paragraph
+          content: "Here's what automation accomplished automatically this month:"
+        - type: bulleted_list_item
+          content: "📧 Sent 24 gentle reminders that resulted in 21 completed tasks"
+        - type: bulleted_list_item
+          content: "📅 Created 8 follow-up tasks after document completions"
+        - type: bulleted_list_item
+          content: "🔔 Delivered 16 progress notifications to family members"
+        - type: bulleted_list_item
+          content: "⚠️ Caught 3 potential deadline conflicts and suggested solutions"
+        - type: paragraph
+          content: "Result: 89% of automated actions led to successful task completion!"
+    
+    - type: toggle
+      content: Time Savings Through Automation
+      blocks:
+        - type: paragraph
+          content: "Automation is saving your family significant time:"
+        - type: bulleted_list_item
+          content: "⏰ 12 hours/month saved on coordination and reminders"
+        - type: bulleted_list_item
+          content: "📊 8 hours/month saved on progress tracking and reporting"
+        - type: bulleted_list_item
+          content: "📞 6 hours/month saved on follow-up communications"
+        - type: bulleted_list_item
+          content: "🎯 4 hours/month saved on deadline monitoring"
+        - type: paragraph
+          content: "💡 Total time savings: 30 hours/month for your family!"
+    
+    - type: heading_2
+      content: Automation Preferences
+    - type: paragraph
+      content: "You can customize how automation works for your family:"
+    - type: toggle
+      content: Notification Preferences
+      blocks:
+        - type: bulleted_list_item
+          content: "📧 Email: Daily digest at 8 AM (customizable)"
+        - type: bulleted_list_item
+          content: "📱 Mobile: Urgent alerts only (immediate notifications)"
+        - type: bulleted_list_item
+          content: "🌐 In-App: All updates visible in dashboard"
+        - type: bulleted_list_item
+          content: "📞 Phone: Emergency situations only (rare but important)"
+    
+    - type: toggle
+      content: Automation Intensity Levels
+      blocks:
+        - type: callout
+          icon: emoji:🔄
+          content: "Light Automation: Essential reminders and progress updates only"
+          color: green_background
+        - type: callout
+          icon: emoji:⚡
+          content: "Standard Automation: Full task management and coordination (Recommended)"
+          color: blue_background
+        - type: callout
+          icon: emoji:🤖
+          content: "Advanced Automation: Predictive task creation and proactive optimization"
+          color: purple_background
+    
+    - type: heading_2
+      content: What Automation Can't Do
+    - type: paragraph
+      content: "Important: Automation handles routine coordination, but you remain in control of all important decisions:"
+    - type: bulleted_list_item
+      content: "⚖️ Legal Decisions: All legal choices require your explicit approval"
+    - type: bulleted_list_item
+      content: "💰 Financial Changes: Investment and financial decisions need your consent"
+    - type: bulleted_list_item
+      content: "👥 Family Matters: Personal and family decisions always require human input"
+    - type: bulleted_list_item
+      content: "🏥 Medical Directives: Healthcare preferences must be explicitly chosen by you"
+
+- title: Smart Alert Configuration
+  parent: Executor Hub
+  icon: emoji:🔔
+  description: Intelligent alert system and notification management
+  role: executor
+  blocks:
+    - type: heading_1
+      content: 🔔 Smart Alert Configuration
+    - type: paragraph
+      content: Advanced alert system that intelligently monitors estate planning progress and sends targeted notifications to optimize workflow efficiency.
+    
+    - type: heading_2
+      content: Alert Categories and Triggers
+    - type: toggle
+      content: Critical Priority Alerts
+      blocks:
+        - type: paragraph
+          content: "Immediate attention required - sent instantly:"
+        - type: bulleted_list_item
+          content: "🚨 Legal Deadline: <48 hours to document execution deadline"
+        - type: bulleted_list_item
+          content: "⚠️ Professional Unresponsive: >5 days without critical response"
+        - type: bulleted_list_item
+          content: "💰 Financial Deadline: Time-sensitive financial decisions pending"
+        - type: bulleted_list_item
+          content: "🏥 Medical Update Needed: Healthcare directive changes required"
+        - type: paragraph
+          content: "📊 Critical alert response rate: 97% within 4 hours"
+    
+    - type: toggle
+      content: High Priority Alerts
+      blocks:
+        - type: paragraph
+          content: "Important but not urgent - sent during business hours:"
+        - type: bulleted_list_item
+          content: "📄 Document Review Ready: Professional has completed document draft"
+        - type: bulleted_list_item
+          content: "🎯 Milestone Achieved: Major estate planning phase completed"
+        - type: bulleted_list_item
+          content: "👥 Family Input Needed: Decision requires family member consultation"
+        - type: bulleted_list_item
+          content: "📊 Weekly Progress Summary: Automated weekly status compilation"
+        - type: paragraph
+          content: "📊 High priority alert response rate: 84% within 24 hours"
+    
+    - type: toggle
+      content: Standard Alerts
+      blocks:
+        - type: paragraph
+          content: "Routine notifications - sent as daily digest:"
+        - type: bulleted_list_item
+          content: "✅ Task Completed: Regular task completion confirmations"
+        - type: bulleted_list_item
+          content: "📅 Upcoming Appointments: Meeting reminders and preparations"
+        - type: bulleted_list_item
+          content: "📊 Progress Updates: Incremental progress notifications"
+        - type: bulleted_list_item
+          content: "💡 Optimization Suggestions: Workflow improvement recommendations"
+        - type: paragraph
+          content: "📊 Standard alert engagement rate: 67% (appropriate for routine items)"
+    
+    - type: heading_2
+      content: Intelligent Alert Optimization
+    - type: callout
+      icon: emoji:🧠
+      content: "Learning Algorithm: Adapts alert timing based on individual response patterns"
+      color: blue_background
+    - type: callout
+      icon: emoji:🎯
+      content: "Context Awareness: Considers current workload and availability before sending"
+      color: green_background
+    - type: callout
+      icon: emoji:📊
+      content: "Effectiveness Tracking: Monitors alert success rates and adjusts accordingly"
+      color: yellow_background
+    - type: callout
+      icon: emoji:🔄
+      content: "Feedback Loop: Uses completion data to improve future alert strategies"
+      color: purple_background
+    
+    - type: heading_2
+      content: Alert Delivery Channels
+    - type: paragraph
+      content: "Multi-channel alert delivery optimized for different urgency levels:"
+    - type: bulleted_list_item
+      content: "📧 Email: Detailed alerts with full context and action links"
+    - type: bulleted_list_item
+      content: "📱 SMS: Urgent alerts with brief summary and quick response options"
+    - type: bulleted_list_item
+      content: "🔔 Push Notifications: In-app alerts with immediate action capabilities"
+    - type: bulleted_list_item
+      content: "📊 Dashboard Badges: Visual indicators for less urgent items"
+    - type: bulleted_list_item
+      content: "📞 Phone Calls: Emergency-level alerts only (rare but critical)"
+    
+    - type: heading_2
+      content: Alert Performance Dashboard
+    - type: callout
+      icon: emoji:📊
+      content: "Total Alerts Sent: 847 this quarter | Response Rate: 87% | Effectiveness Score: 94%"
+      color: blue_background
+    - type: callout
+      icon: emoji:⚡
+      content: "Average Response Time: 4.3 hours | Fastest Response: 12 minutes | Target: <6 hours"
+      color: green_background
+    - type: callout
+      icon: emoji:🎯
+      content: "False Positive Rate: 3% | User Satisfaction: 91% | Opt-out Rate: 2%"
+      color: yellow_background
+
+- title: Progress Alert System
+  parent: Family Hub
+  icon: emoji:📊
+  description: Family-friendly progress notifications and milestone celebrations
+  role: family
+  blocks:
+    - type: heading_1
+      content: 📊 Family Progress Alerts
+    - type: paragraph
+      content: Friendly notifications and milestone celebrations that keep family members informed and engaged in the estate planning journey.
+    
+    - type: heading_2
+      content: Celebration Alerts
+    - type: callout
+      icon: emoji:🎉
+      content: "Recent Achievement: Legal documents 95% complete! Will and power of attorney executed."
+      color: green_background
+    - type: callout
+      icon: emoji:⭐
+      content: "Milestone Reached: Professional team fully coordinated and active"
+      color: blue_background
+    - type: callout
+      icon: emoji:🏆
+      content: "Major Progress: Asset documentation exceeded 90% completion target"
+      color: yellow_background
+    
+    - type: heading_2
+      content: Gentle Progress Reminders
+    - type: paragraph
+      content: "Friendly reminders to keep everyone informed without being overwhelming:"
+    - type: bulleted_list_item
+      content: "📅 Weekly Summary: 'Here's what we accomplished this week...'"
+    - type: bulleted_list_item
+      content: "🎯 Milestone Updates: 'We just reached 70% completion - great progress!'"
+    - type: bulleted_list_item
+      content: "💡 Next Steps: 'Coming up next week: family meeting and access testing'"
+    - type: bulleted_list_item
+      content: "❓ Check-ins: 'Any questions about the current progress or next steps?'"
+    
+    - type: heading_2
+      content: Family Engagement Opportunities
+    - type: toggle
+      content: How Family Members Can Stay Involved
+      blocks:
+        - type: paragraph
+          content: "Automation identifies opportunities for family participation:"
+        - type: bulleted_list_item
+          content: "📚 Learning Opportunities: Suggests relevant educational content"
+        - type: bulleted_list_item
+          content: "💬 Input Requests: Alerts when family opinions or decisions are needed"
+        - type: bulleted_list_item
+          content: "🧪 Testing Invitations: Requests help testing new features or access"
+        - type: bulleted_list_item
+          content: "🎭 Memory Sharing: Prompts for family stories and memory contributions"
+        - type: bulleted_list_item
+          content: "📞 Communication Checks: Ensures everyone feels informed and included"
+    
+    - type: toggle
+      content: Comfort and Reassurance Features
+      blocks:
+        - type: paragraph
+          content: "Automation provides emotional support throughout the process:"
+        - type: callout
+          icon: emoji:🤗
+          content: "Progress Affirmation: 'You're doing great! 68% complete puts you ahead of schedule.'"
+          color: green_background
+        - type: callout
+          icon: emoji:💪
+          content: "Confidence Building: 'Your estate plan is becoming more secure every day.'"
+          color: blue_background
+        - type: callout
+          icon: emoji:👥
+          content: "Team Support: 'Your professional team is actively working on your behalf.'"
+          color: yellow_background
+        - type: callout
+          icon: emoji:🎯
+          content: "Goal Reinforcement: 'Each completed task protects your family's future.'"
+          color: purple_background
+    
+    - type: heading_2
+      content: Alert Preferences for Families
+    - type: paragraph
+      content: "Customize how your family receives progress updates:"
+    - type: toggle
+      content: Frequency Options
+      blocks:
+        - type: bulleted_list_item
+          content: "📧 Daily Brief: Short email with yesterday's progress (optional)"
+        - type: bulleted_list_item
+          content: "📊 Weekly Summary: Comprehensive update every Sunday (recommended)"
+        - type: bulleted_list_item
+          content: "🎯 Milestone Only: Notifications only for major achievements"
+        - type: bulleted_list_item
+          content: "🚨 Critical Only: Only urgent items that need immediate attention"
+    
+    - type: toggle
+      content: Content Customization
+      blocks:
+        - type: bulleted_list_item
+          content: "👨‍👩‍👧‍👦 Family-Friendly Language: Technical terms explained simply"
+        - type: bulleted_list_item
+          content: "🎨 Visual Progress: Charts and graphics to show completion status"
+        - type: bulleted_list_item
+          content: "📝 Action Items: Clear next steps when family input is needed"
+        - type: bulleted_list_item
+          content: "❓ Help Integration: Links to explanations and guidance when relevant"

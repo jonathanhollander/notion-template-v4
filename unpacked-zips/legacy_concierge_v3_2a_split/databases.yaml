@@ -1,0 +1,209 @@
+db:
+  schemas:
+    sample_letters:
+      properties:
+        Title: title
+        Audience: select
+        Category: select
+        Scenario: rich_text
+        Body: rich_text
+        AI Prompt: rich_text
+        Section: select
+    executors_contacts:
+      properties:
+        Name: title
+        Role: select
+        Phone: phone_number
+        Email: email
+        Priority: select
+        Notes: rich_text
+    financial_accounts:
+      properties:
+        Institution: title
+        Type: select
+        StatementsLocation: rich_text
+        Contact: rich_text
+        Notes: rich_text
+        Status: select
+    insurance_policies:
+      properties:
+        Carrier: title
+        PolicyType: select
+        PolicyNumber: rich_text
+        Beneficiary: rich_text
+        DocsLocation: rich_text
+        Status: select
+        Notes: rich_text
+    tax_documents:
+      properties:
+        DocType: select
+        Year: number
+        Location: rich_text
+        Contact: rich_text
+        Notes: rich_text
+    business_entities:
+      properties:
+        Entity: title
+        Type: select
+        PrimaryContact: rich_text
+        DocsLocation: rich_text
+        Notes: rich_text
+        Status: select
+    property_inventory:
+      properties:
+        Location: title
+        ItemsOfNote: rich_text
+        PhotosFolder: url
+        Notes: rich_text
+    vehicles:
+      properties:
+        Vehicle: title
+        VIN: rich_text
+        Registration: rich_text
+        TitleLocation: rich_text
+        Notes: rich_text
+    devices_access:
+      properties:
+        Device: title
+        OwnerProfile: rich_text
+        WhereAccessStored: rich_text
+        Notes: rich_text
+  validation:
+    required_fields:
+      executors_contacts:
+      - Name
+      - Role
+      financial_accounts:
+      - Institution
+      - Type
+      insurance_policies:
+      - Carrier
+      - PolicyType
+      - PolicyNumber
+      tax_documents:
+      - DocType
+      - Year
+      vehicles:
+      - Vehicle
+      - VIN
+  seeds:
+    sample_letters:
+    - Title: Executor Notification
+      Audience: Executor
+      Category: Executor
+      Scenario: Initial notification
+      Body: Dear [Name], …
+      AI Prompt: Rewrite to be warm and clear.
+      Section: Executor QuickStart
+    - Title: Family Announcement
+      Audience: Family
+      Category: Family
+      Scenario: Announcement
+      Body: Dear family and friends, …
+      AI Prompt: Shorten to 120 words, gentle.
+      Section: Family View
+    - Title: Sympathy / Thank You
+      Audience: Family
+      Category: Family
+      Scenario: Reply to condolences
+      Body: Thank you for your kind message…
+      AI Prompt: Make it brief and heartfelt.
+      Section: Family FAQ
+    - Title: Employer Notification
+      Audience: Executor
+      Category: Employer
+      Scenario: HR notification
+      Body: Dear HR, …
+      AI Prompt: Formal, include contact details.
+      Section: Notifications
+    - Title: Bank Notification
+      Audience: Executor
+      Category: Financial / Bank
+      Scenario: Account handling
+      Body: Dear [Bank], …
+      AI Prompt: Include institution + statements location.
+      Section: Financial Accounts
+    - Title: Credit Card Company
+      Audience: Executor
+      Category: Financial / Card
+      Scenario: Card closure
+      Body: To Whom It May Concern, …
+      AI Prompt: Adapt one letter per card.
+      Section: Financial Accounts
+    - Title: Utility Company
+      Audience: Executor
+      Category: Utilities
+      Scenario: Service change
+      Body: To Whom It May Concern, …
+      AI Prompt: Create one per utility.
+      Section: Letters Library
+    - Title: Insurance Carrier
+      Audience: Executor
+      Category: Insurance
+      Scenario: Claim notice
+      Body: Dear Claims, …
+      AI Prompt: 'Policy # and docs location.'
+      Section: Insurance
+    - Title: Brokerage / Investment
+      Audience: Executor
+      Category: Financial / Brokerage
+      Scenario: Account handling
+      Body: Dear [Firm], …
+      AI Prompt: Statement references.
+      Section: Financial Accounts
+    - Title: Lawyer Notification
+      Audience: Executor
+      Category: Executor
+      Scenario: Attorney notice
+      Body: Dear [Attorney], …
+      AI Prompt: Confirm representation + next steps.
+      Section: Letters Library
+    - Title: Community / Social Group
+      Audience: Executor
+      Category: Community
+      Scenario: Announcement
+      Body: Hello [Group], …
+      AI Prompt: Add any service details.
+      Section: Notifications
+    - Title: Short Death Notice
+      Audience: Executor
+      Category: Public
+      Scenario: Newspaper notice
+      Body: '[Name], [Age], of [City], …'
+      AI Prompt: 2–3 sentence factual notice.
+      Section: Life Story
+    - Title: QR Distribution — Pack One
+      Audience: Executor
+      Category: QR
+      Scenario: Share limited set
+      Body: Dear [Name], here are QR codes…
+      AI Prompt: Clarify scope, warm tone.
+      Section: QR Letters
+    - Title: QR Distribution — Pack Two
+      Audience: Executor
+      Category: QR
+      Scenario: Share full set
+      Body: Dear [Name], here is full access…
+      AI Prompt: Remind about privacy.
+      Section: QR Letters
+    - Title: QR Distribution — Email
+      Audience: Executor
+      Category: QR
+      Scenario: Email version
+      Body: Hello, attaching QR images…
+      AI Prompt: 120-word concise email.
+      Section: QR Letters
+    - Title: QR Distribution — SMS
+      Audience: Executor
+      Category: QR
+      Scenario: SMS version
+      Body: Hi, here’s the link…
+      AI Prompt: <280 chars, clear.
+      Section: QR Letters
+    - Title: Tax / CPA
+      Audience: Executor
+      Category: Tax
+      Scenario: CPA packet
+      Body: Hello [CPA], …
+      AI Prompt: List documents you’ll send.
+      Section: Taxes

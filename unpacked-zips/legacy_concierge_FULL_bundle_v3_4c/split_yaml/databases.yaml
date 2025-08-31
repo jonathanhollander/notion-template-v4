@@ -1,0 +1,46 @@
+db:
+  schemas:
+    owner_progress:
+      properties:
+        Page: title
+        Status: select
+        Notes: rich_text
+      options:
+        Status:
+        - Done
+        - In Progress
+        - Needs Attention
+      seed_rows:
+      - Page: Essentials
+        Status: Done
+        Notes: All essentials documented.
+      - Page: Executors & Key Contacts
+        Status: In Progress
+        Notes: Attorney contact added; backup pending.
+      - Page: Life Story
+        Status: In Progress
+        Notes: First memory written.
+      - Page: Letters & Notifications
+        Status: Needs Attention
+        Notes: Personalize 2–3 letters.
+      - Page: Memories
+        Status: Needs Attention
+        Notes: Add at least one keepsake note.
+    sample_letters:
+      properties:
+        Title: title
+        Audience: select
+        Category: select
+        Body: rich_text
+  seeds:
+    sample_letters:
+    - Title: Bank Notification
+      Audience: Executor
+      Category: Financial
+      Body: 'Dear [Bank],
+
+        I am writing to inform you of the passing of [Name]. I am executor and have enclosed the death certificate. Please advise steps to close or transfer accounts. Thank you for your guidance.'
+    - Title: Letter to My Family
+      Audience: Family
+      Category: Personal
+      Body: I wanted you to have my words close by. Thank you for every ordinary day we shared. Nothing needs to happen all at once. I love you, and I am grateful for you.

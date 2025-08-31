@@ -1,0 +1,1 @@
+- Daily schedule → Notion due today → Google Calendar event → Email

@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+jinja2
+python-dotenv
+requests
+stripe
+qrcode
+Pillow
+python-slugify
+notion-client

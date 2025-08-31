@@ -1,0 +1,185 @@
+db:
+  schemas:
+    Accounts:
+      properties:
+        Name: title
+        Institution: text
+        Type: select
+        'Account #': text
+        Notes: text
+      seed_rows:
+      - Name: Bank Accounts
+        Institution: ''
+        Type: Bank
+        'Account #': ''
+        Notes: List each account; add closure/transfer steps.
+      - Name: Retirement Accounts
+        Institution: ''
+        Type: Retirement
+        'Account #': ''
+        Notes: Add beneficiaries; rollover instructions.
+      - Name: Brokerage Accounts
+        Institution: ''
+        Type: Brokerage
+        'Account #': ''
+        Notes: Holdings; transfer-on-death details.
+      - Name: Credit Cards
+        Institution: ''
+        Type: Credit Card
+        'Account #': ''
+        Notes: Cancel cards; reconcile statements; disable autopay.
+    Property:
+      properties:
+        Name: title
+        Type: select
+        Identifier: text
+        Notes: text
+      seed_rows:
+      - Name: Primary Residence
+        Type: Real Estate
+        Identifier: ''
+        Notes: Deed/mortgage details; utility handoff.
+      - Name: Vehicle
+        Type: Vehicle
+        Identifier: ''
+        Notes: Title; registration; insurance carrier.
+      - Name: Safe Deposit Box
+        Type: Asset
+        Identifier: ''
+        Notes: Location; access rules; key custody.
+    Insurance:
+      properties:
+        Policy: title
+        Carrier: text
+        Type: select
+        'Policy #': text
+        Notes: text
+      seed_rows:
+      - Name: Life Insurance
+        Type: Life
+        Carrier: ''
+        'Policy #': ''
+        Notes: Claim initiation steps; beneficiary process.
+      - Name: Health Insurance
+        Type: Health
+        Carrier: ''
+        'Policy #': ''
+        Notes: Coverage end date; outstanding claims.
+      - Name: Home Insurance
+        Type: Home
+        Carrier: ''
+        'Policy #': ''
+        Notes: Property coverage; claims contact.
+      - Name: Auto Insurance
+        Type: Auto
+        Carrier: ''
+        'Policy #': ''
+        Notes: Cancel/transfer policy; proof of sale for vehicle.
+    Contacts:
+      properties:
+        Name: title
+        Role: select
+        Email: text
+        Phone: text
+        Notes: text
+      seed_rows:
+      - Name: Attorney
+        Role: Attorney
+        Email: ''
+        Phone: ''
+        Notes: Primary legal point of contact.
+      - Name: Executor
+        Role: Executor
+        Email: ''
+        Phone: ''
+        Notes: Primary executor contact.
+      - Name: Accountant/Tax
+        Role: Accountant/Tax
+        Email: ''
+        Phone: ''
+        Notes: Year-of-death return; filings.
+      - Name: Primary Family Contact
+        Role: Family
+        Email: ''
+        Phone: ''
+        Notes: Coordinator for family communications.
+    Subscriptions:
+      properties:
+        Service: title
+        Category: select
+        Account Email: text
+        Notes: text
+      seed_rows:
+      - Name: Utilities
+        Type: Utilities
+        Provider: ''
+        'Account #': ''
+        Notes: Electric, gas, water, internet, phone.
+      - Name: Digital Services
+        Type: Digital
+        Provider: ''
+        'Account #': ''
+        Notes: Streaming, storage, software subscriptions.
+      - Name: Memberships
+        Type: Membership
+        Provider: ''
+        'Account #': ''
+        Notes: Gyms, clubs, associations.
+    Keepsakes:
+      properties:
+        Title: title
+        Story: text
+        Where: text
+      seed_rows:
+      - Title: Photos
+        Story: ''
+        Where: Add location of albums/drives.
+      - Title: Stories
+        Story: Write a memory that matters — a moment, a lesson, a laugh.
+        Where: ''
+      - Title: Letters
+        Story: If you’d like, add a note for someone special.
+        Where: ''
+    Letters Index:
+      properties:
+        Title: title
+        Audience: select
+        Category: select
+        URL: url
+      seed_rows:
+      - Title: Letter – Banks
+        Audience: Institution
+        Category: Banking
+        URL: ''
+      - Title: Letter – Credit Card Issuers
+        Audience: Institution
+        Category: Credit Cards
+        URL: ''
+      - Title: Letter – Utilities
+        Audience: Institution
+        Category: Utilities
+        URL: ''
+      - Title: Letter – Insurance Companies
+        Audience: Institution
+        Category: Insurance
+        URL: ''
+      - Title: Letter – Mortgage/Servicer
+        Audience: Institution
+        Category: Mortgage
+        URL: ''
+      - Title: Letter – Employer/HR
+        Audience: Employer
+        Category: Employment
+        URL: ''
+      - Title: Letter – Social Security Administration
+        Audience: Agency
+        Category: Government
+        URL: ''
+      - Title: Letter – Pension/Benefits
+        Audience: Plan
+        Category: Benefits
+        URL: ''
+      - Title: Letter – Subscriptions & Services
+        Audience: Provider
+        Category: Subscriptions
+        URL: ''

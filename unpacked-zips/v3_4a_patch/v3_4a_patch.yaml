@@ -1,0 +1,142 @@
+meta:
+  patch: v3.4a
+  notes: 'Premium polish: letters uniformity, sharper executor copy, firmer disclaimers, diagnostics coaching, ceremonial closure, admin readiness checklist. No new features.'
+merge:
+  strings:
+    mode: overwrite
+    on_missing_key: warn
+globals:
+  covers_map:
+    life-story: https://images.examplecdn.com/premium/soft-sepia-texture.jpg
+    family-view: https://images.examplecdn.com/premium/warm-light-bokeh.jpg
+    executor-quickstart: https://images.examplecdn.com/premium/minimal-compass.jpg
+    memories: https://images.examplecdn.com/premium/quiet-frames.jpg
+    finishing: https://images.examplecdn.com/premium/quiet-horizon-fade.jpg
+  strings:
+    caution_notes:
+      legal: These pages help organize information and wishes. For a legally valid document or advice, please speak with a licensed professional.
+      letter: This is a sample letter to help you begin. Adjust names, dates, and details for your situation.
+    pages:
+      executors-contacts:
+        description: Keep your executor, attorney, and key contacts together here so decisions and paperwork don’t stall. Add names, roles, and best phone numbers.
+        owner_instructions: Add your attorney, primary executor, and a backup contact. Confirm numbers and preferred email. Remove this note when the list is complete.
+      financial-accounts:
+        description: Group bank, card, brokerage, mortgage, and pension items here so closures and transfers can happen without searching through papers.
+        owner_instructions: Add the institutions you use. If an item doesn’t apply, delete the placeholder. Remove this note when the list is accurate.
+      insurance:
+        description: Keep life, health, and other insurance details here so claims or closures can be handled in one place.
+        owner_instructions: List policies with carriers and policy numbers if available. Remove this note when details are accurate.
+      taxes:
+        description: A simple spot to prepare final returns and keep notices together so deadlines aren’t missed.
+        owner_instructions: Add your CPA or tax preparer if you have one. Note any deadlines you’ve been given. Remove this note when ready.
+      notifications:
+        description: Letters and wording to notify employers, utilities, subscriptions, and groups—so accounts can be closed or transferred cleanly.
+        owner_instructions: Personalize 2–3 letters that apply now. Remove this note when the essentials are covered.
+      property:
+        description: Addresses, leases, mortgage info, and a short note on access—so property matters can be handled without delay.
+        owner_instructions: Add keys/entry notes (non-secret) and who to contact for access. Remove this note when set.
+      living-will:
+        description: A place to organize preferences and pointers. For a legally valid document, consult your attorney or local forms.
+        owner_instructions: Add your preferences simply and clearly. If you have a signed document, point to its location. Remove this note when accurate.
+      medical:
+        description: Contacts and details for doctors, pharmacies, and health coverage to help with records and benefits.
+        owner_instructions: List primary doctor and insurance member IDs if available. Remove this note when updated.
+      devices:
+        description: A pointer list for important devices and how they’re used (no passwords here).
+        owner_instructions: List the devices that matter (phone, laptop) and where to find instructions. Remove this note when up to date.
+      digital-legacy:
+        description: Guidance for online accounts and memorial options so digital matters are handled with care.
+        owner_instructions: Point to any account lists or instructions (no secrets here). Remove this note when accurate.
+      executor-quickstart:
+        description: A short path for the first steps—personalize a few letters, check essentials, and move at a steady pace.
+        owner_instructions: Scan this page as if you were the executor. Keep steps short and practical. Remove this note when it reads clearly.
+      executor-orientation:
+        description: Begin with one or two pages that feel most important. Personalize any letter needed now and let the rest wait.
+        owner_instructions: Link the two or three pages you want opened first. Remove this note when the path feels obvious.
+      everything-done:
+        description: When the last small tasks are settled, pause here and take a breath. Everything important has been carried through. Nothing more is required of you.
+        owner_instructions: If you plan to leave a brief sign‑off note for future readers, add it above. Remove this note when finished.
+  diagnostics_text:
+    messages:
+      cover_missing: ‘{page}’ doesn’t have a cover yet. A soft image helps the page feel settled—choose a calm photo or simple texture.
+      icon_missing: ‘{page}’ has no icon. A small symbol makes scanning easier—pick something steady and clear.
+      instr_present: ‘{page}’ still shows a helper note. When the page reads smoothly, you can remove it.
+      db_required_field: ‘{db}’ is missing basic details. Adding {fields} keeps this page dependable.
+    reminders:
+      family_no_tasks: Family pages shouldn’t read like checklists. If steps are needed, move them to executor pages.
+db:
+  seeds:
+    sample_letters:
+    - Title: Letter to My Family
+      Body: I wanted you to have my words close by. Thank you for every ordinary day we shared. Please take your time with everything. Nothing needs to happen all at once. I love you, and I am grateful for you.
+    - Title: Family Announcement
+      Body: Dear friends and family, with sadness we share that [Full Name] has passed away. Services will be held at [Location/Date]. Additional details are below. We’re grateful for your thoughts and support.
+    - Title: Short Death Notice / Newspaper Draft
+      Body: '[Full Name], [Age], of [City], passed away on [Date]. [First Name] is survived by [Family Members]. A service will be held at [Location/Date]. Memorial contributions may be made to [Charity/Organization].'
+    - Title: Bank Notification
+      Body: 'Dear [Bank Name],
+
+        I am writing to inform you of the passing of [Full Name]. I am the executor and have enclosed the death certificate. Please let me know your process to close or transfer accounts and any documents you require. Thank you for your guidance.'
+    - Title: Credit Card Company
+      Body: 'Dear [Company Name],
+
+        Please note the passing of [Full Name], account holder. Kindly close the account and stop further charges. I have enclosed the death certificate. Please confirm any remaining balance and the steps for settlement. Thank you.'
+    - Title: Brokerage / Investment Firm
+      Body: 'Dear [Firm Name],
+
+        I am executor for [Full Name], who held accounts with you. Enclosed is the death certificate. Please advise on your procedure for transferring or closing these accounts and what documents are required. Thank you for your help.'
+    - Title: Mortgage / Lender
+      Body: 'Dear [Lender],
+
+        I am executor for [Full Name], the borrower on this mortgage. Enclosed is the death certificate. Please confirm the current balance and outline the steps for continuing payments or settling the loan. Thank you for your guidance.'
+    - Title: Pension / Retirement / Social Security
+      Body: 'Dear [Agency/Plan],
+
+        I am notifying you of the passing of [Full Name]. Enclosed is the death certificate. Please advise on survivor benefits or the process for closing the account. Thank you.'
+    - Title: Insurance Carrier
+      Body: 'Dear [Insurance Company],
+
+        Please note the passing of [Full Name], policy holder. I am the executor and have enclosed the death certificate. Kindly provide the forms or steps to process the claim or close the policy. Thank you.'
+    - Title: Medical Providers / Health Insurance
+      Body: 'Dear [Provider/Office],
+
+        This letter notifies you of the passing of [Full Name]. Enclosed is the death certificate. Please let me know if you require additional documentation to close patient or insurance records. Thank you.'
+    - Title: Tax Notification
+      Body: 'Dear [IRS/State Agency],
+
+        I am notifying you of the passing of [Full Name]. Enclosed is the death certificate. Please advise on final return requirements or any balances due. Thank you.'
+    - Title: Employer Notification
+      Body: 'Dear [HR Department],
+
+        I am writing regarding [Full Name], who has passed away. Enclosed is the death certificate. Please advise on final pay, benefits, or retirement plans, and let me know any required forms. Thank you.'
+    - Title: Utility Company
+      Body: 'Dear [Utility Company],
+
+        Please note the passing of [Full Name], account holder at [Address]. Enclosed is the death certificate. Kindly advise how to transfer or close service and settle the final bill. Thank you.'
+    - Title: Subscriptions / Digital Services
+      Body: 'Dear [Service],
+
+        This letter is to notify you of the passing of [Full Name], the account holder. Please close the account and stop further charges. Enclosed is the death certificate. Thank you.'
+    - Title: Community / Social Group
+      Body: 'Dear [Group/Association],
+
+        I am writing to notify you of the passing of [Full Name], a member of your organization. Enclosed is the death certificate. Please update your records and let me know if anything further is required. Thank you.'
+    - Title: Executor Cover Note / Authority
+      Body: 'To Whom It May Concern,
+
+        I am the named executor for the estate of [Full Name], who has passed away. Enclosed is the death certificate and my proof of authority. Please work directly with me on matters related to the estate. Thank you.'
+    - Title: Landlord / Property Management
+      Body: 'Dear [Landlord/Management],
+
+        This letter is to inform you of the passing of [Full Name], tenant at [Address]. Enclosed is the death certificate. Please confirm next steps for lease termination, property access, and final accounting. Thank you.'
+    update_by_title: true
+admin_content_suggested:
+  admin-cockpit:
+    prepend_blocks:
+    - h2: Readiness Checklist (Delete when green)
+    - bulleted_list:
+      - Icons and covers added to key pages (Life Story, Family View, Executor QuickStart).
+      - Helper notes removed from public/executor/family pages.
+      - Letters personalized where needed (bank, utilities, employer).
+      - Disclaimers present only where appropriate (Living Will, Medical, Letters).
+      - Diagnostics run clean; mobile/print skim check complete.

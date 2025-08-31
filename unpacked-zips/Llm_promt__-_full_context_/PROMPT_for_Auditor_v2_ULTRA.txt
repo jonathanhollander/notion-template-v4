@@ -1,0 +1,2497 @@
+# 📄 Auditor Prompt v2 (ULTRA, all YAML embedded)
+
+**Your Role:**
+Act as a strict technical auditor (software QA + Notion API compliance expert).
+
+Rules: Do not invent features. Evaluate only what is here. Cross-check all claims. Rate severity of issues.
+
+
+## Project Context (Delivered Build: v3.7.4 — API Max Patch)
+
+Legacy Concierge – Full Bundle v3.6.0
+
+What this bundle does
+- Creates all pages from split YAML with icons, descriptions, disclaimers.
+- Adds collapsed, step-by-step "⚠️ Setup Helper" toggles for manual actions (nesting, DB views, icons).
+- Creates the unified "Setup & Acceptance" database and seeds Acceptance rows for every page & subpage with realistic time estimates.
+- Creates content databases (Accounts, Property, Insurance, Contacts, Subscriptions, Keepsakes, Letters Index) and seeds example rows.
+- Generates Letters as subpages with sample bodies.
+- Adds a Release Notes page with full version history.
+- Writes a live Rollout Summary (section subtotals + total time).
+
+How to run
+1) pip install -r deploy/requirements.txt
+2) cp deploy/.env.example .env
+3) Set NOTION_TOKEN and NOTION_PARENT_PAGEID (and optionally ICON_BASE_URL for hosted icons)
+4) Preview: python deploy/deploy_v3_5.py --dir split_yaml --dry-run
+5) Deploy:  python deploy/deploy_v3_5.py --dir split_yaml --deploy
+6) Update:  python deploy/deploy_v3_5.py --dir split_yaml --update
+
+Notes
+- Notion API cannot create saved views; the script adds hub-level helper toggles with exact steps to add them manually.
+- Manual nesting: pages are created under the provided parent; helper toggles instruct you to drag them into their hubs.
+- Delete helpers once complete—rows auto-flip to Done in the unified DB on the next --update.
+
+v3.6.1 (no new features — gap closure)
+- Restored helper upsert + auto-Done and live DB-driven Rollout (regression fix from 3.5.9).
+- Added hub saved-view helper toggles to each hub (manual steps, collapsed).
+- Expanded page inventory (~100+ with executor tasks, digital assets guides, agency guides).
+- Introduced centralized copy registry (00_copy_registry.yaml); pages can reference by slug.
+- Expanded letters catalog (SSA, IRS, DMV, USPS, mortgage, landlord/HOA, pension/401k, brokerage, credit bureaus) + QR pack cover letters.
+- Beefed up DB seeds with more varied examples.
+- Refined time estimates for specific page types (digital assets, executor tasks, guides, QR pages).
+- Moved Release Notes into an Admin branch (“Admin – Release Notes”).
+
+v3.6.2 (gap-closure, no new features)
+- Compassionate, page-specific helper instructions across the template.
+- Acceptance rows carry unique checks and refined time estimates.
+- Letters pages include draft + disclaimer + AI prompt.
+- Legal sample documents include structured sections + disclaimers + AI prompt.
+- Tailored DB helper pages created; acceptance items added for each.
+- Admin branch completed with Rollout Cockpit and Diagnostics.
+- Emoji icons preserved; optional hosted icon filenames supported via ICON_BASE_URL.
+
+v3.6.3 Visual Cohesion Patch
+- Bundled semantic-named placeholder assets in /assets/icons and /assets/covers (SVG).
+- YAML references these filenames via icon_file / cover_file.
+- IMPORTANT: Notion API requires public URLs for icons/covers. Set ASSET_BASE_URL (or ICON_BASE_URL) to the public folder where you host /assets/ so the deployer can attach them.
+  - Example: ASSET_BASE_URL=https://yourdomain.com/notion-assets
+  - Then /assets/icons/preparation-hub-icon.svg will resolve to https://yourdomain.com/notion-assets/assets/icons/preparation-hub-icon.svg
+- Until you host assets, emoji icons remain the fallback, and covers may remain default.
+
+v3.7.0 Ultra-Premium UX Patch
+- Start Here and Welcome dashboards added (no fake data).
+- Hub pages transformed into dashboards with section links and guidance.
+- Back-to-Hub and Next-step navigation links added to all child pages.
+- Database seed rows removed entirely (no stubs or fake entries).
+- Letters/legal content written as real, generic drafts with instructions, no dummy names/numbers.
+- Callouts aligned by role (Executor blue, Family peach, Owner teal) where applicable.
+
+v3.7.1 User-Facing UI Polish
+- Start Here & Hubs converted to card/tile dashboards (role-colored callouts in columns).
+- Universal navigation: Back-to-Hub and Next Step on all subpages (including letters/legal).
+- Role color alignment inside pages (executor blue, family peach, preparation teal/gray).
+- Progress summaries added to hubs (with helper on how to view Pending).
+- First-run checklist embedded in Start Here.
+- Keepsakes structured (Photos, Stories, Letters) with gentle prompts.
+- Legal & Letters pages reformatted for skimmability (Purpose, Draft toggle, Disclaimer callout).
+- Accessibility captions under tiles.
+- Naming & slugs standardized across extended pages.
+- PNG icons/covers generated for maximum reliability; YAML points to PNG by default.
+
+v3.7.2 Premium UI Patch (user-facing)
+- Start Here & Hubs now true dashboards: card grids, dividers, captions, mobile notes, top-nav row.
+- Global Quick Jump not a separate page (kept simple): hub top-nav links + Start Here grid cover all flows.
+- Hero block added to every user page (no duplicates on rerun).
+- Letters & Legal: long draft/sample sections moved under collapsible toggles.
+- Brand accents via role-colored callouts; strict heading hierarchy.
+- Emotional completion cue appears during `--update` when Acceptance row flips to Done.
+- Admin 'Final UI Checklist' page added (deletable).
+
+v3.7.3 (DB Seeds – Real Project Data)
+- Seeded all available databases with durable, project-relevant entries (no demo names).
+- Accounts, Property, Insurance, Contacts, Subscriptions, Keepsakes, Letters Index now deploy ready-to-use.
+- Acceptance rows remain in zz_acceptance_rows.yaml and mirror the page tree.
+
+v3.7.3a Brokerage Details Patch
+- Accounts DB: replaced generic 'Brokerage Accounts' with detailed, durable entries:
+  • Brokerage – Taxable (Individual), Brokerage – Taxable (Joint),
+  • Brokerage – Traditional IRA, Brokerage – Roth IRA,
+  • Brokerage – 529 College Savings
+  Each row includes concrete next steps (DTC forms, beneficiary/TOD, cost basis, medallion).
+- Letters Index DB: added 'Letter – Brokerage Firms' category.
+
+v3.7.4 API Max Patch
+- Relations from DB rows to related subpages (title-matched) now auto-populate.
+- Acceptance DB 'Check' formula shows ✅ when Status = Done.
+- Rich-text seeds (italic/gray) used for Notes to improve scannability.
+- Multi-select defaults across Accounts, Insurance, Subscriptions, Contacts, Keepsakes, Letters Index.
+- Synced blocks: master disclaimers/helpers page added; synced copies placed on Legal, Letters, Executor.
+
+
+
+## deploy/deploy_v3_5.py (full)
+```python
+
+# deploy_v3_5.py — v3.6.0
+# - Creates pages (with icons, covers, descriptions, disclaimers)
+# - Adds collapsed "⚠️ Setup Helper" toggles where manual steps are needed
+# - Creates unified "Setup & Acceptance" DB; seeds Acceptance rows from YAML; tracks Helpers
+# - Creates content databases from YAML (schemas + seed_rows)
+# - Creates Letters subpages from YAML
+# - Creates "Release Notes" page from YAML content
+# - Rollout Summary shows live totals from unified DB
+#
+# Usage:
+#   python deploy/deploy_v3_5.py --dir split_yaml --dry-run
+#   python deploy/deploy_v3_5.py --dir split_yaml --deploy
+#   python deploy/deploy_v3_5.py --dir split_yaml --update
+
+import os, sys, json, time
+import requests
+
+NOTION_TOKEN = os.getenv("NOTION_TOKEN")
+ICON_BASE_URL = os.getenv("ICON_BASE_URL")
+HELPER_TEXT = "⚠️ Setup Helper:"
+
+def req(method, url, data=None):
+    headers = {
+        "Authorization": f"Bearer {NOTION_TOKEN}",
+        "Notion-Version": "2022-06-28",
+        "Content-Type": "application/json"
+    }
+    for attempt in range(3):
+        r = requests.request(method, url, headers=headers, data=data)
+        if r.status_code in (429, 500, 502, 503):
+            time.sleep(1.5 * (attempt + 1))
+            continue
+        return r
+    return r
+
+
+def load_copy_registry(dir_path):
+    import yaml, os
+    reg = {}
+    fp = os.path.join(dir_path, "00_copy_registry.yaml")
+    if os.path.exists(fp):
+        d = yaml.safe_load(open(fp, "r", encoding="utf-8")) or {}
+        reg = d.get("copy_registry") or {}
+    return reg
+
+def load_split_yaml(dir_path):
+    import yaml, os
+    merged = {"pages":[], "letters":[], "db":{"schemas":{}}, "acceptance":{"rows":[]}, "release_notes":""}
+    for name in sorted(os.listdir(dir_path)):
+        if not name.endswith(".yaml"): continue
+        with open(os.path.join(dir_path, name), "r", encoding="utf-8") as f:
+            y = yaml.safe_load(f) or {}
+        for k,v in y.items():
+            if k == "pages":
+                merged["pages"].extend(v or [])
+            elif k == "letters":
+                merged["letters"].extend(v or [])
+            elif k == "db":
+                merged["db"]["schemas"].update((v or {}).get("schemas") or {})
+            elif k == "acceptance":
+                merged["acceptance"]["rows"].extend((v or {}).get("rows") or [])
+            elif k == "release_notes":
+                merged["release_notes"] = v or merged["release_notes"]
+    return merged
+
+def helper_toggle(summary_text, steps):
+    toggle = {"object":"block","type":"toggle","toggle":{"rich_text":[{"type":"text","text":{"content":f"{HELPER_TEXT} {summary_text}"}}],"children":[]}}
+    for i,s in enumerate(steps, start=1):
+        toggle["toggle"]["children"].append({"object":"block","type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":f"{i}. {s}"}}]}})
+    toggle["toggle"]["children"].append({"object":"block","type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"Delete this helper once complete."}}]}})
+    return toggle
+
+def build_nesting_helper(parent_title):
+    return helper_toggle(f"Move this page under “{parent_title}” (manual)",
+                         ["Open Notion’s left sidebar.",
+                          f"Locate this page and drag it into “{parent_title}”.",
+                          "Drop so it appears indented under the correct section.",
+                          "Verify the new position in the sidebar."])
+
+def build_db_setup_helper(db_name):
+    return helper_toggle(f"Set up database views & templates for “{db_name}” (manual)",
+                         ["Open the database in full-page view.",
+                          "Add a Table view (default) and show key properties.",
+                          "Add a Board view grouped by Status (or another useful property).",
+                          "Add a Timeline view if you plan to use dates.",
+                          "Create a Page Template with the fields users should fill for new entries."])
+
+def build_icon_hosting_helper():
+    return helper_toggle("Host premium icons and set ICON_BASE_URL in .env",
+                         ["Upload the diamond icons to a public host (e.g., GitHub Pages, S3, Cloudflare).",
+                          "Copy the base URL for the icon directory.",
+                          "In your .env, set ICON_BASE_URL to that base URL.",
+                          "Re-run the deploy script with --update to refresh icons."])
+
+def page_url(page_id):
+    r = req("GET", f"https://api.notion.com/v1/pages/{page_id}")
+    if r.status_code in (200,201):
+        return r.json().get("url")
+    return None
+
+def children_have_helper(page_id):
+    r = req("GET", f"https://api.notion.com/v1/blocks/{page_id}/children?page_size=100")
+    if r.status_code not in (200,201): return False
+    for b in r.json().get("results", []):
+        if "toggle" in b:
+            rich = b["toggle"].get("rich_text", [])
+            txt = "".join([t.get("text",{}).get("content","") for t in rich if t.get("type")=="text"])
+            if HELPER_TEXT in txt: return True
+        if "paragraph" in b:
+            rich = b["paragraph"].get("rich_text", [])
+            txt = "".join([t.get("text",{}).get("content","") for t in rich if t.get("type")=="text"])
+            if HELPER_TEXT in txt: return True
+    return False
+
+# Unified DB
+SETUP_DB_TITLE = "Setup & Acceptance"
+def ensure_setup_db(state, parent):
+    if state.get("setup_db_id"): return state["setup_db_id"]
+    props = {
+        "Page": {"title": {}},
+        "Role": {"select": {"options":[{"name":"owner"},{"name":"executor"},{"name":"family"}]}},
+        "Type": {"select": {"options":[{"name":"Helper"},{"name":"Acceptance"}]}},
+        "Check": {"rich_text": {}},
+        "Status": {"select": {"options":[{"name":"Pending"},{"name":"Done"}]}},
+        "Est. Time": {"number": {"format":"number"}},
+        "Section": {"select": {"options":[]}},
+        "PageURL": {"url": {}},
+        "PageID": {"rich_text": {}}
+    }
+    r = req("POST","https://api.notion.com/v1/databases",
+            data=json.dumps({"parent":{"type":"page_id","page_id":parent},
+                             "title":[{"type":"text","text":{"content":SETUP_DB_TITLE}}],
+                             "properties": props}))
+    if r.status_code not in (200,201):
+        print("ERROR creating Setup & Acceptance DB", r.text); sys.exit(1)
+    dbid = r.json()["id"]
+    state["setup_db_id"] = dbid
+    return dbid
+
+def db_query(dbid, filter_obj=None):
+    payload = {}
+    if filter_obj:
+        payload["filter"] = filter_obj
+    r = req("POST", f"https://api.notion.com/v1/databases/{dbid}/query", data=json.dumps(payload))
+    if r.status_code in (200,201):
+        return r.json().get("results", [])
+    return []
+
+def setup_row_find(dbid, page_title, rtype, check_text=None):
+    flt = {"and":[
+        {"property":"Page","title":{"equals": page_title}},
+        {"property":"Type","select":{"equals": rtype}}
+    ]}
+    if check_text:
+        flt["and"].append({"property":"Check","rich_text":{"equals": check_text}})
+    return db_query(dbid, flt)
+
+def patch_setup_row(row_id, props):
+    r = req("PATCH", f"https://api.notion.com/v1/pages/{row_id}", data=json.dumps({"properties": props}))
+    return r.status_code in (200,201)
+
+def setup_db_add_row(dbid, page_title, role, rtype, check, status, est_minutes=None, section=None, page_url_val=None, page_id=None, state=None):
+    key = f"{page_title}::{rtype}::{check}"
+    if state is None: state = {}
+    seen = state.get("setup_rows", [])
+    if key in seen: return False
+    props = {
+        "Page": {"title":[{"type":"text","text":{"content":page_title}}]},
+        "Role": {"select":{"name": role}},
+        "Type": {"select":{"name": rtype}},
+        "Check": {"rich_text":[{"type":"text","text":{"content": check}}]},
+        "Status": {"select":{"name": status}},
+        "PageID": {"rich_text":[{"type":"text","text":{"content": page_id or ""}}]}
+    }
+    if est_minutes is not None:
+        props["Est. Time"] = {"number": float(est_minutes)}
+    if section:
+        props["Section"] = {"select":{"name": section}}
+    if page_url_val:
+        props["PageURL"] = {"url": page_url_val}
+    resp = req("POST","https://api.notion.com/v1/pages", data=json.dumps({"parent":{"type":"database_id","database_id":dbid},"properties":props}))
+    if resp.status_code in (200,201):
+        seen.append(key); state["setup_rows"]=seen; return True
+    return False
+
+# Page & DB creation
+def resolve_icon(spec, filename=None):
+    # Prefer hosted filename if provided
+    base = os.getenv("ASSET_BASE_URL") or os.getenv("ICON_BASE_URL")
+    if filename and base:
+        return {"type":"external","external":{"url": base.rstrip('/') + '/' + filename}}
+    # Emoji fallback
+    if isinstance(spec, str) and spec.startswith("emoji:"):
+        return {"type":"emoji","emoji": spec.replace("emoji:","",1)}
+    # Direct url
+    if isinstance(spec, str) and spec.startswith("http"):
+        return {"type":"external","external":{"url": spec}}
+    return None
+    if isinstance(spec, str) and spec.startswith("emoji:"):
+        return {"type":"emoji","emoji": spec.replace("emoji:","",1)}
+    if isinstance(spec, str) and spec.startswith("http"):
+        return {"type":"external","external":{"url": spec}}
+    if isinstance(spec, str) and ICON_BASE_URL:
+        return {"type":"external","external":{"url": ICON_BASE_URL.rstrip('/') + '/' + spec}}
+    return None
+
+def create_page(parent_id, title, icon=None, cover=None, description=None, disclaimer=None, helper=None, icon_file=None, cover_file=None, icon_png=None, cover_png=None):
+    props = {"title":{"title":[{"type":"text","text":{"content":title}}]}}
+    payload = {"parent":{"type":"page_id","page_id":parent_id},"properties":props}
+    if icon_png:
+        icon = resolve_icon(icon, filename=icon_png)
+    elif icon_file:
+        icon = resolve_icon(icon, filename=icon_file)
+    if icon: payload["icon"]=icon
+    if cover_png:
+        c_url = resolve_cover(cover_png)
+    elif cover_file:
+        c_url = resolve_cover(cover_file)
+        if c_url:
+            payload["cover"]={"type":"external","external":{"url": c_url}}
+    elif cover:
+        payload["cover"]={"type":"external","external":{"url": cover}}
+    r = req("POST","https://api.notion.com/v1/pages", data=json.dumps(payload))
+    if r.status_code not in (200,201):
+        print("ERROR creating page", title, r.text); return None
+    pid = r.json()["id"]
+    blocks = []
+    if description:
+        blocks.append({"object":"block","type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":description}}]}})
+    if disclaimer:
+        blocks.append({"object":"block","type":"callout","callout":{"icon":{"type":"emoji","emoji":"ℹ️"},"rich_text":[{"type":"text","text":{"content":disclaimer}}]}})
+    if helper:
+        if isinstance(helper, dict):
+            if helper.get("type")=="nesting" and helper.get("parent"):
+                blocks.append(build_nesting_helper(helper["parent"]))
+            elif helper.get("type")=="db_setup" and helper.get("db"):
+                blocks.append(build_db_setup_helper(helper["db"]))
+            elif helper.get("type")=="icons":
+                blocks.append(build_icon_hosting_helper())
+        else:
+            blocks.append(helper_toggle(str(helper), ["Please complete this step."]))
+    if blocks:
+        req("PATCH", f"https://api.notion.com/v1/blocks/{pid}/children", data=json.dumps({"children":blocks}))
+    return pid
+
+def create_database(parent_id, title, schema):
+    props = {}
+    # Minimal type mapping
+    for name, t in (schema.get("properties") or {}).items():
+        if t=="title": props[name]={"title":{}}
+        elif t=="text": props[name]={"rich_text":{}}
+        elif t=="number": props[name]={"number":{"format":"number"}}
+        elif t=="select": props[name]={"select":{"options":[{"name":"Pending"},{"name":"Done"}]}}
+        elif t=="multi_select": props[name]={"multi_select":{"options":[]}}
+        elif t=="date": props[name]={"date":{}}
+        elif t=="url": props[name]={"url":{}}
+        else: props[name]={"rich_text":{}}
+    payload = {"parent":{"type":"page_id","page_id":parent_id},"title":[{"type":"text","text":{"content":title}}],"properties":props}
+    r = req("POST","https://api.notion.com/v1/databases", data=json.dumps(payload))
+    if r.status_code not in (200,201):
+        print("ERROR creating DB", title, r.text); return None
+    return r.json()["id"]
+
+def insert_db_rows(dbid, rows):
+    for row in rows or []:
+        props={}
+        for k,v in row.items():
+            if isinstance(v,(int,float)):
+                props[k]={"number": float(v)}
+            elif isinstance(v,str) and v.startswith("http"):
+                props[k]={"url": v}
+            elif isinstance(v,str):
+                props[k]={"rich_text":[{"type":"text","text":{"content":v}}]}
+            elif isinstance(v,dict) and v.get("_select"):
+                props[k]={"select":{"name": v["_select"]}}
+            else:
+                props[k]={"rich_text":[{"type":"text","text":{"content":str(v)}}]}
+        req("POST","https://api.notion.com/v1/pages", data=json.dumps({"parent":{"type":"database_id","database_id":dbid},"properties":props}))
+
+def main():
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--dir", default="split_yaml")
+    ap.add_argument("--deploy", action="store_true")
+    ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--update", action="store_true")
+    args = ap.parse_args()
+
+    merged = load_split_yaml(args.dir)
+
+    copy_registry = load_copy_registry(args.dir)
+
+    parent = os.getenv("NOTION_PARENT_PAGEID")
+    print("Preflight:")
+    print(f"  NOTION_TOKEN: {'set' if bool(NOTION_TOKEN) else 'MISSING'}")
+    print(f"  Parent page ID: {parent[:6] + '...' if parent else 'ASKING'}")
+    print(f"  ICON_BASE_URL: {ICON_BASE_URL if ICON_BASE_URL else '(emoji fallback)'}")
+    if not NOTION_TOKEN:
+        print("ERROR: NOTION_TOKEN missing"); sys.exit(1)
+    if not parent:
+        parent = input("Enter top-level Notion page ID to deploy under: ").strip()
+
+    state={"pages":{}, "setup_rows":[]}
+    setup_db_id = ensure_setup_db(state, parent)
+
+    # Create pages
+    change_plan = []
+    for p in merged.get("pages", []):
+        title = p.get("title"); icon = resolve_icon(p.get("icon")); cover=p.get("cover")
+        desc=p.get("description"); disc=p.get("disclaimer"); slug=p.get("slug")
+        if slug and slug in copy_registry:
+            override = copy_registry[slug]
+            desc = override.get("description", desc)
+            disc = override.get("disclaimer", disc)
+        parent_title = p.get("parent")
+        helper = {"type":"nesting","parent": parent_title} if parent_title else None
+        change_plan.append(f"PAGE: {title} (parent: {parent_title or 'Top Level'})")
+        if args.dry_run: continue
+        pid = create_page(parent, title, icon, cover, desc, disc, helper, p.get("icon_file"), p.get("cover_file"), p.get("icon_png"), p.get("cover_png"))
+        if pid: state["pages"][title]=pid
+    # Add legal sample content where applicable
+    if pid and title and ("Sample" in title or "Advance Directive" in title):
+        sample_blocks=[
+            {"object":"block","type":"callout","callout":{"icon":{"type":"emoji","emoji":"⚖️"},"rich_text":[{"type":"text","text":{"content":"Sample text for planning conversations — not a valid legal document."}}]}},
+            {"object":"block","type":"heading_2","heading_2":{"rich_text":[{"type":"text","text":{"content":"Purpose"}}]}},
+            {"object":"block","type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"This sample outlines common sections you may discuss with your attorney. Adapt thoughtfully."}}]}},
+            {"object":"block","type":"heading_2","heading_2":{"rich_text":[{"type":"text","text":{"content":"Key Sections"}}]}},
+            {"object":"block","type":"bulleted_list_item","bulleted_list_item":{"rich_text":[{"type":"text","text":{"content":"Identification and intent"}}]}},
+            {"object":"block","type":"bulleted_list_item","bulleted_list_item":{"rich_text":[{"type":"text","text":{"content":"Health care preferences (comfort, interventions, pain management)"}}]}},
+            {"object":"block","type":"bulleted_list_item","bulleted_list_item":{"rich_text":[{"type":"text","text":{"content":"Agents/decision-makers and alternates"}}]}},
+            {"object":"block","type":"bulleted_list_item","bulleted_list_item":{"rich_text":[{"type":"text","text":{"content":"Signatures, witnesses, and notarization as required"}}]}},
+            {"object":"block","type":"heading_2","heading_2":{"rich_text":[{"type":"text","text":{"content":"AI Prompt"}}]}},
+            {"object":"block","type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"Draft a more detailed sample using the sections above. Keep language clear and compassionate. Mark clearly as 'Sample, not legal advice'."}}]}},
+        ]
+        req("PATCH", f"https://api.notion.com/v1/blocks/{pid}/children", data=json.dumps({"children":sample_blocks}))
+
+
+    # Create content databases
+    for db_name, schema in (merged.get("db") or {}).get("schemas", {}).items():
+        change_plan.append(f"DB: {db_name}")
+        if args.dry_run: continue
+        dbid = create_database(parent, db_name, schema)
+        if dbid:
+            pass
+
+
+    # --- Build Start Here, Welcome, Hub dashboards, and Back/Next navigation ---
+    hubs = ["Preparation Hub","Executor Hub","Family Hub"]
+    hub_ids = {t: state["pages"].get(t) for t in hubs if state["pages"].get(t)}
+
+    # START HERE
+    start_pid = create_page(parent, "Start Here", resolve_icon("emoji:🌟"), None,
+                            "Begin here. Choose the path that fits what you need right now.", None, None)
+    if start_pid:
+        # Mobile tip
+        start_mobile=[{"object":"block","type":"callout","callout":{"icon":{"type":"emoji","emoji":"📱"},"rich_text":[{"type":"text","text":{"content":"On mobile, cards stack vertically. Scroll to view all options."}}],"color":"gray_background"}}]
+        req("PATCH", f"https://api.notion.com/v1/blocks/{start_pid}/children", data=json.dumps({"children":start_mobile}))
+        # Card grid to hubs
+        items=[]
+        for hub in hubs:
+            hid=hub_ids.get(hub)
+            if not hid: continue
+            role = "executor" if hub=="Executor Hub" else ("family" if hub=="Family Hub" else "owner")
+            items.append({"title": hub, "subtitle": f"Go to {hub.lower()}.", "page_id": hid, "role": role})
+        grid = grid_cards(items, cols=3)
+        req("PATCH", f"https://api.notion.com/v1/blocks/{start_pid}/children", data=json.dumps({"children":grid}))
+
+    # WELCOME
+    welcome_pid = create_page(parent, "Welcome", resolve_icon("emoji:🤝"), None,
+                              "You’re in the right place. This workspace helps you prepare, guide your executor, and support family.", None, None)
+    if welcome_pid and start_pid:
+        welcome_blocks=[
+            {"object":"block","type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"Take it one section at a time. There’s no rush."}}]}},
+            {"object":"block","type":"link_to_page","link_to_page":{"type":"page_id","page_id":start_pid}},
+            helper_toggle("Delete this Welcome page when it’s served its purpose.", ["Open the ••• menu → Delete.", "This page is optional."])
+        ]
+        req("PATCH", f"https://api.notion.com/v1/blocks/{welcome_pid}/children", data=json.dumps({"children":welcome_blocks}))
+
+    # HUBS
+    pages_by_parent = {}
+    for p in merged.get("pages", []):
+        pr = p.get("parent")
+        if pr:
+            pages_by_parent.setdefault(pr, []).append(p.get("title"))
+    for hub, hid in hub_ids.items():
+        children_titles = pages_by_parent.get(hub, [])
+        # Brand stripe
+        stripe=[{"object":"block","type":"divider","divider":{}}]
+        req("PATCH", f"https://api.notion.com/v1/blocks/{hid}/children", data=json.dumps({"children":stripe}))
+        # Top nav row across hubs
+        add_top_nav_row(hub_ids, hid)
+        # Grid of section cards
+        items=[]
+        for t in children_titles:
+            pidc = state["pages"].get(t)
+            if not pidc: continue
+            role = "owner" if hub=="Preparation Hub" else ("executor" if hub=="Executor Hub" else "family")
+            items.append({"title": t, "subtitle": None, "page_id": pidc, "role": role})
+        grid = grid_cards(items, cols=3)
+        # Mobile tip
+        mobile=[{"object":"block","type":"callout","callout":{"icon":{"type":"emoji","emoji":"📱"},"rich_text":[{"type":"text","text":{"content":"On mobile, these cards appear in a single column."}}],"color":"gray_background"}}]
+        req("PATCH", f"https://api.notion.com/v1/blocks/{hid}/children", data=json.dumps({"children":grid + mobile}))
+    # Synced library
+    try:
+        lib_id, sync_map = create_synced_library(parent)
+        if lib_id:
+            add_synced_to_pages(state, sync_map)
+    except Exception:
+        pass
+
+    # UNIVERSAL NAV
+    order_by_parent = {}
+    for p in merged.get("pages", []):
+        if p.get("parent"):
+            order_by_parent.setdefault(p["parent"], []).append(p["title"])
+    for parent_title, titles in order_by_parent.items():
+        for idx, tt in enumerate(titles):
+            pidc = state["pages"].get(tt)
+            if not pidc: continue
+            blocks=[]
+            hub_id = state["pages"].get(parent_title)
+            if hub_id and not has_marker(pidc, parent_title):
+                blocks.append({"object":"block","type":"link_to_page","link_to_page":{"type":"page_id","page_id":hub_id}})
+            if idx+1 < len(titles):
+                next_pid = state["pages"].get(titles[idx+1])
+                if next_pid and not has_marker(pidc, "Next step"):
+                    blocks.append({"object":"block","type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"Next step →"}}]}})
+                    blocks.append({"object":"block","type":"link_to_page","link_to_page":{"type":"page_id","page_id":next_pid}})
+            if blocks:
+                req("PATCH", f"https://api.notion.com/v1/blocks/{pidc}/children", data=json.dumps({"children":blocks}))
+
+    # HERO ON ALL PAGES
+    ensure_hero_for_all(state, merged, pages_by_parent)
+
+    # QR PORTALS
+    for title in ["QR – Family Essentials","QR – Full Access for Executor"]:
+        pidq = state["pages"].get(title)
+        if not pidq: continue
+        if not has_marker(pidq, "Scan this code to access"):
+            portal=[{"object":"block","type":"callout","callout":{"icon":{"type":"emoji","emoji":"🔗"},"rich_text":[{"type":"text","text":{"content":"Scan this code to access everything you need."}}],"color":"gray_background"}},{"object":"block","type":"divider","divider":{}}]
+            req("PATCH", f"https://api.notion.com/v1/blocks/{pidq}/children", data=json.dumps({"children":portal}))
+
+    # KEEPSAKES STRUCTURE
+    kid = state["pages"].get("Memories & Keepsakes")
+    if kid and not has_marker(kid, "Photos"):
+        keeps=[
+            {"object":"block","type":"heading_2","heading_2":{"rich_text":[{"type":"text","text":{"content":"Photos"}}]}},
+            {"object":"block","type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"Add a favorite photo here and a short caption."}}]}},
+            {"object":"block","type":"heading_2","heading_2":{"rich_text":[{"type":"text","text":{"content":"Stories"}}]}},
+            {"object":"block","type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"Write a memory that matters — a moment, a lesson, a laugh."}}]}},
+            {"object":"block","type":"heading_2","heading_2":{"rich_text":[{"type":"text","text":{"content":"Letters"}}]}},
+            {"object":"block","type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"If you’d like, add a note for someone special."}}]}}
+        ]
+        req("PATCH", f"https://api.notion.com/v1/blocks/{kid}/children", data=json.dumps({"children":keeps}))
+    # End UX polish
+
+    kid = state["pages"].get("Memories & Keepsakes")
+    if kid:
+        keeps=[
+            {"object":"block","type":"heading_2","heading_2":{"rich_text":[{"type":"text","text":{"content":"Photos"}}]}},
+            {"object":"block","type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"Add a favorite photo here and a short caption."}}]}},
+            {"object":"block","type":"heading_2","heading_2":{"rich_text":[{"type":"text","text":{"content":"Stories"}}]}},
+            {"object":"block","type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"Write a memory that matters — a moment, a lesson, a laugh."}}]}},
+            {"object":"block","type":"heading_2","heading_2":{"rich_text":[{"type":"text","text":{"content":"Letters"}}]}},
+            {"object":"block","type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"If you’d like, add a note for someone special."}}]}}
+        ]
+        req("PATCH", f"https://api.notion.com/v1/blocks/{kid}/children", data=json.dumps({"children":keeps}))
+    # --- End UX polish ---
+    # Letters as subpages
+
+    for L in merged.get("letters", []):
+        title = f"Letter — {L.get('Title','Untitled')}"
+        body = L.get("Body","")
+        desc = "This draft letter is provided to help you start; personalize details before sending."
+        parent_title = "Letters"
+        change_plan.append(f"LETTER: {title} (parent: {parent_title})")
+        if args.dry_run: continue
+        pid = create_page(parent, title, resolve_icon("emoji:✉️"), None, desc, None, {"type":"nesting","parent":parent_title})
+        if pid and body:
+            blocks=[
+                {"object":"block","type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":body}}]}},
+                {"object":"block","type":"callout","callout":{"icon":{"type":"emoji","emoji":"ℹ️"},"rich_text":[{"type":"text","text":{"content":"This is a suggested draft, not legal advice. Confirm requirements for the recipient."}}]}},
+                {"object":"block","type":"heading_3","heading_3":{"rich_text":[{"type":"text","text":{"content":"AI Prompt"}}]}},
+                {"object":"block","type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"Please refine the letter above using the facts from this page. Keep the tone respectful, factual, and concise."}}]}}
+            ]
+            req("PATCH", f"https://api.notion.com/v1/blocks/{pid}/children", data=json.dumps({"children":blocks}))
+
+    # Release Notes page
+    rn = merged.get("release_notes")
+    if rn:
+        change_plan.append("PAGE: Release Notes (Admin)")
+        if not args.dry_run:
+            pid = create_page(parent, "Admin – Release Notes", resolve_icon("emoji:🗒️"), None, None, None, None)
+            # Add content paragraphs
+            blocks=[]
+            for line in rn.splitlines():
+                blocks.append({"object":"block","type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":line}}]}})
+            if pid: req("PATCH", f"https://api.notion.com/v1/blocks/{pid}/children", data=json.dumps({"children":blocks}))
+
+    
+    # --- Unified Setup & Acceptance population (upsert) ---
+    def upsert_helper_row(title, intended_parent, pid):
+        section = intended_parent or "Top Level"
+        url = page_url(pid)
+        check_text = f"Move under “{intended_parent}”" if intended_parent else "Complete manual step"
+        existing = setup_row_find(setup_db_id, title, "Helper", check_text)
+        has_helper = children_have_helper(pid)
+        status = "Pending" if has_helper else "Done"
+        props = {"Status":{"select":{"name": status}}, "Section":{"select":{"name": section}}}
+        if url: props["PageURL"] = {"url": url}
+        if existing:
+            for row in existing: patch_setup_row(row["id"], props)
+        else:
+            setup_db_add_row(setup_db_id, title, "owner", "Helper", check_text, status, est_minutes=5, section=section, page_url_val=url, page_id=pid, state=state)
+
+    def upsert_acceptance_row(title, role, check, status, section, pid, est):
+        url = page_url(pid) if pid else None
+        existing = setup_row_find(setup_db_id, title, "Acceptance", check)
+        props = {"Status":{"select":{"name": status}}, "Section":{"select":{"name": section or 'Top Level'}}}
+        if url: props["PageURL"] = {"url": url}
+        if existing:
+            for row in existing: patch_setup_row(row["id"], props)
+        else:
+            setup_db_add_row(setup_db_id, title, role, "Acceptance", check, status, est_minutes=est, section=section, page_url_val=url, page_id=pid, state=state)
+
+    # Helpers (one per page that has nesting intent)
+    for p in merged.get("pages", []):
+        intended_parent = p.get("parent")
+        title = p.get("title")
+        pid = state["pages"].get(title)
+        if intended_parent and pid:
+            upsert_helper_row(title, intended_parent, pid)
+
+    # Acceptance rows from YAML
+    acc_rows = (merged.get("acceptance") or {}).get("rows") or []
+    for r in acc_rows:
+        title=r.get("Page"); role=r.get("Role","owner"); check=r.get("Check","Finalize this page")
+        status=r.get("Status","Pending"); section=r.get("Section") or r.get("Parent") or "Top Level"
+        est=r.get("Est. Time (min)") or None
+        pid=state["pages"].get(title)
+        upsert_acceptance_row(title, role, check, status, section, pid, est)
+
+    # Build Rollout Summary from live DB (Pending only)
+    pendings = db_query(setup_db_id, {"property":"Status","select":{"equals":"Pending"}})
+    section_counts={}
+    for row in pendings:
+        props=row.get("properties",{})
+        sec=(props.get("Section",{}).get("select",{}) or {}).get("name") or "(Unassigned)"
+        minutes=props.get("Est. Time",{}).get("number") or 5
+        section_counts.setdefault(sec,{"pending":0,"minutes":0})
+        section_counts[sec]["pending"]+=1
+        section_counts[sec]["minutes"]+=float(minutes)
+    total_pending=sum(v["pending"] for v in section_counts.values())
+    total_minutes=sum(v["minutes"] for v in section_counts.values())
+# Write rollout summary onto parent page (top-level)
+    rollout_blocks=[build_icon_hosting_helper()]
+    if section_counts:
+        rollout_blocks.append({"object":"block","type":"heading_2","heading_2":{"rich_text":[{"type":"text","text":{"content":"Section Subtotals"}}]}})
+        for sec,vals in section_counts.items():
+            hrs=int(vals["minutes"]//60); mins=int(vals["minutes"]%60)
+            line=f"{sec}: {vals['pending']} Pending — ~{hrs}h {mins}m remaining"
+            rollout_blocks.append({"object":"block","type":"bulleted_list_item","bulleted_list_item":{"rich_text":[{"type":"text","text":{"content":line}}]}})
+        hrs=int(total_minutes//60); mins=int(total_minutes%60)
+        rollout_blocks.append({"object":"block","type":"heading_3","heading_3":{"rich_text":[{"type":"text","text":{"content":f'Total Remaining: {total_pending} Pending — ~{hrs}h {mins}m'}}]}})
+    req("PATCH", f"https://api.notion.com/v1/blocks/{parent}/children", data=json.dumps({"children":rollout_blocks}))
+    # --- Admin branch pages: Cockpit and Diagnostics ---
+    # Cockpit: instructions + link to Setup & Acceptance
+    cock_pid = create_page(parent, "Admin – Rollout Cockpit", resolve_icon("emoji:🧭"), None,
+                           "Quick access to rollout. Filter by Section, Status=Pending. Group by Type or Role for focus.", None, None)
+    if cock_pid:
+        cock_blocks=[
+            {"object":"block","type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"Use the database below to track progress. Create views in the UI: Pending Only, Quick Wins (<=15m), By Type (Helper vs Acceptance)."}}]}},
+            {"object":"block","type":"heading_3","heading_3":{"rich_text":[{"type":"text","text":{"content":"Setup & Acceptance Database"}}]}},
+            {"object":"block","type":"link_to_page","link_to_page":{"type":"database_id","database_id": setup_db_id}}
+        ]
+        req("PATCH", f"https://api.notion.com/v1/blocks/{cock_pid}/children", data=json.dumps({"children":cock_blocks}))
+
+    # Diagnostics: missing icons/covers + pages still carrying helpers
+    diag_pid = create_page(parent, "Admin – Diagnostics", resolve_icon("emoji:🔍"), None,
+                           "Automatic checks to help you finish setup.", None, None)
+    if diag_pid:
+        issues=[]
+        # Check icons/covers: from YAML
+        for p in merged.get("pages", []):
+            ttl=p.get("title"); ic=p.get("icon"); cov=p.get("cover")
+            if not ic: issues.append(f"Icon missing — {ttl}")
+            if not cov: issues.append(f"Cover missing — {ttl}")
+        # Pages still with helpers
+        for ttl, pid in state["pages"].items():
+            if children_have_helper(pid):
+                issues.append(f"Helper present — {ttl}")
+        if not issues:
+            diag_blocks=[{"object":"block","type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":"No issues detected."}}]}}]
+        else:
+            diag_blocks=[{"object":"block","type":"heading_3","heading_3":{"rich_text":[{"type":"text","text":{"content":"Items to review"}}]}}]
+            for it in issues:
+                diag_blocks.append({"object":"block","type":"bulleted_list_item","bulleted_list_item":{"rich_text":[{"type":"text","text":{"content":it}}]}})
+        req("PATCH", f"https://api.notion.com/v1/blocks/{diag_pid}/children", data=json.dumps({"children":diag_blocks}))
+
+
+    # Hub saved-views helper toggles (API can't create views)
+    hub_titles = set([p.get("parent") for p in merged.get("pages", []) if p.get("parent")])
+    hub_page_ids = {t: state["pages"].get(t) for t in hub_titles if state["pages"].get(t)}
+    hub_helper = helper_toggle(
+        "Create linked views for this section (one-time)",
+        [
+            "Add a linked view of the ‘Setup & Acceptance’ database on this page.",
+            "Filter: Section equals this hub’s name.",
+            "Add a ‘Pending Only’ view: filter Status = Pending.",
+            "Add a ‘Quick Wins’ view: filter Est. Time <= 15.",
+            "Add a ‘By Type’ view: group by Helper vs Acceptance.",
+            "Optional: Add a ‘Timeline’ view if you assign due dates."
+        ]
+    )
+    for hub_title, hub_id in hub_page_ids.items():
+        req("PATCH", f"https://api.notion.com/v1/blocks/{hub_id}/children", data=json.dumps({"children":[hub_helper]}))
+
+    # Print plan
+    print("Change plan:")
+    for line in change_plan:
+        print(" -", line)
+    print(f"Acceptance rows added/updated: {added}")
+
+if __name__ == "__main__":
+    main()
+
+def resolve_cover(filename):
+    # Notion requires a public URL for covers; use ICON_BASE_URL as generic ASSET_BASE_URL if set
+    base = os.getenv("ASSET_BASE_URL") or ICON_BASE_URL
+    if filename and base:
+        return base.rstrip('/') + '/' + filename
+    return None
+
+def role_callout_color(role):
+    r = (role or "").lower()
+    if "executor" in r: return "blue_background"
+    if "family" in r: return "orange_background"
+    if "owner" in r or "preparation" in r: return "gray_background"
+    return "gray_background"
+
+def card_tile(title, subtitle=None, page_id=None, role=None):
+    # Renders a callout 'tile' with link_to_page below it
+    color = role_callout_color(role)
+    blocks = [{
+        "object":"block","type":"callout",
+        "callout":{"icon":{"type":"emoji","emoji":"⬢"},"rich_text":[{"type":"text","text":{"content": title}}],"color": color}
+    }]
+    if subtitle:
+        blocks.append({"object":"block","type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content": subtitle}}]}})
+    if page_id:
+        blocks.append({"object":"block","type":"link_to_page","link_to_page":{"type":"page_id","page_id": page_id}})
+    return blocks
+
+def role_for_page(title, parent_title=None):
+    pt = (parent_title or "").lower()
+    t = (title or "").lower()
+    if "executor" in pt or "executor" in t: return "executor"
+    if "family" in pt or "family" in t: return "family"
+    if "preparation" in pt or t in ["legal documents","financial accounts","property & assets","insurance","subscriptions","letters","memories & keepsakes","contacts","qr codes"]:
+        return "owner"
+    return "owner"
+
+def role_color(role):
+    r=(role or "owner").lower()
+    if r=="executor": return "blue_background"
+    if r=="family": return "orange_background"
+    return "gray_background"
+
+def make_hero_blocks(title, role):
+    return [
+        {"object":"block","type":"callout","callout":{"icon":{"type":"emoji","emoji":"⬢"},"rich_text":[{"type":"text","text":{"content": f"This page helps you with: {title}"}}],"color": role_color(role)}},
+        {"object":"block","type":"divider","divider":{}}
+    ]
+
+def has_marker(pid, text_snippet):
+    # naive scan: get children and see if any text contains snippet
+    try:
+        ch = req("GET", f"https://api.notion.com/v1/blocks/{pid}/children")
+        if not ch or "results" not in ch: return False
+        for b in ch["results"]:
+            # check text-rich blocks
+            for key in ["paragraph","heading_1","heading_2","heading_3","callout","bulleted_list_item","numbered_list_item","to_do","toggle"]:
+                if b.get("type")==key and b[key].get("rich_text"):
+                    txt="".join([t.get("plain_text","") for t in b[key]["rich_text"]])
+                    if text_snippet.lower() in txt.lower(): return True
+    except Exception as e:
+        pass
+    return False
+
+def grid_cards(items, cols=3):
+    # items: list of dicts {title, subtitle, page_id, role}
+    # returns a column_list with cols columns, distributing items round-robin
+    columns=[[] for _ in range(cols)]
+    for i, it in enumerate(items):
+        c=i%cols
+        # each item as a callout tile + link
+        tile={"object":"block","type":"callout","callout":{"icon":{"type":"emoji","emoji":"⬢"},"rich_text":[{"type":"text","text":{"content": it["title"]}}],"color": role_color(it.get("role"))}}
+        columns[c].append(tile)
+        if it.get("subtitle"):
+            columns[c].append({"object":"block","type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content": it["subtitle"]}}]}})
+        if it.get("page_id"):
+            columns[c].append({"object":"block","type":"link_to_page","link_to_page":{"type":"page_id","page_id": it["page_id"]}})
+        # spacer
+        columns[c].append({"object":"block","type":"paragraph","paragraph":{"rich_text":[{"type":"text","text":{"content":" "}}]}})
+    # build column_list
+    col_blocks=[{"object":"block","type":"column","column":{"children":blocks}} for blocks in columns]
+    return [{"object":"block","type":"column_list","column_list":{}}, *col_blocks]
+
+def ensure_hero_for_all(state, merged, pages_by_parent):
+    # add hero to all non-admin pages if not present
+    for p in merged.get("pages", []):
+        title=p.get("title"); pid = state["pages"].get(title); parent=p.get("parent")
+        if not pid: continue
+        if title.startswith("Admin –"): continue
+        if not has_marker(pid, "This page helps you with"):
+            role = role_for_page(title, parent)
+            blocks = make_hero_blocks(title, role)
+            req("PATCH", f"https://api.notion.com/v1/blocks/{pid}/children", data=json.dumps({"children":blocks}))
+
+def add_top_nav_row(hub_id_map, container_pid):
+    # create a 3-column nav row to the hubs
+    cols=[
+        {"title":"Preparation Hub","role":"owner"},
+        {"title":"Executor Hub","role":"executor"},
+        {"title":"Family Hub","role":"family"},
+    ]
+    items=[]
+    for c in cols:
+        hid = hub_id_map.get(c["title"])
+        if hid:
+            items.append({"title": c["title"], "subtitle": None, "page_id": hid, "role": c["role"]})
+    nav = grid_cards(items, cols=3)
+    req("PATCH", f"https://api.notion.com/v1/blocks/{container_pid}/children", data=json.dumps({"children":nav}))
+
+def wrap_long_sections_in_toggle(pid, heading_text):
+    # search for a heading and wrap the following paragraph(s) into a toggle-like block by adding a toggle header
+    try:
+        ch = req("GET", f"https://api.notion.com/v1/blocks/{pid}/children")
+        found=False
+        for b in ch.get("results", []):
+            if b.get("type") in ["heading_2","heading_3"]:
+                rt=b[b["type"]].get("rich_text",[])
+                txt="".join([t.get("plain_text","") for t in rt])
+                if heading_text.lower() in txt.lower():
+                    found=True; break
+        if found and not has_marker(pid, "Draft (open to view)"):
+            toggle=[{"object":"block","type":"toggle","toggle":{"rich_text":[{"type":"text","text":{"content": "Draft (open to view)"}}]}}]
+            req("PATCH", f"https://api.notion.com/v1/blocks/{pid}/children", data=json.dumps({"children":toggle}))
+    except Exception:
+        pass
+
+def add_completion_cue_if_done(setup_db_id, state):
+    # When running update, read Setup DB for pages with Status=Done and add a gentle checkmark callout
+    try:
+        if not setup_db_id: return
+        q={"filter":{"property":"Status","select":{"equals":"Done"}}}
+        data=req("POST", f"https://api.notion.com/v1/databases/{setup_db_id}/query", data=json.dumps(q))
+        if not data or "results" not in data: return
+        done_titles=set()
+        for row in data["results"]:
+            props=row.get("properties",{})
+            title_prop=props.get("Page",{}).get("title",[])
+            if title_prop:
+                t=title_prop[0].get("plain_text","")
+                if t: done_titles.add(t)
+        for t in done_titles:
+            pid=state["pages"].get(t)
+            if not pid: continue
+            if not has_marker(pid, "This section is complete"):
+                call=[{"object":"block","type":"callout","callout":{"icon":{"type":"emoji","emoji":"✅"},"rich_text":[{"type":"text","text":{"content":"This section is complete. Take a breath."}}],"color":"gray_background"}}]
+                req("PATCH", f"https://api.notion.com/v1/blocks/{pid}/children", data=json.dumps({"children":call}))
+    except Exception:
+        pass
+
+def rt(text, **ann):
+    return [{"type":"text","text":{"content":text},"annotations":{
+        "bold": ann.get("bold", False),
+        "italic": ann.get("italic", False),
+        "strikethrough": False,
+        "underline": False,
+        "code": False,
+        "color": ann.get("color","default")
+    }}]
+
+def resolve_relation_value(page_title, state):
+    pid = state["pages"].get(page_title)
+    if not pid:
+        return []
+    return [{"id": pid}]
+
+def create_synced_library(parent):
+    lib_id = create_page(parent, "Admin – Synced Library", resolve_icon("emoji:📌"), None,
+                         "Master synced blocks for disclaimers and helpers.", None, None)
+    if not lib_id: return None, {}
+    children=[
+        {"object":"block","type":"callout","callout":{"icon":{"type":"emoji","emoji":"⚖️"},"rich_text":[{"type":"text","text":{"content":"Legal documents: This workspace offers general guidance only. It is not legal advice."}}],"color":"gray_background"}},
+        {"object":"block","type":"callout","callout":{"icon":{"type":"emoji","emoji":"✉️"},"rich_text":[{"type":"text","text":{"content":"Letters: Confirm each recipient’s requirements before sending."}}],"color":"gray_background"}},
+        {"object":"block","type":"callout","callout":{"icon":{"type":"emoji","emoji":"🧭"},"rich_text":[{"type":"text","text":{"content":"Executor: You don’t have to do this all at once. Start with the first, easiest step."}}],"color":"gray_background"}}
+    ]
+    resp=req("PATCH", f"https://api.notion.com/v1/blocks/{lib_id}/children", data=json.dumps({"children":children}))
+    sync_map={}
+    if resp and "results" in resp:
+        for b in resp["results"]:
+            text="".join([t.get("plain_text","") for t in b["callout"].get("rich_text",[])])
+            key=text.split(":")[0] if ":" in text else text[:16]
+            sync_map[key]=b["id"]
+    return lib_id, sync_map
+
+def add_synced_to_pages(state, sync_map):
+    pairs=[("Legal documents","Legal Documents"),("Letters","Letters"),("Executor","Executor Hub")]
+    for key, page_title in pairs:
+        pid=state["pages"].get(page_title)
+        if not pid or key not in sync_map: continue
+        src_id=sync_map[key]
+        block={"object":"block","type":"synced_block","synced_block":{"synced_from":{"block_id":src_id}}}
+        req("PATCH", f"https://api.notion.com/v1/blocks/{pid}/children", data=json.dumps({"children":[block]}))
+
+
+```
+
+
+
+## split_yaml/01_pages_core.yaml
+```yaml
+pages:
+- title: Preparation Hub
+  icon: emoji:🧭
+  description: Your personal starting place to set everything in motion.
+  role: owner
+  slug: preparation-hub
+  icon_file: assets/icons/preparation-hub-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/preparation-hub-cover.svg
+  icon_png: assets/icons_png/preparation-hub-icon.png
+  cover_png: assets/covers_png/preparation-hub-cover.png
+- title: Executor Hub
+  icon: emoji:🧑‍⚖️
+  description: Resources your executor will use to honor your wishes.
+  role: executor
+  disclaimer: This section offers practical guidance; it is not legal advice.
+  slug: executor-hub
+  icon_file: assets/icons/executor-hub-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/executor-hub-cover.svg
+  icon_png: assets/icons_png/executor-hub-icon.png
+  cover_png: assets/covers_png/executor-hub-cover.png
+- title: Family Hub
+  icon: emoji:👪
+  description: Gentle guidance and memories for family.
+  role: family
+  slug: family-hub
+  icon_file: assets/icons/family-hub-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/family-hub-cover.svg
+  icon_png: assets/icons_png/family-hub-icon.png
+  cover_png: assets/covers_png/family-hub-cover.png
+- title: Legal Documents
+  icon: emoji:📜
+  description: Important documents and samples (not legal advice).
+  role: owner
+  icon_file: assets/icons/legal-documents-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/legal-documents-cover.svg
+  icon_png: assets/icons_png/legal-documents-icon.png
+  cover_png: assets/covers_png/legal-documents-cover.png
+- title: Financial Accounts
+  icon: emoji:💳
+  description: Accounts, cards, and institutions to settle and notify.
+  role: owner
+  icon_file: assets/icons/financial-accounts-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/financial-accounts-cover.svg
+  icon_png: assets/icons_png/financial-accounts-icon.png
+  cover_png: assets/covers_png/financial-accounts-cover.png
+- title: Property & Assets
+  icon: emoji:🏠
+  description: Homes, vehicles, valuables, and digital assets.
+  role: owner
+  icon_file: assets/icons/property-assets-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/property-assets-cover.svg
+  icon_png: assets/icons_png/property-assets-icon.png
+  cover_png: assets/covers_png/property-assets-cover.png
+- title: Insurance
+  icon: emoji:🛡️
+  description: Policies and claims info.
+  role: owner
+  icon_file: assets/icons/insurance-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/insurance-cover.svg
+  icon_png: assets/icons_png/insurance-icon.png
+  cover_png: assets/covers_png/insurance-cover.png
+- title: Subscriptions
+  icon: emoji:🧾
+  description: Recurring services to cancel or transfer.
+  role: owner
+  icon_file: assets/icons/subscriptions-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/subscriptions-cover.svg
+  icon_png: assets/icons_png/subscriptions-icon.png
+  cover_png: assets/covers_png/subscriptions-cover.png
+- title: Letters
+  icon: emoji:✉️
+  description: Ready-to-adapt letters for banks, utilities, and more.
+  role: owner
+  icon_file: assets/icons/letters-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/letters-cover.svg
+  icon_png: assets/icons_png/letters-icon.png
+  cover_png: assets/covers_png/letters-cover.png
+- title: Memories & Keepsakes
+  icon: emoji:📷
+  description: Notes, photos, and stories worth saving.
+  role: family
+  icon_file: assets/icons/memories-keepsakes-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/memories-keepsakes-cover.svg
+  icon_png: assets/icons_png/memories-keepsakes-icon.png
+  cover_png: assets/covers_png/memories-keepsakes-cover.png
+- title: Contacts
+  icon: emoji:📇
+  description: People and organizations who matter in this process.
+  role: owner
+  icon_file: assets/icons/contacts-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/contacts-cover.svg
+  icon_png: assets/icons_png/contacts-icon.png
+  cover_png: assets/covers_png/contacts-cover.png
+- title: QR Codes
+  icon: emoji:🔗
+  description: Pages linked by printed QR codes.
+  role: owner
+  icon_file: assets/icons/qr-codes-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/qr-codes-cover.svg
+  icon_png: assets/icons_png/qr-codes-icon.png
+  cover_png: assets/covers_png/qr-codes-cover.png
+- title: Living Will – Sample Document
+  parent: Legal Documents
+  icon: emoji:📄
+  description: A gentle example to help you think through choices.
+  role: owner
+  disclaimer: Sample language only; not legal advice.
+  slug: legal-living-will
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Power of Attorney – Sample
+  parent: Legal Documents
+  icon: emoji:📄
+  description: Sample wording to discuss with your attorney.
+  role: owner
+  disclaimer: Sample only; not legal advice.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Advance Directive – Sample
+  parent: Legal Documents
+  icon: emoji:📄
+  role: owner
+  description: Guidance to capture your preferences.
+  disclaimer: Sample only; not legal advice.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Trust – Sample Outline
+  parent: Legal Documents
+  icon: emoji:📄
+  role: owner
+  description: Common sections to consider with counsel.
+  disclaimer: Informational only; not legal advice.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Executor Checklist
+  parent: Executor Hub
+  icon: emoji:✅
+  role: executor
+  description: A practical list of the first tasks to complete.
+  disclaimer: Checklist is informational; confirm local requirements.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Bank & Account Access Notes
+  parent: Executor Hub
+  icon: emoji:🏦
+  role: executor
+  description: Where to find account details and documents.
+  disclaimer: Handle credentials securely.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Funeral & Memorial Preferences
+  parent: Executor Hub
+  icon: emoji:🕊️
+  role: executor
+  description: Notes to guide thoughtful arrangements.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Messages for Family
+  parent: Family Hub
+  icon: emoji:💬
+  role: family
+  description: Short notes you’d like loved ones to read.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Keepsakes Index
+  parent: Family Hub
+  icon: emoji:🎁
+  role: family
+  description: A list of items with stories attached.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Primary Bank Accounts
+  parent: Financial Accounts
+  icon: emoji:🏦
+  role: owner
+  description: Main checking/savings with contact details.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Credit Cards
+  parent: Financial Accounts
+  icon: emoji:💳
+  role: owner
+  description: Active cards and closure notes.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Brokerage & Retirement
+  parent: Financial Accounts
+  icon: emoji:📈
+  role: owner
+  description: Investment and retirement accounts.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Real Estate
+  parent: Property & Assets
+  icon: emoji:🏡
+  role: owner
+  description: Properties with addresses, contacts, documents.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Vehicles
+  parent: Property & Assets
+  icon: emoji:🚗
+  role: owner
+  description: Cars, motorcycles—VINs, titles, insurers.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Digital Assets
+  parent: Property & Assets
+  icon: emoji:💾
+  role: owner
+  description: Domains, wallets, important logins.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Life Insurance
+  parent: Insurance
+  icon: emoji:🧾
+  role: owner
+  description: Policies, beneficiaries, contact paths.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Homeowners/Renters
+  parent: Insurance
+  icon: emoji:🏠
+  role: owner
+  description: Policy numbers, adjuster contacts.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Health Insurance
+  parent: Insurance
+  icon: emoji:🏥
+  role: owner
+  description: Carrier, member IDs, claims steps.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Streaming Services
+  parent: Subscriptions
+  icon: emoji:📺
+  role: owner
+  description: Netflix, Spotify, etc.—how to cancel.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Utilities
+  parent: Subscriptions
+  icon: emoji:💡
+  role: owner
+  description: Electric, gas, water—account numbers, final meter reads.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Online Services
+  parent: Subscriptions
+  icon: emoji:🌐
+  role: owner
+  description: Web tools with billing attached.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: QR – Family Essentials
+  parent: QR Codes
+  icon: emoji:🔖
+  role: owner
+  description: A small set of pages for family to access quickly.
+  slug: qr-family-essentials
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: QR – Full Access for Executor
+  parent: QR Codes
+  icon: emoji:🧩
+  role: owner
+  description: Links to all sections your executor will need.
+  slug: qr-executor-full
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+
+```
+
+
+
+## split_yaml/04_databases.yaml
+```yaml
+db:
+  schemas:
+    Accounts:
+      properties:
+        Name: title
+        Institution: text
+        Type: select
+        'Account #': text
+        Notes: text
+        Related Page:
+          type: relation
+          database_id_ref: pages
+          by_title: true
+        Tags:
+          type: multi_select
+          options:
+          - Critical
+          - Tax
+          - Transfer
+          - Beneficiaries
+        Note:
+          type: rich_text
+      seed_rows:
+      - Name: Bank Accounts
+        Institution: ''
+        Type: Bank
+        'Account #': ''
+        Notes: List each account; add closure/transfer steps.
+        Related Page Title: Financial Accounts
+      - Name: Retirement Accounts
+        Institution: ''
+        Type: Retirement
+        'Account #': ''
+        Notes: Add beneficiaries; rollover instructions.
+        Related Page Title: Financial Accounts
+      - Name: Brokerage – Taxable (Individual)
+        Institution: ''
+        Type: Brokerage
+        'Account #': ''
+        Notes: DTC transfer form; cost basis statements; TOD (transfer-on-death) designation;
+          medallion signature guarantee if required.
+        Related Page Title: Financial Accounts
+      - Name: Brokerage – Taxable (Joint)
+        Institution: ''
+        Type: Brokerage
+        'Account #': ''
+        Notes: Joint tenancy details; survivorship; DTC transfer; cost basis docs;
+          beneficiary/TOD where applicable.
+        Related Page Title: Financial Accounts
+      - Name: Brokerage – Traditional IRA
+        Institution: ''
+        Type: Retirement
+        'Account #': ''
+        Notes: Custodian transfer/rollover process; beneficiary designation; RMD considerations
+          if applicable.
+        Related Page Title: Financial Accounts
+      - Name: Brokerage – Roth IRA
+        Institution: ''
+        Type: Retirement
+        'Account #': ''
+        Notes: Custodian transfer/rollover; beneficiary designation; tax treatment
+          notes.
+        Related Page Title: Financial Accounts
+      - Name: Brokerage – 529 College Savings
+        Institution: ''
+        Type: Education
+        'Account #': ''
+        Notes: Plan administrator; successor owner/beneficiary change process; distribution
+          rules.
+        Related Page Title: Financial Accounts
+      - Name: Credit Cards
+        Institution: ''
+        Type: Credit Card
+        'Account #': ''
+        Notes: Cancel cards; reconcile statements; disable autopay.
+        Related Page Title: Financial Accounts
+    Property:
+      properties:
+        Name: title
+        Type: select
+        Identifier: text
+        Notes: text
+      seed_rows:
+      - Name: Primary Residence
+        Type: Real Estate
+        Identifier: ''
+        Notes: Deed/mortgage details; utility handoff.
+      - Name: Vehicle
+        Type: Vehicle
+        Identifier: ''
+        Notes: Title; registration; insurance carrier.
+      - Name: Safe Deposit Box
+        Type: Asset
+        Identifier: ''
+        Notes: Location; access rules; key custody.
+    Insurance:
+      properties:
+        Policy: title
+        Carrier: text
+        Type: select
+        'Policy #': text
+        Notes: text
+        Related Page:
+          type: relation
+          database_id_ref: pages
+          by_title: true
+        Tags:
+          type: multi_select
+          options:
+          - Life
+          - Health
+          - Property
+          - Auto
+          - Claims
+        Note:
+          type: rich_text
+      seed_rows:
+      - Name: Life Insurance
+        Type: Life
+        Carrier: ''
+        'Policy #': ''
+        Notes: Claim initiation steps; beneficiary process.
+        Related Page Title: Insurance
+      - Name: Health Insurance
+        Type: Health
+        Carrier: ''
+        'Policy #': ''
+        Notes: Coverage end date; outstanding claims.
+        Related Page Title: Insurance
+      - Name: Home Insurance
+        Type: Home
+        Carrier: ''
+        'Policy #': ''
+        Notes: Property coverage; claims contact.
+        Related Page Title: Insurance
+      - Name: Auto Insurance
+        Type: Auto
+        Carrier: ''
+        'Policy #': ''
+        Notes: Cancel/transfer policy; proof of sale for vehicle.
+        Related Page Title: Insurance
+    Contacts:
+      properties:
+        Name: title
+        Role: select
+        Email: text
+        Phone: text
+        Notes: text
+        Tags:
+          type: multi_select
+          options:
+          - Legal
+          - Executor
+          - Finance
+          - Family
+          - Urgent
+        Note:
+          type: rich_text
+      seed_rows:
+      - Name: Attorney
+        Role: Attorney
+        Email: ''
+        Phone: ''
+        Notes: Primary legal point of contact.
+        Tags:
+        - Legal
+      - Name: Executor
+        Role: Executor
+        Email: ''
+        Phone: ''
+        Notes: Primary executor contact.
+        Tags:
+        - Executor
+      - Name: Accountant/Tax
+        Role: Accountant/Tax
+        Email: ''
+        Phone: ''
+        Notes: Year-of-death return; filings.
+        Tags:
+        - Finance
+      - Name: Primary Family Contact
+        Role: Family
+        Email: ''
+        Phone: ''
+        Notes: Coordinator for family communications.
+        Tags:
+        - Family
+    Subscriptions:
+      properties:
+        Service: title
+        Category: select
+        Account Email: text
+        Notes: text
+        Tags:
+          type: multi_select
+          options:
+          - Critical
+          - Recurring
+          - Optional
+        Note:
+          type: rich_text
+      seed_rows:
+      - Name: Utilities
+        Type: Utilities
+        Provider: ''
+        'Account #': ''
+        Notes: Electric, gas, water, internet, phone.
+        Tags:
+        - Critical
+        - Recurring
+      - Name: Digital Services
+        Type: Digital
+        Provider: ''
+        'Account #': ''
+        Notes: Streaming, storage, software subscriptions.
+        Tags:
+        - Recurring
+      - Name: Memberships
+        Type: Membership
+        Provider: ''
+        'Account #': ''
+        Notes: Gyms, clubs, associations.
+        Tags:
+        - Optional
+    Keepsakes:
+      properties:
+        Title: title
+        Story: text
+        Where: text
+        Tags:
+          type: multi_select
+          options:
+          - Photos
+          - Stories
+          - Letters
+      seed_rows:
+      - Title: Photos
+        Story: ''
+        Where: Add location of albums/drives.
+      - Title: Stories
+        Story: Write a memory that matters — a moment, a lesson, a laugh.
+        Where: ''
+      - Title: Letters
+        Story: If you’d like, add a note for someone special.
+        Where: ''
+    Letters Index:
+      properties:
+        Title: title
+        Audience: select
+        Category:
+          type: multi_select
+          options:
+          - Banking
+          - Credit Cards
+          - Utilities
+          - Insurance
+          - Mortgage
+          - Employment
+          - Government
+          - Benefits
+          - Subscriptions
+          - Brokerage
+        URL: url
+        Related Page:
+          type: relation
+          database_id_ref: pages
+          by_title: true
+        Note:
+          type: rich_text
+      seed_rows:
+      - Title: Letter – Banks
+        Audience: Institution
+        Category: Banking
+        URL: ''
+        Related Page Title: Letter – Banks
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Credit Card Issuers
+        Audience: Institution
+        Category: Credit Cards
+        URL: ''
+        Related Page Title: Letter – Credit Card Issuers
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Utilities
+        Audience: Institution
+        Category: Utilities
+        URL: ''
+        Related Page Title: Letter – Utilities
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Insurance Companies
+        Audience: Institution
+        Category: Insurance
+        URL: ''
+        Related Page Title: Letter – Insurance Companies
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Mortgage/Servicer
+        Audience: Institution
+        Category: Mortgage
+        URL: ''
+        Related Page Title: Letter – Mortgage/Servicer
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Employer/HR
+        Audience: Employer
+        Category: Employment
+        URL: ''
+        Related Page Title: Letter – Employer/HR
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Social Security Administration
+        Audience: Agency
+        Category: Government
+        URL: ''
+        Related Page Title: Letter – Social Security Administration
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Pension/Benefits
+        Audience: Plan
+        Category: Benefits
+        URL: ''
+        Related Page Title: Letter – Pension/Benefits
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Subscriptions & Services
+        Audience: Provider
+        Category: Subscriptions
+        URL: ''
+        Related Page Title: Letter – Subscriptions & Services
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Brokerage Firms
+        Audience: Institution
+        Category: Brokerage
+        URL: ''
+        Related Page Title: Letter – Brokerage Firms
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+
+```
+
+
+
+## split_yaml/03_letters.yaml
+```yaml
+letters:
+- Title: Bank Notification – Deceased Account Holder
+  Audience: Bank
+  Category: Financial
+  Body: Dear  [insert appropriate detail] , I’m writing to inform you of the passing
+    of  [insert appropriate detail] . I’m assisting with the estate and would appreciate
+    guidance on required documents...
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Credit Card Closure Request
+  Audience: Credit Card
+  Category: Financial
+  Body: Hello  [insert appropriate detail] , Please close the account ending in  [insert
+    appropriate detail]  for  [insert appropriate detail] , who has passed away. Attached
+    are the documents you requested...
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Utility Account Transfer/Closure
+  Audience: Utility
+  Category: Household
+  Body: To  [insert appropriate detail] , Please transfer or close services for the
+    account at  [insert appropriate detail] . The account holder,  [insert appropriate
+    detail] , has passed away...
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Insurance Claim Notification
+  Audience: Insurance
+  Category: Insurance
+  Body: Dear Claims Department, This is to notify you of a claim for policy  [insert
+    appropriate detail]  for  [insert appropriate detail] . Please advise on next
+    steps...
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Employer HR Notification
+  Audience: Employer
+  Category: Employment
+  Body: Dear HR, I’m writing regarding  [insert appropriate detail] . Would you guide
+    us through any benefits, payroll, or COBRA steps that apply?
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Subscription Cancellation (General)
+  Audience: Provider
+  Category: Digital
+  Body: Hello, Please cancel the subscription for  [insert appropriate detail]  associated
+    with  [insert appropriate detail] . The account holder  [insert appropriate detail]  has
+    passed away...
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Social Media Memorialization
+  Audience: Platform
+  Category: Digital
+  Body: Hello  [insert appropriate detail] , Please memorialize or close the account
+    for  [insert appropriate detail] . I can provide documentation as needed...
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: SSA Notification of Death
+  Audience: Agency
+  Category: Government
+  Body: 'To the Social Security Administration: I’m writing to report the passing
+    of  [insert appropriate detail] , SSN ending  [insert appropriate detail] . Please
+    advise documentation required.'
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: IRS Final Return & Estate EIN
+  Audience: Agency
+  Category: Government
+  Body: 'To the IRS: Please guide us on filing the final return for  [insert appropriate
+    detail]  and obtaining an EIN for the estate, if required.'
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: DMV Title Transfer Request
+  Audience: Agency
+  Category: Transportation
+  Body: 'To the DMV: Please provide instructions to transfer vehicle title(s) for  [insert
+    appropriate detail] . Documentation can be provided.'
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: USPS Mail Forwarding for Estate
+  Audience: Agency
+  Category: Mail
+  Body: 'To the USPS: Please enable forwarding for mail addressed to  [insert appropriate
+    detail]  to  [insert appropriate detail]  for estate administration.'
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Mortgage Servicer Notice
+  Audience: Lender
+  Category: Financial
+  Body: 'To the Servicer: Please note the passing of  [insert appropriate detail]
+    , borrower on loan  [insert appropriate detail] . Kindly advise on next steps.'
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Landlord/HOA Notification
+  Audience: Housing
+  Category: Housing
+  Body: Hello, This is to inform you of the passing of  [insert appropriate detail]
+    . We will coordinate keys, dues, and next steps with your guidance.
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Pension/401(k) Administrator Notice
+  Audience: Plan Admin
+  Category: Retirement
+  Body: 'To the Plan Administrator: Please guide beneficiary claim steps for  [insert
+    appropriate detail]  under plan  [insert appropriate detail] .'
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Brokerage Transfer/Beneficiary Claim
+  Audience: Brokerage
+  Category: Financial
+  Body: 'To  [insert appropriate detail] : Please advise on beneficiary claim or transfer
+    of assets for account(s) owned by  [insert appropriate detail] .'
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Credit Bureaus Deceased Flag
+  Audience: Credit Bureau
+  Category: Financial
+  Body: 'To  [insert appropriate detail] : Please place a deceased flag on the credit
+    file for  [insert appropriate detail]  to help prevent fraud. Supporting documents
+    available.'
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Cover Letter – Family Essentials QR Pack
+  Audience: Family
+  Category: QR Pack
+  Body: I’ve included a few QR codes that open only the pages you’ll likely need first.
+    They don’t expose everything, just the essentials.
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Cover Letter – Full Executor QR Pack
+  Audience: Executor
+  Category: QR Pack
+  Body: These QR codes open all sections the executor will need. Please keep them
+    secure and use them only when it’s time to act.
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+
+```
+
+
+
+## split_yaml/99_release_notes.yaml
+```yaml
+release_notes: 'Legacy Concierge — Full Release Notes
+
+  v0.0: Initial concept & YAML skeleton (titles only).
+
+  v0.1: Basic page creation script; dry-run/deploy; icons/covers minimal.
+
+  v0.2: Subpages & disclaimers; executor/family distinction; first prompts.
+
+  v0.3: Compassionate instructions; sample legal text (non-legal).
+
+  v0.4: QR code strategy finalized (two packs: Family Essentials, Full Executor).
+
+  v0.5: Letters & samples seeded; Letters DB established.
+
+  v1.0: First complete deployable template (60+ pages).
+
+  v3.5.4: One-way helpers; never reappear once removed.
+
+  v3.5.5: Parent-aware deploy; respects manual nesting (overrides available).
+
+  v3.5.6: Acceptance DB seeding from YAML; Letters Index de-dup.
+
+  v3.5.7: Unified Setup & Acceptance DB; section subtotals & totals.
+
+  v3.5.8: Collapsible helper toggles with step-by-step instructions.
+
+  v3.5.9: Live DB-driven rollout; helper rows auto-Done; PageURL/Section sync; hub
+  view helpers; extra diagnostics; preflight.
+
+  v3.6.0: Content completion pass (samples, letters, seeds, time estimates, release
+  notes page).
+
+  v3.6.1: Gaps fixed (helper upsert/auto-Done restored; hub toggles; expanded pages
+  & letters; copy registry; refined seeds/times; Admin release notes).
+
+  v3.6.2: Final content polish — page-specific compassionate helpers, unique Acceptance
+  checks, letters with prompts/disclaimers, legal samples with prompts/disclaimers,
+  tailored DB helper pages, Admin cockpit & diagnostics, emoji icons with optional
+  hosted filenames.
+
+  '
+
+```
+
+
+
+## split_yaml/zz_acceptance_rows.yaml
+```yaml
+acceptance:
+  rows:
+  - Page: Preparation Hub
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Top Level
+  - Page: Executor Hub
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Top Level
+  - Page: Family Hub
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Top Level
+  - Page: Legal Documents
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Financial Accounts
+    Role: owner
+    Check: Add institution contacts, balances, and closure steps.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Top Level
+  - Page: Property & Assets
+    Role: owner
+    Check: Add deed/mortgage info and point of contact.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Top Level
+  - Page: Insurance
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Top Level
+  - Page: Subscriptions
+    Role: owner
+    Check: List services, login methods, next billing dates.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Top Level
+  - Page: Letters
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Top Level
+  - Page: Memories & Keepsakes
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Top Level
+  - Page: Contacts
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: QR Codes
+    Role: owner
+    Check: Confirm each QR points to the intended page and permissions are correct.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Top Level
+  - Page: Living Will – Sample Document
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 75
+    Section: Legal Documents
+  - Page: Power of Attorney – Sample
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 75
+    Section: Legal Documents
+  - Page: Advance Directive – Sample
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 75
+    Section: Legal Documents
+  - Page: Trust – Sample Outline
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 75
+    Section: Legal Documents
+  - Page: Executor Checklist
+    Role: owner
+    Check: Review first-48-hours tasks and note what’s done.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Executor Hub
+  - Page: Bank & Account Access Notes
+    Role: owner
+    Check: Add institution contacts, balances, and closure steps.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Executor Hub
+  - Page: Funeral & Memorial Preferences
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Executor Hub
+  - Page: Messages for Family
+    Role: owner
+    Check: Write a short note in your own words and remove this prompt.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Family Hub
+  - Page: Keepsakes Index
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Family Hub
+  - Page: Primary Bank Accounts
+    Role: owner
+    Check: Add institution contacts, balances, and closure steps.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Financial Accounts
+  - Page: Credit Cards
+    Role: owner
+    Check: List issuer contacts, last four digits, and closure instructions.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Financial Accounts
+  - Page: Brokerage & Retirement
+    Role: owner
+    Check: Upload latest statements and confirm beneficiaries/transfers.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Financial Accounts
+  - Page: Real Estate
+    Role: owner
+    Check: Add deed/mortgage info and point of contact.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Property & Assets
+  - Page: Vehicles
+    Role: owner
+    Check: Add VIN, title location, insurer details.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Property & Assets
+  - Page: Digital Assets
+    Role: owner
+    Check: Document access paths and any recovery instructions.
+    Status: Pending
+    Est. Time (min): 50
+    Section: Property & Assets
+  - Page: Life Insurance
+    Role: owner
+    Check: Upload policy, confirm beneficiary, note claim contact path.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Insurance
+  - Page: Homeowners/Renters
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Insurance
+  - Page: Health Insurance
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 30
+    Section: Insurance
+  - Page: Streaming Services
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Subscriptions
+  - Page: Utilities
+    Role: owner
+    Check: List services, login methods, next billing dates.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Subscriptions
+  - Page: Online Services
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 25
+    Section: Subscriptions
+  - Page: QR – Family Essentials
+    Role: owner
+    Check: Confirm each QR points to the intended page and permissions are correct.
+    Status: Pending
+    Est. Time (min): 10
+    Section: QR Codes
+  - Page: QR – Full Access for Executor
+    Role: owner
+    Check: Confirm each QR points to the intended page and permissions are correct.
+    Status: Pending
+    Est. Time (min): 10
+    Section: QR Codes
+  - Page: Letter — Bank Notification – Deceased Account Holder
+    Role: owner
+    Check: Add institution contacts, balances, and closure steps.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Credit Card Closure Request
+    Role: owner
+    Check: List issuer contacts, last four digits, and closure instructions.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Utility Account Transfer/Closure
+    Role: owner
+    Check: Add institution contacts, balances, and closure steps.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Insurance Claim Notification
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Employer HR Notification
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Subscription Cancellation (General)
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: Letter — Social Media Memorialization
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 45
+    Section: Letters
+  - Page: 'DB Setup: Accounts'
+    Role: owner
+    Check: Add institution contacts, balances, and closure steps.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Database Setup
+  - Page: 'DB Setup: Property'
+    Role: owner
+    Check: Add deed/mortgage info and point of contact.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Database Setup
+  - Page: 'DB Setup: Insurance'
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Database Setup
+  - Page: 'DB Setup: Contacts'
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Database Setup
+  - Page: 'DB Setup: Subscriptions'
+    Role: owner
+    Check: List services, login methods, next billing dates.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Database Setup
+  - Page: 'DB Setup: Keepsakes'
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Database Setup
+  - Page: 'DB Setup: Letters Index'
+    Role: owner
+    Check: Personalize details, attach relevant files, and remove helpers when finished.
+    Status: Pending
+    Est. Time (min): 20
+    Section: Database Setup
+
+```
+
+
+
+## split_yaml/00_copy_registry.yaml
+```yaml
+copy_registry:
+  preparation-hub:
+    description: A steady starting place. Work at your pace; each step waits for you.
+  executor-hub:
+    description: Practical steps for carrying out wishes. Keep documents together
+      and note what you complete.
+    disclaimer: These pages are practical guidance only and not legal advice. Confirm
+      local requirements.
+  family-hub:
+    description: A gentle place for photos, notes, and memories that matter.
+  legal-living-will:
+    description: A soft, non-legal sample to help you consider choices. Speak with
+      your attorney for a valid document.
+    disclaimer: Sample only; not legal advice.
+  qr-family-essentials:
+    description: QR links for the few pages your family may need quickly. Share only
+      when ready.
+  qr-executor-full:
+    description: QR links to every section your executor will need. Keep this secure.
+  executor-checklist:
+    description: Start here after the passing. Some steps are time-sensitive; move
+      steadily, one task at a time.
+    disclaimer: This is practical guidance, not legal advice.
+  life-insurance:
+    description: Add policy documents and confirm beneficiaries. Note claim phone
+      numbers and hours.
+    disclaimer: Policies differ by carrier; verify requirements.
+  subscriptions:
+    description: List recurring charges so nothing continues unnoticed. Capture login
+      details and next billing dates.
+  messages-for-family:
+    description: Short notes you’d like loved ones to read, in your own words.
+
+```
+
+
+
+## split_yaml/02_pages_extended.yaml
+```yaml
+pages:
+- title: Executor Task 01
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-01
+- title: Executor Task 02
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-02
+- title: Executor Task 03
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-03
+- title: Executor Task 04
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-04
+- title: Executor Task 05
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-05
+- title: Executor Task 06
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-06
+- title: Executor Task 07
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-07
+- title: Executor Task 08
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-08
+- title: Executor Task 09
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-09
+- title: Executor Task 10
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-10
+- title: Executor Task 11
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-11
+- title: Executor Task 12
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-12
+- title: Executor Task 13
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-13
+- title: Executor Task 14
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-14
+- title: Executor Task 15
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-15
+- title: Executor Task 16
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-16
+- title: Executor Task 17
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-17
+- title: Executor Task 18
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-18
+- title: Executor Task 19
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-19
+- title: Executor Task 20
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-20
+- title: Executor Task 21
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-21
+- title: Executor Task 22
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-22
+- title: Executor Task 23
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-23
+- title: Executor Task 24
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-24
+- title: Executor Task 25
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-25
+- title: Executor Task 26
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-26
+- title: Executor Task 27
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-27
+- title: Executor Task 28
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-28
+- title: Executor Task 29
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-29
+- title: Executor Task 30
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-30
+- title: Executor Task 31
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-31
+- title: Executor Task 32
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-32
+- title: Executor Task 33
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-33
+- title: Executor Task 34
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-34
+- title: Executor Task 35
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-35
+- title: Executor Task 36
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-36
+- title: Executor Task 37
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-37
+- title: Executor Task 38
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-38
+- title: Executor Task 39
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-39
+- title: Executor Task 40
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-40
+- title: Executor Guide – SSA Notification
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+  slug: executor-guide-ssa-notification
+- title: Executor Guide – IRS Final Return Notes
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+  slug: executor-guide-irs-final-return-notes
+- title: Executor Guide – DMV Title Transfer
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+  slug: executor-guide-dmv-title-transfer
+- title: Executor Guide – USPS Mail Forwarding
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+  slug: executor-guide-usps-mail-forwarding
+- title: Executor Guide – Mortgage Servicer
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+  slug: executor-guide-mortgage-servicer
+- title: Executor Guide – Landlord/HOA
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+  slug: executor-guide-landlord/hoa
+- title: Executor Guide – Pension/401(k) Administrator
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+  slug: executor-guide-pension/401(k)-administrator
+- title: Executor Guide – Brokerage Transfer
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+  slug: executor-guide-brokerage-transfer
+- title: Executor Guide – Credit Bureaus (Equifax/Experian/TransUnion)
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+  slug: executor-guide-credit-bureaus-(equifax/experian/transunion)
+- title: Digital Assets – Passwords & Access Hints
+  parent: Property & Assets
+  icon: emoji:💾
+  role: owner
+  description: Where to find and how to handle this item.
+  slug: digital-assets-passwords-access-hints
+- title: Digital Assets – Email Accounts
+  parent: Property & Assets
+  icon: emoji:💾
+  role: owner
+  description: Where to find and how to handle this item.
+  slug: digital-assets-email-accounts
+- title: Digital Assets – Cloud Storage
+  parent: Property & Assets
+  icon: emoji:💾
+  role: owner
+  description: Where to find and how to handle this item.
+  slug: digital-assets-cloud-storage
+- title: Digital Assets – Photo Archives
+  parent: Property & Assets
+  icon: emoji:💾
+  role: owner
+  description: Where to find and how to handle this item.
+  slug: digital-assets-photo-archives
+- title: Digital Assets – Domain Names
+  parent: Property & Assets
+  icon: emoji:💾
+  role: owner
+  description: Where to find and how to handle this item.
+  slug: digital-assets-domain-names
+- title: Digital Assets – Crypto Wallets
+  parent: Property & Assets
+  icon: emoji:💾
+  role: owner
+  description: Where to find and how to handle this item.
+  slug: digital-assets-crypto-wallets
+- title: Letters of Sympathy (Optional)
+  parent: Family Hub
+  icon: emoji:📝
+  role: family
+  description: Optional items to help the family remember and gather.
+  slug: letters-of-sympathy-(optional)
+- title: Memorial Playlist
+  parent: Family Hub
+  icon: emoji:📝
+  role: family
+  description: Optional items to help the family remember and gather.
+  slug: memorial-playlist
+- title: Photo Collage Plan
+  parent: Family Hub
+  icon: emoji:📝
+  role: family
+  description: Optional items to help the family remember and gather.
+  slug: photo-collage-plan
+- title: Memorial Guestbook
+  parent: Family Hub
+  icon: emoji:📝
+  role: family
+  description: Optional items to help the family remember and gather.
+  slug: memorial-guestbook
+
+```
+
+
+
+## split_yaml/00_admin.yaml
+```yaml
+pages:
+- title: Admin – Release Notes
+  icon: emoji:🗒️
+  role: owner
+  description: Version history for this template (safe to delete before sharing).
+  icon_file: assets/icons/admin-release-notes-icon.svg
+  cover_file: assets/covers/admin-release-notes-cover.svg
+  icon_png: assets/icons_png/preparation-hub-icon.png
+  cover_png: assets/covers_png/preparation-hub-cover.png
+- title: Admin – Rollout Cockpit
+  icon: emoji:🧭
+  description: Quick access to the Setup & Acceptance DB with guidance for useful
+    views.
+  icon_file: assets/icons/admin-rollout-cockpit-icon.svg
+  cover_file: assets/covers/admin-rollout-cockpit-cover.svg
+  icon_png: assets/icons_png/executor-hub-icon.png
+  cover_png: assets/covers_png/executor-hub-cover.png
+- title: Admin – Diagnostics
+  icon: emoji:🔍
+  description: 'Checks that help you finish setup: missing icons/covers and pages
+    still carrying helpers.'
+  icon_file: assets/icons/admin-diagnostics-icon.svg
+  cover_file: assets/covers/admin-diagnostics-cover.svg
+  icon_png: assets/icons_png/legal-documents-icon.png
+  cover_png: assets/covers_png/legal-documents-cover.png
+- title: Admin – Final UI Checklist
+  icon: emoji:✅
+  description: Confirm premium UI polish is complete, then delete this page.
+  helper:
+    instructions:
+    - Start Here shows 3 hub cards (grid) + first-run checklist.
+    - Each Hub shows section cards (grid) with clear spacing and captions.
+    - All user pages have a hero block at the top.
+    - Every user page has Back-to-Hub (top) and Next step (bottom).
+    - Letters/Legal long text is under a collapsible toggle.
+    - Role colors are consistent inside pages (Executor blue / Family peach / Preparation
+      teal).
+    - QR pages have a portal callout at the top.
+    - Mobile tips present on Start/Hub pages.
+    - PNG icons/covers render everywhere (desktop + mobile).
+    - No seeded/fake data anywhere.
+
+```

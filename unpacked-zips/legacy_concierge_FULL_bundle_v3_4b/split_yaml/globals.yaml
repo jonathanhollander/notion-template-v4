@@ -1,0 +1,508 @@
+globals:
+  icons_map:
+    executor-guide: 🧭
+    family-guide: 👨‍👩‍👧‍👦
+    preparation-hub: 🗂️
+    essentials: 📁
+    life-story: 📖
+    finishing: ✅
+  covers_map:
+    preparation-hub: https://images.examplecdn.com/premium/organize-soft.jpg
+    executor-quickstart: https://images.examplecdn.com/premium/minimal-compass.jpg
+    family-guide: https://images.examplecdn.com/premium/warm-light-bokeh.jpg
+  strings:
+    caution_notes:
+      legal: These pages help organize information and wishes. For a legally valid document or advice, speak with a licensed professional.
+      letter: This is a sample letter to help you begin. Adjust details for your situation.
+    pages:
+      home:
+        header: Home / Welcome
+        description: A quiet page for “Home / Welcome.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Home / Welcome” with appropriate undertone.
+        disclaimer: NONE
+      map:
+        header: Template Map (All Pages Index)
+        description: A quiet page for “Template Map (All Pages Index).” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Template Map (All Pages Index)” with appropriate undertone.
+        disclaimer: NONE
+      peace-of-mind:
+        header: Peace of Mind Overview
+        description: A quiet page for “Peace of Mind Overview.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Peace of Mind Overview” with appropriate undertone.
+        disclaimer: NONE
+      essentials:
+        header: Important Documents & Essentials
+        description: Clear steps for “Important Documents & Essentials.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Important Documents & Essentials” with appropriate undertone.
+        disclaimer: NONE
+      executors-contacts:
+        header: Executors & Key Contacts
+        description: Clear steps for “Executors & Key Contacts.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Executors & Key Contacts” with appropriate undertone.
+        disclaimer: NONE
+      financial-accounts:
+        header: Financial Accounts Index
+        description: Clear steps for “Financial Accounts Index.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Financial Accounts Index” with appropriate undertone.
+        disclaimer: NONE
+      insurance:
+        header: Insurance Policies Index
+        description: Clear steps for “Insurance Policies Index.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Insurance Policies Index” with appropriate undertone.
+        disclaimer: NONE
+      taxes:
+        header: Taxes & Documents Checklist
+        description: Clear steps for “Taxes & Documents Checklist.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Taxes & Documents Checklist” with appropriate undertone.
+        disclaimer: NONE
+      business:
+        header: Business Interests / LLCs
+        description: Clear steps for “Business Interests / LLCs.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Business Interests / LLCs” with appropriate undertone.
+        disclaimer: NONE
+      property:
+        header: Property & Inventory
+        description: Clear steps for “Property & Inventory.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Property & Inventory” with appropriate undertone.
+        disclaimer: NONE
+      vehicles:
+        header: Vehicles & Titles
+        description: Clear steps for “Vehicles & Titles.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Vehicles & Titles” with appropriate undertone.
+        disclaimer: NONE
+      keepsakes:
+        header: Keepsakes & Gifts
+        description: Notes and keepsakes for “Keepsakes & Gifts.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Keepsakes & Gifts” with appropriate undertone.
+        disclaimer: NONE
+      digital-legacy:
+        header: Digital Legacy
+        description: Clear steps for “Digital Legacy.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Digital Legacy” with appropriate undertone.
+        disclaimer: NONE
+      devices:
+        header: Devices & Access (Non-secret pointers)
+        description: Clear steps for “Devices & Access (Non-secret pointers).” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Devices & Access (Non-secret pointers)” with appropriate undertone.
+        disclaimer: NONE
+      executor-quickstart:
+        header: Executor QuickStart (One-Pager)
+        description: Clear steps for “Executor QuickStart (One-Pager).” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Executor QuickStart (One-Pager)” with appropriate undertone.
+        disclaimer: NONE
+      executor-card:
+        header: Executor Contact Card
+        description: Clear steps for “Executor Contact Card.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Executor Contact Card” with appropriate undertone.
+        disclaimer: NONE
+      executor-guide:
+        header: Executor Guide
+        description: Clear steps for “Executor Guide.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Executor Guide” with appropriate undertone.
+        disclaimer: NONE
+      family-guide:
+        header: Family Guide
+        description: Notes and keepsakes for “Family Guide.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Family Guide” with appropriate undertone.
+        disclaimer: NONE
+      memories:
+        header: Memories & Letters
+        description: Notes and keepsakes for “Memories & Letters.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Memories & Letters” with appropriate undertone.
+        disclaimer: NONE
+      photos:
+        header: Memories — Photo Albums (Gallery)
+        description: Notes and keepsakes for “Memories — Photo Albums (Gallery).” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Memories — Photo Albums (Gallery)” with appropriate undertone.
+        disclaimer: NONE
+      letters-index:
+        header: Memories — Letters Index
+        description: Notes and keepsakes for “Memories — Letters Index.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Memories — Letters Index” with appropriate undertone.
+        disclaimer: NONE
+      life-story:
+        header: Life Story & Guidance
+        description: Notes and keepsakes for “Life Story & Guidance.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Life Story & Guidance” with appropriate undertone.
+        disclaimer: NONE
+      grief-support:
+        header: Grief Support Resources
+        description: Notes and keepsakes for “Grief Support Resources.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Grief Support Resources” with appropriate undertone.
+        disclaimer: NONE
+      family-faq:
+        header: Family FAQ / Getting Started
+        description: Notes and keepsakes for “Family FAQ / Getting Started.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Family FAQ / Getting Started” with appropriate undertone.
+        disclaimer: NONE
+      medical:
+        header: Medical & Healthcare Preferences
+        description: Clear steps for “Medical & Healthcare Preferences.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Medical & Healthcare Preferences” with appropriate undertone.
+        disclaimer: NONE
+      living-will:
+        header: Living Will / Advance Care Directives
+        description: Clear steps for “Living Will / Advance Care Directives.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Living Will / Advance Care Directives” with appropriate undertone.
+        disclaimer: NONE
+      donation-wishes:
+        header: Donation & Personal Wishes
+        description: Notes and keepsakes for “Donation & Personal Wishes.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Donation & Personal Wishes” with appropriate undertone.
+        disclaimer: NONE
+      notifications:
+        header: Notifications Plan
+        description: Clear steps for “Notifications Plan.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Notifications Plan” with appropriate undertone.
+        disclaimer: NONE
+      letters-db:
+        header: Sample Letters Library (DB parent view)
+        description: A quiet page for “Sample Letters Library (DB parent view).” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Sample Letters Library (DB parent view)” with appropriate undertone.
+        disclaimer: NONE
+      qr-reference:
+        header: QR Codes Reference
+        description: A quiet page for “QR Codes Reference.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “QR Codes Reference” with appropriate undertone.
+        disclaimer: NONE
+      qr-print:
+        header: QR Card Printables (How-To)
+        description: Clear steps for “QR Card Printables (How-To).” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “QR Card Printables (How-To)” with appropriate undertone.
+        disclaimer: NONE
+      qr-packages:
+        header: QR Packages (Reference)
+        description: A quiet page for “QR Packages (Reference).” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “QR Packages (Reference)” with appropriate undertone.
+        disclaimer: NONE
+      qr-letters:
+        header: QR Distribution Letters
+        description: Clear steps for “QR Distribution Letters.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “QR Distribution Letters” with appropriate undertone.
+        disclaimer: NONE
+      prompts-letters:
+        header: Prompt Library — Letters & Stories
+        description: A quiet page for “Prompt Library — Letters & Stories.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Prompt Library — Letters & Stories” with appropriate undertone.
+        disclaimer: NONE
+      prompts-tribute:
+        header: Prompt Library — Life Story & Tribute
+        description: A quiet page for “Prompt Library — Life Story & Tribute.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Prompt Library — Life Story & Tribute” with appropriate undertone.
+        disclaimer: NONE
+      prompts-executor:
+        header: Prompt Library — Executor & Summary Aids
+        description: A quiet page for “Prompt Library — Executor & Summary Aids.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Prompt Library — Executor & Summary Aids” with appropriate undertone.
+        disclaimer: NONE
+      prompts-rewrite:
+        header: Prompt Library — Combine & Rewrite
+        description: A quiet page for “Prompt Library — Combine & Rewrite.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Prompt Library — Combine & Rewrite” with appropriate undertone.
+        disclaimer: NONE
+      prompts-translate:
+        header: Prompt Library — Translate
+        description: A quiet page for “Prompt Library — Translate.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Prompt Library — Translate” with appropriate undertone.
+        disclaimer: NONE
+      flow-process:
+        header: Process Flow (Mermaid)
+        description: Clear steps for “Process Flow (Mermaid).” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Process Flow (Mermaid)” with appropriate undertone.
+        disclaimer: NONE
+      flow-contacts:
+        header: Contacts & Roles Map (Mermaid)
+        description: Clear steps for “Contacts & Roles Map (Mermaid).” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Contacts & Roles Map (Mermaid)” with appropriate undertone.
+        disclaimer: NONE
+      flow-activation:
+        header: Executor Activation Flow (Mermaid)
+        description: Clear steps for “Executor Activation Flow (Mermaid).” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Executor Activation Flow (Mermaid)” with appropriate undertone.
+        disclaimer: NONE
+      guidance:
+        header: Guidance Library (Resources)
+        description: Notes and keepsakes for “Guidance Library (Resources).” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Guidance Library (Resources)” with appropriate undertone.
+        disclaimer: NONE
+      tone:
+        header: Copy & Tone Guide
+        description: A quiet page for “Copy & Tone Guide.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Copy & Tone Guide” with appropriate undertone.
+        disclaimer: NONE
+      disclaimer:
+        header: Legal Disclaimer (Standalone Page)
+        description: A quiet page for “Legal Disclaimer (Standalone Page).” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Legal Disclaimer (Standalone Page)” with appropriate undertone.
+        disclaimer: NONE
+      diagnostics:
+        header: Diagnostics
+        description: A quiet page for “Diagnostics.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Diagnostics” with appropriate undertone.
+        disclaimer: NONE
+      owner-progress:
+        header: Preparation Progress (DB)
+        description: A quiet page for “Preparation Progress (DB).” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Preparation Progress (DB)” with appropriate undertone.
+        disclaimer: NONE
+      finishing:
+        header: Manual Finishing Tasks
+        description: A quiet page for “Manual Finishing Tasks.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Manual Finishing Tasks” with appropriate undertone.
+        disclaimer: NONE
+      dev-notes:
+        header: Developer Notes / Version & Changelog
+        description: A quiet page for “Developer Notes / Version & Changelog.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Developer Notes / Version & Changelog” with appropriate undertone.
+        disclaimer: NONE
+      recovery:
+        header: System Check / Recovery Report
+        description: A quiet page for “System Check / Recovery Report.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “System Check / Recovery Report” with appropriate undertone.
+        disclaimer: NONE
+      encouragements:
+        header: Encouragements
+        description: Notes and keepsakes for “Encouragements.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Encouragements” with appropriate undertone.
+        disclaimer: NONE
+      icons-headers:
+        header: Icons & Headers Library
+        description: A quiet page for “Icons & Headers Library.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Icons & Headers Library” with appropriate undertone.
+        disclaimer: NONE
+      mobile-test:
+        header: Mobile Test Checklist
+        description: A quiet page for “Mobile Test Checklist.” Simple links and short notes you can return to.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Mobile Test Checklist” with appropriate undertone.
+        disclaimer: NONE
+      letters-family-view:
+        header: Memories — Letters (Family Library View)
+        description: Notes and keepsakes for “Memories — Letters (Family Library View).” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Memories — Letters (Family Library View)” with appropriate undertone.
+        disclaimer: NONE
+      letters-brokerage-view:
+        header: Brokerage Letters (Library View)
+        description: Clear steps for “Brokerage Letters (Library View).” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Brokerage Letters (Library View)” with appropriate undertone.
+        disclaimer: NONE
+      letters-bank-view:
+        header: Bank Letters (Library View)
+        description: Clear steps for “Bank Letters (Library View).” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Bank Letters (Library View)” with appropriate undertone.
+        disclaimer: NONE
+      letters-insurance-view:
+        header: Insurance Letters (Library View)
+        description: Clear steps for “Insurance Letters (Library View).” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Insurance Letters (Library View)” with appropriate undertone.
+        disclaimer: NONE
+      letters-utilities-view:
+        header: Utilities Letters (Library View)
+        description: Clear steps for “Utilities Letters (Library View).” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Utilities Letters (Library View)” with appropriate undertone.
+        disclaimer: NONE
+      letters-community-view:
+        header: Community Letters (Library View)
+        description: Clear steps for “Community Letters (Library View).” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Community Letters (Library View)” with appropriate undertone.
+        disclaimer: NONE
+      letters-executor-view:
+        header: Executor Letters (Library View)
+        description: Clear steps for “Executor Letters (Library View).” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Executor Letters (Library View)” with appropriate undertone.
+        disclaimer: NONE
+      letters-family-announcements-view:
+        header: Family Letters (Library View)
+        description: Notes and keepsakes for “Family Letters (Library View).” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Family Letters (Library View)” with appropriate undertone.
+        disclaimer: NONE
+      photos-captions-helper:
+        header: Photo Captions Helper
+        description: Notes and keepsakes for “Photo Captions Helper.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR] Review this page once as your user. Remove friction. Clear when it reads smoothly.'
+        ai_prompt: Draft an 80–120 word intro for “Photo Captions Helper” with appropriate undertone.
+        disclaimer: NONE
+      preparation-hub:
+        header: Preparation Hub
+        description: This hub is for setting things up. You don’t have to finish everything at once—one section at a time is enough.
+        owner_instructions: '[#INSTR] The linked progress view below points to the Preparation Progress database. Keep statuses accurate. Clear when ready.'
+        ai_prompt: Write a short welcome that reassures without minimizing the work.
+        disclaimer: NONE
+      executor-orientation:
+        header: When You First Open This
+        description: Begin with one or two pages that matter most. Personalize any letter needed now and let the rest wait.
+        owner_instructions: '[#INSTR] Review once for clarity and tone. Clear when complete.'
+        ai_prompt: Draft an 80–120 word intro for “When You First Open This” with appropriate undertone.
+        disclaimer: NONE
+      everything-done:
+        header: For When It Feels Complete
+        description: When the last small tasks are settled, pause here. Everything important has been carried through.
+        owner_instructions: '[#INSTR] Review once for clarity and tone. Clear when complete.'
+        ai_prompt: Draft an 80–120 word intro for “For When It Feels Complete” with appropriate undertone.
+        disclaimer: NONE
+      letter-bank:
+        header: Bank Notification Letter
+        description: Clear steps for “Bank Notification Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review once for clarity and tone. Clear when complete.'
+        ai_prompt: Draft an 80–120 word intro for “Bank Notification Letter” with appropriate undertone.
+        disclaimer: LETTER
+      letter-card:
+        header: Credit Card Company Letter
+        description: Clear steps for “Credit Card Company Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review once for clarity and tone. Clear when complete.'
+        ai_prompt: Draft an 80–120 word intro for “Credit Card Company Letter” with appropriate undertone.
+        disclaimer: LETTER
+      letter-brokerage:
+        header: Brokerage / Investment Firm Letter
+        description: Clear steps for “Brokerage / Investment Firm Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review once for clarity and tone. Clear when complete.'
+        ai_prompt: Draft an 80–120 word intro for “Brokerage / Investment Firm Letter” with appropriate undertone.
+        disclaimer: LETTER
+      letter-insurance:
+        header: Insurance Carrier Letter
+        description: Clear steps for “Insurance Carrier Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review once for clarity and tone. Clear when complete.'
+        ai_prompt: Draft an 80–120 word intro for “Insurance Carrier Letter” with appropriate undertone.
+        disclaimer: LETTER
+      letter-tax:
+        header: Tax Notification Letter
+        description: Clear steps for “Tax Notification Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review once for clarity and tone. Clear when complete.'
+        ai_prompt: Draft an 80–120 word intro for “Tax Notification Letter” with appropriate undertone.
+        disclaimer: LETTER
+      letter-employer:
+        header: Employer Notification Letter
+        description: Clear steps for “Employer Notification Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review once for clarity and tone. Clear when complete.'
+        ai_prompt: Draft an 80–120 word intro for “Employer Notification Letter” with appropriate undertone.
+        disclaimer: LETTER
+      letter-utilities:
+        header: Utility Company Letter
+        description: Clear steps for “Utility Company Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review once for clarity and tone. Clear when complete.'
+        ai_prompt: Draft an 80–120 word intro for “Utility Company Letter” with appropriate undertone.
+        disclaimer: LETTER
+      letter-community:
+        header: Community / Social Group Letter
+        description: Clear steps for “Community / Social Group Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review once for clarity and tone. Clear when complete.'
+        ai_prompt: Draft an 80–120 word intro for “Community / Social Group Letter” with appropriate undertone.
+        disclaimer: LETTER
+      letter-executor-authority:
+        header: Executor Cover Note / Authority
+        description: Clear steps for “Executor Cover Note / Authority.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review once for clarity and tone. Clear when complete.'
+        ai_prompt: Draft an 80–120 word intro for “Executor Cover Note / Authority” with appropriate undertone.
+        disclaimer: LETTER
+      letter-landlord:
+        header: Landlord / Property Management Letter
+        description: Clear steps for “Landlord / Property Management Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review once for clarity and tone. Clear when complete.'
+        ai_prompt: Draft an 80–120 word intro for “Landlord / Property Management Letter” with appropriate undertone.
+        disclaimer: LETTER
+      letter-medical-providers:
+        header: Medical Providers / Health Insurance Letter
+        description: Clear steps for “Medical Providers / Health Insurance Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review once for clarity and tone. Clear when complete.'
+        ai_prompt: Draft an 80–120 word intro for “Medical Providers / Health Insurance Letter” with appropriate undertone.
+        disclaimer: LETTER
+      letter-mortgage:
+        header: Mortgage / Lender Letter
+        description: Clear steps for “Mortgage / Lender Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review once for clarity and tone. Clear when complete.'
+        ai_prompt: Draft an 80–120 word intro for “Mortgage / Lender Letter” with appropriate undertone.
+        disclaimer: LETTER
+      letter-pension:
+        header: Pension / Retirement / Social Security Letter
+        description: Clear steps for “Pension / Retirement / Social Security Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review once for clarity and tone. Clear when complete.'
+        ai_prompt: Draft an 80–120 word intro for “Pension / Retirement / Social Security Letter” with appropriate undertone.
+        disclaimer: LETTER
+      letter-digital:
+        header: Subscriptions / Digital Services Letter
+        description: Clear steps for “Subscriptions / Digital Services Letter.” Use what you need and move at a steady pace.
+        owner_instructions: '[#INSTR] Review once for clarity and tone. Clear when complete.'
+        ai_prompt: Draft an 80–120 word intro for “Subscriptions / Digital Services Letter” with appropriate undertone.
+        disclaimer: LETTER
+      letter-family:
+        header: Family Announcement Letter
+        description: Notes and keepsakes for “Family Announcement Letter.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR] Review once for clarity and tone. Clear when complete.'
+        ai_prompt: Draft an 80–120 word intro for “Family Announcement Letter” with appropriate undertone.
+        disclaimer: LETTER
+      letter-death-notice:
+        header: Short Death Notice / Newspaper Draft
+        description: Notes and keepsakes for “Short Death Notice / Newspaper Draft.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR] Review once for clarity and tone. Clear when complete.'
+        ai_prompt: Draft an 80–120 word intro for “Short Death Notice / Newspaper Draft” with appropriate undertone.
+        disclaimer: LETTER
+      letter-to-family:
+        header: Letter to My Family
+        description: Notes and keepsakes for “Letter to My Family.” Nothing here is urgent—take what helps.
+        owner_instructions: '[#INSTR] Review once for clarity and tone. Clear when complete.'
+        ai_prompt: Draft an 80–120 word intro for “Letter to My Family” with appropriate undertone.
+        disclaimer: LETTER
+  diagnostics_text:
+    messages:
+      cover_missing: ‘{page}’ doesn’t have a cover yet. A soft image helps the page feel settled.
+      icon_missing: ‘{page}’ has no icon. A small symbol makes scanning easier.
+      instr_present: ‘{page}’ still shows a helper note. When the page reads smoothly, remove it.

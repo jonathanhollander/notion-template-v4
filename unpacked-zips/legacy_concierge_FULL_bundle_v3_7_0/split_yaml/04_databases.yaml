@@ -1,0 +1,53 @@
+db:
+  schemas:
+    Accounts:
+      properties:
+        Name: title
+        Institution: text
+        Type: select
+        'Account #': text
+        Notes: text
+      seed_rows: []
+    Property:
+      properties:
+        Name: title
+        Type: select
+        Identifier: text
+        Notes: text
+      seed_rows: []
+    Insurance:
+      properties:
+        Policy: title
+        Carrier: text
+        Type: select
+        'Policy #': text
+        Notes: text
+      seed_rows: []
+    Contacts:
+      properties:
+        Name: title
+        Role: select
+        Email: text
+        Phone: text
+        Notes: text
+      seed_rows: []
+    Subscriptions:
+      properties:
+        Service: title
+        Category: select
+        Account Email: text
+        Notes: text
+      seed_rows: []
+    Keepsakes:
+      properties:
+        Title: title
+        Story: text
+        Where: text
+      seed_rows: []
+    Letters Index:
+      properties:
+        Title: title
+        Audience: select
+        Category: select
+        URL: url
+      seed_rows: []

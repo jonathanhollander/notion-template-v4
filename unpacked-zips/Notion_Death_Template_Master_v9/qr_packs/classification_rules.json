@@ -1,0 +1,22 @@
+{
+  "top10": {
+    "family": [
+      "Family Portal",
+      "Funeral Service Preferences",
+      "Obituary & Announcements",
+      "Memorial Program (PDF)",
+      "Letters to Loved Ones"
+    ],
+    "executor": [
+      "Executor Console",
+      "Document Locator & Vault Index",
+      "Assets & Liabilities",
+      "Insurance Center",
+      "Emergency Info Card (Executor)"
+    ]
+  },
+  "buckets": {
+    "family_root": "Family Portal",
+    "executor_root": "Executor Console"
+  }
+}

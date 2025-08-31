@@ -1,0 +1,12 @@
+Changelog v3.4g (from v3.4f)
+- Covers: replaced with cohesive Unsplash images (Muted Nature palette, center-balanced for Notion).
+- Typography: consistent editorial rhythm applied (H2/H3, dividers, spacing, restrained callouts).
+- Letters: all 17 refined — standardized spacing, bold greetings, disclaimers, consistent closings.
+- Descriptions: filler removed; all pages role-specific (Executor = directive, Family = invitational, Shared = neutral).
+- Icons: gradient diamond icons fully integrated (SVG + PNG).
+- Disclaimers: sweep confirmed across all executor/legal/financial subsections.
+- Diagnostics: severity levels added (⚠️ critical, 🟡 minor, ✅ passed).
+- Acceptance criteria: grouped by Executor, Family, Shared for clarity.
+- Sample Data: added to all remaining DBs (Business Interests, Keepsakes, etc.).
+- Builder’s Console: includes live Diagnostics view, Acceptance grouped by role, reassurance message.
+- Cultural Tone: replaced any loaded phrasing with gentle undertones.

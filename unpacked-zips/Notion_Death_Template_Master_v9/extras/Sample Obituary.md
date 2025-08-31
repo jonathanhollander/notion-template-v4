@@ -1,0 +1,2 @@
+# Sample Obituary
+[Editable draft]

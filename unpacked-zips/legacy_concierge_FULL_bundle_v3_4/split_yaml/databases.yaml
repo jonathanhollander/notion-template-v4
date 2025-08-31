@@ -1,0 +1,132 @@
+db:
+  schemas:
+    sample_letters:
+      properties:
+        Title: title
+        Audience: select
+        Category: select
+        Scenario: rich_text
+        Body: rich_text
+        AI Prompt: rich_text
+        Section: select
+  seeds:
+    sample_letters:
+    - Title: Letter to My Family
+      Audience: Family
+      Category: Family
+      Scenario: First words to family
+      Body: I wanted you to have my words close by. Thank you for every ordinary day we shared. Please take your time with everything. Nothing needs to happen all at once. I love you, and I am grateful for you.
+      AI Prompt: Warm, 120–160 words, simple language. Keep it loving and steady; avoid instructions.
+      Section: Memories & Letters
+    - Title: Family Announcement
+      Audience: Family
+      Category: Family
+      Scenario: Announcement to friends/family
+      Body: Dear friends and family, with sadness we share that [Full Name] has passed away. Services will be at [Location/Date]. We’re grateful for your thoughts and support. Thank you for your kindness.
+      AI Prompt: Clear, gentle, under 120 words.
+      Section: Family View
+    - Title: Short Death Notice / Newspaper Draft
+      Audience: Family
+      Category: Public
+      Scenario: Newspaper / public notice
+      Body: '[Full Name], [Age], of [City], passed away on [Date]. [First Name] is survived by [Family Members]. A service will be held at [Location/Date]. Memorial contributions may be made to [Charity/Organization].'
+      AI Prompt: Factual, respectful, 2–3 sentences.
+      Section: Life Story
+    - Title: Bank Notification
+      Audience: Executor
+      Category: Financial / Bank
+      Scenario: Close/transfer accounts
+      Body: Dear [Bank Name], I am writing to inform you of the passing of [Full Name]. I am serving as executor and have enclosed a copy of the death certificate. Please let me know the process to close or transfer these accounts and what documents you require. Thank you for your guidance.
+      AI Prompt: Professional, steady, 100–140 words.
+      Section: Financial Accounts
+    - Title: Credit Card Company
+      Audience: Executor
+      Category: Financial / Card
+      Scenario: Close card / stop charges
+      Body: Dear [Company Name], Please note the passing of [Full Name], account holder. Kindly close the account and stop further charges. I have enclosed the death certificate. Please confirm any remaining balance and the steps for settlement.
+      AI Prompt: Direct, courteous, under 130 words.
+      Section: Financial Accounts
+    - Title: Brokerage / Investment Firm
+      Audience: Executor
+      Category: Financial / Brokerage
+      Scenario: Transfer/close accounts
+      Body: Dear [Firm Name], I am executor for [Full Name], who held accounts with you. Enclosed is the death certificate. Please advise on your procedure for transferring or closing these accounts and what documents are required.
+      AI Prompt: Professional, steady tone.
+      Section: Financial Accounts
+    - Title: Mortgage / Lender
+      Audience: Executor
+      Category: Financial / Mortgage
+      Scenario: Loan status and next steps
+      Body: Dear [Lender], I am executor for [Full Name], the borrower on this mortgage. Enclosed is the death certificate. Please confirm the current balance and outline the steps for continuing payments or settling the loan.
+      AI Prompt: Clear, practical, 80–130 words.
+      Section: Property
+    - Title: Pension / Retirement / Social Security
+      Audience: Executor
+      Category: Financial / Pension
+      Scenario: Notify and request survivor process
+      Body: Dear [Agency/Plan], I am notifying you of the passing of [Full Name]. Enclosed is the death certificate. Please advise on survivor benefits or the process for closing the account.
+      AI Prompt: Respectful, concise.
+      Section: Financial Accounts
+    - Title: Insurance Carrier
+      Audience: Executor
+      Category: Insurance
+      Scenario: Claim/close policy
+      Body: Dear [Insurance Company], Please note the passing of [Full Name], policy holder. I am the executor and have enclosed the death certificate. Kindly provide the forms or steps needed to process the claim or close the policy.
+      AI Prompt: Clear, polite, 90–130 words.
+      Section: Insurance
+    - Title: Medical Providers / Health Insurance
+      Audience: Executor
+      Category: Medical
+      Scenario: Close records / notify insurer
+      Body: Dear [Provider/Office], This letter is to notify you of the passing of [Full Name]. Enclosed is the death certificate. Please confirm if you require any additional documentation to close patient or insurance records.
+      AI Prompt: Neutral, respectful, brief.
+      Section: Insurance
+    - Title: Tax Notification
+      Audience: Executor
+      Category: Tax
+      Scenario: Final return / balances
+      Body: Dear [IRS/State Agency], I am notifying you of the passing of [Full Name]. Enclosed is the death certificate. Please advise on final return requirements or any balances due.
+      AI Prompt: Factual, brief, under 120 words.
+      Section: Taxes
+    - Title: Employer Notification
+      Audience: Executor
+      Category: Employer
+      Scenario: HR, final pay, benefits
+      Body: Dear [HR Department], I am writing regarding [Full Name], who has passed away. Enclosed is the death certificate. Please advise on final pay, benefits, or retirement plans, and let me know any required forms.
+      AI Prompt: Calm, professional, 90–130 words.
+      Section: Notifications
+    - Title: Utility Company
+      Audience: Executor
+      Category: Utilities
+      Scenario: Transfer/close service
+      Body: Dear [Utility Company], Please note the passing of [Full Name], account holder at [Address]. Enclosed is the death certificate. Kindly advise how to transfer or close service and settle the final bill.
+      AI Prompt: Direct, courteous, under 130 words.
+      Section: Notifications
+    - Title: Subscriptions / Digital Services
+      Audience: Executor
+      Category: Digital Services
+      Scenario: Close online accounts
+      Body: Dear [Service], This letter is to notify you of the passing of [Full Name], the account holder. Please close the account and stop further charges. Enclosed is the death certificate.
+      AI Prompt: Clear, brief, under 120 words.
+      Section: Notifications
+    - Title: Community / Social Group
+      Audience: Executor
+      Category: Community
+      Scenario: Membership update
+      Body: Dear [Group/Association], I am writing to notify you of the passing of [Full Name], a member of your organization. Enclosed is the death certificate. Please update your records and let me know if anything further is required.
+      AI Prompt: Courteous, simple.
+      Section: Notifications
+    - Title: Executor Cover Note / Authority
+      Audience: Executor
+      Category: Executor
+      Scenario: Proof of authority cover note
+      Body: To Whom It May Concern, I am the named executor for the estate of [Full Name], who has passed away. Enclosed is the death certificate and my proof of authority. Please work directly with me on any matters related to the estate.
+      AI Prompt: Simple, formal, under 120 words.
+      Section: Executors & Key Contacts
+    - Title: Landlord / Property Management
+      Audience: Executor
+      Category: Housing
+      Scenario: Lease termination / access / final accounting
+      Body: Dear [Landlord/Management], This letter is to inform you of the passing of [Full Name], tenant at [Address]. Enclosed is the death certificate. Please confirm next steps for lease termination, property access, and final accounting.
+      AI Prompt: Practical, clear, 90–130 words.
+      Section: Property

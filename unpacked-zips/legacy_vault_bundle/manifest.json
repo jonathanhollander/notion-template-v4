@@ -1,0 +1,30 @@
+{
+  "date": "2025-08-22",
+  "files": [
+    "DIGITAL_GUARDIAN_SETUP_GUIDE.md",
+    "DIGITAL_LEGACY_CENTER_SAMPLE.md",
+    "ETHICAL_WILL_TEMPLATE.md",
+    "EXECUTOR_EMAIL_TEMPLATES.md",
+    "EXECUTOR_QUICK_SHEET.md",
+    "HOW_TO_USE.md",
+    "Legacy_Vault_CSV_Starter_Pack___Manifest.csv",
+    "MASTER_CHECKLIST.md",
+    "README_Legacy_Vault_CSVs.txt",
+    "README_MASTER.md",
+    "SAMPLE_WILL.md",
+    "STORY_PROMPTS.md",
+    "contacts_roles.csv",
+    "digital_accounts.csv",
+    "executor_expenses.csv",
+    "executor_tasks.csv",
+    "final_wishes.csv",
+    "financial_assets.csv",
+    "heirlooms.csv",
+    "legal_documents.csv",
+    "medical_meds.csv",
+    "memories_stories.csv",
+    "messages_loved_ones.csv",
+    "subscriptions_bills.csv"
+  ],
+  "note": "Import CSVs into Notion. Paste Markdown as pages. Set relations and rollups after import."
+}
