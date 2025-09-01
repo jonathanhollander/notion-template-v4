@@ -16,10 +16,10 @@ pages:
     - type: heading_2
       content: Overall Progress Overview
     - type: callout
-      icon: emoji:🎯
-      content: "Overall Completion: 68% [████████████████░░░░] 68%"
+      icon: emoji:🚀
+      content: "Overall Completion: 68% - We're on our way! 🌟"
       color: blue_background
-    
+
     - type: heading_2
       content: Progress by Category
     - type: callout
@@ -40,7 +40,7 @@ pages:
       color: brown_background
     - type: callout
       icon: emoji:👨‍👩‍👧‍👦
-      content: "Family Access Setup: 45% [█████████░░░░░░░░░░░] 45%"
+      content: "Family Access Setup: 45% [█████████░░░░░░░░░░░] 45% - 🚧 Work in Progress"
       color: yellow_background
     
     - type: heading_2

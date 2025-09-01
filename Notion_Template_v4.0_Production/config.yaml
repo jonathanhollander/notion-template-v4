@@ -1,0 +1,65 @@
+base_url: https://api.notion.com
+notion_api_version: "2022-06-28"
+rate_limit_rps: 2.5
+default_timeout: 30
+max_retries: 5
+backoff_base: 1.5
+
+# Premium Visual Configuration for Estate Planning
+visual_config:
+  tier: "premium"
+  github_assets_base_url: "https://raw.githubusercontent.com/jonathanhollander/notion-assets/main/assets"
+  default_theme: "default"
+  
+  # Professional Theme Palette for Estate Planning
+  themes:
+    executive_blue:
+      primary: "#1E3A8A"    # Deep Professional Blue
+      accent: "#60A5FA"     # Soft Sky Blue
+      text: "#1F2937"       # Dark Gray
+    legacy_purple:
+      primary: "#581C87"    # Deep Purple (dignity, wisdom)
+      accent: "#A78BFA"     # Soft Lavender
+      text: "#1F2937"       # Dark Gray
+    heritage_green:
+      primary: "#14532D"    # Deep Forest Green (growth, legacy)
+      accent: "#86EFAC"     # Soft Mint
+      text: "#1F2937"       # Dark Gray
+    
+  # Tasteful emoji for estate planning context
+  estate_emoji:
+    # Document & Legal
+    document: "📄"        # Document
+    legal: "⚖️"          # Scales of justice
+    signature: "✍️"       # Signature
+    sealed: "📜"          # Scroll/sealed document
+    
+    # Family & Legacy
+    family: "👨‍👩‍👧‍👦"       # Family unit
+    legacy: "🏛️"         # Institution/legacy
+    heritage: "🌳"        # Family tree
+    generations: "👥"     # People/beneficiaries
+    
+    # Financial & Assets
+    assets: "🏦"          # Bank/institution
+    property: "🏡"        # Home/property
+    investment: "📈"      # Growth/investments
+    secure: "🔒"          # Security/protection
+    
+    # Status & Progress (Dignified)
+    complete: "✓"         # Simple checkmark
+    pending: "○"          # Open circle
+    in_progress: "◐"      # Half circle
+    important: "•"        # Bullet point
+    
+    # Navigation & Structure
+    section: "▸"          # Arrow right
+    subsection: "▪"       # Small square
+    divider: "―"          # Em dash
+    hierarchy: "├"        # Tree branch
+    
+    # Professional Indicators
+    verified: "✓"         # Verification
+    attention: "!"        # Attention needed
+    confidential: "🔐"    # Confidential/secure
+    archived: "🗄️"       # Filed/archived

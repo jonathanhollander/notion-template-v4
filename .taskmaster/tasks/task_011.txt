@@ -1,0 +1,11 @@
+# Task ID: 11
+# Title: Implement idempotency system
+# Status: pending
+# Dependencies: 1, 4
+# Priority: high
+# Description: Ensure all operations are idempotent with marker-based deduplication
+# Details:
+Add marker checking before operations, implement has_marker functions, ensure no duplicate creation on re-runs
+
+# Test Strategy:
+Run deployment multiple times, verify no duplicates, test partial failure recovery

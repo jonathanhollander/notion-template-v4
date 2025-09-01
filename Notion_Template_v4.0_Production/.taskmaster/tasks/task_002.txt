@@ -1,0 +1,11 @@
+# Task ID: 2
+# Title: Fix Asset Upload System
+# Status: pending
+# Dependencies: None
+# Priority: critical
+# Description: Implement local file upload functionality for icons and cover images
+# Details:
+Create upload_file_to_notion() function in deploy.py. Handle PNG/SVG files from assets/ directory. Ensure all 100+ custom assets are properly deployed.
+
+# Test Strategy:
+Test file upload with sample assets, verify icons and covers display correctly, check error handling

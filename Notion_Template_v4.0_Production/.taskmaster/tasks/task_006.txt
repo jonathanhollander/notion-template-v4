@@ -1,0 +1,11 @@
+# Task ID: 6
+# Title: Fix Formula and Rollup Properties
+# Status: pending
+# Dependencies: 1, 3
+# Priority: high
+# Description: Add formula property creation and rollup linking logic
+# Details:
+Add formula property creation to deploy.py. Implement rollup property linking between databases. Create progress tracking calculations.
+
+# Test Strategy:
+Test all formulas calculate correctly, verify rollups aggregate properly, check edge cases

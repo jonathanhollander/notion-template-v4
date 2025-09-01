@@ -1,6 +1,6 @@
 # 08_ultra_premium_db_patch.yaml
-complexity: moderate
 # Ultra-Premium Phase A: Advanced DB Architecture
+complexity: moderate
 db:
   schemas:
 

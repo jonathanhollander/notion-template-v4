@@ -1,0 +1,11 @@
+# Task ID: 10
+# Title: Build validation and dry-run modes
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Implement validation-only and dry-run modes for safe pre-deployment testing
+# Details:
+Create --validate-only flag for schema checking, implement --dry-run for simulation, add --verbose for detailed output
+
+# Test Strategy:
+Run validation against known good/bad configs, test dry-run output accuracy

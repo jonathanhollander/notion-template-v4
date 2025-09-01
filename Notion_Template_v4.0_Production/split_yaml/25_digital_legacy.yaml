@@ -1,11 +1,12 @@
-pages:
 complexity: moderate
+pages:
 - title: Digital Legacy Management
   icon: emoji:💻
   description: Manage your digital afterlife across all platforms
   role: owner
   slug: digital-legacy-management
   cover: https://images.unsplash.com/photo-1516865131505-4dabf2efc692
+  alt_text: "A laptop on a desk with a cup of coffee."
   
 - title: Google Inactive Account Manager
   parent: Digital Legacy Management  

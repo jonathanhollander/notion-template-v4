@@ -1,0 +1,68 @@
+{
+  "assets": {
+    "icons": 162,
+    "covers": 162,
+    "textures": 10,
+    "letter_headers": 3,
+    "database_icons": 0
+  },
+  "total": 337,
+  "sample_icons": [
+    {
+      "title": "Admin \u2013 Release Notes",
+      "slug": "admin-\u2013-release-notes",
+      "role": "owner",
+      "prompt": "Technical drawing icon for 'Admin \u2013 Release Notes': Version history for this template (safe to delete before sharing)., mechanical poetry style, readable at 24px"
+    },
+    {
+      "title": "Admin \u2013 Rollout Cockpit",
+      "slug": "admin-\u2013-rollout-cockpit",
+      "role": "owner",
+      "prompt": "Technical drawing icon for 'Admin \u2013 Rollout Cockpit': Quick access to the Setup & Acceptance DB with guidance for useful views., mechanical poetry style, readable at 24px"
+    },
+    {
+      "title": "Admin \u2013 Diagnostics",
+      "slug": "admin-\u2013-diagnostics",
+      "role": "owner",
+      "prompt": "Technical drawing icon for 'Admin \u2013 Diagnostics': Checks that help you finish setup: missing icons/covers and pages still carrying helpers., mechanical poetry style, readable at 24px"
+    }
+  ],
+  "sample_covers": [
+    {
+      "title": "Admin \u2013 Release Notes",
+      "slug": "admin-\u2013-release-notes",
+      "role": "owner",
+      "prompt": "Blueprint cover for 'Admin \u2013 Release Notes': Version history for this template (safe to delete before sharing)., architectural drawing style, golden ratio grid"
+    },
+    {
+      "title": "Admin \u2013 Rollout Cockpit",
+      "slug": "admin-\u2013-rollout-cockpit",
+      "role": "owner",
+      "prompt": "Blueprint cover for 'Admin \u2013 Rollout Cockpit': Quick access to the Setup & Acceptance DB with guidance for useful views., architectural drawing style, golden ratio grid"
+    },
+    {
+      "title": "Admin \u2013 Diagnostics",
+      "slug": "admin-\u2013-diagnostics",
+      "role": "owner",
+      "prompt": "Blueprint cover for 'Admin \u2013 Diagnostics': Checks that help you finish setup: missing icons/covers and pages still carrying helpers., architectural drawing style, golden ratio grid"
+    }
+  ],
+  "sample_letters": [
+    {
+      "title": "Attorney Engagement Letter Template",
+      "slug": "attorney-engagement-letter-template",
+      "prompt": "Professional letterhead design for 'Attorney Engagement Letter Template': , formal business style, subtle estate planning motif"
+    },
+    {
+      "title": "CPA Estate Tax Planning Request",
+      "slug": "cpa-estate-tax-planning-request",
+      "prompt": "Professional letterhead design for 'CPA Estate Tax Planning Request': , formal business style, subtle estate planning motif"
+    },
+    {
+      "title": "Financial Advisor Estate Review Request",
+      "slug": "financial-advisor-estate-review-request",
+      "prompt": "Professional letterhead design for 'Financial Advisor Estate Review Request': , formal business style, subtle estate planning motif"
+    }
+  ],
+  "sample_database": []
+}

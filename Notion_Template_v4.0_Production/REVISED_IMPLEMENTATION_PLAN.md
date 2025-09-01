@@ -7,11 +7,11 @@ This document outlines a revised plan to implement the fixes and features recomm
 
 This phase focuses on fixing the critical bugs in the `deploy.py` script that are preventing the system from being deployed successfully.
 
-*   **Correct `NOTION_API_VERSION` in `deploy.py` to `2022-06-28`** (Complexity: Simple)
+
 *   **Fix `BASE_URL` and `notion` object bugs in `deploy.py`** (Complexity: Simple)
 *   **Add basic error handling to `deploy.py` to prevent silent failures** (Complexity: Moderate)
 *   **Add input sanitization to `deploy.py` to prevent security vulnerabilities** (Complexity: Moderate)
-*   **Validate the Notion token with the API** (Complexity: Simple)
+*   **Validate the Notion token with the API (token in the environent shell) ** (Complexity: Simple)
 
 ## Phase 2: Core Feature Completion (High Priority)
 

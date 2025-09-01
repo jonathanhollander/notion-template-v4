@@ -1,0 +1,9 @@
+# Estate Planning Concierge v4.0 Asset Generation Requirements
+replicate>=0.25.0
+colorama>=0.4.6
+tqdm>=4.66.0
+aiohttp>=3.9.0
+Pillow>=10.0.0
+python-dotenv>=1.0.0
+requests>=2.31.0
+PyYAML>=6.0.1

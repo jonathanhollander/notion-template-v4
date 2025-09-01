@@ -1,0 +1,11 @@
+# Task ID: 7
+# Title: Build database seeding system
+# Status: pending
+# Dependencies: 6
+# Priority: medium
+# Description: Implement data seeding for all databases with proper formatting and relation binding
+# Details:
+Load seed data from YAML, handle rich text formatting (italic/gray), bind relations after creation, validate data integrity
+
+# Test Strategy:
+Seed all databases, verify data formatting, check relation bindings, validate completeness

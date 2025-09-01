@@ -1,5 +1,5 @@
-pages:
 complexity: simple
+pages:
 - title: Preparation Hub
   icon: emoji:🧭
   description: Your personal starting place to set everything in motion.
@@ -10,6 +10,7 @@ complexity: simple
   cover_file: assets/covers/preparation-hub-cover.svg
   icon_png: assets/icons_png/preparation-hub-icon.png
   cover_png: assets/covers_png/preparation-hub-cover.png
+  alt_text: "An icon representing the preparation hub."
 - title: Executor Hub
   icon: emoji:🧑‍⚖️
   description: Resources your executor will use to honor your wishes.
@@ -21,6 +22,7 @@ complexity: simple
   cover_file: assets/covers/executor-hub-cover.svg
   icon_png: assets/icons_png/executor-hub-icon.png
   cover_png: assets/covers_png/executor-hub-cover.png
+  alt_text: "An icon representing the executor hub."
 - title: Family Hub
   icon: emoji:👪
   description: Gentle guidance and memories for family.
@@ -31,6 +33,7 @@ complexity: simple
   cover_file: assets/covers/family-hub-cover.svg
   icon_png: assets/icons_png/family-hub-icon.png
   cover_png: assets/covers_png/family-hub-cover.png
+  alt_text: "An icon representing the family hub."
 - title: Legal Documents
   icon: emoji:📜
   description: Important documents and samples (not legal advice).

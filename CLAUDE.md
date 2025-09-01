@@ -8,6 +8,14 @@ This is a forensic analysis project investigating a failed Notion template deplo
 
 ## Critical Context
 
+**⚠️ CRITICAL RESTRICTION - ASSET GENERATION:**
+- **NEVER run full asset generation (400+ images)**
+- Only generate SAMPLE images (5-10 max) for testing purposes
+- Full generation (490 assets) must ONLY be run by the user
+- This project requires ~$20 in Replicate API costs for full generation
+- Sample generation for testing: OK (max 10 images)
+- Mass production: FORBIDDEN for Claude
+
 **The Fatal Error:** Line 82 in `unpacked-zips/legacy_concierge_gold_v3_8_2/deploy/deploy.py`
 ```python
 def req(')  # Missing closing parenthesis - 30-second fix that broke everything
@@ -126,6 +134,36 @@ The project has extensive MCP server support configured in `.mcp.json` including
 - filesystem (enhanced file operations)
 
 ## Session History
+
+### Session: August 31, 2025
+- **Completed:** 21:44 EDT  
+- **Working Directory:** Notion_Template_v4.0_Production/
+- **Focus:** Estate Planning Concierge v4.0 Asset Generation System
+- **Achievements:** 
+  - Tested and verified dynamic meta-prompt system via test_generate_samples.py
+  - Created audit file with 13,122 lines of image generation code (NO Notion code)
+  - Generated 4-document comprehensive documentation suite using multi-model approach
+- **Key Files Created:**
+  - `Notion_Template_v4.0_Production/estate_planning_v4_code_audit.txt` (566KB)
+  - `Notion_Template_v4.0_Production/documentation_technical_gemini.md`
+  - `Notion_Template_v4.0_Production/documentation_business_o3.md`
+
+### Session: September 1, 2025 
+- **Started:** 02:20 UTC
+- **Working Directory:** Notion_Template_v4.0_Production/
+- **Git Branch:** master
+- **Git Status:** 90+ modified/untracked files, asset generation modules added
+- **Previous Work:** Completed comprehensive "write to all" status updates
+- **Status Updates Created:**
+  - GitHub Issue #9 with full documentation
+  - Notion page with 60+ content blocks
+  - Mermaid architecture diagram (estate_planning_v4_architecture.svg)
+  - JSON/Markdown status reports saved locally
+  - Roo-Cline memory updated with 4 memory bank entries
+- **Status:** Awaiting user objectives for current session
+  - `Notion_Template_v4.0_Production/documentation_innovation_claude.md`
+  - `Notion_Template_v4.0_Production/documentation_consensus_synthesis.md`
+- **Important:** v4.0 = Image Generation System (NOT Notion template v3.8.x)
 
 ### Session: August 30, 2025
 - **Started:** 17:04 EDT

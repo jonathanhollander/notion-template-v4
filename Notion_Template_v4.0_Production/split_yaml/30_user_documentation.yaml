@@ -9,127 +9,79 @@ pages:
   role: owner
   blocks:
     - type: heading_1
-      content: 📖 Estate Planning User Manual
+      content: "✨ Welcome to Your Estate Planning Concierge! ✨"
     - type: paragraph
-      content: Complete documentation system providing detailed guidance for all aspects of estate planning management, from basic setup to advanced features.
-    
+      content: "Let's get you set up quickly. This interactive wizard will guide you through the essential steps."
+    - type: divider
     - type: heading_2
-      content: Getting Started Guide
-    - type: toggle
-      content: Initial Setup (First 24 Hours)
-      blocks:
-        - type: numbered_list_item
-          content: "Review system overview and three-hub architecture (Preparation, Executor, Family)"
-        - type: numbered_list_item
-          content: "Complete initial assessment questionnaire to determine complexity level"
-        - type: numbered_list_item
-          content: "Set up professional team contacts (attorney, financial advisor, CPA)"
-        - type: numbered_list_item
-          content: "Begin asset inventory with high-value items first"
-        - type: numbered_list_item
-          content: "Configure family access levels and sharing preferences"
-        - type: numbered_list_item
-          content: "Schedule initial attorney consultation within first week"
-    
-    - type: toggle
-      content: First Week Checklist
-      blocks:
-        - type: bulleted_list_item
-          content: "📋 Complete personal information profile"
-        - type: bulleted_list_item
-          content: "💰 Begin comprehensive asset documentation"
-        - type: bulleted_list_item
-          content: "👥 Add family members and assign appropriate access levels"
-        - type: bulleted_list_item
-          content: "⚖️ Schedule professional consultations"
-        - type: bulleted_list_item
-          content: "📱 Test mobile access and notification preferences"
-        - type: bulleted_list_item
-          content: "🎯 Set initial goals and timeline expectations"
-    
-    - type: toggle
-      content: First Month Objectives
-      blocks:
-        - type: bulleted_list_item
-          content: "📄 Draft primary estate planning documents (will, POA)"
-        - type: bulleted_list_item
-          content: "🏦 Complete financial account beneficiary reviews"
-        - type: bulleted_list_item
-          content: "🏠 Obtain professional property valuations"
-        - type: bulleted_list_item
-          content: "👔 Establish regular professional coordination schedule"
-        - type: bulleted_list_item
-          content: "👨‍👩‍👧‍👦 Conduct first family estate planning discussion"
-        - type: bulleted_list_item
-          content: "📊 Review progress analytics and adjust timeline if needed"
-    
+      content: "Step 1: Choose Your Estate Complexity"
+    - type: paragraph
+      content: "This helps tailor the template to your needs. You can change this later."
+    - type: callout
+      icon: emoji:💡
+      content: "**Simple:** Few accounts/assets, single property, straightforward will."
+      color: blue_background
+    - type: callout
+      icon: emoji:🏡
+      content: "**Moderate:** Multiple accounts/assets, property + insurance claims."
+      color: green_background
+    - type: callout
+      icon: emoji:🏢
+      content: "**Complex:** Businesses, multiple properties, trusts, tax planning."
+      color: yellow_background
+    - type: paragraph
+      content: "To select, go to the **Admin – Settings** page and choose your complexity from the dropdown."
+    - type: divider
     - type: heading_2
-      content: Feature Documentation
-    - type: toggle
-      content: Database Management
-      blocks:
-        - type: paragraph
-          content: "Complete guide to using the 11 integrated databases:"
-        - type: bulleted_list_item
-          content: "📊 Estate Analytics: Track completion metrics and performance indicators"
-        - type: bulleted_list_item
-          content: "👔 Professional Coordination: Manage attorney, CPA, advisor relationships"
-        - type: bulleted_list_item
-          content: "💰 Financial Assets: Document bank accounts, investments, real estate"
-        - type: bulleted_list_item
-          content: "📄 Legal Documents: Track will, trusts, powers of attorney"
-        - type: bulleted_list_item
-          content: "👥 Family Access: Manage family member permissions and roles"
-        - type: bulleted_list_item
-          content: "🎭 Memory Preservation: Store family stories and important memories"
-        - type: bulleted_list_item
-          content: "🚨 Crisis Management: Emergency procedures and contact protocols"
-    
-    - type: toggle
-      content: Progress Tracking Features
-      blocks:
-        - type: paragraph
-          content: "Understanding and using the progress visualization system:"
-        - type: bulleted_list_item
-          content: "📊 Real-time Progress Bars: Visual completion indicators with live updates"
-        - type: bulleted_list_item
-          content: "🎯 Milestone Tracking: Major achievement markers and celebration points"
-        - type: bulleted_list_item
-          content: "⚡ Velocity Analytics: Task completion speed and efficiency metrics"
-        - type: bulleted_list_item
-          content: "🚨 Bottleneck Detection: Automatic identification of process delays"
-        - type: bulleted_list_item
-          content: "📈 Trend Analysis: Historical patterns and future projections"
-    
+      content: "Step 2: Connect Your Notion Account"
+    - type: paragraph
+      content: "The deployment script needs your Notion API token and parent page ID."
+    - type: callout
+      icon: emoji:🔑
+      content: "**NOTION_TOKEN:** Your Notion integration token (starts with `secret_`)."
+      color: purple_background
+    - type: callout
+      icon: emoji:📄
+      content: "**NOTION_PARENT_PAGEID:** The ID of the Notion page where the template will be deployed."
+      color: orange_background
+    - type: paragraph
+      content: "Set these as environment variables as instructed in `setup.sh`."
+    - type: divider
     - type: heading_2
-      content: Advanced Features Guide
-    - type: toggle
-      content: Automation System
-      blocks:
-        - type: paragraph
-          content: "Understanding and configuring the automation features:"
-        - type: bulleted_list_item
-          content: "🤖 Auto-Task Generation: How intelligent task creation works"
-        - type: bulleted_list_item
-          content: "⏰ Smart Reminders: Customizing notification timing and frequency"
-        - type: bulleted_list_item
-          content: "🔔 Alert Configuration: Setting up appropriate alert levels"
-        - type: bulleted_list_item
-          content: "📊 Performance Optimization: Using analytics to improve efficiency"
-    
-    - type: toggle
-      content: Multi-Language Features
-      blocks:
-        - type: paragraph
-          content: "Using the international language support system:"
-        - type: bulleted_list_item
-          content: "🌐 Language Selection: How to change languages and regional settings"
-        - type: bulleted_list_item
-          content: "↩️ RTL Support: Using Arabic, Hebrew, and Urdu language features"
-        - type: bulleted_list_item
-          content: "🎭 Cultural Adaptations: Understanding region-specific legal considerations"
-        - type: bulleted_list_item
-          content: "🔤 Translation Quality: How to request improvements or report issues"
+      content: "Step 3: Run the Deployment Script"
+    - type: paragraph
+      content: "Execute the `deploy.py` script to set up your template."
+    - type: code
+      language: bash
+      content: "python3 deploy.py --verbose"
+    - type: paragraph
+      content: "This will create all the pages, databases, and content in your Notion workspace."
+    - type: divider
+    - type: heading_2
+      content: "Step 4: Explore Your New Template!"
+    - type: paragraph
+      content: "Once deployment is complete, you're ready to start organizing your estate plan."
+    - type: callout
+      icon: emoji:🚀
+      content: "**Start with the Preparation Hub** for core planning."
+      color: blue_background
+    - type: callout
+      icon: emoji:⚖️
+      content: "**Executor Hub** contains resources for your chosen executor."
+      color: green_background
+    - type: callout
+      icon: emoji:👨‍👩‍👧‍👦
+      content: "**Family Hub** is for shared memories and family access."
+      color: yellow_background
+    - type: divider
+    - type: heading_2
+      content: "Need Help?"
+    - type: paragraph
+      content: "Visit the **Help Center** page for FAQs, troubleshooting, and more detailed guides."
+    - type: callout
+      icon: emoji:❓
+      content: "**Help Center:** Your go-to for all questions and support."
+      color: gray_background
 
 - title: Administrator Guide
   parent: Executor Hub

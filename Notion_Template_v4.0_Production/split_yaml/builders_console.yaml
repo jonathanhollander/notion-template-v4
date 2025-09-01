@@ -1,8 +1,10 @@
-admin_page:
 complexity: moderate
+admin_page:
   title: Builder’s Console
   icon: assets/icons/diamonds/beige_filled.svg
+  alt_text: "A beige diamond icon."
   cover: https://images.unsplash.com/photo-1517245386807-bb43f82c33c4
+  alt_text: "A person writing on a piece of paper with a laptop in the background."
   description: For setup only. Delete this branch before sharing.
   blocks:
   - heading: Diagnostics Overview

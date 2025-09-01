@@ -1,0 +1,11 @@
+# Task ID: 2
+# Title: Fix critical relation resolution system
+# Status: pending
+# Dependencies: 1
+# Priority: critical
+# Description: Replace custom title matching with proper Notion API relation calls as identified in auditor reports
+# Details:
+Implement Pages Index DB pattern, use proper relation API endpoints, ensure bidirectional relation support
+
+# Test Strategy:
+Test with sample relations, verify all 62 acceptance items with relations resolve correctly

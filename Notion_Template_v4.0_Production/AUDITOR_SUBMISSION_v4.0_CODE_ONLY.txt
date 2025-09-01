@@ -1,0 +1,517 @@
+# requirements.txt
+requests>=2.31.0
+PyYAML>=6.0.1
+Pillow>=10.0.0
+python-dotenv>=1.0.0
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# .env.example
+NOTION_TOKEN=your_notion_integration_token_here
+NOTION_PARENT_PAGEID=your_parent_page_id_here
+NOTION_VERSION=2022-06-28
+THROTTLE_RPS=2.5
+ENABLE_SEARCH_FALLBACK=true
+NOTION_TIMEOUT=30
+RETRY_MAX=5
+RETRY_BACKOFF_BASE=1.5
+LOG_LEVEL=INFO
+LOG_FILE=logs/deployment.log
+LOG_MAX_SIZE=10485760
+LOG_BACKUP_COUNT=5
+GITHUB_ASSETS_REPO=jonathanhollander/notion-assets
+GITHUB_ASSETS_BRANCH=main
+
+# config.yaml
+base_url: https://api.notion.com
+notion_api_version: "2022-06-28"
+rate_limit_rps: 2.5
+default_timeout: 30
+max_retries: 5
+backoff_base: 1.5
+
+visual_config:
+  tier: "premium"
+  github_assets_base_url: "https://raw.githubusercontent.com/jonathanhollander/notion-assets/main/assets"
+  default_theme: "default"
+  
+  themes:
+    executive_blue:
+      primary: "#1E3A8A"
+      accent: "#60A5FA"
+      text: "#1F2937"
+    legacy_purple:
+      primary: "#581C87"
+      accent: "#A78BFA"
+      text: "#1F2937"
+    heritage_green:
+      primary: "#14532D"
+      accent: "#86EFAC"
+      text: "#1F2937"
+    
+  estate_emoji:
+    document: "📄"
+    legal: "⚖️"
+    signature: "✍️"
+    sealed: "📜"
+    family: "👨‍👩‍👧‍👦"
+    legacy: "🏛️"
+    heritage: "🌳"
+    generations: "👥"
+    assets: "🏦"
+    property: "🏡"
+    investment: "📈"
+    secure: "🔒"
+    complete: "✓"
+    pending: "○"
+    in_progress: "◐"
+    important: "•"
+    section: "▸"
+    subsection: "▪"
+    divider: "―"
+    hierarchy: "├"
+    verified: "✓"
+    attention: "!"
+    confidential: "🔐"
+    archived: "🗄️"
+
+# modules/logging_config.py
+import logging
+import os
+from pathlib import Path
+from logging.handlers import RotatingFileHandler
+from typing import Optional
+
+def setup_logging(
+    log_level: str = None,
+    log_file: str = None,
+    log_max_size: int = None,
+    log_backup_count: int = None,
+    console_output: bool = True
+) -> logging.Logger:
+    log_level = log_level or os.getenv('LOG_LEVEL', 'INFO')
+    log_file = log_file or os.getenv('LOG_FILE', 'logs/deployment.log')
+    log_max_size = log_max_size or int(os.getenv('LOG_MAX_SIZE', 10485760))
+    log_backup_count = log_backup_count or int(os.getenv('LOG_BACKUP_COUNT', 5))
+    
+    log_path = Path(log_file)
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    logger = logging.getLogger('estate_planning')
+    logger.setLevel(getattr(logging, log_level.upper()))
+    logger.handlers.clear()
+    
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+    
+    file_handler = RotatingFileHandler(
+        log_file,
+        maxBytes=log_max_size,
+        backupCount=log_backup_count
+    )
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+    
+    if console_output:
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(formatter)
+        logger.addHandler(console_handler)
+    
+    logger.info(f"Logging initialized - Level: {log_level}, File: {log_file}")
+    return logger
+
+def get_logger(name: Optional[str] = None) -> logging.Logger:
+    if name:
+        return logging.getLogger(f'estate_planning.{name}')
+    return logging.getLogger('estate_planning')
+
+# validate_deployment_ready.py
+#!/usr/bin/env python3
+import sys
+import os
+from pathlib import Path
+from typing import Dict, List, Tuple
+
+sys.path.insert(0, str(Path(__file__).parent))
+
+class DeploymentValidator:
+    def __init__(self):
+        self.checks_passed = []
+        self.checks_failed = []
+        self.is_ready = True
+        
+    def validate(self) -> bool:
+        print("\n" + "=" * 70)
+        print("ESTATE PLANNING CONCIERGE v4.0 - DEPLOYMENT READINESS CHECK")
+        print("=" * 70)
+        
+        checks = [
+            ("Python Version", self.check_python_version),
+            ("Required Files", self.check_required_files),
+            ("Environment Setup", self.check_environment),
+            ("Dependencies", self.check_dependencies),
+            ("Module Imports", self.check_imports),
+            ("Configuration", self.check_configuration),
+            ("API Credentials", self.check_api_credentials),
+            ("GitHub Assets", self.check_github_assets),
+            ("YAML Files", self.check_yaml_files),
+            ("No Duplicate Functions", self.check_no_duplicates)
+        ]
+        
+        for check_name, check_func in checks:
+            print(f"\n🔍 Checking: {check_name}")
+            try:
+                result, message = check_func()
+                if result:
+                    print(f"  ✅ {message}")
+                    self.checks_passed.append(check_name)
+                else:
+                    print(f"  ❌ {message}")
+                    self.checks_failed.append(check_name)
+                    self.is_ready = False
+            except Exception as e:
+                print(f"  ❌ Error: {e}")
+                self.checks_failed.append(check_name)
+                self.is_ready = False
+        
+        self.print_summary()
+        return self.is_ready
+    
+    def check_python_version(self) -> Tuple[bool, str]:
+        version = sys.version_info
+        if version.major == 3 and version.minor >= 8:
+            return True, f"Python {version.major}.{version.minor}.{version.micro} is compatible"
+        return False, f"Python 3.8+ required, found {version.major}.{version.minor}"
+    
+    def check_required_files(self) -> Tuple[bool, str]:
+        required = [
+            "deploy.py",
+            "requirements.txt",
+            ".env.example",
+            "config.yaml",
+            "modules/__init__.py",
+            "modules/config.py",
+            "modules/auth.py",
+            "modules/notion_api.py",
+            "modules/validation.py",
+            "modules/exceptions.py",
+            "modules/visuals.py",
+            "modules/database.py",
+            "modules/logging_config.py"
+        ]
+        
+        missing = []
+        for file in required:
+            if not Path(file).exists():
+                missing.append(file)
+        
+        if missing:
+            return False, f"Missing files: {', '.join(missing[:3])}..."
+        return True, f"All {len(required)} required files present"
+    
+    def check_environment(self) -> Tuple[bool, str]:
+        if Path(".env").exists():
+            return True, ".env file exists (credentials configured)"
+        elif Path(".env.example").exists():
+            return False, ".env.example exists but .env not created - copy and configure it"
+        return False, "No .env or .env.example found"
+    
+    def check_dependencies(self) -> Tuple[bool, str]:
+        try:
+            import requests
+            import yaml
+            from PIL import Image
+            return True, "Core dependencies (requests, PyYAML, Pillow) are installed"
+        except ImportError as e:
+            missing = str(e).split("'")[1] if "'" in str(e) else "dependencies"
+            return False, f"Missing dependency: {missing} - run 'pip install -r requirements.txt'"
+    
+    def check_imports(self) -> Tuple[bool, str]:
+        try:
+            from modules.config import load_config
+            from modules.auth import validate_token
+            from modules.notion_api import throttle
+            from modules.validation import sanitize_input
+            from modules.exceptions import NotionAPIError
+            from modules.visuals import get_estate_emoji
+            from modules.database import create_database_entry
+            from modules.logging_config import setup_logging
+            return True, "All modules import successfully"
+        except ImportError as e:
+            return False, f"Module import error: {e}"
+    
+    def check_configuration(self) -> Tuple[bool, str]:
+        try:
+            import yaml
+            with open("config.yaml", 'r') as f:
+                config = yaml.safe_load(f)
+            
+            api_version = config.get('notion_api_version')
+            expected_version = '2022-06-28'
+            
+            if hasattr(api_version, 'strftime'):
+                api_version = api_version.strftime('%Y-%m-%d')
+            
+            if str(api_version) != expected_version:
+                return False, f"API version is {api_version}, should be {expected_version}"
+            
+            rate_limit = config.get('rate_limit_rps', 2.5)
+            if rate_limit > 3:
+                return False, f"Rate limit too high: {rate_limit} RPS (max 3)"
+            
+            return True, "Configuration is valid"
+        except Exception as e:
+            return False, f"Configuration error: {e}"
+    
+    def check_api_credentials(self) -> Tuple[bool, str]:
+        if Path(".env").exists():
+            try:
+                from dotenv import load_dotenv
+                load_dotenv()
+            except ImportError:
+                with open(".env", 'r') as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith('#') and '=' in line:
+                            key, value = line.split('=', 1)
+                            os.environ[key.strip()] = value.strip()
+        
+        token = os.getenv("NOTION_TOKEN")
+        parent_id = os.getenv("NOTION_PARENT_PAGEID")
+        
+        if not token:
+            return False, "NOTION_TOKEN not set in environment"
+        if not parent_id:
+            return False, "NOTION_PARENT_PAGEID not set in environment"
+        
+        if token.startswith("secret_") or token.startswith("ntn_"):
+            return True, "API credentials configured and formatted correctly"
+        return False, "NOTION_TOKEN has invalid format (should start with secret_ or ntn_)"
+    
+    def check_github_assets(self) -> Tuple[bool, str]:
+        try:
+            from modules.config import load_config
+            config = load_config(Path("config.yaml"))
+            
+            github_url = config.get('visual_config', {}).get('github_assets_base_url')
+            if github_url and 'github' in github_url:
+                return True, f"GitHub assets configured: {github_url}"
+            return False, "GitHub assets URL not configured"
+        except Exception as e:
+            return False, f"Cannot check GitHub assets: {e}"
+    
+    def check_yaml_files(self) -> Tuple[bool, str]:
+        yaml_dir = Path("split_yaml")
+        if not yaml_dir.exists():
+            return False, "split_yaml directory not found"
+        
+        yaml_files = list(yaml_dir.glob("*.yaml"))
+        if len(yaml_files) < 10:
+            return False, f"Only {len(yaml_files)} YAML files found (expected 20+)"
+        
+        return True, f"{len(yaml_files)} YAML configuration files found"
+    
+    def check_no_duplicates(self) -> Tuple[bool, str]:
+        with open("deploy.py", 'r') as f:
+            content = f.read()
+        
+        if 'def validate_token(' in content and 'from modules.auth import validate_token' in content:
+            return False, "validate_token is both imported and defined locally"
+        
+        return True, "No duplicate function conflicts detected"
+    
+    def print_summary(self):
+        print("\n" + "=" * 70)
+        print("VALIDATION SUMMARY")
+        print("=" * 70)
+        
+        total = len(self.checks_passed) + len(self.checks_failed)
+        print(f"\n📊 Results: {len(self.checks_passed)}/{total} checks passed")
+        
+        if self.checks_passed:
+            print(f"\n✅ Passed Checks:")
+            for check in self.checks_passed:
+                print(f"  • {check}")
+        
+        if self.checks_failed:
+            print(f"\n❌ Failed Checks:")
+            for check in self.checks_failed:
+                print(f"  • {check}")
+        
+        print("\n" + "=" * 70)
+        
+        if self.is_ready:
+            print("🎉 DEPLOYMENT READY!")
+            print("✨ All checks passed. You can now run deploy.py")
+            print("\n📝 To deploy:")
+            print("  1. Ensure .env file has your Notion credentials")
+            print("  2. Run: python deploy.py")
+        else:
+            print("⚠️  NOT READY FOR DEPLOYMENT")
+            print(f"❌ Fix the {len(self.checks_failed)} failed checks above")
+            print("\n📝 Next steps:")
+            print("  1. Fix the issues listed above")
+            print("  2. Run this validation again")
+            print("  3. Only deploy when all checks pass")
+        
+        print("=" * 70)
+
+def main():
+    validator = DeploymentValidator()
+    is_ready = validator.validate()
+    sys.exit(0 if is_ready else 1)
+
+if __name__ == "__main__":
+    main()
+
+# test_deployment_requirements.py
+import unittest
+import os
+import sys
+from pathlib import Path
+import importlib
+import yaml
+
+sys.path.insert(0, str(Path(__file__).parent))
+
+class TestDeploymentRequirements(unittest.TestCase):
+    
+    def setUp(self):
+        self.project_root = Path(__file__).parent
+        
+    def test_environment_variables(self):
+        if Path(".env").exists():
+            try:
+                from dotenv import load_dotenv
+                load_dotenv()
+            except ImportError:
+                with open(".env", 'r') as f:
+                    for line in f:
+                        if '=' in line and not line.startswith('#'):
+                            key, value = line.split('=', 1)
+                            os.environ[key.strip()] = value.strip()
+        
+        token = os.getenv("NOTION_TOKEN")
+        self.assertIsNotNone(token, "NOTION_TOKEN not found")
+        self.assertTrue(
+            token.startswith("secret_") or token.startswith("ntn_"),
+            f"Invalid token format: {token[:10]}..."
+        )
+        
+        parent_id = os.getenv("NOTION_PARENT_PAGEID")
+        self.assertIsNotNone(parent_id, "NOTION_PARENT_PAGEID not found")
+    
+    def test_dependencies_installed(self):
+        required_modules = ['requests', 'yaml', 'PIL']
+        for module_name in required_modules:
+            try:
+                if module_name == 'yaml':
+                    import yaml
+                elif module_name == 'PIL':
+                    from PIL import Image
+                else:
+                    importlib.import_module(module_name)
+            except ImportError:
+                self.fail(f"Required module {module_name} not installed")
+    
+    def test_yaml_files_valid(self):
+        yaml_dir = self.project_root / "split_yaml"
+        self.assertTrue(yaml_dir.exists(), "split_yaml directory not found")
+        
+        yaml_files = list(yaml_dir.glob("*.yaml"))
+        self.assertGreater(len(yaml_files), 0, "No YAML files found")
+        
+        for yaml_file in yaml_files:
+            with open(yaml_file, 'r') as f:
+                try:
+                    yaml.safe_load(f)
+                except yaml.YAMLError as e:
+                    self.fail(f"Invalid YAML in {yaml_file.name}: {e}")
+    
+    def test_module_imports(self):
+        modules_to_test = [
+            'modules.config',
+            'modules.auth',
+            'modules.notion_api',
+            'modules.validation',
+            'modules.exceptions',
+            'modules.visuals',
+            'modules.database',
+            'modules.logging_config'
+        ]
+        
+        for module_name in modules_to_test:
+            try:
+                importlib.import_module(module_name)
+            except ImportError as e:
+                self.fail(f"Cannot import {module_name}: {e}")
+    
+    def test_api_configuration(self):
+        config_file = self.project_root / "config.yaml"
+        self.assertTrue(config_file.exists(), "config.yaml not found")
+        
+        with open(config_file, 'r') as f:
+            config = yaml.safe_load(f)
+        
+        self.assertIn('notion_api_version', config, "API version not configured")
+        api_version = config['notion_api_version']
+        
+        if hasattr(api_version, 'strftime'):
+            api_version = api_version.strftime('%Y-%m-%d')
+        
+        self.assertEqual(str(api_version), '2022-06-28', 
+                        f"Wrong API version: {api_version}")
+        
+        self.assertIn('rate_limit_rps', config, "Rate limit not configured")
+        self.assertLessEqual(config['rate_limit_rps'], 3, 
+                           f"Rate limit too high: {config['rate_limit_rps']}")
+    
+    def test_no_duplicate_functions(self):
+        deploy_file = self.project_root / "deploy.py"
+        self.assertTrue(deploy_file.exists(), "deploy.py not found")
+        
+        with open(deploy_file, 'r') as f:
+            content = f.read()
+        
+        self.assertFalse(
+            'def validate_token(' in content and 'from modules.auth import validate_token' in content,
+            "validate_token is both imported and defined locally"
+        )
+    
+    def test_security_configuration(self):
+        env_example = self.project_root / ".env.example"
+        self.assertTrue(env_example.exists(), ".env.example not found")
+        
+        with open(env_example, 'r') as f:
+            content = f.read()
+        
+        self.assertNotIn('secret_', content, "Real token found in .env.example")
+        self.assertNotIn('ntn_', content, "Real token found in .env.example")
+    
+    def test_error_handling_coverage(self):
+        deploy_file = self.project_root / "deploy.py"
+        with open(deploy_file, 'r') as f:
+            content = f.read()
+        
+        self.assertIn('try:', content, "No try/except blocks found")
+        self.assertIn('except', content, "No exception handling found")
+        self.assertIn('retry', content.lower(), "No retry logic found")
+    
+    def test_github_assets_accessible(self):
+        config_file = self.project_root / "config.yaml"
+        with open(config_file, 'r') as f:
+            config = yaml.safe_load(f)
+        
+        github_url = config.get('visual_config', {}).get('github_assets_base_url')
+        self.assertIsNotNone(github_url, "GitHub assets URL not configured")
+        self.assertIn('github', github_url, "Invalid GitHub URL")
+    
+    def test_database_module_functions(self):
+        from modules.database import create_database_entry
+        self.assertTrue(callable(create_database_entry), 
+                       "create_database_entry is not callable")
+
+if __name__ == '__main__':
+    unittest.main(verbosity=2)

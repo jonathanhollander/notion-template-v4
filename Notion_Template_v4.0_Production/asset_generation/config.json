@@ -1,0 +1,125 @@
+{
+  "replicate": {
+    "api_key": "${REPLICATE_API_KEY}",
+    "rate_limit": 2,
+    "timeout": 30,
+    "retry": 3,
+    "models": {
+      "icons": {
+        "model_id": "black-forest-labs/recraft-v3-svg",
+        "cost_per_image": 0.04,
+        "style": "realistic_image",
+        "purpose": "Technical drawing icons with mechanical poetry aesthetic"
+      },
+      "covers": {
+        "model_id": "black-forest-labs/flux-1.1-pro",
+        "cost_per_image": 0.04,
+        "style": "photorealistic",
+        "purpose": "Blueprint-style technical covers with layered compositions"
+      },
+      "textures": {
+        "model_id": "stability-ai/sdxl",
+        "cost_per_image": 0.003,
+        "style": "texture",
+        "purpose": "Background textures and patterns"
+      },
+      "letter_headers": {
+        "model_id": "black-forest-labs/flux-1.1-pro",
+        "cost_per_image": 0.04,
+        "style": "professional_letterhead",
+        "purpose": "Formal letterhead designs for template letters"
+      },
+      "database_icons": {
+        "model_id": "black-forest-labs/recraft-v3-svg",
+        "cost_per_image": 0.04,
+        "style": "data_visualization",
+        "purpose": "Clean icons for database category organization"
+      }
+    }
+  },
+  "review": {
+    "port": 4500,
+    "auto_open": true,
+    "host": "localhost",
+    "approval_file": "APPROVED.txt",
+    "production_approval_file": "PRODUCTION_APPROVED.txt"
+  },
+  "budget": {
+    "sample_generation": {
+      "max_cost": 1.00,
+      "approval_required": true,
+      "items": 10,
+      "alert_threshold": 0.80
+    },
+    "mass_generation": {
+      "max_cost": 25.00,
+      "approval_required": true,
+      "items": "dynamic",
+      "alert_threshold": 20.00,
+      "comment": "Dynamically discovers ~490 assets from YAML files"
+    },
+    "daily_limit": 25.00
+  },
+  "assets": {
+    "icons": {
+      "count": "dynamic",
+      "format": "svg",
+      "dimensions": "64x64",
+      "style": "mechanical_poetry",
+      "comment": "~230 icons discovered from YAML"
+    },
+    "covers": {
+      "count": "dynamic",
+      "format": "png",
+      "dimensions": "1500x400",
+      "style": "blueprint_technical",
+      "comment": "~230 covers discovered from YAML"
+    },
+    "textures": {
+      "count": 10,
+      "format": "png",
+      "dimensions": "512x512",
+      "style": "seamless_pattern"
+    },
+    "letter_headers": {
+      "count": 18,
+      "format": "png",
+      "dimensions": "1920x400",
+      "style": "professional_letterhead"
+    },
+    "database_icons": {
+      "count": 10,
+      "format": "svg",
+      "dimensions": "48x48",
+      "style": "data_visualization"
+    }
+  },
+  "theme": {
+    "name": "Estate Planning Executive",
+    "description": "Single high-end theme with mechanical poetry icons and blueprint covers",
+    "colors": {
+      "primary": "#4A7C74",
+      "secondary": "#527B84",
+      "accent": "#90CDF4",
+      "background": "#F9FAFB",
+      "text": "#1F2937"
+    },
+    "total_assets": "~490 (dynamically discovered)",
+    "estimated_cost": 19.60
+  },
+  "logging": {
+    "level": "INFO",
+    "colored_output": true,
+    "progress_bars": true,
+    "log_file": "logs/asset_generation.log",
+    "max_log_size": 10485760,
+    "backup_count": 5
+  },
+  "output": {
+    "sample_directory": "output/samples",
+    "production_directory": "output/production",
+    "backup_directory": "output/backup",
+    "github_repo": "notion-estate-assets",
+    "github_branch": "main"
+  }
+}

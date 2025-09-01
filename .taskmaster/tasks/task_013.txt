@@ -1,0 +1,11 @@
+# Task ID: 13
+# Title: Consolidate 4 AI builds into single deploy.py
+# Status: pending
+# Dependencies: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+# Priority: high
+# Description: Merge best features from Claude, ChatGPT, Gemini, and Qwen builds into master version
+# Details:
+Analyze each AI build for strengths, extract best implementations, merge into cohesive system, resolve conflicts
+
+# Test Strategy:
+Compare outputs with individual builds, verify no feature regression

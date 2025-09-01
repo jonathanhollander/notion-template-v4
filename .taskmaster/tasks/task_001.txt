@@ -1,0 +1,11 @@
+# Task ID: 1
+# Title: Set up core infrastructure and dependencies
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Initialize project structure, install required packages (requests, PyYAML), and set up configuration for Notion API v2025-09-03
+# Details:
+Create main deploy.py framework with updated API version, token format support (secret_ and ntn_ prefixes), and proper rate limiting implementation (2.5 RPS)
+
+# Test Strategy:
+Verify API connection with test token, validate rate limiting with burst tests

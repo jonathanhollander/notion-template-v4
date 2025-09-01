@@ -510,7 +510,7 @@ databases:
         Next Action Required: "Draft business succession/wind-down plan"
         Notes: "Helped establish LLC. Will need her expertise for business transition planning."
 
-  - title: Crisis Management
+  Crisis Management:
     icon:
       type: emoji
       emoji: 🚨
@@ -1239,6 +1239,30 @@ database_entries:
       Share With: Specific Individuals
       Preservation Status: Draft
       Tags: ["Career", "Milestones"]
+
+    - Memory Title: Our Wedding Day
+      Memory Type: Story
+      Date/Period: "2010-06-12"
+      Description: "The story of our wedding day, from the proposal to the last dance."
+      People Involved: ["Spouse", "Family", "Friends"]
+      Location: "The Old Mill, Anytown, USA"
+      Media Files: "/assets/images/wedding.jpg"
+      Significance: "The day we started our life together."
+      Share With: Family Only
+      Preservation Status: Ready to Share
+      Tags: ["Wedding", "Family", "Milestones"]
+
+    - Memory Title: First Home
+      Memory Type: Story
+      Date/Period: "2012-03-20"
+      Description: "Buying our first home and all the adventures that came with it."
+      People Involved: ["Spouse"]
+      Location: "123 Main Street, Anytown, USA"
+      Media Files: "/assets/images/first_home.jpg"
+      Significance: "The place where we built our family."
+      Share With: Family Only
+      Preservation Status: Ready to Share
+      Tags: ["Home", "Family", "Milestones"]
     
     # Additional comprehensive memory preservation templates
     - Memory Title: Wedding Day Memories

@@ -1,0 +1,11 @@
+# Task ID: 10
+# Title: Add Navigation Features
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Create navigation blocks and saved views
+# Details:
+Create back-to-hub navigation blocks. Implement breadcrumb navigation. Save filtered database views for common queries.
+
+# Test Strategy:
+Test all navigation links, verify breadcrumbs work, check saved views persist

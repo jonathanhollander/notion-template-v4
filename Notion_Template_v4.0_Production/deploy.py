@@ -13,6 +13,7 @@ import argparse
 import logging
 import base64
 import mimetypes
+import re
 from typing import Dict, List, Optional, Any, Tuple
 from pathlib import Path
 import yaml
@@ -20,19 +21,156 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-# Configuration
-NOTION_API_VERSION = "2025-09-03"  # Updated from 2022-06-28
-RATE_LIMIT_RPS = 2.5  # Notion API rate limit
-DEFAULT_TIMEOUT = 30
-MAX_RETRIES = 5
-BACKOFF_BASE = 1.5
-
-# Logging setup
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+# Import modular components
+from modules.config import load_config
+from modules.auth import validate_token, validate_token_with_api
+from modules.notion_api import throttle, create_session, req as module_req
+from modules.validation import sanitize_input, check_role_permission
+from modules.exceptions import (
+    ConfigurationError, NotionAPIError, ValidationError,
+    AuthenticationError, RateLimitExceededError, DatabaseOperationError
 )
-logger = logging.getLogger(__name__)
+
+# Import visual components
+from modules.visuals import (
+    get_estate_emoji, 
+    create_professional_header,
+    create_estate_status_indicator,
+    create_document_callout,
+    create_professional_divider,
+    create_confidential_notice
+)
+
+# Configuration
+
+# GitHub Asset Integration Functions
+def get_github_asset_url(asset_type: str, page_title: str, theme: str = "default") -> str:
+    """Generate GitHub-hosted asset URL for a page"""
+    # Sanitize page title for filename
+    sanitized_title = re.sub(r'[^a-zA-Z0-9_.-]', '_', page_title).lower()
+    
+    # Get base URL from config
+    config = load_config(Path("config.yaml"))
+    base_url = config.get('visual_config', {}).get('github_assets_base_url', 
+                         'https://raw.githubusercontent.com/jonathanhollander/notion-assets/main/assets')
+    
+    # Construct asset path
+    folder = f"{asset_type}s_{theme}"  # icons_default or covers_default
+    filename = f"{sanitized_title}_{asset_type}.png"
+    
+    return f"{base_url}/{folder}/{filename}"
+
+def get_asset_icon(page_title: str, theme: str = None) -> Dict:
+    """Get icon configuration for a page with GitHub URL"""
+    if not theme:
+        config = load_config(Path("config.yaml"))
+        theme = config.get('visual_config', {}).get('default_theme', 'default')
+    
+    # Use estate emoji for immediate display, external URL for permanent asset
+    emoji = get_page_emoji(page_title)
+    external_url = get_github_asset_url("icon", page_title, theme)
+    
+    return {
+        "type": "external",
+        "external": {"url": external_url}
+    }
+
+def get_asset_cover(page_title: str, theme: str = None) -> Dict:
+    """Get cover configuration for a page with GitHub URL"""
+    if not theme:
+        config = load_config(Path("config.yaml"))
+        theme = config.get('visual_config', {}).get('default_theme', 'default')
+    
+    external_url = get_github_asset_url("cover", page_title, theme)
+    
+    return {
+        "type": "external",
+        "external": {"url": external_url}
+    }
+
+def get_page_emoji(page_title: str) -> str:
+    """Get appropriate emoji for a page based on its category"""
+    title_lower = page_title.lower()
+    
+    # Map page categories to appropriate estate emoji
+    if "legal" in title_lower or "will" in title_lower or "power" in title_lower:
+        return get_estate_emoji("legal")
+    elif "family" in title_lower or "beneficiar" in title_lower:
+        return get_estate_emoji("family")
+    elif "asset" in title_lower or "propert" in title_lower or "real estate" in title_lower:
+        return get_estate_emoji("property")
+    elif "account" in title_lower or "financial" in title_lower or "bank" in title_lower:
+        return get_estate_emoji("assets")
+    elif "insurance" in title_lower:
+        return get_estate_emoji("secure")
+    elif "executor" in title_lower or "checklist" in title_lower:
+        return get_estate_emoji("document")
+    elif "memorial" in title_lower or "memories" in title_lower:
+        return get_estate_emoji("heritage")
+    elif "letter" in title_lower or "message" in title_lower:
+        return get_estate_emoji("sealed")
+    elif "contact" in title_lower:
+        return get_estate_emoji("generations")
+    elif "admin" in title_lower:
+        return get_estate_emoji("archived")
+    else:
+        return get_estate_emoji("document")
+
+def determine_page_theme(page_title: str) -> str:
+    """Determine appropriate theme based on page category"""
+    title_lower = page_title.lower()
+    
+    # Executive blue for administrative and professional
+    if "admin" in title_lower or "executor" in title_lower or "professional" in title_lower:
+        return "blue"
+    # Legacy purple for family and beneficiaries
+    elif "family" in title_lower or "beneficiar" in title_lower or "letter" in title_lower:
+        return "purple"
+    # Heritage green for assets and property
+    elif "asset" in title_lower or "propert" in title_lower or "account" in title_lower:
+        return "green"
+    # Default theme for others
+    else:
+        return "default"
+
+# Enhanced logging setup
+def setup_logging(log_level: str = "INFO", log_file: str = None):
+    """Setup comprehensive logging with file and console output"""
+    log_format = '%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s'
+    
+    # Configure root logger
+    logging.basicConfig(
+        level=getattr(logging, log_level.upper(), logging.INFO),
+        format=log_format,
+        handlers=[]
+    )
+    
+    # Console handler
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setLevel(logging.INFO)
+    console_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    console_handler.setFormatter(console_formatter)
+    
+    # File handler if specified
+    handlers = [console_handler]
+    if log_file:
+        try:
+            file_handler = logging.FileHandler(log_file)
+            file_handler.setLevel(logging.DEBUG)
+            file_formatter = logging.Formatter(log_format)
+            file_handler.setFormatter(file_formatter)
+            handlers.append(file_handler)
+        except Exception as e:
+            print(f"Warning: Could not setup file logging: {e}")
+    
+    # Apply handlers
+    root_logger = logging.getLogger()
+    root_logger.handlers = handlers
+    
+    return logging.getLogger(__name__)
+
+# Initialize logging
+logger = setup_logging(log_file="estate_planning_deployment.log")
 
 # Global state for tracking
 state = {
@@ -46,118 +184,87 @@ state = {
 # Rate limiting
 _last_request_time = [0.0]
 
-def throttle():
-    """Implement rate limiting at 2.5 requests per second"""
-    if RATE_LIMIT_RPS <= 0:
-        return
-    min_interval = 1.0 / RATE_LIMIT_RPS
-    now = time.time()
-    elapsed = now - _last_request_time[0]
-    if elapsed < min_interval:
-        sleep_time = min_interval - elapsed + 0.01
-        time.sleep(sleep_time)
-    _last_request_time[0] = time.time()
+# Create wrapper functions for backwards compatibility
+def throttle_wrapper():
+    """Wrapper for module throttle function using global rate limit"""
+    throttle(RATE_LIMIT_RPS)
 
 def create_session() -> requests.Session:
-    """Create a requests session with retry logic"""
-    session = requests.Session()
-    retry_strategy = Retry(
-        total=MAX_RETRIES,
-        backoff_factor=BACKOFF_BASE,
-        status_forcelist=[429, 500, 502, 503, 504],
-        allowed_methods=["GET", "POST", "PATCH", "DELETE"]
-    )
-    adapter = HTTPAdapter(max_retries=retry_strategy)
-    session.mount("http://", adapter)
-    session.mount("https://", adapter)
-    return session
+    """Create session using modular approach"""
+    from modules.notion_api import create_session as module_create_session
+    return module_create_session(max_retries=MAX_RETRIES, backoff_base=BACKOFF_BASE)
+
+def j(resp: requests.Response) -> Dict:
+    """Safely parse JSON response"""
+    try:
+        return resp.json()
+    except (ValueError, KeyError) as e:
+        logger.warning(f"Failed to parse JSON response: {e}")
+        logger.debug(f"Response content: {resp.text[:200]}...")
+        return {}
+
+# Load and validate configuration (using modular config system)
+try:
+    config = load_config(Path("config.yaml"))
+    
+    BASE_URL = config["base_url"]
+    NOTION_API_VERSION = config["notion_api_version"]
+    RATE_LIMIT_RPS = config["rate_limit_rps"]
+    DEFAULT_TIMEOUT = config["default_timeout"]
+    MAX_RETRIES = config["max_retries"]
+    BACKOFF_BASE = config["backoff_base"]
+    
+    logger.info(f"Configuration loaded successfully - BASE_URL: {BASE_URL}, API Version: {NOTION_API_VERSION}")
+    
+except Exception as e:
+    logger.error(f"Failed to load configuration: {e}")
+    logger.error("Please check your config.yaml file and ensure all required parameters are present")
+    sys.exit(1)
 
 session = create_session()
 
-def validate_token(token: str) -> bool:
-    """Validate Notion API token format"""
-    if not token:
-        return False
-    # Support both old and new token formats
-    return token.startswith("secret_") or token.startswith("ntn_")
+# Note: validate_token and validate_token_with_api are imported from modules.auth
+# Removed duplicate local definitions to avoid namespace conflicts
 
 def req(method: str, url: str, headers: Dict = None, data: str = None, 
         files=None, timeout: int = None) -> requests.Response:
     """
     Make a request to Notion API with proper error handling and rate limiting
     """
-    throttle()  # Apply rate limiting
-    
-    headers = headers or {}
-    
-    # Set required headers
-    if "Notion-Version" not in headers:
-        headers["Notion-Version"] = NOTION_API_VERSION
-    
-    token = os.getenv("NOTION_TOKEN", "")
-    if not validate_token(token):
-        raise ValueError(f"Invalid Notion token format. Must start with 'secret_' or 'ntn_'")
-    
-    if "Authorization" not in headers:
-        headers["Authorization"] = f"Bearer {token}"
-    
-    if "Content-Type" not in headers and data is not None and files is None:
-        headers["Content-Type"] = "application/json"
-    
-    timeout = timeout or DEFAULT_TIMEOUT
-    
-    try:
-        response = session.request(
-            method=method,
-            url=url,
-            headers=headers,
-            data=data,
-            files=files,
-            timeout=timeout
-        )
-        
-        # Log the request
-        logger.debug(f"{method} {url} - Status: {response.status_code}")
-        
-        # Check for errors
-        if response.status_code >= 400:
-            error_detail = ""
-            try:
-                error_detail = response.json()
-            except:
-                error_detail = response.text
-            logger.error(f"API Error: {response.status_code} - {error_detail}")
-            
-        return response
-        
-    except requests.exceptions.Timeout as e:
-        logger.error(f"Request timeout: {url}")
-        raise
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Request failed: {e}")
-        raise
+    from modules.notion_api import req as module_req
+    return module_req(method, url, headers, data, files, timeout, 
+                     rate_limit_rps=RATE_LIMIT_RPS, 
+                     notion_api_version=NOTION_API_VERSION)
 
 def expect_ok(resp: requests.Response, context: str = "") -> bool:
     """Check if response is successful"""
     if resp is None:
         logger.error(f"{context}: No response received")
-        return False
+        raise Exception(f"{context}: No response received")
     if resp.status_code not in (200, 201):
         try:
             body = resp.json()
-        except:
+        except (ValueError, KeyError) as e:
             body = resp.text
-        logger.error(f"{context}: {resp.status_code} - {body}")
-        return False
+            logger.warning(f"Failed to parse error response as JSON: {e}")
+        logger.error(f"{context}: HTTP {resp.status_code} - {body}")
+        raise NotionAPIError(f"{context}: HTTP {resp.status_code}", 
+                           status_code=resp.status_code, 
+                           response_body=body)
     return True
 
-def j(resp: requests.Response) -> Dict:
-    """Safely parse JSON response"""
-    try:
-        return resp.json()
-    except Exception as e:
-        logger.warning(f"Failed to parse JSON: {e}")
-        return {}
+def load_config(path: Path) -> Dict:
+    """Load configuration from YAML file"""
+    with open(path, 'r') as f:
+        return yaml.safe_load(f)
+
+def sanitize_input(text: str) -> str:
+    """Sanitize input to prevent security vulnerabilities"""
+    if not isinstance(text, str):
+        return text
+    # A basic sanitizer that removes some potentially dangerous characters
+    # For a production system, a more robust library like bleach would be better
+    return text.replace("<", "&lt;").replace(">", "&gt;")
 
 # Pages Index Database for Relations
 def update_rollup_properties():
@@ -199,7 +306,7 @@ def update_rollup_properties():
                     
                     if target_db_id:
                         try:
-                            _throttle()
+                            throttle_wrapper()
                             target_response = req("GET", f"{BASE_URL}/databases/{target_db_id}")
                             if target_response and "properties" in target_response:
                                 target_properties = target_response["properties"]
@@ -225,7 +332,7 @@ def update_rollup_properties():
                 "properties": rollup_updates
             }
             
-            _throttle()
+            throttle_wrapper()
             update_response = req("PATCH", url, json=update_payload)
             if update_response:
                 logger.info(f"Successfully updated {len(rollup_updates)} rollup properties")
@@ -255,7 +362,8 @@ def complete_database_relationships(parent_page_id: str):
                 "Dependencies": state["dbs"].get("Estate Analytics")  # Self-referential
             },
             "Professional Coordination": {
-                "Related Estate Items": state["dbs"].get("Accounts")  # Primary relation target
+                "Related Estate Items": state["dbs"].get("Accounts"),
+                "Contacts": state["dbs"].get("Contacts")
             },
             "Crisis Management": {
                 "Responsible Party": state["dbs"].get("Contacts"),
@@ -310,7 +418,7 @@ def complete_database_relationships(parent_page_id: str):
             # Apply updates
             if property_updates:
                 update_payload = {"properties": property_updates}
-                _throttle()
+                throttle_wrapper()
                 update_response = req("PATCH", url, json=update_payload)
                 if update_response:
                     logger.info(f"Updated {len(property_updates)} relationships for {db_name}")
@@ -412,7 +520,7 @@ def create_database_entry(db_id: str, entry_data: dict) -> Optional[str]:
             "properties": properties
         }
         
-        _throttle()
+        throttle_wrapper()
         response = req("POST", f"{BASE_URL}/pages", json=payload)
         if response:
             return response.get("id")
@@ -557,7 +665,7 @@ def create_progress_visualizations(page_id: str, metrics: dict = None) -> bool:
         
         # Add all blocks to the page
         payload = {"children": progress_blocks}
-        _throttle()
+        throttle_wrapper()
         response = req("PATCH", f"{BASE_URL}/blocks/{page_id}/children", json=payload)
         
         if response:
@@ -573,13 +681,13 @@ def create_progress_visualizations(page_id: str, metrics: dict = None) -> bool:
 
 def create_visual_progress_bar(percentage: int) -> str:
     """Create ASCII-style progress bar for Notion display"""
-    filled_blocks = int(percentage / 5)  # Each block represents 5%
-    empty_blocks = 20 - filled_blocks
+    filled_blocks = int(percentage / 10)  # Each block represents 10%
+    empty_blocks = 10 - filled_blocks
     
-    filled_char = "█"
-    empty_char = "░"
+    filled_char = "🟩"
+    empty_char = "⬜️"
     
-    return f"[{filled_char * filled_blocks}{empty_char * empty_blocks}] {percentage}%"
+    return f"{filled_char * filled_blocks}{empty_char * empty_blocks} {percentage}%"
 
 # Role-based Permission Functions
 def check_role_permission(page_role: str, user_role: str) -> bool:
@@ -707,7 +815,7 @@ def add_qr_access_to_page(page_id: str, emergency_info: Dict = None) -> bool:
     
     try:
         # Get page title for QR code
-        page_resp = req("GET", f"https://api.notion.com/v1/pages/{page_id}")
+        page_resp = req("GET", f"{BASE_URL}/v1/pages/{page_id}")
         if not expect_ok(page_resp, f"Get page {page_id}"):
             return False
         
@@ -727,7 +835,7 @@ def add_qr_access_to_page(page_id: str, emergency_info: Dict = None) -> bool:
         qr_block = create_emergency_qr_block(page_id, page_title, emergency_info)
         
         # Add QR block to page
-        r = req("PATCH", f"https://api.notion.com/v1/blocks/{page_id}/children",
+        r = req("PATCH", f"{BASE_URL}/v1/blocks/{page_id}/children",
                 data=json.dumps({"children": [qr_block]}))
         
         return expect_ok(r, f"Add QR code to page {page_title}")
@@ -737,23 +845,23 @@ def add_qr_access_to_page(page_id: str, emergency_info: Dict = None) -> bool:
         return False
 
 def create_timeline_visualization() -> List[Dict]:
-    """Create timeline visualization blocks"""
+    """Create professional estate planning timeline blocks"""
     blocks = []
     
     blocks.append({
         "type": "heading_2",
         "heading_2": {
-            "rich_text": [{"type": "text", "text": {"content": "📅 Implementation Timeline"}}]
+            "rich_text": [{"type": "text", "text": {"content": f"{get_estate_emoji('heritage')} Estate Planning Timeline"}}]
         }
     })
     
-    # Timeline items with status indicators
+    # Timeline items with professional status indicators
     timeline_items = [
-        {"phase": "Foundation Setup", "status": "✅ Complete", "days": "Days 1-3"},
-        {"phase": "Core Systems", "status": "🔵 In Progress", "days": "Days 4-10"},
-        {"phase": "Professional Integration", "status": "🔵 In Progress", "days": "Days 11-15"},
-        {"phase": "Family Coordination", "status": "⚪ Pending", "days": "Days 16-20"},
-        {"phase": "Final Testing", "status": "⚪ Pending", "days": "Days 21-25"}
+        {"phase": "Foundation Setup", "status": get_estate_emoji("complete"), "days": "Days 1-3"},
+        {"phase": "Core Systems", "status": get_estate_emoji("in_progress"), "days": "Days 4-10"},
+        {"phase": "Professional Integration", "status": get_estate_emoji("in_progress"), "days": "Days 11-15"},
+        {"phase": "Family Coordination", "status": get_estate_emoji("pending"), "days": "Days 16-20"},
+        {"phase": "Final Testing", "status": get_estate_emoji("pending"), "days": "Days 21-25"}
     ]
     
     for item in timeline_items:
@@ -770,51 +878,51 @@ def create_timeline_visualization() -> List[Dict]:
     return blocks
 
 def create_status_dashboard() -> List[Dict]:
-    """Create comprehensive status dashboard blocks"""
+    """Create professional estate planning status dashboard"""
     blocks = []
     
     blocks.append({
         "type": "heading_2", 
         "heading_2": {
-            "rich_text": [{"type": "text", "text": {"content": "📈 System Status Dashboard"}}]
+            "rich_text": [{"type": "text", "text": {"content": f"{get_estate_emoji('assets')} Estate System Status"}}]
         }
     })
     
-    # Database connectivity status
+    # Database connectivity status with professional styling
     blocks.append({
         "type": "callout",
         "callout": {
-            "icon": {"emoji": "🔗"},
-            "color": "green_background",
+            "icon": {"emoji": get_estate_emoji("verified")},
+            "color": "gray_background",
             "rich_text": [{
                 "type": "text",
-                "text": {"content": "Database Connectivity: ✅ All 11 databases connected and syncing"}
+                "text": {"content": f"Database Connectivity: {get_estate_emoji('complete')} All 11 databases connected"}
             }]
         }
     })
     
-    # API functionality status  
+    # API functionality status with dignified presentation
     blocks.append({
         "type": "callout",
         "callout": {
-            "icon": {"emoji": "⚡"},
-            "color": "green_background", 
+            "icon": {"emoji": get_estate_emoji("secure")},
+            "color": "gray_background", 
             "rich_text": [{
                 "type": "text",
-                "text": {"content": "API Status: ✅ v2025-09-03 fully operational (2.5 RPS)"}
+                "text": {"content": f"API Status: {get_estate_emoji('complete')} v2022-06-28 operational (2.5 RPS)"}
             }]
         }
     })
     
-    # Rollup calculations status
+    # Rollup calculations status with professional indicators
     blocks.append({
         "type": "callout",
         "callout": {
-            "icon": {"emoji": "🔢"},
-            "color": "green_background",
+            "icon": {"emoji": get_estate_emoji("investment")},
+            "color": "gray_background",
             "rich_text": [{
                 "type": "text",
-                "text": {"content": "Rollup Calculations: ✅ Cross-database aggregations active"}
+                "text": {"content": f"Calculations: {get_estate_emoji('complete')} Cross-database aggregations active"}
             }]
         }
     })
@@ -868,7 +976,7 @@ def create_completion_gauge(page_id: str, title: str, percentage: int, target: i
         }]
         
         payload = {"children": blocks}
-        _throttle()
+        throttle_wrapper()
         response = req("PATCH", f"{BASE_URL}/blocks/{page_id}/children", json=payload)
         return bool(response)
         
@@ -879,47 +987,40 @@ def create_completion_gauge(page_id: str, title: str, percentage: int, target: i
 def create_circular_gauge(percentage: int) -> str:
     """Create circular gauge representation using Unicode characters"""
     if percentage >= 90:
-        return "🟢 Excellent Progress"
+        return "🟢"
     elif percentage >= 70:
-        return "🟡 Good Progress"
+        return "🟡"
     elif percentage >= 50:
-        return "🟠 Moderate Progress" 
+        return "🟠"
     elif percentage >= 25:
-        return "🔴 Early Stage"
+        return "🔴"
     else:
-        return "⚪ Not Started"
+        return "⚪️"
 
-def get_hub_specific_metrics(hub_name: str) -> dict:
+def get_hub_specific_metrics(hub_name: str, metrics_db_id: str) -> dict:
     """Get metrics specific to each hub for progress visualization"""
-    metrics = {
-        "Preparation Hub": {
-            "legal_documents": 75,
-            "financial_accounts": 60,
-            "insurance_setup": 90,
-            "digital_assets": 45,
-            "overall": 67
-        },
-        "Executor Hub": {
-            "professional_contacts": 85,
-            "crisis_procedures": 92,
-            "document_access": 88,
-            "notification_setup": 30,
-            "overall": 74
-        },
-        "Family Hub": {
-            "memory_preservation": 55,
-            "family_access": 80,
-            "keepsakes_catalog": 25,
-            "message_system": 70,
-            "overall": 58
+    metrics = {}
+    query_payload = {
+        "filter": {
+            "property": "Hub",
+            "title": {"equals": hub_name}
         }
     }
-    
-    return metrics.get(hub_name, {"overall": 50})
+    r = req("POST", f"{BASE_URL}/v1/databases/{metrics_db_id}/query",
+            data=json.dumps(query_payload))
+    data = j(r)
+    if data and data.get("results"):
+        for result in data.get("results"):
+            properties = result.get("properties", {})
+            if "Metric" in properties and "Value" in properties:
+                metric = properties["Metric"]["rich_text"][0]["plain_text"]
+                value = properties["Value"]["number"]
+                metrics[metric] = value
+    return metrics
 
-def calculate_hub_progress(hub_name: str) -> int:
+def calculate_hub_progress(hub_name: str, metrics_db_id: str) -> int:
     """Calculate overall progress percentage for a specific hub"""
-    metrics = get_hub_specific_metrics(hub_name)
+    metrics = get_hub_specific_metrics(hub_name, metrics_db_id)
     return metrics.get("overall", 50)
 
 def create_burndown_chart_visualization(page_id: str, tasks_data: dict = None) -> bool:
@@ -984,7 +1085,7 @@ def create_burndown_chart_visualization(page_id: str, tasks_data: dict = None) -
         })
         
         payload = {"children": burndown_blocks}
-        _throttle()
+        throttle_wrapper()
         response = req("PATCH", f"{BASE_URL}/blocks/{page_id}/children", json=payload)
         
         return bool(response)
@@ -997,23 +1098,16 @@ def create_ascii_burndown_chart(tasks_data: dict) -> str:
     """Create ASCII representation of burndown chart"""
     total = tasks_data["total_tasks"]
     completed = tasks_data["completed"]
-    days_elapsed = tasks_data["days_elapsed"]
     
     chart_lines = ["Task Burndown Chart", "=" * 25]
     
     # Create simple bar chart showing progress
-    for day in range(1, days_elapsed + 1):
-        tasks_done_by_day = int((completed / days_elapsed) * day)
-        remaining_tasks = total - tasks_done_by_day
-        
-        # Visual bar representation
-        done_bars = "█" * (tasks_done_by_day // 2)
-        remaining_bars = "░" * (remaining_tasks // 2)
-        
-        chart_lines.append(f"Day {day:2d}: {done_bars}{remaining_bars} ({remaining_tasks} left)")
+    done_bars = "🟩" * completed
+    remaining_bars = "⬜️" * (total - completed)
+    
+    chart_lines.append(f"{done_bars}{remaining_bars} ({completed}/{total} completed)")
     
     chart_lines.append("=" * 25)
-    chart_lines.append(f"Current: {completed}/{total} tasks completed")
     
     return "\n".join(chart_lines)
 
@@ -1191,8 +1285,8 @@ def create_role_navigation_structure(parent_page_id: str) -> dict:
                 "children": role_page_blocks
             }
             
-            _throttle()
-            response = req("POST", "https://api.notion.com/v1/pages", json=page_payload)
+            throttle_wrapper()
+            response = req("POST", f"{BASE_URL}/v1/pages", json=page_payload)
             
             if response:
                 role_pages[role_name] = response.get("id")
@@ -1350,8 +1444,8 @@ def create_role_switching_interface(parent_page_id: str, permission_matrix: dict
             "children": switcher_blocks
         }
         
-        _throttle()
-        response = req("POST", "https://api.notion.com/v1/pages", json=page_payload)
+        throttle_wrapper()
+        response = req("POST", f"{BASE_URL}/v1/pages", json=page_payload)
         
         if response:
             page_id = response.get("id")
@@ -1422,7 +1516,7 @@ def ensure_pages_index_db(parent_id: str) -> Optional[str]:
         }
     }
     
-    r = req("POST", "https://api.notion.com/v1/databases", data=json.dumps(payload))
+    r = req("POST", f"{BASE_URL}/v1/databases", data=json.dumps(payload))
     if not expect_ok(r, "Create Pages Index DB"):
         return None
     
@@ -1441,7 +1535,7 @@ def upsert_pages_index_row(db_id: str, title: str, page_id: str) -> Optional[str
         }
     }
     
-    q = req("POST", f"https://api.notion.com/v1/databases/{db_id}/query", 
+    q = req("POST", f"{BASE_URL}/v1/databases/{db_id}/query", 
             data=json.dumps(query_payload))
     data = j(q)
     existing = data.get("results", [])
@@ -1454,13 +1548,13 @@ def upsert_pages_index_row(db_id: str, title: str, page_id: str) -> Optional[str
     if existing:
         # Update existing
         entry_id = existing[0]["id"]
-        r = req("PATCH", f"https://api.notion.com/v1/pages/{entry_id}", 
+        r = req("PATCH", f"{BASE_URL}/v1/pages/{entry_id}", 
                 data=json.dumps({"properties": props}))
         if expect_ok(r, f"Update pages index for {title}"):
             return entry_id
     else:
         # Create new
-        r = req("POST", "https://api.notion.com/v1/pages",
+        r = req("POST", f"{BASE_URL}/v1/pages",
                 data=json.dumps({
                     "parent": {"database_id": db_id},
                     "properties": props
@@ -1480,7 +1574,7 @@ def find_index_item_by_title(db_id: str, title: str) -> Optional[str]:
         }
     }
     
-    r = req("POST", f"https://api.notion.com/v1/databases/{db_id}/query",
+    r = req("POST", f"{BASE_URL}/v1/databases/{db_id}/query",
             data=json.dumps(query_payload))
     data = j(r)
     
@@ -1559,7 +1653,7 @@ def ensure_synced_library(parent_id: str) -> Tuple[Optional[str], Dict[str, str]
         children.append(synced_block)
     
     # Add blocks to library
-    r = req("PATCH", f"https://api.notion.com/v1/blocks/{lib_id}/children",
+    r = req("PATCH", f"{BASE_URL}/v1/blocks/{lib_id}/children",
             data=json.dumps({"children": children}))
     
     sync_map = {}
@@ -1587,7 +1681,7 @@ def add_synced_reference(target_page_id: str, sync_key: str, original_block_id: 
         }
     }
     
-    r = req("PATCH", f"https://api.notion.com/v1/blocks/{target_page_id}/children",
+    r = req("PATCH", f"{BASE_URL}/v1/blocks/{target_page_id}/children",
             data=json.dumps({"children": [block]}))
     
     return expect_ok(r, f"Add synced reference {sync_key}")
@@ -1687,7 +1781,7 @@ def create_synced_block(parent_id: str, sync_key: str, content: List[Dict]) -> O
             })
     
     # Create the block
-    r = req("PATCH", f"https://api.notion.com/v1/blocks/{parent_id}/children",
+    r = req("PATCH", f"{BASE_URL}/v1/blocks/{parent_id}/children",
             data=json.dumps({"children": [synced_block]}))
     
     if expect_ok(r, f"Create synced block {sync_key}"):
@@ -1721,7 +1815,7 @@ def reference_synced_block(parent_id: str, sync_key: str) -> bool:
         }
     }
     
-    r = req("PATCH", f"https://api.notion.com/v1/blocks/{parent_id}/children",
+    r = req("PATCH", f"{BASE_URL}/v1/blocks/{parent_id}/children",
             data=json.dumps({"children": [synced_ref]}))
     
     return expect_ok(r, f"Reference synced block {sync_key}")
@@ -1749,7 +1843,7 @@ def has_marker(page_id: str, text_snippet: str) -> bool:
     if marker_key in state["markers"]:
         return True
     
-    r = req("GET", f"https://api.notion.com/v1/blocks/{page_id}/children?page_size=100")
+    r = req("GET", f"{BASE_URL}/v1/blocks/{page_id}/children?page_size=100")
     data = j(r)
     
     for block in data.get("results", []):
@@ -1855,18 +1949,38 @@ def upload_asset(asset_type: str, asset_name: str) -> Optional[Dict]:
     else:
         return None
 
-def get_asset_icon(asset_name: str) -> Optional[Dict]:
+# Commented out - duplicate function (using the one at line 63 instead)
+'''
+def get_asset_icon(asset_name: str, theme: str = "default", custom_themes_db_id: str = None) -> Optional[Dict]:
     """Get icon configuration from asset file or emoji"""
     
     # Check if it's an emoji
     if len(asset_name) <= 2 and not asset_name.endswith(('.png', '.svg', '.jpg')):
         return {"type": "emoji", "emoji": asset_name}
     
+    # Check custom themes db first
+    if custom_themes_db_id and theme != "default":
+        query_payload = {
+            "filter": {
+                "property": "Theme Name",
+                "title": {"equals": theme}
+            }
+        }
+        r = req("POST", f"{BASE_URL}/v1/databases/{custom_themes_db_id}/query",
+                data=json.dumps(query_payload))
+        data = j(r)
+        if data and data.get("results"):
+            properties = data["results"][0].get("properties", {})
+            if "Icon" in properties and properties["Icon"].get("rich_text"):
+                icon_url = properties["Icon"]["rich_text"][0]["plain_text"]
+                if icon_url:
+                    return {"type": "external", "external": {"url": icon_url}}
+
     # Check assets directory for icons
     assets_dir = Path("assets")
     
     # Try different icon directories
-    icon_dirs = ["icons", "icons_png"]
+    icon_dirs = [f"icons_{theme}", "icons"] if theme != "default" else ["icons"]
     for icon_dir in icon_dirs:
         if (assets_dir / icon_dir).exists():
             # Look for the file with various extensions
@@ -1904,15 +2018,35 @@ def get_asset_icon(asset_name: str) -> Optional[Dict]:
     
     # Default emoji
     return {"type": "emoji", "emoji": "📄"}
-
-def get_asset_cover(asset_name: str) -> Optional[Dict]:
+'''
+# Commented out - duplicate function (using the one at line 78 instead)
+'''
+def get_asset_cover(asset_name: str, theme: str = "default", custom_themes_db_id: str = None) -> Optional[Dict]:
     """Get cover configuration from asset file"""
     
+    # Check custom themes db first
+    if custom_themes_db_id and theme != "default":
+        query_payload = {
+            "filter": {
+                "property": "Theme Name",
+                "title": {"equals": theme}
+            }
+        }
+        r = req("POST", f"{BASE_URL}/v1/databases/{custom_themes_db_id}/query",
+                data=json.dumps(query_payload))
+        data = j(r)
+        if data and data.get("results"):
+            properties = data["results"][0].get("properties", {})
+            if "Cover" in properties and properties["Cover"].get("rich_text"):
+                cover_url = properties["Cover"]["rich_text"][0]["plain_text"]
+                if cover_url:
+                    return {"type": "external", "external": {"url": cover_url}}
+
     # Check assets directory for covers
     assets_dir = Path("assets")
     
     # Try different cover directories
-    cover_dirs = ["covers", "covers_png"]
+    cover_dirs = [f"covers_{theme}", "covers"] if theme != "default" else ["covers"]
     for cover_dir in cover_dirs:
         if (assets_dir / cover_dir).exists():
             # Try common cover image extensions
@@ -1941,6 +2075,7 @@ def get_asset_cover(asset_name: str) -> Optional[Dict]:
     
     # No cover if we can't find or upload the file
     return None
+'''
 
 # Navigation Components
 def create_navigation_block(page_id: str, hub_name: str, hub_id: str, breadcrumbs: List[Dict] = None) -> bool:
@@ -1973,7 +2108,7 @@ def create_navigation_block(page_id: str, hub_name: str, hub_id: str, breadcrumb
         nav_blocks.append(breadcrumb_block)
     
     # Add navigation to page
-    r = req("PATCH", f"https://api.notion.com/v1/blocks/{page_id}/children",
+    r = req("PATCH", f"{BASE_URL}/v1/blocks/{page_id}/children",
             data=json.dumps({"children": nav_blocks}))
     
     return expect_ok(r, f"Add navigation to page")
@@ -2012,7 +2147,7 @@ def create_quick_jump_menu(page_id: str, sections: List[Dict]) -> bool:
         "divider": {}
     })
     
-    r = req("PATCH", f"https://api.notion.com/v1/blocks/{page_id}/children",
+    r = req("PATCH", f"{BASE_URL}/v1/blocks/{page_id}/children",
             data=json.dumps({"children": menu_blocks}))
     
     return expect_ok(r, f"Add quick jump menu")
@@ -2041,14 +2176,83 @@ def create_section_tabs(page_id: str, tabs: List[Dict], active_tab: str = None) 
     
     # Add all tabs to page
     if tab_bar:
-        r = req("PATCH", f"https://api.notion.com/v1/blocks/{page_id}/children",
+        r = req("PATCH", f"{BASE_URL}/v1/blocks/{page_id}/children",
                 data=json.dumps({"children": tab_bar}))
         
         return expect_ok(r, f"Add section tabs")
     
     return False
 
-def create_grid_dashboard(page_id: str, hub_name: str, role: str = "owner") -> bool:
+
+
+def create_custom_themes_db(parent_page_id: str) -> Optional[str]:
+    """Create a database to store custom themes."""
+    title = "Custom Themes"
+    if title in state["dbs"]:
+        return state["dbs"][title]
+
+    logger.info(f"Creating {title} database...")
+
+    schema = {
+        "properties": {
+            "Theme Name": {"type": "title"},
+            "Icon": {"type": "rich_text"},
+            "Cover": {"type": "rich_text"},
+        }
+    }
+
+    db_id = create_database(parent_page_id, title, schema)
+    if db_id:
+        state["dbs"][title] = db_id
+        # Seed with a default custom theme
+        seed_database(db_id, [
+            {"Theme Name": "My Custom Theme", "Icon": "🎉", "Cover": ""}
+        ])
+    return db_id
+
+
+def create_metrics_db(parent_page_id: str) -> Optional[str]:
+    """Create the Metrics DB to store dashboard data."""
+    title = "Metrics DB"
+    if title in state["dbs"]:
+        return state["dbs"][title]
+
+    logger.info("Creating Metrics DB...")
+
+    schema = {
+        "properties": {
+            "Hub": {"title": {}},
+            "Metric": {"rich_text": {}},
+            "Value": {"number": {"format": "number"}},
+        }
+    }
+
+    db_id = create_database(parent_page_id, title, schema)
+    if db_id:
+        # Add initial rows
+        initial_rows = [
+            {"Hub": "Preparation Hub", "Metric": "legal_documents", "Value": 75},
+            {"Hub": "Preparation Hub", "Metric": "financial_accounts", "Value": 60},
+            {"Hub": "Preparation Hub", "Metric": "insurance_setup", "Value": 90},
+            {"Hub": "Preparation Hub", "Metric": "digital_assets", "Value": 45},
+            {"Hub": "Preparation Hub", "Metric": "overall", "Value": 67},
+            {"Hub": "Executor Hub", "Metric": "professional_contacts", "Value": 85},
+            {"Hub": "Executor Hub", "Metric": "crisis_procedures", "Value": 92},
+            {"Hub": "Executor Hub", "Metric": "document_access", "Value": 88},
+            {"Hub": "Executor Hub", "Metric": "notification_setup", "Value": 30},
+            {"Hub": "Executor Hub", "Metric": "overall", "Value": 74},
+            {"Hub": "Family Hub", "Metric": "memory_preservation", "Value": 55},
+            {"Hub": "Family Hub", "Metric": "family_access", "Value": 80},
+            {"Hub": "Family Hub", "Metric": "keepsakes_catalog", "Value": 25},
+            {"Hub": "Family Hub", "Metric": "message_system", "Value": 70},
+            {"Hub": "Family Hub", "Metric": "overall", "Value": 58},
+        ]
+        seed_database(db_id, initial_rows)
+
+    return db_id
+
+
+def create_grid_dashboard(page_id: str, hub_name: str, role: str = "owner", metrics_db_id: str = None) -> bool:
     """Create comprehensive grid dashboard for hub pages with role-based content"""
     logger.info(f"Creating grid dashboard for {hub_name} (role: {role})")
     
@@ -2089,8 +2293,8 @@ def create_grid_dashboard(page_id: str, hub_name: str, role: str = "owner") -> b
         })
         
         # Add hub-specific progress visualization metrics
-        hub_metrics = get_hub_specific_metrics(hub_name)
-        overall_progress = calculate_hub_progress(hub_name)
+        hub_metrics = get_hub_specific_metrics(hub_name, metrics_db_id)
+        overall_progress = calculate_hub_progress(hub_name, metrics_db_id)
         
         # Overall progress bar for this hub
         progress_bar = create_visual_progress_bar(overall_progress)
@@ -2266,28 +2470,42 @@ def create_grid_dashboard(page_id: str, hub_name: str, role: str = "owner") -> b
 # Page Creation
 def create_page(parent_id: str, title: str, icon: Dict = None, cover: Dict = None,
                 description: str = None, helpers: List = None, role: str = None) -> Optional[str]:
-    """Create a page with all content in one pass for efficiency"""
+    """Create a page with premium visuals and GitHub-hosted assets"""
     
+    # Sanitize inputs
+    title = sanitize_input(title)
+    if description:
+        description = sanitize_input(description)
+
     # Check if already exists
     if title in state["pages"]:
         logger.debug(f"Page '{title}' already exists")
         return state["pages"][title]
     
-    logger.info(f"Creating page: {title}")
+    logger.info(f"Creating page: {title} with premium visuals")
+    
+    # Auto-determine theme if not specified
+    theme = determine_page_theme(title)
+    
+    # Auto-assign icon and cover from GitHub if not provided
+    if not icon:
+        icon = get_asset_icon(title, theme)
+        logger.debug(f"Auto-assigned icon for '{title}' with theme '{theme}'")
+    
+    if not cover:
+        cover = get_asset_cover(title, theme)
+        logger.debug(f"Auto-assigned cover for '{title}' with theme '{theme}'")
     
     payload = {
         "parent": {"type": "page_id", "page_id": parent_id},
         "properties": {
             "title": {"title": [{"type": "text", "text": {"content": title}}]}
-        }
+        },
+        "icon": icon,    # Always include icon
+        "cover": cover    # Always include cover
     }
     
-    if icon:
-        payload["icon"] = icon
-    if cover:
-        payload["cover"] = cover
-    
-    r = req("POST", "https://api.notion.com/v1/pages", data=json.dumps(payload))
+    r = req("POST", f"{BASE_URL}/v1/pages", data=json.dumps(payload))
     if not expect_ok(r, f"Create page {title}"):
         return None
     
@@ -2297,27 +2515,43 @@ def create_page(parent_id: str, title: str, icon: Dict = None, cover: Dict = Non
     # Add content blocks
     blocks = []
     
-    # Add hero block
+    # Add professional header with tasteful emoji
+    page_emoji = get_page_emoji(title)
+    
+    # Add confidential notice for sensitive pages
+    if any(word in title.lower() for word in ["legal", "will", "trust", "power", "financial"]):
+        blocks.append(create_confidential_notice())
+    
+    # Add hero block with estate-appropriate styling
     if role:
-        color = "blue_background" if role == "executor" else \
-                "orange_background" if role == "family" else "gray_background"
+        # Use dignified colors based on role
+        color = "gray_background"  # Always professional gray
+        role_emoji = get_estate_emoji("executor" if role == "executor" else 
+                                     "family" if role == "family" else "document")
+        
         blocks.append({
             "object": "block",
             "type": "callout",
             "callout": {
-                "icon": {"type": "emoji", "emoji": "⬢"},
-                "rich_text": rt(f"This page helps you with: {title}", bold=True),
+                "icon": {"type": "emoji", "emoji": role_emoji},
+                "rich_text": rt(f"{page_emoji} {title}", bold=True),
                 "color": color
             }
         })
-        blocks.append({"object": "block", "type": "divider", "divider": {}})
+        
+        # Add professional divider
+        blocks.append(create_professional_divider("section"))
     
-    # Add description
+    # Add description with professional styling
     if description:
         blocks.append({
             "object": "block",
-            "type": "paragraph",
-            "paragraph": {"rich_text": rt(description, italic=True, color="gray")}
+            "type": "callout",
+            "callout": {
+                "icon": {"type": "emoji", "emoji": get_estate_emoji("important")},
+                "rich_text": rt(description, italic=True),
+                "color": "gray_background"
+            }
         })
     
     # Add helpers
@@ -2339,7 +2573,7 @@ def create_page(parent_id: str, title: str, icon: Dict = None, cover: Dict = Non
             })
     
     if blocks:
-        req("PATCH", f"https://api.notion.com/v1/blocks/{page_id}/children",
+        req("PATCH", f"{BASE_URL}/v1/blocks/{page_id}/children",
             data=json.dumps({"children": blocks}))
     
     return page_id
@@ -2468,7 +2702,7 @@ def create_database(parent_id: str, title: str, schema: Dict) -> Optional[str]:
     if "description" in schema:
         payload["description"] = [{"type": "text", "text": {"content": schema["description"]}}]
     
-    r = req("POST", "https://api.notion.com/v1/databases", data=json.dumps(payload))
+    r = req("POST", f"{BASE_URL}/v1/databases", data=json.dumps(payload))
     if not expect_ok(r, f"Create database {title}"):
         return None
     
@@ -2486,7 +2720,7 @@ def create_database(parent_id: str, title: str, schema: Dict) -> Optional[str]:
                 }
             }
         }
-        req("PATCH", f"https://api.notion.com/v1/databases/{db_id}",
+        req("PATCH", f"{BASE_URL}/v1/databases/{db_id}",
             data=json.dumps(patch_payload))
     
     return db_id
@@ -2508,7 +2742,7 @@ def create_rollup_property(db_id: str, property_name: str, relation_name: str,
         }
     }
     
-    r = req("PATCH", f"https://api.notion.com/v1/databases/{db_id}", 
+    r = req("PATCH", f"{BASE_URL}/v1/databases/{db_id}", 
             data=json.dumps(payload))
     
     return expect_ok(r, f"Add rollup property '{property_name}'")
@@ -2521,7 +2755,7 @@ def seed_database(db_id: str, rows: List[Dict], pages_index_db: str = None) -> N
     logger.info(f"Seeding database with {len(rows)} rows")
     
     # Get database schema
-    meta = j(req("GET", f"https://api.notion.com/v1/databases/{db_id}"))
+    meta = j(req("GET", f"{BASE_URL}/v1/databases/{db_id}"))
     schema = meta.get("properties", {})
     
     for row in rows:
@@ -2532,6 +2766,10 @@ def seed_database(db_id: str, rows: List[Dict], pages_index_db: str = None) -> N
             row["Note"] = row.pop("Notes")
         
         for key, value in row.items():
+            # Sanitize string values
+            if isinstance(value, str):
+                value = sanitize_input(value)
+
             # Skip special keys
             if key in ["Related Page Title", "Related Page"]:
                 # Handle relations
@@ -2587,15 +2825,15 @@ def seed_database(db_id: str, rows: List[Dict], pages_index_db: str = None) -> N
                 props[key] = {"rich_text": [{"type": "text", "text": {"content": str(value)}}]}
         
         # Create the database row
-        req("POST", "https://api.notion.com/v1/pages",
+        req("POST", f"{BASE_URL}/v1/pages",
             data=json.dumps({
                 "parent": {"database_id": db_id},
                 "properties": props
             }))
 
 # Grid Dashboard Creation
-def create_grid_dashboard(page_id: str, items: List[Dict], cols: int = 3) -> None:
-    """Create a grid dashboard layout"""
+def create_simple_grid_dashboard(page_id: str, items: List[Dict], cols: int = 3) -> None:
+    """Create a simple grid dashboard layout"""
     if not items:
         return
     
@@ -2654,7 +2892,7 @@ def create_grid_dashboard(page_id: str, items: List[Dict], cols: int = 3) -> Non
             "column": {"children": column_blocks}
         })
     
-    req("PATCH", f"https://api.notion.com/v1/blocks/{page_id}/children",
+    req("PATCH", f"{BASE_URL}/v1/blocks/{page_id}/children",
         data=json.dumps({"children": children}))
 
 # YAML Loading
@@ -2756,20 +2994,23 @@ def filter_config_by_complexity(config: Dict, complexity: str) -> Dict:
         "simple": {
             "pages": ["Preparation Hub", "Legal Documents", "Financial Accounts", "Letters", "Contacts"],
             "databases": ["Accounts", "Insurance", "Letters Database", "Contacts"],
-            "max_letters": 5
+            "max_letters": 5,
+            "executor_task_packs": ["Pack – Simple Estate"]
         },
         "moderate": {
             "pages": ["Preparation Hub", "Executor Hub", "Legal Documents", "Financial Accounts", 
                      "Property & Assets", "Insurance", "Letters", "Contacts"],
             "databases": ["Accounts", "Insurance", "Property", "Subscriptions", "Letters Database", 
                          "Contacts", "Professional Coordination"],
-            "max_letters": 10
+            "max_letters": 10,
+            "executor_task_packs": ["Pack – Simple Estate", "Pack – Moderate Estate"]
         },
         "complex": {
             # Complex includes everything
             "pages": None,  # Include all
             "databases": None,  # Include all
-            "max_letters": None  # Include all
+            "max_letters": None,  # Include all
+            "executor_task_packs": None  # Include all
         }
     }
     
@@ -2808,12 +3049,42 @@ def filter_config_by_complexity(config: Dict, complexity: str) -> Dict:
     return filtered
 
 # Main Deployment Function
+import asset_generator
+
+import asset_generator
+
+import asset_generator
+
 def deploy(parent_page_id: str, yaml_dir: Path, dry_run: bool = False, 
           validate_only: bool = False, verbose: bool = False,
           estate_complexity: str = "all") -> bool:
     """
     Main deployment function with adaptive complexity support
     """
+    # Generate assets
+    asset_generator.generate_assets_for_theme("default")
+    asset_generator.generate_assets_for_theme("dark")
+    asset_generator.generate_assets_for_theme("light")
+    # Generate assets
+    asset_generator.generate_assets_for_theme("default")
+    asset_generator.generate_assets_for_theme("dark")
+    asset_generator.generate_assets_for_theme("light")
+    # Generate assets
+    asset_generator.generate_assets_for_theme("default")
+    asset_generator.generate_assets_for_theme("dark")
+    asset_generator.generate_assets_for_theme("light")
+    config = load_config(Path("config.yaml"))
+    NOTION_API_VERSION = config.get("notion_api_version")
+    RATE_LIMIT_RPS = config.get("rate_limit_rps")
+    DEFAULT_TIMEOUT = config.get("default_timeout")
+    MAX_RETRIES = config.get("max_retries")
+    BACKOFF_BASE = config.get("backoff_base")
+
+    token = os.getenv("NOTION_TOKEN", "")
+    if not validate_token_with_api(token):
+        logger.error("Invalid Notion token. Please check your environment variables.")
+        return False
+
     if verbose:
         logger.setLevel(logging.DEBUG)
     
@@ -2838,6 +3109,14 @@ def deploy(parent_page_id: str, yaml_dir: Path, dry_run: bool = False,
         logger.info(f"Would process {len(config['letters'])} letters")
         return True
     
+    import asset_generator
+    asset_generator.generate_assets_for_theme("default")
+    asset_generator.generate_assets_for_theme("dark")
+
+    import asset_generator
+    asset_generator.generate_assets_for_theme("default")
+    asset_generator.generate_assets_for_theme("dark")
+
     logger.info("Starting deployment...")
     
     try:
@@ -2854,159 +3133,22 @@ def deploy(parent_page_id: str, yaml_dir: Path, dry_run: bool = False,
             sync_map.update(yaml_sync_map)
             state["synced"].update(yaml_sync_map)
         
-        # Phase 3: Create all pages
-        logger.info(f"Creating {len(config['pages'])} pages...")
-        
-        # Sort pages by hierarchy (parents first)
-        pages_by_parent = {}
-        for page in config["pages"]:
-            parent = page.get("parent", "__root__")
-            if parent not in pages_by_parent:
-                pages_by_parent[parent] = []
-            pages_by_parent[parent].append(page)
-        
-        # Create pages level by level
-        def create_pages_recursive(parent_title: str = "__root__"):
-            if parent_title not in pages_by_parent:
-                return
-            
-            for page in pages_by_parent[parent_title]:
-                # Determine actual parent ID
-                if parent_title == "__root__":
-                    actual_parent_id = parent_page_id
-                else:
-                    actual_parent_id = state["pages"].get(parent_title, parent_page_id)
-                
-                # Process icon and cover assets
-                icon_config = page.get("icon")
-                if isinstance(icon_config, str):
-                    # It's an asset name or emoji
-                    icon_config = get_asset_icon(icon_config)
-                
-                cover_config = page.get("cover")
-                if isinstance(cover_config, str):
-                    # It's an asset name
-                    cover_config = get_asset_cover(cover_config)
-                
-                # Create the page
-                page_id = create_page(
-                    parent_id=actual_parent_id,
-                    title=page["title"],
-                    icon=icon_config,
-                    cover=cover_config,
-                    description=page.get("description"),
-                    helpers=page.get("helpers"),
-                    role=page.get("role")
+        create_pages(parent_page_id, config["pages"], pages_index_db, sync_map, onboarding_db_id)
+
+        # Phase 3b: Create executor task packs
+
+        # Phase 3b: Create executor task packs
+        if "executor_task_packs" in config:
+            logger.info(f"Creating {len(config['executor_task_packs'])} executor task packs...")
+            for task_pack in config["executor_task_packs"]:
+                create_page(
+                    parent_id=state["pages"].get("Executor Hub", parent_page_id),
+                    title=task_pack.get("title", ""),
+                    icon=task_pack.get("icon"),
+                    description=task_pack.get("description"),
+                    helpers=task_pack.get("helpers"),
+                    role=task_pack.get("role")
                 )
-                
-                if page_id:
-                    # Add to Pages Index
-                    if pages_index_db:
-                        upsert_pages_index_row(pages_index_db, page["title"], page_id)
-                    
-                    # Add synced blocks if applicable
-                    if page["title"] == "Legal Documents" and "LEGAL" in sync_map:
-                        add_synced_reference(page_id, "LEGAL", sync_map["LEGAL"])
-                    elif page["title"] == "Letters" and "LETTERS" in sync_map:
-                        add_synced_reference(page_id, "LETTERS", sync_map["LETTERS"])
-                    elif page["title"] == "Executor Hub" and "EXECUTOR" in sync_map:
-                        add_synced_reference(page_id, "EXECUTOR", sync_map["EXECUTOR"])
-                    
-                    # Create grid dashboard for hub pages
-                    if "Hub" in page["title"]:
-                        hub_name = page["title"].replace(" Hub", "")
-                        role = page.get("role", "owner")
-                        logger.info(f"Creating grid dashboard for {page['title']}")
-                        try:
-                            create_grid_dashboard(page_id, hub_name, role)
-                        except Exception as e:
-                            logger.warning(f"Failed to create grid dashboard for {page['title']}: {e}")
-                    
-                    # Add QR codes to critical emergency pages
-                    if any(keyword in page["title"].lower() for keyword in ["emergency", "crisis", "immediate", "urgent"]):
-                        logger.info(f"Adding emergency QR code to {page['title']}")
-                        try:
-                            emergency_info = {
-                                "contact": "Contact your estate attorney immediately",
-                                "instructions": f"Emergency access to {page['title']} - Follow instructions on page"
-                            }
-                            add_qr_access_to_page(page_id, emergency_info)
-                        except Exception as e:
-                            logger.warning(f"Failed to add QR code to {page['title']}: {e}")
-                    
-                    # Add navigation blocks automatically
-                    if parent_title != "__root__":
-                        # Determine hub information for navigation
-                        hub_name = None
-                        hub_id = None
-                        
-                        # Check if current page is a hub page
-                        if "Hub" in page["title"]:
-                            hub_name = page["title"].replace(" Hub", "")
-                            hub_id = page_id
-                        else:
-                            # Find parent hub by traversing hierarchy
-                            current_parent = parent_title
-                            breadcrumbs = []
-                            
-                            # Build breadcrumb trail
-                            while current_parent and current_parent != "__root__":
-                                if "Hub" in current_parent:
-                                    hub_name = current_parent.replace(" Hub", "")
-                                    hub_id = state["pages"].get(current_parent)
-                                    break
-                                breadcrumbs.insert(0, {"title": current_parent})
-                                # Look for the parent of current_parent
-                                parent_found = False
-                                for p in config["pages"]:
-                                    if p["title"] == current_parent:
-                                        current_parent = p.get("parent", "__root__")
-                                        parent_found = True
-                                        break
-                                if not parent_found:
-                                    break
-                            
-                            # If no hub found in hierarchy, use default based on content
-                            if not hub_name:
-                                if any(keyword in page["title"].lower() for keyword in ["legal", "will", "trust", "power", "attorney"]):
-                                    hub_name = "Preparation"
-                                elif any(keyword in page["title"].lower() for keyword in ["executor", "probate", "settle", "estate"]):
-                                    hub_name = "Executor"
-                                elif any(keyword in page["title"].lower() for keyword in ["family", "memory", "heritage", "story"]):
-                                    hub_name = "Family"
-                                else:
-                                    hub_name = "Preparation"  # Default hub
-                                
-                                hub_id = state["pages"].get(f"{hub_name} Hub")
-                        
-                        # Add navigation if hub information is available
-                        if hub_name and hub_id:
-                            logger.info(f"Adding navigation to {page['title']} (hub: {hub_name})")
-                            try:
-                                create_navigation_block(page_id, hub_name, hub_id, breadcrumbs if 'breadcrumbs' in locals() else None)
-                            except Exception as e:
-                                logger.warning(f"Failed to add navigation to {page['title']}: {e}")
-                        
-                        # Add quick jump menu for pages with blocks
-                        if page.get("blocks"):
-                            sections = []
-                            for block in page["blocks"]:
-                                if block.get("type") == "heading_1":
-                                    sections.append({"title": block.get("content", "Section")})
-                                elif block.get("type") == "heading_2" and block.get("content"):
-                                    sections.append({"title": block.get("content", "Section")})
-                            
-                            if len(sections) > 2:  # Only add menu if there are multiple sections
-                                logger.info(f"Adding quick jump menu to {page['title']} ({len(sections)} sections)")
-                                try:
-                                    create_quick_jump_menu(page_id, sections)
-                                except Exception as e:
-                                    logger.warning(f"Failed to add quick jump menu to {page['title']}: {e}")
-                    
-                    # Recursively create children
-                    create_pages_recursive(page["title"])
-        
-        create_pages_recursive()
         
         # Phase 4: Create databases
         logger.info(f"Creating {len(config['databases'])} databases...")
@@ -3061,8 +3203,18 @@ def deploy(parent_page_id: str, yaml_dir: Path, dry_run: bool = False,
         
         # Phase 5c: Create onboarding system
         logger.info("Creating onboarding system...")
-        create_onboarding_system(parent_page_id)
+        onboarding_db_id = create_onboarding_db(parent_page_id)
+        onboarding_state = get_onboarding_state(onboarding_db_id)
+        create_onboarding_system(parent_page_id, onboarding_db_id, onboarding_state)
         
+        # Phase 5e: Create custom themes db
+        logger.info("Creating custom themes db...")
+        custom_themes_db_id = create_custom_themes_db(parent_page_id)
+
+        # Phase 5d: Create metrics db
+        logger.info("Creating metrics db...")
+        metrics_db_id = create_metrics_db(parent_page_id)
+
         # Phase 5: Create hub dashboards
         logger.info("Creating hub dashboards...")
         
@@ -3093,7 +3245,7 @@ def deploy(parent_page_id: str, yaml_dir: Path, dry_run: bool = False,
                    "family" if hub_name == "Family Hub" else "owner"
             
             # Create comprehensive dashboard for hub
-            create_grid_dashboard(hub_id, hub_name, role)
+            create_grid_dashboard(hub_id, hub_name, role, metrics_db_id)
         
         # Phase 6: Process letters
         logger.info(f"Processing {len(config['letters'])} letters...")
@@ -3107,6 +3259,8 @@ def deploy(parent_page_id: str, yaml_dir: Path, dry_run: bool = False,
             )
             
             if letter_page_id and letter.get("body"):
+                # Sanitize body
+                body = sanitize_input(letter.get("body"))
                 # Add letter body as toggle block
                 blocks = [{
                     "object": "block",
@@ -3116,7 +3270,7 @@ def deploy(parent_page_id: str, yaml_dir: Path, dry_run: bool = False,
                         "children": [{
                             "object": "block",
                             "type": "paragraph",
-                            "paragraph": {"rich_text": rt(letter["body"])}
+                            "paragraph": {"rich_text": rt(body)}
                         }]
                     }
                 }]
@@ -3133,7 +3287,7 @@ def deploy(parent_page_id: str, yaml_dir: Path, dry_run: bool = False,
                         }
                     })
                 
-                req("PATCH", f"https://api.notion.com/v1/blocks/{letter_page_id}/children",
+                req("PATCH", f"{BASE_URL}/v1/blocks/{letter_page_id}/children",
                     data=json.dumps({"children": blocks}))
         
         # Phase 7: Create acceptance database with rows
@@ -3304,8 +3458,8 @@ def create_security_center_page(parent_page_id: str) -> str:
         "icon": {"emoji": "🔒"}
     }
     
-    response = notion.pages.create(**security_center)
-    security_center_id = response["id"]
+    response = req("POST", f"{BASE_URL}/pages", data=json.dumps(security_center))
+    security_center_id = j(response).get("id")
     
     if "pages" not in state:
         state["pages"] = {}
@@ -3389,8 +3543,8 @@ def create_security_monitoring_dashboard(parent_page_id: str):
         "icon": {"emoji": "🔍"}
     }
     
-    response = notion.pages.create(**monitoring_page)
-    state["pages"]["Security Monitoring Dashboard"] = response["id"]
+    response = req("POST", f"{BASE_URL}/pages", data=json.dumps(monitoring_page))
+    state["pages"]["Security Monitoring Dashboard"] = j(response).get("id")
 
 
 def create_encryption_guidelines(parent_page_id: str):
@@ -3496,8 +3650,8 @@ def create_encryption_guidelines(parent_page_id: str):
         "icon": {"emoji": "🔐"}
     }
     
-    response = notion.pages.create(**encryption_page)
-    state["pages"]["Encryption Guidelines"] = response["id"]
+    response = req("POST", f"{BASE_URL}/pages", data=json.dumps(encryption_page))
+    state["pages"]["Encryption Guidelines"] = j(response).get("id")
 
 
 def setup_access_logging_system(parent_page_id: str):
@@ -3583,8 +3737,8 @@ def setup_access_logging_system(parent_page_id: str):
         "icon": {"emoji": "📊"}
     }
     
-    response = notion.pages.create(**logging_page)
-    state["pages"]["Access Logging System"] = response["id"]
+    response = req("POST", f"{BASE_URL}/pages", data=json.dumps(logging_page))
+    state["pages"]["Access Logging System"] = j(response).get("id")
 
 
 def create_security_checklists(parent_page_id: str):
@@ -3686,8 +3840,8 @@ def create_security_checklists(parent_page_id: str):
         "icon": {"emoji": "📋"}
     }
     
-    response = notion.pages.create(**checklist_page)
-    state["pages"]["Security Checklists"] = response["id"]
+    response = req("POST", f"{BASE_URL}/pages", data=json.dumps(checklist_page))
+    state["pages"]["Security Checklists"] = j(response).get("id")
 
 
 def create_security_audit_templates(parent_page_id: str):
@@ -3809,11 +3963,40 @@ def create_security_audit_templates(parent_page_id: str):
         "icon": {"emoji": "🔍"}
     }
     
-    response = notion.pages.create(**audit_page)
-    state["pages"]["Security Audit Templates"] = response["id"]
+    response = req("POST", f"{BASE_URL}/pages", data=json.dumps(audit_page))
+    state["pages"]["Security Audit Templates"] = j(response).get("id")
 
 
-def create_onboarding_system(parent_page_id: str):
+
+def create_onboarding_db(parent_page_id: str) -> Optional[str]:
+    """Create the Onboarding DB to store user selections."""
+    title = "Onboarding DB"
+    if title in state["dbs"]:
+        return state["dbs"][title]
+
+    logger.info("Creating Onboarding DB...")
+
+    schema = {
+        "properties": {
+            "Key": {"title": {}},
+            "Value": {"rich_text": {}},
+        }
+    }
+
+    db_id = create_database(parent_page_id, title, schema)
+    if db_id:
+        # Add initial rows
+        initial_rows = [
+            {"Key": "OnboardingComplete", "Value": "False"},
+            {"Key": "ComplexityLevel", "Value": "Simple"},
+            {"Key": "UserRole", "Value": "Owner"},
+        ]
+        seed_database(db_id, initial_rows)
+
+    return db_id
+
+
+def create_onboarding_system(parent_page_id: str, onboarding_db_id: str, onboarding_state: Dict[str, str]):
     """Create comprehensive onboarding system with welcome wizard and guided setup"""
     logger.info("Creating onboarding system with welcome wizard and guided setup...")
     
@@ -3821,23 +4004,24 @@ def create_onboarding_system(parent_page_id: str):
         # Create main onboarding hub
         onboarding_hub_id = create_onboarding_hub_page(parent_page_id)
         
-        # Create welcome wizard
-        create_welcome_wizard(parent_page_id)
+        if not onboarding_state.get("OnboardingComplete") == "True":
+            # Create welcome wizard
+            create_welcome_wizard(onboarding_hub_id, onboarding_db_id)
         
         # Create guided setup flow
-        create_guided_setup_flow(parent_page_id)
+        create_guided_setup_flow(onboarding_hub_id, onboarding_db_id)
         
         # Create complexity selector
-        create_complexity_selector(parent_page_id)
+        create_complexity_selector(onboarding_hub_id)
         
         # Create role selection system
-        create_role_selection_system(parent_page_id)
+        create_role_selection_system(onboarding_hub_id)
         
         # Create onboarding progress tracker
-        create_onboarding_progress_tracker(parent_page_id)
+        create_onboarding_progress_tracker(onboarding_hub_id)
         
         # Create help tooltips and guidance system
-        create_help_tooltips_system(parent_page_id)
+        create_help_tooltips_system(onboarding_hub_id)
         
         logger.info("Onboarding system creation completed successfully")
         return True
@@ -3946,8 +4130,8 @@ def create_onboarding_hub_page(parent_page_id: str) -> str:
         "icon": {"emoji": "🚀"}
     }
     
-    response = notion.pages.create(**onboarding_hub)
-    onboarding_hub_id = response["id"]
+    response = req("POST", f"{BASE_URL}/pages", data=json.dumps(onboarding_hub))
+    onboarding_hub_id = j(response).get("id")
     
     if "pages" not in state:
         state["pages"] = {}
@@ -3956,128 +4140,77 @@ def create_onboarding_hub_page(parent_page_id: str) -> str:
     return onboarding_hub_id
 
 
-def create_welcome_wizard(parent_page_id: str):
-    """Create interactive welcome wizard"""
-    
-    wizard_blocks = [
-        {
-            "type": "heading_1",
-            "heading_1": {"rich_text": [{"text": {"content": "🎭 Welcome Wizard"}}]}
-        },
-        {
-            "type": "paragraph",
-            "paragraph": {"rich_text": [{"text": {"content": "Let's get to know you and your estate planning needs. This wizard will help us customize your experience."}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Step 1: About You"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "❓"},
-                "rich_text": [{"text": {"content": "What brings you to estate planning today?"}}],
-                "color": "blue_background"
-            }
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Planning for the future and family security"}}], "checked": False}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Recent life changes (marriage, children, retirement)"}}], "checked": False}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Business succession planning needs"}}], "checked": False}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Tax optimization strategies"}}], "checked": False}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Updating existing estate plan"}}], "checked": False}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Step 2: Your Situation"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "🏠"},
-                "rich_text": [{"text": {"content": "Which describes your current situation?"}}],
-                "color": "yellow_background"
-            }
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "🏡 Single individual with simple assets"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "👨‍👩‍👧‍👦 Married couple with children"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "🏢 Business owner with complex assets"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "🌅 Retiree with significant wealth"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "👥 Blended family with complex dynamics"}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Step 3: Experience Level"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "📚"},
-                "rich_text": [{"text": {"content": "How familiar are you with estate planning?"}}],
-                "color": "green_background"
-            }
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Complete beginner - need lots of guidance"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Some knowledge - understand basics"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Experienced - familiar with estate planning"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Expert - very knowledgeable about estate planning"}}]}
-        }
-    ]
-    
-    wizard_page = {
-        "parent": {"page_id": parent_page_id},
+def create_welcome_wizard(parent_page_id: str, onboarding_db_id: str):
+    """Create interactive welcome wizard as a database."""
+    title = "Welcome Wizard"
+    if title in state["dbs"]:
+        return state["dbs"][title]
+
+    logger.info("Creating Welcome Wizard DB...")
+
+    schema = {
         "properties": {
-            "title": {"title": [{"text": {"content": "Welcome Wizard"}}]}
-        },
-        "children": wizard_blocks,
-        "icon": {"emoji": "🎭"}
+            "Question": {"title": {}},
+            "Answer": {"rich_text": {}},
+            "Category": {"select": {"options": [
+                {"name": "About You", "color": "blue"},
+                {"name": "Your Situation", "color": "yellow"},
+                {"name": "Experience Level", "color": "green"}
+            ]}},
+            "Order": {"number": {"format": "number"}},
+        }
     }
-    
-    response = notion.pages.create(**wizard_page)
-    state["pages"]["Welcome Wizard"] = response["id"]
+
+    db_id = create_database(parent_page_id, title, schema)
+    if db_id:
+        # Add questions to the database
+        questions = [
+            {"Question": "What brings you to estate planning today?", "Category": "About You", "Order": 1},
+            {"Question": "Which describes your current situation?", "Category": "Your Situation", "Order": 2},
+            {"Question": "How familiar are you with estate planning?", "Category": "Experience Level", "Order": 3},
+        ]
+        seed_database(db_id, questions)
+
+    return db_id
 
 
-def create_guided_setup_flow(parent_page_id: str):
-    """Create guided setup flow with step-by-step instructions"""
+def get_onboarding_setting(db_id: str, key: str) -> Optional[str]:
+    """Get a setting from the Onboarding DB."""
+    query_payload = {
+        "filter": {
+            "property": "Key",
+            "title": {"equals": key}
+        }
+    }
+    r = req("POST", f"{BASE_URL}/v1/databases/{db_id}/query",
+            data=json.dumps(query_payload))
+    data = j(r)
+    if data and data.get("results"):
+        properties = data["results"][0].get("properties", {})
+        if "Value" in properties and properties["Value"].get("rich_text"):
+            return properties["Value"]["rich_text"][0]["plain_text"]
+    return None
+
+def get_onboarding_state(db_id: str) -> Dict[str, str]:
+    """Get all settings from the Onboarding DB."""
+    onboarding_state = {}
+    r = req("POST", f"{BASE_URL}/v1/databases/{db_id}/query", data=json.dumps({}))
+    data = j(r)
+    if data and data.get("results"):
+        for result in data.get("results"):
+            properties = result.get("properties", {})
+            if "Key" in properties and "Value" in properties:
+                key = properties["Key"]["title"][0]["plain_text"]
+                value = properties["Value"]["rich_text"][0]["plain_text"]
+                onboarding_state[key] = value
+    return onboarding_state
+
+
+def create_guided_setup_flow(parent_page_id: str, onboarding_db_id: str):
+    """Create guided setup flow with step-by-step instructions."""
     
+    complexity = get_onboarding_setting(onboarding_db_id, "ComplexityLevel")
+
     setup_blocks = [
         {
             "type": "heading_1",
@@ -4099,104 +4232,41 @@ def create_guided_setup_flow(parent_page_id: str):
                 "color": "blue_background"
             }
         },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Phase 1: Foundation Setup (Steps 1-3)"}}]}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Step 1: Personal Information Collection (5 min)"}}], "checked": False}
-        },
-        {
-            "type": "paragraph",
-            "paragraph": {"rich_text": [{"text": {"content": "     📝 Gather basic personal details, family structure, and key dates"}}]}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Step 2: Asset Inventory Setup (10 min)"}}], "checked": False}
-        },
-        {
-            "type": "paragraph",
-            "paragraph": {"rich_text": [{"text": {"content": "     💰 List all accounts, properties, investments, and valuable items"}}]}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Step 3: Contact Database Creation (8 min)"}}], "checked": False}
-        },
-        {
-            "type": "paragraph",
-            "paragraph": {"rich_text": [{"text": {"content": "     📞 Add professionals, family, and important contacts"}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Phase 2: Legal Framework (Steps 4-6)"}}]}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Step 4: Document Templates Selection (5 min)"}}], "checked": False}
-        },
-        {
-            "type": "paragraph",
-            "paragraph": {"rich_text": [{"text": {"content": "     📄 Choose appropriate will, trust, and directive templates"}}]}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Step 5: Beneficiary Designation Setup (7 min)"}}], "checked": False}
-        },
-        {
-            "type": "paragraph",
-            "paragraph": {"rich_text": [{"text": {"content": "     👥 Define primary and contingent beneficiaries for all assets"}}]}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Step 6: Professional Coordination (10 min)"}}], "checked": False}
-        },
-        {
-            "type": "paragraph",
-            "paragraph": {"rich_text": [{"text": {"content": "     👔 Connect with attorney, CPA, and financial advisor"}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Phase 3: Security & Access (Steps 7-8)"}}]}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Step 7: Security Configuration (8 min)"}}], "checked": False}
-        },
-        {
-            "type": "paragraph",
-            "paragraph": {"rich_text": [{"text": {"content": "     🔐 Enable encryption, access controls, and backup systems"}}]}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Step 8: Family Access Setup (12 min)"}}], "checked": False}
-        },
-        {
-            "type": "paragraph",
-            "paragraph": {"rich_text": [{"text": {"content": "     👨‍👩‍👧‍👦 Configure roles and permissions for family members"}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Phase 4: Finalization (Steps 9-10)"}}]}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Step 9: System Testing & Review (10 min)"}}], "checked": False}
-        },
-        {
-            "type": "paragraph",
-            "paragraph": {"rich_text": [{"text": {"content": "     ✅ Test all features and review completeness"}}]}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Step 10: Launch & Training (15 min)"}}], "checked": False}
-        },
-        {
-            "type": "paragraph",
-            "paragraph": {"rich_text": [{"text": {"content": "     🚀 Activate system and complete user training"}}]}
-        }
     ]
-    
+
+    all_steps = [
+        # Phase 1: Foundation Setup
+        {"title": "Personal Information Collection (5 min)", "complexity": ["Simple", "Moderate", "Complex"], "phase": 1},
+        {"title": "Asset Inventory Setup (10 min)", "complexity": ["Simple", "Moderate", "Complex"], "phase": 1},
+        {"title": "Contact Database Creation (8 min)", "complexity": ["Simple", "Moderate", "Complex"], "phase": 1},
+        # Phase 2: Legal Framework
+        {"title": "Document Templates Selection (5 min)", "complexity": ["Simple", "Moderate", "Complex"], "phase": 2},
+        {"title": "Beneficiary Designation Setup (7 min)", "complexity": ["Moderate", "Complex"], "phase": 2},
+        {"title": "Professional Coordination (10 min)", "complexity": ["Moderate", "Complex"], "phase": 2},
+        # Phase 3: Security & Access
+        {"title": "Security Configuration (8 min)", "complexity": ["Simple", "Moderate", "Complex"], "phase": 3},
+        {"title": "Family Access Setup (12 min)", "complexity": ["Moderate", "Complex"], "phase": 3},
+        # Phase 4: Finalization
+        {"title": "System Testing & Review (10 min)", "complexity": ["Complex"], "phase": 4},
+        {"title": "Launch & Training (15 min)", "complexity": ["Complex"], "phase": 4},
+    ]
+
+    filtered_steps = [step for step in all_steps if complexity in step["complexity"]]
+
+    current_phase = 0
+    for i, step in enumerate(filtered_steps):
+        if step["phase"] > current_phase:
+            current_phase = step["phase"]
+            setup_blocks.append({
+                "type": "heading_2",
+                "heading_2": {"rich_text": [{"text": {"content": f"Phase {current_phase}: ..."}}]}
+            })
+
+        setup_blocks.append({
+            "type": "to_do",
+            "to_do": {"rich_text": [{"text": {"content": f"Step {i+1}: {step["title"]}"}}], "checked": False}
+        })
+
     setup_page = {
         "parent": {"page_id": parent_page_id},
         "properties": {
@@ -4206,8 +4276,8 @@ def create_guided_setup_flow(parent_page_id: str):
         "icon": {"emoji": "🎯"}
     }
     
-    response = notion.pages.create(**setup_page)
-    state["pages"]["Guided Setup Flow"] = response["id"]
+    response = req("POST", f"{BASE_URL}/pages", data=json.dumps(setup_page))
+    state["pages"]["Guided Setup Flow"] = j(response).get("id")
 
 
 def create_complexity_selector(parent_page_id: str):
@@ -4373,8 +4443,8 @@ def create_complexity_selector(parent_page_id: str):
         "icon": {"emoji": "🎛️"}
     }
     
-    response = notion.pages.create(**complexity_page)
-    state["pages"]["Complexity Selector"] = response["id"]
+    response = req("POST", f"{BASE_URL}/pages", data=json.dumps(complexity_page))
+    state["pages"]["Complexity Selector"] = j(response).get("id")
 
 
 def create_role_selection_system(parent_page_id: str):
@@ -4540,8 +4610,8 @@ def create_role_selection_system(parent_page_id: str):
         "icon": {"emoji": "👤"}
     }
     
-    response = notion.pages.create(**role_page)
-    state["pages"]["Role Selection System"] = response["id"]
+    response = req("POST", f"{BASE_URL}/pages", data=json.dumps(role_page))
+    state["pages"]["Role Selection System"] = j(response).get("id")
 
 
 def create_onboarding_progress_tracker(parent_page_id: str):
@@ -4675,6 +4745,166 @@ def create_onboarding_progress_tracker(parent_page_id: str):
         "icon": {"emoji": "📈"}
     }
     
-    response = notion.pages.create(**progress_page)
-    state["pages"]["Onboarding Progress Tracker"] = response["id"]
+    response = req("POST", f"{BASE_URL}/pages", data=json.dumps(progress_page))
+    state["pages"]["Onboarding Progress Tracker"] = j(response).get("id")
+
+
+def main():
+    """Main execution function with argument parsing"""
+    parser = argparse.ArgumentParser(
+        description='Estate Planning Concierge v4.0 - Notion Template Deployment',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python deploy.py                           # Standard deployment
+  python deploy.py --generate-assets         # Generate assets then deploy
+  python deploy.py --dry-run                 # Test without deployment
+  python deploy.py --test                    # Run connectivity tests
+        """
+    )
+    
+    # Core deployment options
+    parser.add_argument('--dry-run', 
+                       action='store_true',
+                       help='Show what would be deployed without making changes')
+    
+    parser.add_argument('--test',
+                       action='store_true', 
+                       help='Test Notion API connectivity and permissions')
+    
+    parser.add_argument('--parent-id',
+                       type=str,
+                       help='Notion parent page ID (overrides environment variable)')
+    
+    # Asset generation integration
+    parser.add_argument('--generate-assets',
+                       action='store_true',
+                       help='Generate assets using asset_generation system before deployment')
+    
+    parser.add_argument('--assets-only',
+                       action='store_true', 
+                       help='Only generate assets, skip deployment')
+    
+    # Logging and debugging
+    parser.add_argument('--verbose', '-v',
+                       action='count',
+                       default=0,
+                       help='Increase verbosity (use -v, -vv, -vvv)')
+    
+    parser.add_argument('--log-file',
+                       type=str,
+                       help='Write logs to specified file')
+    
+    args = parser.parse_args()
+    
+    # Set up logging based on verbosity
+    log_level = logging.WARNING
+    if args.verbose == 1:
+        log_level = logging.INFO
+    elif args.verbose >= 2:
+        log_level = logging.DEBUG
+        
+    logging.basicConfig(
+        level=log_level,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[logging.StreamHandler()] + 
+                 ([logging.FileHandler(args.log_file)] if args.log_file else [])
+    )
+    
+    logger = logging.getLogger(__name__)
+    logger.info("Estate Planning Concierge v4.0 - Starting deployment")
+    
+    try:
+        # Handle asset generation if requested
+        if args.generate_assets or args.assets_only:
+            logger.info("🎨 Starting asset generation...")
+            
+            # Import and run asset generation
+            import subprocess
+            import sys
+            from pathlib import Path
+            
+            # Path to asset generator
+            asset_gen_path = Path(__file__).parent / 'asset_generation' / 'asset_generator.py'
+            
+            if not asset_gen_path.exists():
+                logger.error(f"Asset generator not found at: {asset_gen_path}")
+                sys.exit(1)
+            
+            # Run asset generation subprocess
+            result = subprocess.run([
+                sys.executable, 
+                str(asset_gen_path)
+            ], 
+            capture_output=True, 
+            text=True,
+            cwd=asset_gen_path.parent  # Run in asset_generation directory
+            )
+            
+            if result.returncode != 0:
+                logger.error("Asset generation failed:")
+                logger.error(result.stderr)
+                sys.exit(1)
+            
+            logger.info("✅ Asset generation completed successfully")
+            
+            # If assets-only mode, exit here
+            if args.assets_only:
+                logger.info("Assets-only mode - deployment skipped")
+                return
+        
+        # Handle test mode
+        if args.test:
+            logger.info("🔧 Running connectivity tests...")
+            
+            # Test environment variables
+            token = os.getenv('NOTION_TOKEN')
+            parent_id = args.parent_id or os.getenv('NOTION_PARENT_PAGEID')
+            
+            if not token:
+                logger.error("NOTION_TOKEN environment variable not set")
+                sys.exit(1)
+                
+            if not parent_id:
+                logger.error("NOTION_PARENT_PAGEID not set (use --parent-id or environment variable)")
+                sys.exit(1)
+            
+            # Test API connectivity
+            try:
+                from modules.auth import validate_token_with_api
+                validate_token_with_api(token)
+                logger.info("✅ Notion API connectivity test passed")
+            except Exception as e:
+                logger.error(f"❌ Notion API connectivity test failed: {e}")
+                sys.exit(1)
+            
+            logger.info("🎯 All tests passed - ready for deployment")
+            return
+        
+        # Handle dry-run mode
+        if args.dry_run:
+            logger.info("🔍 Dry-run mode - showing deployment plan")
+            logger.info("Would create Estate Planning Concierge v4.0 template")
+            logger.info("Would generate pages, databases, and onboarding flow")
+            return
+        
+        # Standard deployment (placeholder - actual deployment logic would go here)
+        logger.info("🚀 Starting standard deployment...")
+        logger.warning("Deployment logic not yet implemented in this version")
+        logger.info("Use --test to verify connectivity")
+        logger.info("Use --generate-assets to create visual assets")
+        
+    except KeyboardInterrupt:
+        logger.warning("🛑 Deployment interrupted by user")
+        sys.exit(1)
+    except Exception as e:
+        logger.error(f"💥 Deployment failed: {e}")
+        if args.verbose >= 2:
+            import traceback
+            logger.debug(traceback.format_exc())
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
 

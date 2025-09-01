@@ -1,5 +1,5 @@
-copy_registry:
 complexity: simple
+copy_registry:
   preparation-hub:
     description: A steady starting place. Work at your pace; each step waits for you.
   executor-hub:

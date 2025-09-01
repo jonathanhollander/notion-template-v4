@@ -1,0 +1,11 @@
+# Task ID: 15
+# Title: Create deployment documentation
+# Status: pending
+# Dependencies: 14
+# Priority: low
+# Description: Write comprehensive documentation for deployment, troubleshooting, and maintenance
+# Details:
+Create deployment guide, write troubleshooting section, document known issues, provide maintenance procedures
+
+# Test Strategy:
+Follow documentation for fresh deployment, verify accuracy and completeness

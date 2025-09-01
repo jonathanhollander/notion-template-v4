@@ -1,0 +1,494 @@
+#!/usr/bin/env python3
+"""
+Comprehensive Deployment Requirements Test Suite for Estate Planning Concierge v4.0
+This test suite validates ALL deployment requirements, not just visual components
+"""
+
+import sys
+import os
+import json
+import yaml
+import importlib
+import subprocess
+from pathlib import Path
+from typing import Dict, List, Tuple, Any
+
+# Add current directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent))
+
+class DeploymentRequirementsTest:
+    """Test all deployment requirements comprehensively"""
+    
+    def __init__(self):
+        self.errors = []
+        self.warnings = []
+        self.successes = []
+        self.test_results = {}
+        
+    def run_all_tests(self) -> bool:
+        """Run all deployment requirement tests"""
+        print("\n" + "=" * 70)
+        print("ESTATE PLANNING CONCIERGE v4.0 - DEPLOYMENT REQUIREMENTS TEST")
+        print("=" * 70)
+        
+        tests = [
+            ("Dependencies", self.test_dependencies),
+            ("Environment Variables", self.test_environment_variables),
+            ("Module Imports", self.test_module_imports),
+            ("Configuration Files", self.test_configuration_files),
+            ("Function Duplicates", self.test_no_duplicate_functions),
+            ("API Configuration", self.test_api_configuration),
+            ("Logging System", self.test_logging_system),
+            ("Error Handling", self.test_error_handling),
+            ("GitHub Assets", self.test_github_assets),
+            ("YAML Structure", self.test_yaml_structure),
+            ("Security Checks", self.test_security),
+            ("File Structure", self.test_file_structure)
+        ]
+        
+        for test_name, test_func in tests:
+            print(f"\n🧪 Testing {test_name}...")
+            print("-" * 50)
+            try:
+                result = test_func()
+                self.test_results[test_name] = result
+                if result:
+                    print(f"✅ {test_name}: PASSED")
+                    self.successes.append(test_name)
+                else:
+                    print(f"❌ {test_name}: FAILED")
+            except Exception as e:
+                print(f"❌ {test_name}: ERROR - {e}")
+                self.errors.append(f"{test_name}: {e}")
+                self.test_results[test_name] = False
+        
+        self.print_summary()
+        return len(self.errors) == 0
+    
+    def test_dependencies(self) -> bool:
+        """Test if all required dependencies are installable"""
+        requirements_file = Path("requirements.txt")
+        
+        if not requirements_file.exists():
+            self.errors.append("requirements.txt file not found")
+            return False
+        
+        # Parse requirements
+        with open(requirements_file, 'r') as f:
+            lines = f.readlines()
+        
+        required_packages = []
+        for line in lines:
+            line = line.strip()
+            if line and not line.startswith('#'):
+                # Extract package name
+                package = line.split('>=')[0].split('==')[0].strip()
+                required_packages.append(package)
+        
+        print(f"  Required packages: {', '.join(required_packages[:3])}")
+        
+        # Check if packages can be imported
+        critical_packages = ['requests', 'yaml', 'PIL']
+        missing = []
+        
+        for package in critical_packages:
+            try:
+                if package == 'yaml':
+                    importlib.import_module('yaml')
+                elif package == 'PIL':
+                    importlib.import_module('PIL')
+                else:
+                    importlib.import_module(package)
+                print(f"  ✓ {package} is importable")
+            except ImportError:
+                missing.append(package)
+                self.errors.append(f"Cannot import {package}")
+                print(f"  ✗ {package} is NOT importable")
+        
+        return len(missing) == 0
+    
+    def test_environment_variables(self) -> bool:
+        """Test environment variable documentation and usage"""
+        env_example = Path(".env.example")
+        
+        if not env_example.exists():
+            self.errors.append(".env.example file not found")
+            return False
+        
+        # Parse .env.example
+        with open(env_example, 'r') as f:
+            content = f.read()
+        
+        required_vars = ['NOTION_TOKEN', 'NOTION_PARENT_PAGEID']
+        documented = []
+        
+        for var in required_vars:
+            if var in content:
+                documented.append(var)
+                print(f"  ✓ {var} is documented")
+            else:
+                self.errors.append(f"{var} not documented in .env.example")
+                print(f"  ✗ {var} is NOT documented")
+        
+        # Check if environment variables are used correctly in code
+        deploy_file = Path("deploy.py")
+        if deploy_file.exists():
+            with open(deploy_file, 'r') as f:
+                deploy_content = f.read()
+            
+            if 'os.getenv("NOTION_TOKEN")' in deploy_content or 'os.environ' in deploy_content:
+                print(f"  ✓ Environment variables are accessed in deploy.py")
+            else:
+                self.warnings.append("Environment variables may not be accessed correctly")
+        
+        return len(documented) == len(required_vars)
+    
+    def test_module_imports(self) -> bool:
+        """Test if all required modules can be imported"""
+        modules_to_test = [
+            'modules.config',
+            'modules.auth', 
+            'modules.notion_api',
+            'modules.validation',
+            'modules.exceptions',
+            'modules.visuals',
+            'modules.database',
+            'modules.logging_config'
+        ]
+        
+        failed_imports = []
+        
+        for module in modules_to_test:
+            try:
+                importlib.import_module(module)
+                print(f"  ✓ {module} imported successfully")
+            except ImportError as e:
+                failed_imports.append(module)
+                self.errors.append(f"Cannot import {module}: {e}")
+                print(f"  ✗ {module} import failed: {e}")
+        
+        return len(failed_imports) == 0
+    
+    def test_configuration_files(self) -> bool:
+        """Test if all configuration files exist and are valid"""
+        config_files = {
+            'config.yaml': 'YAML configuration',
+            'requirements.txt': 'Dependencies file',
+            '.env.example': 'Environment example'
+        }
+        
+        all_valid = True
+        
+        for file_path, description in config_files.items():
+            path = Path(file_path)
+            if path.exists():
+                print(f"  ✓ {description} exists: {file_path}")
+                
+                # Validate YAML files
+                if file_path.endswith('.yaml'):
+                    try:
+                        with open(path, 'r') as f:
+                            yaml.safe_load(f)
+                        print(f"    ✓ Valid YAML structure")
+                    except yaml.YAMLError as e:
+                        self.errors.append(f"Invalid YAML in {file_path}: {e}")
+                        print(f"    ✗ Invalid YAML: {e}")
+                        all_valid = False
+            else:
+                self.errors.append(f"{description} not found: {file_path}")
+                print(f"  ✗ {description} NOT found: {file_path}")
+                all_valid = False
+        
+        return all_valid
+    
+    def test_no_duplicate_functions(self) -> bool:
+        """Test for duplicate function definitions"""
+        deploy_file = Path("deploy.py")
+        
+        if not deploy_file.exists():
+            self.errors.append("deploy.py not found")
+            return False
+        
+        with open(deploy_file, 'r') as f:
+            lines = f.readlines()
+        
+        # Track function definitions
+        functions = {}
+        duplicates = []
+        
+        for i, line in enumerate(lines, 1):
+            if line.strip().startswith('def '):
+                func_name = line.strip().split('(')[0].replace('def ', '')
+                if func_name in functions:
+                    duplicates.append(f"{func_name} (lines {functions[func_name]} and {i})")
+                else:
+                    functions[func_name] = i
+        
+        # Check for specific known duplicates that should be removed
+        problematic_funcs = ['validate_token', 'validate_token_with_api']
+        
+        for func in problematic_funcs:
+            if func in functions:
+                # Check if it's imported from modules
+                import_line = f"from modules.auth import {func}"
+                content = ''.join(lines)
+                if import_line in content:
+                    self.warnings.append(
+                        f"{func} is both imported and defined locally - potential conflict"
+                    )
+                    print(f"  ⚠️  {func} may have namespace conflict")
+        
+        if duplicates:
+            for dup in duplicates:
+                self.errors.append(f"Duplicate function: {dup}")
+                print(f"  ✗ Duplicate: {dup}")
+            return False
+        else:
+            print(f"  ✓ No duplicate functions found")
+            return True
+    
+    def test_api_configuration(self) -> bool:
+        """Test API configuration consistency"""
+        config_file = Path("config.yaml")
+        
+        if not config_file.exists():
+            self.errors.append("config.yaml not found")
+            return False
+        
+        with open(config_file, 'r') as f:
+            config = yaml.safe_load(f)
+        
+        # Check API version
+        api_version = config.get('notion_api_version')
+        if api_version == '2022-06-28':
+            print(f"  ✓ API version is correct: {api_version}")
+        else:
+            self.warnings.append(f"API version may be incorrect: {api_version}")
+            print(f"  ⚠️  API version: {api_version} (expected 2022-06-28)")
+        
+        # Check rate limiting
+        rate_limit = config.get('rate_limit_rps')
+        if rate_limit and rate_limit <= 3:
+            print(f"  ✓ Rate limit is safe: {rate_limit} RPS")
+        else:
+            self.warnings.append(f"Rate limit may be too high: {rate_limit}")
+        
+        return True
+    
+    def test_logging_system(self) -> bool:
+        """Test logging configuration"""
+        logging_module = Path("modules/logging_config.py")
+        
+        if not logging_module.exists():
+            self.errors.append("modules/logging_config.py not found")
+            print(f"  ✗ Logging module not found")
+            return False
+        
+        try:
+            from modules.logging_config import setup_logging, get_logger
+            print(f"  ✓ Logging module imports successfully")
+            
+            # Test basic logging setup
+            logger = setup_logging(console_output=False)
+            if logger:
+                print(f"  ✓ Logger can be initialized")
+                return True
+        except Exception as e:
+            self.errors.append(f"Logging system error: {e}")
+            print(f"  ✗ Logging error: {e}")
+            return False
+        
+        return False
+    
+    def test_error_handling(self) -> bool:
+        """Test error handling coverage"""
+        deploy_file = Path("deploy.py")
+        
+        if not deploy_file.exists():
+            return False
+        
+        with open(deploy_file, 'r') as f:
+            content = f.read()
+        
+        # Count try/except blocks
+        try_count = content.count('try:')
+        except_count = content.count('except')
+        
+        print(f"  Try blocks: {try_count}")
+        print(f"  Except blocks: {except_count}")
+        
+        if try_count > 0 and except_count > 0:
+            print(f"  ✓ Error handling is present")
+            
+            # Check for bare excepts
+            bare_except_count = content.count('except:')
+            if bare_except_count > 5:
+                self.warnings.append(f"Too many bare except clauses: {bare_except_count}")
+                print(f"  ⚠️  {bare_except_count} bare except clauses found")
+            
+            return True
+        else:
+            self.errors.append("Insufficient error handling")
+            return False
+    
+    def test_github_assets(self) -> bool:
+        """Test GitHub assets configuration"""
+        config_file = Path("config.yaml")
+        
+        if not config_file.exists():
+            return False
+        
+        with open(config_file, 'r') as f:
+            config = yaml.safe_load(f)
+        
+        visual_config = config.get('visual_config', {})
+        github_url = visual_config.get('github_assets_base_url')
+        
+        if github_url:
+            print(f"  ✓ GitHub assets URL configured: {github_url}")
+            
+            # Check if URL is properly formatted
+            if 'github.com' in github_url or 'githubusercontent.com' in github_url:
+                print(f"  ✓ Valid GitHub URL format")
+                return True
+            else:
+                self.warnings.append("GitHub URL may be incorrect")
+        else:
+            self.errors.append("GitHub assets URL not configured")
+            print(f"  ✗ GitHub assets URL not found")
+        
+        return False
+    
+    def test_yaml_structure(self) -> bool:
+        """Test YAML files structure and validity"""
+        yaml_dir = Path("split_yaml")
+        
+        if not yaml_dir.exists():
+            self.errors.append("split_yaml directory not found")
+            return False
+        
+        yaml_files = list(yaml_dir.glob("*.yaml"))
+        print(f"  Found {len(yaml_files)} YAML files")
+        
+        invalid_files = []
+        for yaml_file in yaml_files:
+            try:
+                with open(yaml_file, 'r') as f:
+                    yaml.safe_load(f)
+            except yaml.YAMLError as e:
+                invalid_files.append(yaml_file.name)
+                self.errors.append(f"Invalid YAML in {yaml_file.name}: {e}")
+        
+        if invalid_files:
+            print(f"  ✗ {len(invalid_files)} invalid YAML files")
+            return False
+        else:
+            print(f"  ✓ All YAML files are valid")
+            return True
+    
+    def test_security(self) -> bool:
+        """Test for security issues"""
+        deploy_file = Path("deploy.py")
+        
+        if not deploy_file.exists():
+            return False
+        
+        with open(deploy_file, 'r') as f:
+            content = f.read()
+        
+        security_issues = []
+        
+        # Check for hardcoded tokens
+        if 'secret_' in content and '="secret_' in content:
+            security_issues.append("Possible hardcoded token found")
+            print(f"  ⚠️  Possible hardcoded token")
+        
+        # Check for SQL injection protection
+        if 'sanitize_input' in content or 'check_role_permission' in content:
+            print(f"  ✓ Input sanitization functions present")
+        else:
+            self.warnings.append("Input sanitization may be missing")
+        
+        # Check for proper token validation
+        if 'validate_token' in content:
+            print(f"  ✓ Token validation present")
+        else:
+            security_issues.append("Token validation missing")
+        
+        return len(security_issues) == 0
+    
+    def test_file_structure(self) -> bool:
+        """Test required file structure"""
+        required_structure = {
+            'modules/': 'Modules directory',
+            'split_yaml/': 'YAML configurations',
+            'csv/': 'CSV data files',
+            'assets/': 'Visual assets (local or GitHub)'
+        }
+        
+        all_present = True
+        
+        for path, description in required_structure.items():
+            if Path(path).exists():
+                print(f"  ✓ {description} exists: {path}")
+            else:
+                # Assets might be on GitHub, so just warn
+                if 'assets' in path:
+                    self.warnings.append(f"{description} not found locally (may be on GitHub)")
+                    print(f"  ⚠️  {description} not found locally: {path}")
+                else:
+                    self.errors.append(f"{description} not found: {path}")
+                    print(f"  ✗ {description} NOT found: {path}")
+                    all_present = False
+        
+        return all_present
+    
+    def print_summary(self):
+        """Print test summary"""
+        print("\n" + "=" * 70)
+        print("TEST SUMMARY")
+        print("=" * 70)
+        
+        total_tests = len(self.test_results)
+        passed = sum(1 for v in self.test_results.values() if v)
+        failed = total_tests - passed
+        
+        print(f"\n📊 Results: {passed}/{total_tests} tests passed")
+        
+        if self.successes:
+            print(f"\n✅ Passed Tests ({len(self.successes)}):")
+            for test in self.successes:
+                print(f"  • {test}")
+        
+        if self.errors:
+            print(f"\n❌ Errors ({len(self.errors)}):")
+            for error in self.errors:
+                print(f"  • {error}")
+        
+        if self.warnings:
+            print(f"\n⚠️  Warnings ({len(self.warnings)}):")
+            for warning in self.warnings:
+                print(f"  • {warning}")
+        
+        print("\n" + "=" * 70)
+        
+        if failed == 0 and len(self.errors) == 0:
+            print("🎉 ALL DEPLOYMENT REQUIREMENTS PASSED!")
+            print("✨ The system is ready for deployment")
+        else:
+            print(f"⚠️  {failed} tests failed, {len(self.errors)} errors found")
+            print("❌ The system is NOT ready for deployment")
+            print("\n📋 Fix the errors above and run tests again")
+        
+        print("=" * 70)
+
+
+def main():
+    """Run all deployment requirement tests"""
+    tester = DeploymentRequirementsTest()
+    success = tester.run_all_tests()
+    sys.exit(0 if success else 1)
+
+
+if __name__ == "__main__":
+    main()

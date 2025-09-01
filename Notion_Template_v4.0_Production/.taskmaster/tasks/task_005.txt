@@ -1,0 +1,11 @@
+# Task ID: 5
+# Title: Enable Adaptive Workflows
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Implement estate complexity filtering for deployment
+# Details:
+Add --estate-complexity CLI flag (simple/moderate/complex/all). Filter YAML configs based on complexity. Implement conditional page/database creation logic.
+
+# Test Strategy:
+Test each complexity level deployment, verify appropriate features included/excluded

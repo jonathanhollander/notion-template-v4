@@ -1,0 +1,11 @@
+# Task ID: 12
+# Title: Create formula and rollup system
+# Status: pending
+# Dependencies: 6
+# Priority: low
+# Description: Implement estate analytics with rollup formulas and progress tracking
+# Details:
+Build estate value rollups, implement tax liability formulas, create progress bars, add archive flag automation
+
+# Test Strategy:
+Verify formula calculations, test rollup aggregations, validate progress tracking

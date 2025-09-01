@@ -1,5 +1,5 @@
-acceptance:
 complexity: moderate
+acceptance:
   rows:
   - Page: Preparation Hub
     Role: owner

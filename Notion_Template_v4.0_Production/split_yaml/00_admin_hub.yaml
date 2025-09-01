@@ -1,0 +1,5 @@
+pages:
+- title: Admin Hub
+  icon: emoji:⚙️
+  description: A central place for all administrative tools.
+  role: owner

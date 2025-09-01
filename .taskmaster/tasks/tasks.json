@@ -1,0 +1,487 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 25,
+        "title": "Resolve Missing BASE_URL Constant",
+        "description": "Identify the correct BASE_URL value for the Notion API and define it as a constant within the primary application entry point or a dedicated configuration module. This is critical for any API interaction.",
+        "details": "Research Notion API documentation for the correct base URL. Add `BASE_URL = \"https://api.notion.com/v1/\"` or similar to the chosen `deploy.py` or a new `constants.py` file. Ensure all 30+ references in `deploy.py` correctly point to this new definition.",
+        "testStrategy": "Attempt to run `deploy.py` and verify that the `BASE_URL` constant is recognized and no `NameError` related to it occurs. Use a debugger to confirm the value.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 26,
+        "title": "Consolidate Duplicate deploy.py Files",
+        "description": "Analyze the two `deploy.py` versions (178KB vs 35KB) to understand their differences, especially regarding API versions and feature implementations. Select the most complete and correct version, merging any critical missing logic from the other, and remove the redundant file.",
+        "details": "Use a diff tool (e.g., `diff`, `meld`, `VS Code diff`) to compare `deploy.py` files. Prioritize the 178KB version as it's likely the one with 'extensive feature implementations'. Carefully port any essential fixes or unique logic from the 35KB version. Ensure the chosen file is the only `deploy.py` in the project root.",
+        "testStrategy": "Verify only one `deploy.py` file exists. Run the consolidated `deploy.py` to check for immediate syntax errors or missing imports.",
+        "priority": "high",
+        "dependencies": [
+          25
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 27,
+        "title": "Implement Basic config.yaml Loading & Error Handling",
+        "description": "Develop or refine the logic to load `config.yaml` securely and efficiently. Implement basic error handling for file not found, YAML parsing errors, and missing critical top-level keys.",
+        "details": "Use Python's `yaml` library. Implement `try-except` blocks around the loading process to catch `FileNotFoundError`, `yaml.YAMLError`, etc. Ensure that the loaded configuration is accessible throughout the application.",
+        "testStrategy": "Create valid and invalid `config.yaml` files (e.g., malformed YAML, missing file) and verify that the loading mechanism handles them gracefully, logging appropriate errors without crashing.",
+        "priority": "high",
+        "dependencies": [
+          26
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 28,
+        "title": "Refactor Monolithic deploy.py into Modules",
+        "description": "Break down the single, large `deploy.py` file into smaller, cohesive modules based on functionality (e.g., API client, configuration management, feature processing, utility functions). This improves maintainability and readability.",
+        "details": "Identify logical boundaries within the 4800+ lines. Create new files like `src/notion_client.py`, `src/config_manager.py`, `src/feature_loader.py`, `src/utils.py`. Move relevant functions, classes, and constants into these new modules. Update imports in the main `deploy.py` (or `main.py` if renamed).",
+        "testStrategy": "After refactoring, ensure the main entry point still executes without import errors. Run existing (if any) or basic functional tests to confirm core logic remains intact.",
+        "priority": "high",
+        "dependencies": [
+          26,
+          27
+        ],
+        "status": "todo",
+        "subtasks": []
+      },
+      {
+        "id": 29,
+        "title": "Standardize Notion API Version Usage",
+        "description": "Review all Notion API calls across the codebase and ensure they consistently use the `2022-06-28` version. Update any references to `2025-09-03` to maintain compatibility and avoid unexpected behavior.",
+        "details": "Search for `Notion-Version` headers or similar version indicators. Update headers to `{\"Notion-Version\": \"2022-06-28\"}`. Verify that the existing feature implementations (from YAML files) are compatible with this version.",
+        "testStrategy": "Monitor API requests (e.g., using a proxy or logging) to confirm the `Notion-Version` header is consistently `2022-06-28`. Run integration tests against the Notion API to ensure functionality.",
+        "priority": "high",
+        "dependencies": [
+          28
+        ],
+        "status": "todo",
+        "subtasks": []
+      },
+      {
+        "id": 30,
+        "title": "Implement Comprehensive Error Handling & Logging",
+        "description": "Integrate a robust, centralized error handling strategy and a structured logging system throughout the application. This includes catching specific exceptions, providing informative error messages, and logging events at appropriate levels (DEBUG, INFO, WARNING, ERROR, CRITICAL).",
+        "details": "Use Python's `logging` module. Configure loggers, handlers (e.g., console, file), and formatters. Implement `try-except` blocks around I/O operations, API calls, and data processing. Ensure sensitive information is not logged.",
+        "testStrategy": "Introduce controlled errors (e.g., invalid API keys, network issues, malformed data) and verify that the application logs the errors correctly without crashing and provides meaningful feedback.",
+        "priority": "medium",
+        "dependencies": [
+          28,
+          29
+        ],
+        "status": "todo",
+        "subtasks": []
+      },
+      {
+        "id": 31,
+        "title": "Develop Robust config.yaml Validation Logic",
+        "description": "Implement detailed validation for all parameters within `config.yaml`, including data types, required fields, and specific value constraints (e.g., token prefixes `secret_` and `ntn_`).",
+        "details": "Utilize a schema validation library like `Pydantic` or `Cerberus` to define the expected structure and types of `config.yaml`. Implement custom validators for token prefixes. Raise specific exceptions for invalid configurations.",
+        "testStrategy": "Create `config.yaml` files with various invalid configurations (e.g., wrong data types, missing required fields, incorrect token prefixes) and verify that the validation logic correctly identifies and reports these issues.",
+        "priority": "medium",
+        "dependencies": [
+          27,
+          28
+        ],
+        "status": "todo",
+        "subtasks": []
+      },
+      {
+        "id": 32,
+        "title": "Verify & Optimize Notion API Rate Limiting",
+        "description": "Thoroughly test the existing 2.5 RPS rate limiting implementation to ensure it effectively prevents exceeding Notion API limits without unnecessarily slowing down operations. Optimize if bottlenecks are identified.",
+        "details": "Simulate high load scenarios or long-running operations that make numerous API calls. Monitor API responses for rate limit errors (HTTP 429). Use tools like `locust` or custom scripts to stress test the API client. Adjust sleep intervals or token bucket parameters if needed.",
+        "testStrategy": "Run a series of API calls exceeding 2.5 RPS and observe if the rate limiter correctly throttles requests. Check logs for any 429 errors from Notion.",
+        "priority": "medium",
+        "dependencies": [
+          29,
+          30
+        ],
+        "status": "todo",
+        "subtasks": []
+      },
+      {
+        "id": 33,
+        "title": "Establish Core Deployment Testing Framework",
+        "description": "Set up a comprehensive testing framework (e.g., `pytest`) for the project. This framework will be used for unit, integration, and potentially end-to-end tests to ensure deployment readiness.",
+        "details": "Install `pytest` and configure `conftest.py` for common fixtures (e.g., mock Notion API, temporary config files). Create a `tests/` directory structure. Write a simple test to confirm the framework is working.",
+        "testStrategy": "Run `pytest` and confirm that the test suite executes successfully, even if no complex tests are written yet.",
+        "priority": "medium",
+        "dependencies": [
+          25,
+          27,
+          31
+        ],
+        "status": "todo",
+        "subtasks": []
+      },
+      {
+        "id": 34,
+        "title": "Develop Configuration File Loading Tests",
+        "description": "Write automated tests to validate that `config.yaml` and all 36 YAML feature files (e.g., `11_professional_integration.yaml`) load correctly, are parsed into the expected data structures, and their content is accessible.",
+        "details": "Use the testing framework (Task 33) to create tests that load each YAML file. Assert on the presence of expected keys, data types, and specific values. Use mock file systems or temporary files for isolated testing.",
+        "testStrategy": "Run tests that attempt to load all YAML files. Verify no parsing errors occur and that key data points from the YAMLs can be programmatically accessed and validated.",
+        "priority": "medium",
+        "dependencies": [
+          31,
+          33
+        ],
+        "status": "todo",
+        "subtasks": []
+      },
+      {
+        "id": 35,
+        "title": "Implement Integration Tests for Key Features",
+        "description": "Develop integration tests for the core features: Professional Integration, Analytics & Reporting, and Executor Task Profiles. These tests should simulate real user flows and verify correct interaction with the Notion API (using mocks or a test Notion workspace).",
+        "details": "For each key feature, define test cases that cover its primary functionality. Use a mocking library (e.g., `unittest.mock`) to simulate Notion API responses for controlled testing, or configure tests to run against a dedicated Notion test workspace.",
+        "testStrategy": "Execute integration tests. For mocked tests, verify correct API calls are made. For live tests, verify Notion pages/databases are created/updated as expected.",
+        "priority": "medium",
+        "dependencies": [
+          32,
+          34
+        ],
+        "status": "todo",
+        "subtasks": []
+      },
+      {
+        "id": 36,
+        "title": "Draft Initial Deployment Guide",
+        "description": "Create a preliminary deployment guide that outlines the steps required to deploy the Notion Estate Planning Concierge system to a production environment.",
+        "details": "Document prerequisites (Python version, dependencies), installation steps, environment variable setup (e.g., Notion API key), and execution commands. Include instructions for `config.yaml` placement.",
+        "testStrategy": "Have a non-developer attempt to follow the guide to set up the system on a clean machine. Gather feedback on clarity and completeness.",
+        "priority": "low",
+        "dependencies": [
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
+        "status": "todo",
+        "subtasks": []
+      },
+      {
+        "id": 37,
+        "title": "Document config.yaml Customization",
+        "description": "Create comprehensive documentation for `config.yaml`, detailing each configurable parameter, its purpose, accepted values, and examples for customization.",
+        "details": "For each field in `config.yaml`, provide a clear description, its data type, whether it's required, default values (if any), and practical examples of how users can modify it to suit their needs.",
+        "testStrategy": "Review the documentation for clarity and accuracy. Verify that all parameters mentioned in Task 31's validation are covered.",
+        "priority": "low",
+        "dependencies": [
+          31
+        ],
+        "status": "todo",
+        "subtasks": []
+      },
+      {
+        "id": 38,
+        "title": "Document Implemented Features from YAML Files",
+        "description": "Compile or generate documentation for all 36 implemented features, leveraging the information contained within their respective YAML configuration files.",
+        "details": "For each YAML feature file, extract key information such as feature name, description, configurable options, and expected Notion page/database structures. Organize this into a user-friendly format.",
+        "testStrategy": "Cross-reference the generated documentation with the actual YAML files to ensure consistency and completeness.",
+        "priority": "low",
+        "dependencies": [
+          35
+        ],
+        "status": "todo",
+        "subtasks": []
+      },
+      {
+        "id": 39,
+        "title": "Conduct End-to-End Deployment Validation",
+        "description": "Perform a final, comprehensive end-to-end deployment and functional validation of the entire system. This includes deploying to a staging environment, running all tests, and manually verifying key functionalities.",
+        "details": "Follow the deployment guide (Task 36) to deploy the system. Execute all automated tests (Tasks 33, 34, 35). Manually verify the success criteria: `deploy.py` execution, config loading, Notion API integration, and core feature functionality (professional integration, analytics, executor profiles). Assess the system's readiness score.",
+        "testStrategy": "Execute the full test suite. Conduct manual user acceptance testing (UAT) for critical features. Document any remaining issues and confirm the system meets or exceeds the 8/10 deployment readiness score.",
+        "priority": "high",
+        "dependencies": [
+          35,
+          36,
+          37,
+          38
+        ],
+        "status": "todo",
+        "subtasks": []
+      },
+      {
+        "id": 40,
+        "title": "Implement Single High-End Theme Asset Generation for Estate Planning Concierge v4.0",
+        "description": "Generate a complete set of 337 high-end visual assets for the 'Estate Planning Executive' theme, including icons, covers, letter headers, and textures, for use within the Estate Planning Concierge v4.0.",
+        "details": "This task involves the creation of a full visual asset pack for the 'Estate Planning Executive' theme. The goal is to produce a cohesive, professional, and luxurious set of graphics for the Notion template, staying within the specified budget of $13.11.\n\n**Asset Breakdown:**\n- **162 Icons:** To represent various sections, pages, and document types. Must be stylistically uniform.\n- **162 Covers:** For Notion page headers. Must align with the theme's aesthetic.\n- **3 Letter Headers:** For use in official document templates within Notion.\n- **10 Textures:** Subtle background patterns for use in covers or other design elements.\n\n**Implementation Steps:**\n1. Define a strict style guide for the 'Estate Planning Executive' theme, including a color palette (e.g., deep navy, gold, charcoal grey, off-white), mood, and keywords (e.g., 'sophisticated', 'minimalist', 'corporate', 'premium').\n2. Use a generative AI tool to create the assets, carefully managing generation costs to stay within the $13.11 budget.\n3. Develop consistent base prompts for each asset type to ensure visual harmony. For example, icon prompts should include 'vector art, minimalist, single object, consistent color palette, on isolated background'.\n4. Perform post-processing on all assets to ensure correct sizing (e.g., covers at 1500px width), format (PNG for icons, JPG for covers/textures), and quality.\n5. Organize the final assets into a structured directory: `/assets/themes/estate_planning_executive/{icons, covers, headers, textures}/` with logical file names.",
+        "testStrategy": "1. **Asset Audit:** Manually verify the count of each asset type (162 icons, 162 covers, 3 headers, 10 textures) in the final directory structure.\n2. **Visual Consistency Review:** A product owner or designer will review the entire asset set to confirm adherence to the 'Estate Planning Executive' style guide. Check for consistent color palette, style, and overall quality.\n3. **Notion Integration Sample Test:** Apply a sample of 10 icons and 10 covers to a test Notion workspace. Verify they render correctly, are not pixelated, and look professional in both light and dark modes.\n4. **Specification Check:** Spot-check file properties to ensure they meet technical requirements (e.g., file format, resolution, logical naming convention).",
+        "status": "pending",
+        "dependencies": [],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Define 'Estate Planning Executive' Theme Style Guide",
+            "description": "Establish the visual identity for the 'Estate Planning Executive' theme, including a strict color palette (e.g., deep navy, gold, charcoal grey, off-white), overall mood, and defining keywords (e.g., 'sophisticated', 'minimalist', 'corporate', 'premium'). This guide will inform all subsequent asset generation.",
+            "dependencies": [],
+            "details": "This step is crucial for ensuring visual harmony and adherence to the high-end aesthetic. Document the chosen palette and keywords clearly.",
+            "status": "pending",
+            "testStrategy": "Review the defined style guide with a product owner or design lead to ensure it aligns with the desired brand image and project requirements."
+          },
+          {
+            "id": 2,
+            "title": "Select Generative AI Tool(s) and Budget Management Strategy",
+            "description": "Research, evaluate, and select the most suitable generative AI tool(s) for asset creation, considering their capabilities, output quality, and pricing models. Develop a clear strategy to meticulously manage generation costs to stay strictly within the $13.11 budget.",
+            "dependencies": [],
+            "details": "This involves understanding the cost per generation, setting limits, and potentially exploring multiple tools for different asset types if cost-effective. Document the chosen tool(s) and the budget tracking method.",
+            "status": "pending",
+            "testStrategy": "Present the chosen tool(s) and budget plan to the project manager for approval, demonstrating the feasibility of staying within the specified budget."
+          },
+          {
+            "id": 3,
+            "title": "Develop Base Prompts for Icons and Covers",
+            "description": "Create a comprehensive set of consistent base prompts specifically tailored for generating the 162 icons and 162 covers. These prompts must incorporate elements from the defined style guide and ensure visual harmony across these high-volume assets.",
+            "dependencies": [
+              "40.1",
+              "40.2"
+            ],
+            "details": "For icons, prompts should include 'vector art, minimalist, single object, consistent color palette, on isolated background'. For covers, prompts should emphasize alignment with the theme's aesthetic and Notion page header requirements.",
+            "status": "pending",
+            "testStrategy": "Generate a small batch (e.g., 5-10) of sample icons and covers using the developed prompts and chosen AI tool to validate visual consistency and adherence to the style guide before full-scale generation."
+          },
+          {
+            "id": 4,
+            "title": "Develop Base Prompts for Letter Headers and Textures",
+            "description": "Formulate consistent base prompts for generating the 3 letter headers and 10 textures, ensuring they align with the 'Estate Planning Executive' theme's aesthetic and functional requirements.",
+            "dependencies": [
+              "40.1",
+              "40.2"
+            ],
+            "details": "Prompts for letter headers should focus on 'official document templates' and 'professional branding'. Prompts for textures should emphasize 'subtle background patterns' suitable for use in covers or other design elements.",
+            "status": "pending",
+            "testStrategy": "Generate a sample of each asset type (1 letter header, 1 texture) to confirm prompt effectiveness and visual quality before full-scale generation."
+          },
+          {
+            "id": 5,
+            "title": "Generate All 337 Theme Assets",
+            "description": "Utilize the selected generative AI tool(s) and the developed base prompts to generate all 162 icons, 162 covers, 3 letter headers, and 10 textures. This step requires careful monitoring of generation costs to remain within the $13.11 budget.",
+            "dependencies": [
+              "40.3",
+              "40.4"
+            ],
+            "details": "Execute the generation process in batches, if necessary, to manage costs and review outputs iteratively. Prioritize generating the highest volume assets (icons, covers) first.",
+            "status": "pending",
+            "testStrategy": "Track the cumulative cost of generation throughout this process. Upon completion, verify the raw count of generated assets (337 total) before proceeding to post-processing."
+          },
+          {
+            "id": 6,
+            "title": "Perform Post-Processing and Quality Assurance for All Assets",
+            "description": "Conduct post-processing on all 337 generated assets to ensure correct sizing, appropriate file formats, and overall quality. This includes resizing covers to 1500px width, converting icons to PNG, and covers/textures to JPG.",
+            "dependencies": [
+              "40.5"
+            ],
+            "details": "Use image editing software or scripts for efficient batch processing. Ensure no quality degradation occurs during resizing or format conversion. Address any minor imperfections or artifacts from AI generation.",
+            "status": "pending",
+            "testStrategy": "Spot-check a representative sample of assets from each category (icons, covers, headers, textures) to verify correct dimensions, file formats, and visual quality as per specifications."
+          },
+          {
+            "id": 7,
+            "title": "Organize and Structure Final Asset Directory",
+            "description": "Organize all post-processed assets into the specified structured directory: `/assets/themes/estate_planning_executive/{icons, covers, headers, textures}/`. Ensure logical and consistent file naming conventions are applied to all 337 assets for easy identification and retrieval.",
+            "dependencies": [
+              "40.6"
+            ],
+            "details": "Create the exact directory structure as specified. File names should be descriptive and consistent (e.g., 'icon_document.png', 'cover_financial_planning.jpg').",
+            "status": "pending",
+            "testStrategy": "Manually verify the directory structure and check a sample of file names across all categories for consistency and adherence to naming conventions."
+          },
+          {
+            "id": 8,
+            "title": "Conduct Final Asset Audit and Visual Consistency Review",
+            "description": "Perform a comprehensive audit to manually verify the exact count of each asset type (162 icons, 162 covers, 3 headers, 10 textures) within the final directory. Subsequently, facilitate a visual consistency review by a product owner or designer to confirm adherence to the 'Estate Planning Executive' theme's aesthetic and quality standards.",
+            "dependencies": [
+              "40.7"
+            ],
+            "details": "The audit ensures all assets are present as per the breakdown. The visual review is critical for subjective quality, brand alignment, and overall cohesiveness of the asset pack.",
+            "status": "pending",
+            "testStrategy": "Document the audit results (counts) and obtain formal sign-off from the product owner/designer on the visual consistency and quality of the entire asset set, confirming it meets the 'high-end' requirement."
+          }
+        ]
+      },
+      {
+        "id": 41,
+        "title": "Implement Ultra-Premium Visual System",
+        "description": "Complete redesign of image generation system to create ultra-premium visuals with emotional intelligence",
+        "details": "Phase 1: Create architecture (prompt_templates.py, emotional_elements.py, visual_hierarchy.py)\nPhase 2: Generate enhanced prompts for all 433 assets\nPhase 3: Test and validate emotional elements and consistency\nPhase 4: Production generation with quality checks",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design and Implement Core Visual System Architecture",
+            "description": "Set up the foundational code architecture for the ultra-premium visual system, including modules for prompt templating, emotional intelligence elements, and visual hierarchy definition.",
+            "dependencies": [],
+            "details": "Create `prompt_templates.py` for structured prompt generation, `emotional_elements.py` for defining and integrating emotional intelligence parameters, and `visual_hierarchy.py` for managing visual composition rules, as per Phase 1 requirements.",
+            "status": "pending",
+            "testStrategy": "Verify that the core modules are created, importable, and contain initial placeholder structures or basic functional definitions. Conduct unit tests for initial functions within these modules."
+          },
+          {
+            "id": 2,
+            "title": "Generate Enhanced Prompts for All Assets",
+            "description": "Develop and apply enhanced, emotionally intelligent prompts for all 433 visual assets, leveraging the newly established architecture.",
+            "dependencies": [
+              "41.1"
+            ],
+            "details": "Utilize `prompt_templates.py` and `emotional_elements.py` to generate specific, high-quality prompts for each of the 433 assets. This involves iterating through asset requirements and applying emotional intelligence parameters, corresponding to Phase 2.",
+            "status": "pending",
+            "testStrategy": "Review a sample set of generated prompts (e.g., 5-10%) to ensure they adhere to the new structure, incorporate emotional elements, and are suitable for ultra-premium visual generation. Verify that 433 unique prompts are generated."
+          },
+          {
+            "id": 3,
+            "title": "Test and Validate Emotional Elements and Visual Consistency",
+            "description": "Conduct comprehensive testing to ensure the emotional intelligence elements are correctly interpreted and consistently applied across generated visuals, and that visual consistency is maintained.",
+            "dependencies": [
+              "41.2"
+            ],
+            "details": "Generate a subset of visuals using the enhanced prompts. Evaluate these visuals for emotional impact, adherence to specified emotional cues, and overall visual consistency across different assets, aligning with Phase 3.",
+            "status": "pending",
+            "testStrategy": "Select a representative sample of generated visuals (e.g., 50-100 assets). Perform a qualitative review by a human expert to assess emotional resonance and visual consistency. Implement automated checks where possible for objective metrics (e.g., color palette consistency)."
+          },
+          {
+            "id": 4,
+            "title": "Execute Production Visual Generation",
+            "description": "Perform the full-scale generation of all ultra-premium visuals using the validated system and enhanced prompts.",
+            "dependencies": [
+              "41.3"
+            ],
+            "details": "Run the image generation process for all 433 assets, ensuring the system is stable and efficient. Monitor the generation process for errors or performance issues, as part of Phase 4 (Production generation).",
+            "status": "pending",
+            "testStrategy": "Verify that all 433 assets are successfully generated. Check file integrity and basic metadata for all generated visuals."
+          },
+          {
+            "id": 5,
+            "title": "Conduct Final Quality Checks and Refinement",
+            "description": "Implement a rigorous quality assurance process for all generated ultra-premium visuals, ensuring they meet the highest standards for visual fidelity, emotional intelligence, and overall quality.",
+            "dependencies": [
+              "41.4"
+            ],
+            "details": "Review all generated visuals against predefined quality metrics, including resolution, artistic quality, emotional impact, and adherence to project requirements. Identify and log any assets requiring refinement or regeneration, completing the 'Quality assurance' phase.",
+            "status": "pending",
+            "testStrategy": "Perform a comprehensive visual audit of all 433 generated assets. Use a checklist to evaluate each asset against criteria such as clarity, composition, color accuracy, emotional resonance, and adherence to brand guidelines. Log any defects and track their resolution."
+          }
+        ]
+      },
+      {
+        "id": 42,
+        "title": "AI-Orchestrated Approval System",
+        "description": "Multi-model competitive prompt generation with AI scoring and human review for ultra-premium image assets",
+        "details": "Phase 1: Multi-model prompt generation using Zen consensus\nPhase 2: 3x3 sample matrix generation (9 variants per asset)\nPhase 3: AI-powered quality scoring\nPhase 4: Smart review dashboard with selection interface\nPhase 5: Apply winning patterns to full production\nEstimated cost: $7-9 for approval, $10-12 for production",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set up AI Orchestration Infrastructure",
+            "description": "Establish the foundational infrastructure for orchestrating multiple AI models, specifically incorporating the Zen Consensus Protocol (Zen MCP) for coordinated operations.",
+            "dependencies": [],
+            "details": "Configure cloud resources, API gateways, and data pipelines necessary for multi-model interaction. Integrate Zen MCP for managing model inputs, outputs, and consensus mechanisms.",
+            "status": "pending",
+            "testStrategy": "Verify connectivity between components and successful initialization of the Zen MCP. Run basic health checks on all deployed services."
+          },
+          {
+            "id": 2,
+            "title": "Develop Multi-Model Prompt Generation System",
+            "description": "Design and implement a system that leverages multiple AI models to competitively generate diverse prompts for image assets, utilizing the Zen consensus mechanism for refinement (Phase 1).",
+            "dependencies": [
+              "42.1"
+            ],
+            "details": "Integrate various prompt generation models (e.g., text-to-text, concept-to-text). Implement competitive prompting strategies and a Zen consensus layer to refine and select optimal prompts.",
+            "status": "pending",
+            "testStrategy": "Generate prompts for a sample set of assets and evaluate diversity, relevance, and adherence to Zen consensus principles."
+          },
+          {
+            "id": 3,
+            "title": "Build 3x3 Sample Matrix Generator",
+            "description": "Develop a system capable of generating a 3x3 sample matrix (9 variants) for each image asset based on the refined prompts (Phase 2).",
+            "dependencies": [
+              "42.2"
+            ],
+            "details": "Integrate with the image generation backend. For each selected prompt, generate 9 distinct visual variants, ensuring diversity within the matrix.",
+            "status": "pending",
+            "testStrategy": "Verify that for each input prompt, exactly 9 unique and visually distinct image variants are produced and correctly organized into a matrix."
+          },
+          {
+            "id": 4,
+            "title": "Implement AI Quality Scoring System",
+            "description": "Develop and integrate an AI-powered system to automatically score the generated image variants based on 5 predefined quality metrics (Phase 3).",
+            "dependencies": [
+              "42.3"
+            ],
+            "details": "Identify and define 5 critical quality metrics (e.g., aesthetic appeal, prompt adherence, visual consistency, emotional intelligence, technical quality). Train or fine-tune AI models to evaluate images against these metrics and assign scores.",
+            "status": "pending",
+            "testStrategy": "Apply the scoring system to a diverse set of images (both good and bad) and compare AI scores against human expert evaluations for accuracy and consistency."
+          },
+          {
+            "id": 5,
+            "title": "Design and Build Smart Review Dashboard",
+            "description": "Develop an intuitive and interactive dashboard for human reviewers to efficiently review the generated image variants, view AI scores, and make selections (Phase 4).",
+            "dependencies": [
+              "42.3",
+              "42.4"
+            ],
+            "details": "Design a user interface that displays the 3x3 matrices, AI scores for each variant, and provides tools for selection, annotation, and feedback. Ensure responsiveness and ease of use.",
+            "status": "pending",
+            "testStrategy": "Conduct user acceptance testing (UAT) with human reviewers to gather feedback on usability, clarity, and functionality of the dashboard."
+          },
+          {
+            "id": 6,
+            "title": "Develop Selection Tracking and Learning System",
+            "description": "Implement a backend system to track human selections and feedback from the review dashboard, using this data to inform and improve future prompt generation and AI scoring.",
+            "dependencies": [
+              "42.5"
+            ],
+            "details": "Store selection data, reviewer comments, and implicit preferences. Develop machine learning models to analyze this data and identify patterns that correlate human preference with prompt characteristics and AI scores.",
+            "status": "pending",
+            "testStrategy": "Verify that all human selections and feedback are accurately captured and stored. Run initial learning algorithms on sample data to ensure they can identify basic patterns."
+          },
+          {
+            "id": 7,
+            "title": "Pilot Testing with Main Categories",
+            "description": "Conduct initial pilot testing of the entire AI-orchestrated approval system using a focused set of main image categories to validate end-to-end functionality and gather performance data.",
+            "dependencies": [
+              "42.1",
+              "42.2",
+              "42.3",
+              "42.4",
+              "42.5",
+              "42.6"
+            ],
+            "details": "Select a representative subset of 'main categories' for ultra-premium image assets. Run the full approval workflow from prompt generation to human review and selection for these categories. Collect metrics on efficiency, quality, and user satisfaction.",
+            "status": "pending",
+            "testStrategy": "Compare the output quality and approval efficiency for the pilot categories against existing manual processes or benchmarks. Identify bottlenecks and areas for improvement."
+          },
+          {
+            "id": 8,
+            "title": "Scale Winning Patterns to Full Production",
+            "description": "Integrate the identified 'winning patterns' and optimized workflows from pilot testing into the full production pipeline for all ultra-premium image assets (Phase 5).",
+            "dependencies": [
+              "42.7"
+            ],
+            "details": "Refine prompt generation models, AI scoring algorithms, and review processes based on insights gained from pilot testing. Roll out the optimized system to handle the full volume of ultra-premium image assets.",
+            "status": "pending",
+            "testStrategy": "Monitor production performance, approval rates, and final asset quality. Conduct A/B testing if necessary to compare optimized workflows with previous iterations."
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "created": "2025-08-31T06:15:13.958Z",
+      "updated": "2025-08-31T23:23:13.299Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

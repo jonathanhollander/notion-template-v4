@@ -1,0 +1,72 @@
+{
+  "version": "1.0.0",
+  "generated_at": "2025-08-31T00:00:00Z",
+  "description": "Centralized prompt storage for asset generation with editing history",
+  
+  "prompt_templates": {
+    "icons": {
+      "base_template": "Technical drawing icon for '{title}': {description}, mechanical poetry style, readable at 24px",
+      "style_modifiers": [
+        "minimalist vector art",
+        "clean geometric shapes",
+        "high contrast",
+        "monochrome friendly"
+      ],
+      "quality_modifiers": [
+        "professional quality",
+        "scalable design",
+        "clear symbolism"
+      ]
+    },
+    "covers": {
+      "base_template": "Blueprint cover for '{title}': {description}, architectural drawing style, golden ratio grid",
+      "style_modifiers": [
+        "technical blueprint aesthetic",
+        "grid overlay",
+        "drafting table feel",
+        "engineering precision"
+      ],
+      "quality_modifiers": [
+        "high resolution",
+        "16:9 aspect ratio",
+        "subtle depth"
+      ]
+    },
+    "textures": {
+      "base_template": "Seamless texture pattern: {description}, technical drawing style",
+      "style_modifiers": [
+        "repeating pattern",
+        "geometric precision",
+        "subtle variation"
+      ],
+      "quality_modifiers": [
+        "tileable",
+        "high detail",
+        "consistent density"
+      ]
+    }
+  },
+  
+  "prompts": {
+    "icons": {},
+    "covers": {},
+    "textures": {}
+  },
+  
+  "edited_prompts": {
+    "icons": {},
+    "covers": {},
+    "textures": {}
+  },
+  
+  "prompt_history": [],
+  
+  "regeneration_queue": [],
+  
+  "statistics": {
+    "total_prompts_generated": 0,
+    "total_prompts_edited": 0,
+    "total_regenerations": 0,
+    "last_updated": null
+  }
+}

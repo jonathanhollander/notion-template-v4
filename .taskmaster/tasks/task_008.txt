@@ -1,0 +1,11 @@
+# Task ID: 8
+# Title: Create letter template system
+# Status: pending
+# Dependencies: 5, 6
+# Priority: medium
+# Description: Implement 18 letter templates with placeholder processing and status tracking
+# Details:
+Process letter templates from YAML, implement {{placeholder}} system, create Letters DB with status tracking, add disclaimers
+
+# Test Strategy:
+Deploy all letters, test placeholder replacement, verify status transitions, check disclaimers

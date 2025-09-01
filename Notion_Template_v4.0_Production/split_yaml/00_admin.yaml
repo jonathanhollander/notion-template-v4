@@ -1,6 +1,6 @@
 pages:
-complexity: simple
 - title: Admin – Release Notes
+  parent: Admin Hub
   icon: emoji:🗒️
   role: owner
   description: Version history for this template (safe to delete before sharing).
@@ -8,7 +8,9 @@ complexity: simple
   cover_file: assets/covers/admin-release-notes-cover.svg
   icon_png: assets/icons_png/preparation-hub-icon.png
   cover_png: assets/covers_png/preparation-hub-cover.png
+  alt_text: "An icon representing release notes."
 - title: Admin – Rollout Cockpit
+  parent: Admin Hub
   icon: emoji:🧭
   description: Quick access to the Setup & Acceptance DB with guidance for useful
     views.
@@ -16,7 +18,9 @@ complexity: simple
   cover_file: assets/covers/admin-rollout-cockpit-cover.svg
   icon_png: assets/icons_png/executor-hub-icon.png
   cover_png: assets/covers_png/executor-hub-cover.png
+  alt_text: "An icon representing a rollout cockpit."
 - title: Admin – Diagnostics
+  parent: Admin Hub
   icon: emoji:🔍
   description: 'Checks that help you finish setup: missing icons/covers and pages
     still carrying helpers.'
@@ -24,7 +28,9 @@ complexity: simple
   cover_file: assets/covers/admin-diagnostics-cover.svg
   icon_png: assets/icons_png/legal-documents-icon.png
   cover_png: assets/covers_png/legal-documents-cover.png
+  alt_text: "An icon representing diagnostics."
 - title: Admin – Final UI Checklist
+  parent: Admin Hub
   icon: emoji:✅
   description: Confirm premium UI polish is complete, then delete this page.
   helper:
@@ -40,3 +46,4 @@ complexity: simple
     - Mobile tips present on Start/Hub pages.
     - PNG icons/covers render everywhere (desktop + mobile).
     - No seeded/fake data anywhere.
+  alt_text: "An icon representing a checklist."

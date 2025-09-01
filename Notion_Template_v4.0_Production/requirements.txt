@@ -1,0 +1,14 @@
+# Estate Planning Concierge v4.0 - Python Dependencies
+# Generated: August 31, 2025
+
+# Core Dependencies
+requests>=2.31.0          # HTTP library for Notion API calls
+PyYAML>=6.0.1            # YAML parsing for configuration files
+Pillow>=10.0.0           # Image processing for asset generation
+
+# Optional Dependencies for Development
+pytest>=7.4.0            # Testing framework
+pytest-cov>=4.1.0        # Code coverage for tests
+black>=23.0.0            # Code formatter
+ruff>=0.1.0              # Python linter
+python-dotenv>=1.0.0     # .env file support
