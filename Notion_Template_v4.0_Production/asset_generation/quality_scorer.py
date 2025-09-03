@@ -464,6 +464,121 @@ Provide thorough, objective evaluation with specific evidence from the prompt.
         
         return "\n".join(summary_parts)
     
+    async def evaluate_competition(self, competition_id: int, db) -> bool:
+        """Evaluate all competitive prompts for a given competition and store results in database.
+        
+        Args:
+            competition_id: ID of the competition to evaluate
+            db: Database manager instance
+            
+        Returns:
+            True if evaluation successful, False otherwise
+        """
+        try:
+            self.logger.info(f"Starting evaluation for competition {competition_id}")
+            
+            # Get competitive prompts for this competition
+            async with db._get_connection() as conn:
+                cursor = await conn.execute("""
+                    SELECT cp.*, pc.asset_type, pc.category, pc.index_in_category
+                    FROM competitive_prompts cp
+                    JOIN prompt_competitions pc ON cp.competition_id = pc.id
+                    WHERE cp.competition_id = ?
+                    ORDER BY cp.id
+                """, (competition_id,))
+                prompt_rows = await cursor.fetchall()
+            
+            if not prompt_rows:
+                self.logger.warning(f"No competitive prompts found for competition {competition_id}")
+                return False
+            
+            # Convert to prompts format for evaluation
+            competitive_prompts = []
+            context = None
+            for row in prompt_rows:
+                competitive_prompts.append({
+                    'prompt': row['prompt_text'],
+                    'model_source': row['model_source'],
+                    'metadata': json.loads(row['metadata']) if row['metadata'] else {}
+                })
+                
+                if context is None:
+                    context = {
+                        'page_title': f"{row['category']} {row['index_in_category']}",
+                        'page_category': row['category'],
+                        'asset_type': row['asset_type']
+                    }
+            
+            # Perform evaluation
+            competitive_eval = await self.evaluate_competitive_prompts(competitive_prompts, context)
+            
+            # Store evaluation results in database
+            for prompt_eval in competitive_eval.prompt_evaluations:
+                # Store each individual evaluation
+                evaluation_data = {
+                    'competition_id': competition_id,
+                    'prompt_text': prompt_eval.prompt,
+                    'model_source': prompt_eval.model_source,
+                    'overall_score': prompt_eval.overall_score,
+                    'weighted_score': prompt_eval.weighted_score,
+                    'individual_scores': [asdict(score) for score in prompt_eval.individual_scores],
+                    'evaluation_summary': prompt_eval.evaluation_summary,
+                    'is_winner': prompt_eval == competitive_eval.winner
+                }
+                
+                await db.store_quality_evaluation(evaluation_data)
+            
+            # Update competition status to evaluated
+            async with db._get_connection() as conn:
+                await conn.execute("""
+                    UPDATE prompt_competitions 
+                    SET competition_status = 'evaluated', updated_at = CURRENT_TIMESTAMP
+                    WHERE id = ?
+                """, (competition_id,))
+                await conn.commit()
+            
+            self.logger.info(f"Competition {competition_id} evaluation complete. Winner: {competitive_eval.winner.model_source}")
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"Failed to evaluate competition {competition_id}: {e}")
+            return False
+    
+    async def batch_evaluate_pending_competitions(self, db, max_competitions: int = None) -> List[int]:
+        """Evaluate all pending competitions in the database.
+        
+        Args:
+            db: Database manager instance
+            max_competitions: Optional limit on number of competitions to evaluate
+            
+        Returns:
+            List of successfully evaluated competition IDs
+        """
+        try:
+            # Get pending competitions
+            pending_competitions = await db.get_pending_competitions()
+            
+            if max_competitions:
+                pending_competitions = pending_competitions[:max_competitions]
+            
+            self.logger.info(f"Found {len(pending_competitions)} pending competitions to evaluate")
+            
+            evaluated_ids = []
+            for competition in pending_competitions:
+                success = await self.evaluate_competition(competition['id'], db)
+                if success:
+                    evaluated_ids.append(competition['id'])
+                
+                # Small delay to avoid overwhelming the API
+                await asyncio.sleep(0.5)
+            
+            self.logger.info(f"Successfully evaluated {len(evaluated_ids)} competitions")
+            return evaluated_ids
+            
+        except Exception as e:
+            self.logger.error(f"Batch evaluation failed: {e}")
+            return []
+    
     def save_evaluation_results(self, competitive_evaluations: List[CompetitiveEvaluation], 
                               output_file: str = "quality_evaluation_results.json") -> Path:
         """Save evaluation results to file"""

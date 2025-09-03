@@ -1,0 +1,19 @@
+[Unit]
+Description=Estate Planning Concierge v4.0 Review Dashboard (Development)
+After=network.target
+
+[Service]
+Type=simple
+User=%i
+Group=%i
+WorkingDirectory=/Users/jonathanhollander/AI Code/Notion Template/Notion_Template_v4.0_Production/asset_generation
+Environment=PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PYTHONPATH=/Users/jonathanhollander/AI Code/Notion Template/Notion_Template_v4.0_Production/asset_generation
+Environment=REVIEW_API_TOKEN=estate-planning-review-2024
+Environment=FLASK_ENV=development
+ExecStart=/opt/homebrew/bin/python3 review_dashboard.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

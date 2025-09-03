@@ -1,0 +1,31 @@
+{
+  "approved_at": "2025-09-02T19:34:01.778567",
+  "approved_by": "smoke_test",
+  "approved_prompts": [
+    {
+      "type": "icons",
+      "prompts": [
+        "minimalist icon design",
+        "flat icon style",
+        "modern icon aesthetic"
+      ]
+    },
+    {
+      "type": "covers",
+      "prompts": [
+        "abstract cover art",
+        "gradient cover design",
+        "minimal cover layout"
+      ]
+    },
+    {
+      "type": "textures",
+      "prompts": [
+        "subtle texture pattern",
+        "organic texture",
+        "geometric texture"
+      ]
+    }
+  ],
+  "notes": "Automated smoke test approval"
+}

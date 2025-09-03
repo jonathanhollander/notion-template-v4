@@ -476,11 +476,147 @@
             "testStrategy": "Monitor production performance, approval rates, and final asset quality. Conduct A/B testing if necessary to compare optimized workflows with previous iterations."
           }
         ]
+      },
+      {
+        "id": 43,
+        "title": "Create Image Forge Documentation Suite",
+        "description": "Develop a comprehensive documentation suite for the Image Forge system, including an Implementation Guide, a Complete Vision roadmap, and a Transformation Guide for migrating existing code.",
+        "details": "Create three distinct documents for the Image Forge system (detailed in Tasks 41 & 42). All code examples must be real, functional, and extracted from the working codebase.\n\n**1. Implementation Guide (Phase 0 & 1):**\n*   **Objective:** Enable a developer to set up and run the initial phases of the Image Forge system.\n*   **Content:**\n    *   **Setup:** Detail environment setup, including Python version, required libraries (e.g., OpenAI, Pillow), and API key configuration.\n    *   **Architecture Overview:** Explain the roles of `prompt_templates.py`, `emotional_elements.py`, and `visual_hierarchy.py` from Task 41. Provide a diagram of their interaction.\n    *   **Core Concepts:** Document the 'Zen consensus' multi-model prompt generation mechanism from Task 42.\n    *   **Usage:** Provide a step-by-step tutorial with real code snippets on how to generate a single enhanced prompt and a 3x3 sample matrix for one asset.\n\n**2. Complete Vision (All Phases Roadmap):**\n*   **Objective:** Provide a high-level overview of the entire Image Forge project, its goals, and the end-to-end workflow.\n*   **Content:**\n    *   **Introduction:** State the problem Image Forge solves (creating ultra-premium, emotionally intelligent visuals at scale).\n    *   **Phase-by-Phase Breakdown:** Detail the purpose and expected outcome of each phase from Task 41 (Architecture, Prompt Enhancement, Testing, Production) and Task 42 (Multi-model Generation, Sampling, AI Scoring, Review Dashboard, Production Application).\n    *   **Workflow Diagram:** Create a visual flowchart showing an asset's journey from initial concept to final approval and production generation.\n    *   **Future State:** Briefly describe the final, fully operational system and its benefits.\n\n**3. Transformation Guide:**\n*   **Objective:** Instruct developers on how to convert existing asset generation scripts (e.g., for the 'Estate Planning Executive' theme in Task 40) to use the new Image Forge system.\n*   **Content:**\n    *   **Rationale:** Explain why the transformation is necessary (e.g., improved quality, consistency, emotional depth).\n    *   **Side-by-Side Comparison:** Show 'before' (old script) and 'after' (Image Forge script) code examples for generating a specific asset, like a page cover.\n    *   **Refactoring Steps:** Provide a checklist for developers to follow, including identifying asset types, mapping them to new prompt templates, and integrating with the new generation and approval workflow.",
+        "testStrategy": "1. **Implementation Guide Validation:** A developer unfamiliar with the Image Forge codebase must follow the guide to successfully set up the environment and generate a 3x3 sample matrix for a test asset. The output must be validated against expected results.\n2. **Vision Document Review:** The product owner and a lead developer will review the 'Complete Vision' document to confirm it accurately reflects the project's scope, goals, and technical roadmap.\n3. **Transformation Guide Practical Test:** A developer will use the 'Transformation Guide' to refactor the generation logic for a small subset of assets (e.g., 5 icons and 5 covers) from the Task 40 theme. The refactored code must run without errors and produce assets ready for the AI-Orchestrated Approval System.\n4. **Code Snippet Accuracy:** All code examples across all three documents will be automatically linted and manually verified to ensure they are syntactically correct and directly applicable to the current state of the codebase.",
+        "status": "pending",
+        "dependencies": [
+          41,
+          42
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Doc 1: Document Environment Setup and Configuration",
+            "description": "Create the initial section of the Implementation Guide detailing all prerequisite software, libraries, and configuration steps for a developer to get started.",
+            "dependencies": [],
+            "details": "Detail the required Python version, steps for installing libraries like OpenAI and Pillow via pip, and clear instructions for configuring API keys and other necessary environment variables.",
+            "status": "pending",
+            "testStrategy": "A new developer must be able to set up a functional local environment for Phases 0 & 1 using only this section of the documentation."
+          },
+          {
+            "id": 2,
+            "title": "Doc 1: Explain Core Architecture and Concepts",
+            "description": "Document the fundamental architecture of Image Forge Phases 0 & 1, including the 'Zen consensus' mechanism and the roles of key modules.",
+            "dependencies": [],
+            "details": "Explain the specific roles and interactions of `prompt_templates.py`, `emotional_elements.py`, and `visual_hierarchy.py`. Create a system interaction diagram. Detail the multi-model prompt generation logic from Task 42.",
+            "status": "pending",
+            "testStrategy": "Review the diagram and explanations with a lead developer from Task 41/42 to ensure technical accuracy and clarity."
+          },
+          {
+            "id": 3,
+            "title": "Doc 1: Write 'Hello, Forge' Usage Tutorial",
+            "description": "Develop a step-by-step tutorial with functional code examples to guide a developer through generating their first enhanced prompt and image matrix.",
+            "dependencies": [
+              "43.1"
+            ],
+            "details": "Provide a complete, runnable script that demonstrates how to generate a single enhanced prompt and a 3x3 sample image matrix for one asset. All code snippets must be extracted from the working codebase.",
+            "status": "pending",
+            "testStrategy": "A developer who completed the setup in subtask 43.1 must be able to run the tutorial code and generate the expected 3x3 image matrix without errors."
+          },
+          {
+            "id": 4,
+            "title": "Doc 1: Detail Phase 1 Component Systems",
+            "description": "Create detailed documentation for the key components introduced in Phase 1: the parser, transparency engine, and preset system.",
+            "dependencies": [
+              "43.2"
+            ],
+            "details": "For each component, explain its purpose, how to configure it, and provide code examples of its usage within the Image Forge workflow, covering both server-side and frontend interactions where applicable.",
+            "status": "pending",
+            "testStrategy": "Review documentation against the actual implementation of the parser, transparency engine, and preset system to ensure all features and configurations are covered accurately."
+          },
+          {
+            "id": 5,
+            "title": "Doc 2: Draft Vision Introduction & Problem Statement",
+            "description": "Write the introductory section of the Complete Vision document, defining the purpose of Image Forge and the problem it solves.",
+            "dependencies": [],
+            "details": "Clearly state the problem Image Forge solves (creating ultra-premium, emotionally intelligent visuals at scale) and outline the document's purpose as a strategic roadmap.",
+            "status": "pending",
+            "testStrategy": "Review with a product manager or project lead to ensure the problem statement and vision are aligned with project goals."
+          },
+          {
+            "id": 6,
+            "title": "Doc 2: Detail the Full 7-Phase Project Roadmap",
+            "description": "Document the complete, phase-by-phase roadmap for the Image Forge project, from initial architecture to full production and review.",
+            "dependencies": [],
+            "details": "Detail the purpose, key activities, and expected outcomes for each of the 7 phases (Architecture, Prompt Enhancement, Testing, Production, Multi-model Generation, Sampling/Scoring, and Production Application/Dashboard).",
+            "status": "pending",
+            "testStrategy": "Validate the phase descriptions and outcomes against the project plans defined in Tasks 41 and 42."
+          },
+          {
+            "id": 7,
+            "title": "Doc 2: Create End-to-End Workflow Diagram",
+            "description": "Create a clear, high-level visual flowchart illustrating the entire asset generation and approval lifecycle within the Image Forge system.",
+            "dependencies": [
+              "43.6"
+            ],
+            "details": "The diagram should visually represent an asset's journey from initial concept, through prompt enhancement, multi-model sampling, AI scoring, manual review via the dashboard, and final approval for production use.",
+            "status": "pending",
+            "testStrategy": "The workflow diagram must be reviewed by the development team to confirm it accurately represents the intended data and process flow."
+          },
+          {
+            "id": 8,
+            "title": "Doc 2: Describe Future State and System Benefits",
+            "description": "Write the concluding section of the Vision document, summarizing the final operational system and its value proposition.",
+            "dependencies": [
+              "43.5",
+              "43.6"
+            ],
+            "details": "Briefly describe the fully operational Image Forge system. List and explain the key benefits, such as enhanced visual quality, brand consistency, emotional resonance, and workflow efficiency.",
+            "status": "pending",
+            "testStrategy": "Review the described benefits for clarity, accuracy, and alignment with the overall project objectives."
+          },
+          {
+            "id": 9,
+            "title": "Doc 3: Write Rationale for Migrating to Image Forge",
+            "description": "Create the introductory section of the Transformation Guide, explaining the strategic importance of adopting the new system over legacy scripts.",
+            "dependencies": [],
+            "details": "Explain why the transformation is necessary, focusing on improvements in quality, consistency, emotional depth, and maintainability compared to legacy scripts.",
+            "status": "pending",
+            "testStrategy": "Review the rationale with a senior developer to ensure the arguments are compelling and technically sound."
+          },
+          {
+            "id": 10,
+            "title": "Doc 3: Analyze Legacy Script and Extract 'Before' Code",
+            "description": "Select a representative legacy asset generation script (e.g., from Task 40) and extract a concise, functional 'before' code example for comparison.",
+            "dependencies": [],
+            "details": "Isolate the code responsible for generating a specific asset (e.g., a page cover) from the 'Estate Planning Executive' theme script. Ensure this code is well-commented for clarity.",
+            "status": "pending",
+            "testStrategy": "Verify that the extracted 'before' code is a realistic and accurate representation of the current, pre-migration development pattern."
+          },
+          {
+            "id": 11,
+            "title": "Doc 3: Develop 'After' Code and Side-by-Side Comparison",
+            "description": "Refactor the 'before' code to use the Image Forge system and present both versions in a clear, side-by-side comparison format.",
+            "dependencies": [
+              "43.10"
+            ],
+            "details": "Write the new Image Forge-compliant code to generate the same asset as the 'before' example. Format the documentation to clearly display the old and new code next to each other, with annotations highlighting key changes.",
+            "status": "pending",
+            "testStrategy": "The 'after' code must be functional and produce a superior result. The comparison must be reviewed for clarity and effectiveness."
+          },
+          {
+            "id": 12,
+            "title": "Doc 3: Create Step-by-Step Refactoring Checklist",
+            "description": "Provide a detailed checklist and code mapping guide for developers to follow when migrating any existing asset generation script.",
+            "dependencies": [
+              "43.11"
+            ],
+            "details": "The checklist should include: 1. Identify asset types. 2. Map requirements to new prompt templates. 3. Integrate emotional elements. 4. Replace direct API calls with the new generator. 5. Integrate with the new approval workflow.",
+            "status": "pending",
+            "testStrategy": "A developer must use the checklist to successfully migrate a different legacy script not used in the example, confirming the steps are comprehensive."
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-08-31T06:15:13.958Z",
-      "updated": "2025-08-31T23:23:13.299Z",
+      "updated": "2025-09-01T04:37:17.010Z",
       "description": "Tasks for master context"
     }
   }

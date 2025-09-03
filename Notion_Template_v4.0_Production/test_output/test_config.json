@@ -1,0 +1,43 @@
+{
+  "replicate": {
+    "api_key": "REDACTED",
+    "rate_limit": 2,
+    "models": {
+      "icons": {
+        "model_id": "stability-ai/sdxl:test",
+        "cost_per_image": 0.04
+      },
+      "covers": {
+        "model_id": "stability-ai/sdxl:test",
+        "cost_per_image": 0.04
+      },
+      "textures": {
+        "model_id": "stability-ai/sdxl:test",
+        "cost_per_image": 0.04
+      }
+    }
+  },
+  "budget": {
+    "sample_generation": {
+      "max_cost": 1.0
+    },
+    "mass_generation": {
+      "max_cost": 20.0
+    }
+  },
+  "output": {
+    "sample_directory": "test_output/samples",
+    "production_directory": "test_output/production",
+    "backup_directory": "test_output/backup"
+  },
+  "logging": {
+    "level": "INFO",
+    "log_file": "test_output/test.log",
+    "max_log_size": 10485760,
+    "backup_count": 3
+  },
+  "review": {
+    "port": 5002,
+    "approval_file": "test_output/APPROVED.txt"
+  }
+}

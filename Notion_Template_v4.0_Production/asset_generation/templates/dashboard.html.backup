@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estate Planning Concierge v4.0 - Prompt Review Dashboard</title>
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <!-- DOMPurify for input sanitization -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
+</head>
+<body>
+    <div class="header">
+        <h1>🏛️ Estate Planning Concierge v4.0</h1>
+        <p>Ultra-Premium Prompt Review Dashboard</p>
+    </div>
+    
+    <main class="dashboard-container" role="main">
+        <section class="panel progress-panel" aria-labelledby="progress-heading">
+            <h2 id="progress-heading">📊 Review Progress</h2>
+            
+            <div id="progress-info">
+                <p><strong>Session:</strong> <span id="session-status">Not Started</span></p>
+                <p><strong>Evaluations Loaded:</strong> <span id="evaluations-count">0</span></p>
+                <p><strong>Decisions Made:</strong> <span id="decisions-count">0</span></p>
+            </div>
+            
+            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-fill progress-fill-init" id="progress-fill"></div>
+            </div>
+            <p id="progress-text">0% Complete</p>
+            
+            <h3 id="controls-heading">🎯 Session Controls</h3>
+            <label for="api-token">API Token</label>
+            <input type="password" id="api-token" class="form-input" aria-describedby="token-help" required aria-required="true">
+            <span id="token-help" class="sr-only">Enter your authentication token to access the review dashboard</span>
+            <label for="reviewer-name">Reviewer Name</label>
+            <input type="text" id="reviewer-name" class="form-input" aria-describedby="name-help">
+            <span id="name-help" class="sr-only">Enter your name for session tracking</span>
+            <button class="button" onclick="startSession()" aria-describedby="controls-heading">Start Review Session</button>
+            <button class="button" onclick="loadEvaluations()" aria-describedby="controls-heading">Load Evaluations</button>
+            <button class="button" onclick="exportDecisions()" disabled id="export-btn" aria-describedby="controls-heading">Export Decisions</button>
+            
+            <h3 id="metrics-heading">📈 Quality Metrics</h3>
+            <div id="quality-metrics" aria-labelledby="metrics-heading">
+                <p>Start a session to view metrics</p>
+            </div>
+        </section>
+        
+        <section class="panel review-area" aria-labelledby="review-heading">
+            <h2 id="review-heading">🎨 Prompt Review</h2>
+            
+            <div id="pre-review-message">
+                <p>👋 Welcome to the Estate Planning Concierge v4.0 Prompt Review Dashboard!</p>
+                <p>This interface allows you to review AI-generated prompts and make final selections for our luxury estate planning assets.</p>
+                <p>To get started:</p>
+                <ol>
+                    <li>Enter your API token and name, then start a review session</li>
+                    <li>Load evaluation results from the quality scorer</li>
+                    <li>Review competing prompts and make your selections</li>
+                    <li>Export your decisions for final generation</li>
+                </ol>
+            </div>
+            
+            <div id="evaluation-display">
+                <div class="evaluation-header">
+                    <h3 id="eval-title">Loading...</h3>
+                    <p id="eval-details">Category: <span id="eval-category"></span> | Type: <span id="eval-type"></span></p>
+                </div>
+                
+                <div id="prompts-container" aria-live="polite">
+                    <!-- Prompts will be loaded here -->
+                </div>
+                
+                <form class="decision-form" role="form" aria-labelledby="decision-heading">
+                    <h4 id="decision-heading">🤔 Make Your Decision</h4>
+                    <label for="selected-prompt">Select Prompt</label>
+                    <select id="selected-prompt" aria-describedby="prompt-help" required aria-required="true">
+                        <option value="">Select a prompt...</option>
+                    </select>
+                    <span id="prompt-help" class="sr-only">Choose the best prompt from the options above</span>
+                    <label for="decision-reasoning">Decision Reasoning</label>
+                    <textarea id="decision-reasoning" aria-describedby="reasoning-help" required aria-required="true" placeholder="Why did you choose this prompt? What makes it best for our estate planning users?"></textarea>
+                    <span id="reasoning-help" class="sr-only">Explain your reasoning for selecting this prompt</span>
+                    <label for="custom-modifications">Custom Modifications (Optional)</label>
+                    <textarea id="custom-modifications" aria-describedby="modifications-help" placeholder="Any modifications or improvements? (optional)"></textarea>
+                    <span id="modifications-help" class="sr-only">Optional: Suggest any improvements to the selected prompt</span>
+                    
+                    <button class="button" onclick="makeDecision()" type="button">Record Decision</button>
+                    <button class="button button-secondary" onclick="nextEvaluation()" type="button" aria-describedby="decision-heading">Next →</button>
+                </form>
+            </div>
+        </section>
+    </main>
+    
+    <!-- External JavaScript -->
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

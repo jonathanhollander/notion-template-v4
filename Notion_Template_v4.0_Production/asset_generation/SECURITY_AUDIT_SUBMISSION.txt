@@ -1,0 +1,2844 @@
+#!/usr/bin/env python3
+"""
+Human Review Dashboard for Estate Planning Concierge v4.0
+Interactive web interface for reviewing and selecting competitive prompts
+"""
+
+import os
+import json
+from typing import Dict, List, Any, Optional
+from dataclasses import dataclass, asdict
+from datetime import datetime
+from pathlib import Path
+import logging
+from functools import wraps
+import secrets
+import hashlib
+import time
+
+# Web framework imports
+try:
+    from flask import Flask, render_template, request, jsonify, send_from_directory, make_response
+    from flask_cors import CORS
+    from flask_limiter import Limiter
+    from flask_limiter.util import get_remote_address
+    FLASK_AVAILABLE = True
+except ImportError as e:
+    FLASK_AVAILABLE = False
+    print(f"Flask dependencies not available: {e}")
+    print("Install with: pip install flask flask-cors Flask-Limiter")
+
+# Our modules
+from utils.sync_database_manager import SyncAssetDatabase
+from utils.session_manager import SessionManager
+from services.prompt_competition_service import PromptCompetitionService
+from quality_scorer import QualityScorer, CompetitiveEvaluation
+
+# Security configuration
+REVIEW_API_TOKEN = os.getenv('REVIEW_API_TOKEN', 'estate-planning-review-2024')
+
+# Initialize SQLite-based session manager
+session_manager = SessionManager(
+    db_path="review_sessions.db",
+    session_lifetime=3600  # 1 hour session lifetime
+)
+
+def token_required(f):
+    """Decorator to require authentication token for sensitive endpoints"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        token = request.headers.get('X-API-TOKEN') or request.form.get('api_token') or request.args.get('api_token')
+        if token != REVIEW_API_TOKEN:
+            return jsonify({
+                'success': False, 
+                'error': 'Authentication required. Set X-API-TOKEN header or api_token parameter.',
+                'code': 'AUTH_REQUIRED'
+            }), 401
+        return f(*args, **kwargs)
+    return decorated_function
+
+def csrf_required(f):
+    """Decorator to require CSRF token for state-changing operations"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Skip CSRF for GET requests
+        if request.method == 'GET':
+            return f(*args, **kwargs)
+        
+        session_id = request.headers.get('X-Session-ID') or request.form.get('session_id')
+        csrf_token = request.headers.get('X-CSRF-Token') or request.form.get('csrf_token')
+        
+        if not session_id or not csrf_token:
+            return jsonify({
+                'success': False,
+                'error': 'CSRF token required. Include X-CSRF-Token header and X-Session-ID.',
+                'code': 'CSRF_REQUIRED'
+            }), 403
+        
+        # Get client IP for logging
+        client_ip = request.remote_addr or get_remote_address()
+        
+        if not session_manager.validate_session(session_id, csrf_token, client_ip):
+            return jsonify({
+                'success': False,
+                'error': 'Invalid or expired CSRF token.',
+                'code': 'CSRF_INVALID'
+            }), 403
+        
+        return f(*args, **kwargs)
+    return decorated_function
+
+def validate_json(required_fields=None, optional_fields=None, max_lengths=None):
+    """Decorator to validate JSON input for API endpoints"""
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            # Check Content-Type
+            if request.content_type and 'application/json' not in request.content_type:
+                return jsonify({
+                    'success': False,
+                    'error': 'Content-Type must be application/json',
+                    'code': 'INVALID_CONTENT_TYPE'
+                }), 400
+            
+            # Parse JSON
+            try:
+                data = request.get_json(force=True)
+                if data is None:
+                    data = {}
+            except Exception as e:
+                return jsonify({
+                    'success': False,
+                    'error': f'Invalid JSON: {str(e)}',
+                    'code': 'INVALID_JSON'
+                }), 400
+            
+            # Validate required fields
+            if required_fields:
+                missing_fields = [field for field in required_fields if field not in data]
+                if missing_fields:
+                    return jsonify({
+                        'success': False,
+                        'error': f'Missing required fields: {missing_fields}',
+                        'code': 'MISSING_FIELDS'
+                    }), 400
+            
+            # Validate field types and lengths
+            if max_lengths:
+                for field, max_len in max_lengths.items():
+                    if field in data and isinstance(data[field], str) and len(data[field]) > max_len:
+                        return jsonify({
+                            'success': False,
+                            'error': f'Field "{field}" exceeds maximum length of {max_len}',
+                            'code': 'FIELD_TOO_LONG'
+                        }), 400
+            
+            # Filter out unexpected fields
+            all_allowed_fields = set()
+            if required_fields:
+                all_allowed_fields.update(required_fields)
+            if optional_fields:
+                all_allowed_fields.update(optional_fields)
+            
+            if all_allowed_fields:
+                filtered_data = {k: v for k, v in data.items() if k in all_allowed_fields}
+            else:
+                filtered_data = data
+            
+            # Add validated data to kwargs
+            kwargs['validated_data'] = filtered_data
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+@dataclass
+class ReviewSession:
+    """Represents a human review session"""
+    session_id: str
+    reviewer_name: str
+    start_time: str
+    pages_reviewed: int
+    decisions_made: int
+    quality_feedback: List[Dict[str, Any]]
+    session_notes: str
+    completion_status: str  # 'active', 'paused', 'completed'
+
+@dataclass 
+class HumanDecision:
+    """Represents a human decision on prompt selection"""
+    page_title: str
+    page_category: str
+    asset_type: str
+    selected_prompt_id: str
+    selected_model: str
+    decision_reasoning: str
+    quality_override: Optional[float] = None
+    custom_modifications: Optional[str] = None
+    decision_timestamp: str = None
+    
+    def __post_init__(self):
+        if self.decision_timestamp is None:
+            self.decision_timestamp = datetime.now().isoformat()
+
+class ReviewDashboard:
+    """Web-based human review dashboard for prompt selection"""
+    
+    def __init__(self, db_path: str = "estate_planning_assets.db", port: int = 5000):
+        """Initialize the review dashboard"""
+        if not FLASK_AVAILABLE:
+            raise ImportError("Flask is required. Install with: pip install flask flask-cors")
+            
+        self.port = port
+        self.app = Flask(__name__, template_folder='templates', static_folder='static')
+        CORS(self.app)
+        
+        # Initialize rate limiter (using memory storage for local deployment)
+        self.limiter = Limiter(
+            app=self.app,
+            key_func=get_remote_address,
+            default_limits=["1000 per hour", "100 per minute"],
+            storage_uri="memory://"  # Using memory for local laptop deployment
+        )
+        
+        # Initialize database with connection pooling (synchronous)
+        self.db = SyncAssetDatabase(db_path, pool_size=10)
+        # Note: prompt_service and quality_scorer may need sync versions too
+        # For now, we'll focus on the main database operations
+        self.quality_scorer = QualityScorer()
+        
+        self.logger = self._setup_logger()
+        
+        # Session management
+        self.current_session: Optional[ReviewSession] = None
+        
+        # Setup routes
+        self._setup_routes()
+        self._create_templates()
+        
+    def _setup_logger(self) -> logging.Logger:
+        """Set up logging for the dashboard"""
+        logger = logging.getLogger('ReviewDashboard')
+        logger.setLevel(logging.INFO)
+        
+        # Console handler
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.INFO)
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        ch.setFormatter(formatter)
+        logger.addHandler(ch)
+        
+        # File handler
+        fh = logging.FileHandler('review_dashboard.log')
+        fh.setLevel(logging.DEBUG)
+        fh.setFormatter(formatter)
+        logger.addHandler(fh)
+        
+        return logger
+    
+    def _setup_routes(self):
+        """Setup Flask routes for the dashboard"""
+        
+        @self.app.route('/static/<path:filename>')
+        def static_files(filename):
+            """Serve static files (CSS, JS)"""
+            return send_from_directory('static', filename)
+
+        @self.app.route('/')
+        def index():
+            """Main dashboard page"""
+            try:
+                async def _get_stats():
+                    await self.db.init_database()
+                    async with self.db.get_connection() as conn:
+                        cursor = await conn.execute("SELECT COUNT(*) as total FROM prompt_competitions WHERE competition_status = 'evaluated'")
+                        total_row = await cursor.fetchone()
+                        cursor = await conn.execute("SELECT COUNT(*) as decided FROM prompt_competitions WHERE competition_status = 'decided'")
+                        decided_row = await cursor.fetchone()
+                        return total_row['total'] if total_row else 0, decided_row['decided'] if decided_row else 0
+                
+                # Run the async operation
+                total_evaluations, decisions_made = asyncio.run(_get_stats())
+            except:
+                total_evaluations, decisions_made = 0, 0
+            
+            # Create response with security headers
+            response = make_response(render_template('dashboard.html', 
+                                                   session=self.current_session,
+                                                   total_evaluations=total_evaluations,
+                                                   decisions_made=decisions_made))
+            
+            # Content Security Policy - Strict mode (no unsafe-inline)
+            response.headers['Content-Security-Policy'] = (
+                "default-src 'self'; "
+                "script-src 'self' https://cdn.jsdelivr.net/npm/dompurify@3.0.5/; "
+                "style-src 'self'; "  # Removed 'unsafe-inline' - all styles now external
+                "img-src 'self' data:; "
+                "connect-src 'self'; "
+                "font-src 'self'; "
+                "object-src 'none'; "
+                "media-src 'self'; "
+                "frame-src 'none';"
+            )
+            
+            # Additional security headers
+            response.headers['X-Content-Type-Options'] = 'nosniff'
+            response.headers['X-Frame-Options'] = 'DENY'
+            response.headers['X-XSS-Protection'] = '1; mode=block'
+            response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+            
+            return response
+        
+        @self.app.route('/api/get-csrf-token', methods=['POST'])
+        @self.limiter.limit("5 per minute")
+        @token_required
+        def get_csrf_token():
+            """Get a CSRF token for the session"""
+            # Get client info for session tracking
+            client_ip = request.remote_addr or get_remote_address()
+            user_agent = request.headers.get('User-Agent', 'Unknown')
+            
+            # Create session with SQLite backend
+            session_data = session_manager.create_session(
+                user_data={'api_token_validated': True},
+                ip_address=client_ip,
+                user_agent=user_agent
+            )
+            
+            return jsonify({
+                'success': True,
+                'session_id': session_data['session_id'],
+                'csrf_token': session_data['csrf_token'],
+                'expires_at': session_data['expires_at']
+            })
+        
+        @self.app.route('/api/start-session', methods=['POST'])
+        @self.limiter.limit("5 per minute")
+        @token_required
+        @csrf_required
+        @validate_json(optional_fields=['reviewer_name'], max_lengths={'reviewer_name': 100})
+        def start_session(validated_data):
+            """Start a new review session"""
+            reviewer_name = validated_data.get('reviewer_name', 'Anonymous')
+            
+            # Additional validation
+            if reviewer_name and not reviewer_name.strip():
+                reviewer_name = 'Anonymous'
+            
+            self.current_session = ReviewSession(
+                session_id=f"review_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+                reviewer_name=reviewer_name,
+                start_time=datetime.now().isoformat(),
+                pages_reviewed=0,
+                decisions_made=0,
+                quality_feedback=[],
+                session_notes="",
+                completion_status='active'
+            )
+            
+            self.logger.info(f"Started review session: {self.current_session.session_id}")
+            return jsonify({'success': True, 'session': asdict(self.current_session)})
+        
+        @self.app.route('/api/load-evaluations', methods=['POST'])
+        @self.limiter.limit("10 per minute")
+        @token_required
+        @csrf_required
+        @validate_json(optional_fields=[])
+        def load_evaluations(validated_data):
+            """Load evaluated competitions from database for review"""
+            try:
+                # Use synchronous database operations
+                competitions = self.db.get_competitions(status='evaluated')
+                
+                return jsonify({
+                    'success': True,
+                    'competitions_loaded': len(competitions),
+                    'message': f'Loaded {len(competitions)} evaluated competitions for review',
+                    'competitions': [dict(comp) for comp in competitions]
+                })
+                    
+            except Exception as e:
+                self.logger.error(f"Failed to load evaluations from database: {e}")
+                return jsonify({'success': False, 'error': str(e)}), 500
+        
+        @self.app.route('/api/get-competition/<int:competition_id>')
+        def get_competition(competition_id):
+            """Get specific competition details for review"""
+            # Validate competition_id parameter
+            if competition_id <= 0:
+                return jsonify({
+                    'success': False,
+                    'error': 'competition_id must be a positive integer',
+                    'code': 'INVALID_COMPETITION_ID'
+                }), 400
+            
+            try:
+                # Use synchronous database operations
+                result = self.db.get_competition_with_evaluations(competition_id)
+                
+                if not result:
+                    return jsonify({'success': False, 'error': 'Competition not found'}), 404
+                
+                competition = result['competition']
+                evaluations = result['evaluations']
+                
+                # Convert to dict for JSON serialization
+                eval_data = {
+                    'competition_id': competition_id,
+                    'page_title': f"{competition['category']} {competition['index_in_category']}",
+                    'page_category': competition['category'],
+                    'asset_type': competition['asset_type'],
+                    'prompts': [
+                        {
+                            'id': prompt['id'],
+                            'text': prompt['prompt_text'],
+                            'model_source': prompt['model_source'],
+                            'metadata': json.loads(prompt['metadata']) if prompt['metadata'] else {}
+                        }
+                        for prompt in prompts
+                    ],
+                    'evaluations': [
+                        {
+                            'prompt_text': eval_row['prompt_text'],
+                            'model_source': eval_row['model_source'],
+                            'overall_score': eval_row['overall_score'],
+                            'weighted_score': eval_row['weighted_score'],
+                            'individual_scores': json.loads(eval_row['individual_scores']) if eval_row['individual_scores'] else [],
+                            'is_winner': eval_row['is_winner']
+                        }
+                        for eval_row in evaluations
+                    ],
+                    'winner': next((
+                        {
+                            'model_source': eval_row['model_source'],
+                            'weighted_score': eval_row['weighted_score']
+                        }
+                        for eval_row in evaluations if eval_row['is_winner']
+                    ), None)
+                }
+                
+                return jsonify({'success': True, 'competition': eval_data})
+                
+            except Exception as e:
+                self.logger.error(f"Failed to get competition {competition_id}: {e}")
+                return jsonify({'success': False, 'error': str(e)}), 500
+        
+        @self.app.route('/api/make-decision', methods=['POST'])
+        @self.limiter.limit("20 per minute")  # Rate limit decision making
+        @token_required
+        @csrf_required
+        @validate_json(
+            required_fields=['competition_id', 'selected_prompt_text', 'selected_model'],
+            optional_fields=['reasoning', 'quality_override', 'custom_modifications'],
+            max_lengths={
+                'selected_prompt_text': 10000,
+                'selected_model': 100,
+                'reasoning': 2000,
+                'custom_modifications': 2000
+            }
+        )
+        def make_decision(validated_data):
+            """Record human decision on prompt selection"""
+            try:
+                # Additional validation
+                competition_id = validated_data['competition_id']
+                if not isinstance(competition_id, int) or competition_id <= 0:
+                    return jsonify({
+                        'success': False,
+                        'error': 'competition_id must be a positive integer',
+                        'code': 'INVALID_COMPETITION_ID'
+                    }), 400
+                
+                reasoning = validated_data.get('reasoning', '')
+                if reasoning and len(reasoning.strip()) < 10:
+                    return jsonify({
+                        'success': False,
+                        'error': 'reasoning must be at least 10 characters if provided',
+                        'code': 'REASONING_TOO_SHORT'
+                    }), 400
+                
+                # Use synchronous database operations
+                decision_data = {
+                    'competition_id': validated_data['competition_id'],
+                    'selected_prompt_text': validated_data['selected_prompt_text'],
+                    'selected_model': validated_data['selected_model'],
+                    'decision_reasoning': validated_data.get('reasoning', ''),
+                    'quality_override': validated_data.get('quality_override'),
+                    'custom_modifications': validated_data.get('custom_modifications'),
+                    'reviewer_name': self.current_session.reviewer_name if self.current_session else 'Anonymous'
+                }
+                
+                # Store the decision in database (synchronously)
+                decision_id = self.db.store_human_decision(decision_data)
+                
+                # Update session stats
+                if self.current_session:
+                    self.current_session.decisions_made += 1
+                    self.current_session.pages_reviewed += 1
+                
+                self.logger.info(f"Decision recorded: Competition {validated_data['competition_id']} -> {validated_data['selected_model']}")
+                
+                return jsonify({
+                    'success': True,
+                    'decision_id': decision_id,
+                    'competition_id': validated_data['competition_id']
+                })
+                
+            except Exception as e:
+                self.logger.error(f"Failed to record decision: {e}")
+                return jsonify({'success': False, 'error': str(e)}), 500
+        
+        @self.app.route('/api/get-progress')
+        @self.limiter.limit("30 per minute")  # Rate limit progress checks
+        def get_progress():
+            """Get current review progress from database"""
+            try:
+                # Use synchronous database operations
+                stats = self.db.get_progress_stats()
+                
+                progress_data = {
+                    'total_evaluations': stats['total_evaluations'],
+                    'decisions_made': stats['decisions_made'],
+                    'completion_percentage': stats['completion_percentage'],
+                    'pending_reviews': stats['pending_reviews'],
+                    'session': asdict(self.current_session) if self.current_session else None
+                }
+                
+                return jsonify(progress_data)
+                
+            except Exception as e:
+                self.logger.error(f"Failed to get progress: {e}")
+                return jsonify({'success': False, 'error': str(e)}), 500
+        
+        @self.app.route('/api/export-decisions')
+        @self.limiter.limit("5 per minute")  # Rate limit exports  
+        @token_required
+        def export_decisions():
+            """Export all human decisions from database"""
+            try:
+                # Use synchronous database operations
+                decisions = self.db.get_all_decisions()
+                
+                export_data = {
+                    'export_timestamp': datetime.now().isoformat(),
+                    'session': asdict(self.current_session) if self.current_session else None,
+                    'total_decisions': len(decisions),
+                    'decisions': [dict(decision) for decision in decisions],
+                    'decision_summary': self._generate_decision_summary_from_db(decisions)
+                }
+                
+                output_file = f"human_decisions_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+                with open(output_file, 'w') as f:
+                    json.dump(export_data, f, indent=2)
+                
+                self.logger.info(f"Exported {len(decisions)} decisions to {output_file}")
+                
+                return jsonify({
+                    'success': True,
+                    'file_path': output_file,
+                    'total_decisions': len(decisions)
+                })
+                
+            except Exception as e:
+                self.logger.error(f"Failed to export decisions: {e}")
+                return jsonify({'success': False, 'error': str(e)}), 500
+        
+        @self.app.route('/api/generate-final-prompts')
+        @token_required
+        def generate_final_prompts():
+            """Generate final prompt selections based on human decisions from database"""
+            try:
+                # Use synchronous database operations
+                decisions = self.db.get_all_decisions()
+                final_prompts = {}
+                
+                for decision in decisions:
+                    key = f"{decision['page_category']}_{decision['index_in_category']}_{decision['asset_type']}"
+                    final_prompts[key] = {
+                        'page_title': f"{decision['page_category']} {decision['index_in_category']}",
+                        'page_category': decision['page_category'],
+                        'asset_type': decision['asset_type'],
+                        'selected_prompt': decision['selected_prompt_text'],
+                        'selected_model': decision['selected_model'],
+                        'human_reasoning': decision['decision_reasoning'],
+                        'custom_modifications': decision['custom_modifications'],
+                        'decision_timestamp': decision['decision_timestamp']
+                    }
+                
+                # Save final prompts
+                output_file = f"final_selected_prompts_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+                with open(output_file, 'w') as f:
+                    json.dump(final_prompts, f, indent=2)
+                
+                self.logger.info(f"Generated {len(final_prompts)} final prompt selections")
+                
+                return jsonify({
+                    'success': True,
+                    'final_prompts_file': output_file,
+                    'total_selections': len(final_prompts)
+                })
+                
+            except Exception as e:
+                self.logger.error(f"Failed to generate final prompts: {e}")
+                return jsonify({'success': False, 'error': str(e)}), 500
+    
+    def _generate_decision_summary_from_db(self, decisions: List[Dict]) -> Dict[str, Any]:
+        """Generate summary statistics for human decisions from database records"""
+        if not decisions:
+            return {}
+        
+        model_preferences = {}
+        asset_type_counts = {}
+        
+        for decision in decisions:
+            # Count model preferences
+            model = decision['selected_model']
+            model_preferences[model] = model_preferences.get(model, 0) + 1
+            
+            # Count asset types
+            asset_type = decision['asset_type']
+            asset_type_counts[asset_type] = asset_type_counts.get(asset_type, 0) + 1
+        
+        return {
+            'total_decisions': len(decisions),
+            'model_preference_ranking': sorted(model_preferences.items(), key=lambda x: x[1], reverse=True),
+            'asset_type_distribution': asset_type_counts,
+            'decisions_with_custom_modifications': sum(1 for d in decisions if d.get('custom_modifications')),
+            'decisions_with_quality_override': sum(1 for d in decisions if d.get('quality_override')),
+            'average_decision_reasoning_length': sum(len(d.get('decision_reasoning', '')) for d in decisions) / len(decisions) if decisions else 0
+        }
+    
+    def _create_templates(self):
+        """Ensure template directory exists (templates are now external files)"""
+        templates_dir = Path('templates')
+        templates_dir.mkdir(exist_ok=True)
+        
+        # Dashboard template is now an external file at templates/dashboard.html
+        self.logger.info("Template directory confirmed")
+    
+    def run(self, debug: bool = True):
+        """Run the dashboard server"""
+        # Setup periodic session cleanup (every 5 minutes)
+        import threading
+        
+        def cleanup_sessions():
+            while True:
+                time.sleep(300)  # 5 minutes
+                try:
+                    expired = session_manager.cleanup_expired_sessions()
+                    if expired > 0:
+                        self.logger.info(f"Cleaned up {expired} expired sessions")
+                except Exception as e:
+                    self.logger.error(f"Session cleanup error: {e}")
+        
+        cleanup_thread = threading.Thread(target=cleanup_sessions, daemon=True)
+        cleanup_thread.start()
+        
+        self.logger.info(f"Starting Review Dashboard on http://localhost:{self.port}")
+        print(f"\n🌐 Estate Planning Concierge v4.0 - Review Dashboard")
+        print(f"📊 Open http://localhost:{self.port} to start reviewing prompts")
+        print(f"🎯 Use this interface to review AI-generated prompts and make final selections")
+        print(f"🔐 Authentication Token: {REVIEW_API_TOKEN}")
+        print(f"   Set REVIEW_API_TOKEN environment variable to customize")
+        
+        # Initialize database before starting server
+        async def _init_db():
+            await self.db.init_database()
+            self.logger.info("Database initialized successfully")
+        
+        try:
+            asyncio.run(_init_db())
+        except Exception as e:
+            self.logger.error(f"Database initialization failed: {e}")
+            print(f"Warning: Database initialization failed - {e}")
+        
+        self.app.run(host='0.0.0.0', port=self.port, debug=debug)
+
+
+def create_dashboard_server(port: int = 5000):
+    """Create and return a dashboard server instance"""
+    try:
+        dashboard = ReviewDashboard(port=port)
+        return dashboard
+    except ImportError as e:
+        print(f"Cannot create dashboard: {e}")
+        print("Install required dependencies: pip install flask flask-cors")
+        return None
+
+
+async def test_review_dashboard():
+    """Test the review dashboard with sample data"""
+    print("🎛️ Testing Review Dashboard...")
+    
+    # Create dashboard (but don't run it in test mode)
+    dashboard = create_dashboard_server(port=5001)
+    
+    if dashboard:
+        print(f"✅ Review dashboard created successfully!")
+        print(f"📱 Dashboard features:")
+        print(f"  - Interactive web interface for prompt review")
+        print(f"  - Side-by-side prompt comparison")
+        print(f"  - Quality score visualization")
+        print(f"  - Human decision recording")
+        print(f"  - Progress tracking")
+        print(f"  - Export capabilities")
+        
+        print(f"\n🚀 To run the dashboard:")
+        print(f"  dashboard = create_dashboard_server()")
+        print(f"  dashboard.run()")
+        print(f"  # Then open http://localhost:5000")
+        
+        return True
+    else:
+        print("❌ Dashboard creation failed")
+        return False
+
+
+if __name__ == "__main__":
+    import sys
+    
+    if len(sys.argv) > 1 and sys.argv[1] == 'test':
+        # Run test
+        asyncio.run(test_review_dashboard())
+    else:
+        # Run dashboard server
+        dashboard = create_dashboard_server()
+        if dashboard:
+            dashboard.run()
+        else:
+            print("Failed to create dashboard. Check dependencies.")#!/usr/bin/env python3
+"""
+SQLite-based Session Management for Estate Planning Concierge v4.0
+Provides secure session storage without requiring Redis
+"""
+
+import sqlite3
+import json
+import secrets
+import hashlib
+import time
+from typing import Dict, Optional, Any
+from datetime import datetime, timedelta
+import logging
+from pathlib import Path
+import asyncio
+import aiosqlite
+
+class SessionManager:
+    """SQLite-backed session management with CSRF protection"""
+    
+    def __init__(self, db_path: str = "sessions.db", session_lifetime: int = 3600):
+        """
+        Initialize session manager
+        
+        Args:
+            db_path: Path to SQLite database file
+            session_lifetime: Session lifetime in seconds (default 1 hour)
+        """
+        self.db_path = db_path
+        self.session_lifetime = session_lifetime
+        self.logger = logging.getLogger(__name__)
+        self._init_database()
+    
+    def _init_database(self):
+        """Initialize SQLite database with session tables"""
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS sessions (
+                    session_id TEXT PRIMARY KEY,
+                    csrf_token TEXT NOT NULL,
+                    user_data TEXT,
+                    ip_address TEXT,
+                    user_agent TEXT,
+                    created_at REAL NOT NULL,
+                    updated_at REAL NOT NULL,
+                    expires_at REAL NOT NULL
+                )
+            """)
+            
+            conn.execute("""
+                CREATE INDEX IF NOT EXISTS idx_sessions_expires 
+                ON sessions(expires_at)
+            """)
+            
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS session_activity (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    session_id TEXT NOT NULL,
+                    action TEXT NOT NULL,
+                    ip_address TEXT,
+                    timestamp REAL NOT NULL,
+                    FOREIGN KEY (session_id) REFERENCES sessions(session_id)
+                )
+            """)
+            
+            conn.commit()
+            self.logger.info(f"Session database initialized at {self.db_path}")
+    
+    async def init_async_database(self):
+        """Initialize async database connection"""
+        async with aiosqlite.connect(self.db_path) as conn:
+            await conn.execute("""
+                CREATE TABLE IF NOT EXISTS sessions (
+                    session_id TEXT PRIMARY KEY,
+                    csrf_token TEXT NOT NULL,
+                    user_data TEXT,
+                    ip_address TEXT,
+                    user_agent TEXT,
+                    created_at REAL NOT NULL,
+                    updated_at REAL NOT NULL,
+                    expires_at REAL NOT NULL
+                )
+            """)
+            
+            await conn.execute("""
+                CREATE INDEX IF NOT EXISTS idx_sessions_expires 
+                ON sessions(expires_at)
+            """)
+            
+            await conn.execute("""
+                CREATE TABLE IF NOT EXISTS session_activity (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    session_id TEXT NOT NULL,
+                    action TEXT NOT NULL,
+                    ip_address TEXT,
+                    timestamp REAL NOT NULL,
+                    FOREIGN KEY (session_id) REFERENCES sessions(session_id)
+                )
+            """)
+            
+            await conn.commit()
+    
+    def create_session(self, user_data: Optional[Dict] = None, 
+                      ip_address: Optional[str] = None,
+                      user_agent: Optional[str] = None) -> Dict[str, str]:
+        """
+        Create a new session with CSRF token
+        
+        Args:
+            user_data: Optional user data to store in session
+            ip_address: Client IP address
+            user_agent: Client user agent
+            
+        Returns:
+            Dict with session_id and csrf_token
+        """
+        session_id = secrets.token_urlsafe(32)
+        csrf_token = self._generate_csrf_token(session_id)
+        
+        now = time.time()
+        expires_at = now + self.session_lifetime
+        
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute("""
+                INSERT INTO sessions 
+                (session_id, csrf_token, user_data, ip_address, user_agent, 
+                 created_at, updated_at, expires_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                session_id, csrf_token, 
+                json.dumps(user_data) if user_data else None,
+                ip_address, user_agent,
+                now, now, expires_at
+            ))
+            
+            # Log session creation
+            conn.execute("""
+                INSERT INTO session_activity (session_id, action, ip_address, timestamp)
+                VALUES (?, ?, ?, ?)
+            """, (session_id, 'created', ip_address, now))
+            
+            conn.commit()
+        
+        self.logger.info(f"Session created: {session_id[:8]}... from {ip_address}")
+        
+        return {
+            'session_id': session_id,
+            'csrf_token': csrf_token,
+            'expires_at': datetime.fromtimestamp(expires_at).isoformat()
+        }
+    
+    async def create_session_async(self, user_data: Optional[Dict] = None,
+                                  ip_address: Optional[str] = None,
+                                  user_agent: Optional[str] = None) -> Dict[str, str]:
+        """Async version of create_session"""
+        session_id = secrets.token_urlsafe(32)
+        csrf_token = self._generate_csrf_token(session_id)
+        
+        now = time.time()
+        expires_at = now + self.session_lifetime
+        
+        async with aiosqlite.connect(self.db_path) as conn:
+            await conn.execute("""
+                INSERT INTO sessions 
+                (session_id, csrf_token, user_data, ip_address, user_agent, 
+                 created_at, updated_at, expires_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                session_id, csrf_token,
+                json.dumps(user_data) if user_data else None,
+                ip_address, user_agent,
+                now, now, expires_at
+            ))
+            
+            await conn.execute("""
+                INSERT INTO session_activity (session_id, action, ip_address, timestamp)
+                VALUES (?, ?, ?, ?)
+            """, (session_id, 'created', ip_address, now))
+            
+            await conn.commit()
+        
+        return {
+            'session_id': session_id,
+            'csrf_token': csrf_token,
+            'expires_at': datetime.fromtimestamp(expires_at).isoformat()
+        }
+    
+    def validate_session(self, session_id: str, csrf_token: Optional[str] = None,
+                        ip_address: Optional[str] = None) -> bool:
+        """
+        Validate session and optionally CSRF token
+        
+        Args:
+            session_id: Session ID to validate
+            csrf_token: Optional CSRF token to validate
+            ip_address: Optional IP address to log
+            
+        Returns:
+            True if session is valid, False otherwise
+        """
+        now = time.time()
+        
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.execute("""
+                SELECT csrf_token, expires_at, ip_address 
+                FROM sessions 
+                WHERE session_id = ?
+            """, (session_id,))
+            
+            row = cursor.fetchone()
+            
+            if not row:
+                self.logger.warning(f"Invalid session attempt: {session_id[:8]}...")
+                return False
+            
+            stored_csrf, expires_at, stored_ip = row
+            
+            # Check if session expired
+            if now > expires_at:
+                self.logger.warning(f"Expired session: {session_id[:8]}...")
+                conn.execute("DELETE FROM sessions WHERE session_id = ?", (session_id,))
+                conn.commit()
+                return False
+            
+            # Validate CSRF token if provided
+            if csrf_token and not secrets.compare_digest(stored_csrf, csrf_token):
+                self.logger.warning(f"Invalid CSRF token for session: {session_id[:8]}...")
+                # Log suspicious activity
+                conn.execute("""
+                    INSERT INTO session_activity (session_id, action, ip_address, timestamp)
+                    VALUES (?, ?, ?, ?)
+                """, (session_id, 'invalid_csrf', ip_address, now))
+                conn.commit()
+                return False
+            
+            # Update session activity
+            conn.execute("""
+                UPDATE sessions 
+                SET updated_at = ? 
+                WHERE session_id = ?
+            """, (now, session_id))
+            
+            conn.execute("""
+                INSERT INTO session_activity (session_id, action, ip_address, timestamp)
+                VALUES (?, ?, ?, ?)
+            """, (session_id, 'validated', ip_address, now))
+            
+            conn.commit()
+            
+        return True
+    
+    async def validate_session_async(self, session_id: str, csrf_token: Optional[str] = None,
+                                    ip_address: Optional[str] = None) -> bool:
+        """Async version of validate_session"""
+        now = time.time()
+        
+        async with aiosqlite.connect(self.db_path) as conn:
+            async with conn.execute("""
+                SELECT csrf_token, expires_at, ip_address 
+                FROM sessions 
+                WHERE session_id = ?
+            """, (session_id,)) as cursor:
+                row = await cursor.fetchone()
+            
+            if not row:
+                return False
+            
+            stored_csrf, expires_at, stored_ip = row
+            
+            if now > expires_at:
+                await conn.execute("DELETE FROM sessions WHERE session_id = ?", (session_id,))
+                await conn.commit()
+                return False
+            
+            if csrf_token and not secrets.compare_digest(stored_csrf, csrf_token):
+                await conn.execute("""
+                    INSERT INTO session_activity (session_id, action, ip_address, timestamp)
+                    VALUES (?, ?, ?, ?)
+                """, (session_id, 'invalid_csrf', ip_address, now))
+                await conn.commit()
+                return False
+            
+            await conn.execute("""
+                UPDATE sessions 
+                SET updated_at = ? 
+                WHERE session_id = ?
+            """, (now, session_id))
+            
+            await conn.execute("""
+                INSERT INTO session_activity (session_id, action, ip_address, timestamp)
+                VALUES (?, ?, ?, ?)
+            """, (session_id, 'validated', ip_address, now))
+            
+            await conn.commit()
+            
+        return True
+    
+    def get_session_data(self, session_id: str) -> Optional[Dict]:
+        """Get session user data"""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.execute("""
+                SELECT user_data FROM sessions 
+                WHERE session_id = ? AND expires_at > ?
+            """, (session_id, time.time()))
+            
+            row = cursor.fetchone()
+            if row and row[0]:
+                return json.loads(row[0])
+        
+        return None
+    
+    def update_session_data(self, session_id: str, user_data: Dict) -> bool:
+        """Update session user data"""
+        now = time.time()
+        
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.execute("""
+                UPDATE sessions 
+                SET user_data = ?, updated_at = ?
+                WHERE session_id = ? AND expires_at > ?
+            """, (json.dumps(user_data), now, session_id, now))
+            
+            conn.commit()
+            return cursor.rowcount > 0
+    
+    def delete_session(self, session_id: str) -> bool:
+        """Delete a session"""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.execute("""
+                DELETE FROM sessions WHERE session_id = ?
+            """, (session_id,))
+            
+            conn.commit()
+            return cursor.rowcount > 0
+    
+    def cleanup_expired_sessions(self) -> int:
+        """Remove expired sessions from database"""
+        now = time.time()
+        
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.execute("""
+                DELETE FROM sessions WHERE expires_at < ?
+            """, (now,))
+            
+            deleted = cursor.rowcount
+            
+            # Also cleanup old activity logs (older than 7 days)
+            week_ago = now - (7 * 24 * 3600)
+            conn.execute("""
+                DELETE FROM session_activity WHERE timestamp < ?
+            """, (week_ago,))
+            
+            conn.commit()
+            
+        if deleted > 0:
+            self.logger.info(f"Cleaned up {deleted} expired sessions")
+        
+        return deleted
+    
+    def get_active_sessions_count(self) -> int:
+        """Get count of active sessions"""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.execute("""
+                SELECT COUNT(*) FROM sessions WHERE expires_at > ?
+            """, (time.time(),))
+            
+            return cursor.fetchone()[0]
+    
+    def get_session_activity(self, session_id: str, limit: int = 100) -> List[Dict]:
+        """Get activity log for a session"""
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.execute("""
+                SELECT action, ip_address, timestamp 
+                FROM session_activity 
+                WHERE session_id = ?
+                ORDER BY timestamp DESC
+                LIMIT ?
+            """, (session_id, limit))
+            
+            return [dict(row) for row in cursor.fetchall()]
+    
+    def _generate_csrf_token(self, session_id: str) -> str:
+        """Generate a CSRF token for a session"""
+        data = f"{session_id}:{time.time()}:{secrets.token_hex(16)}"
+        return hashlib.sha256(data.encode()).hexdigest()
+
+
+# Example usage and testing
+if __name__ == "__main__":
+    import asyncio
+    
+    # Setup logging
+    logging.basicConfig(level=logging.INFO)
+    
+    # Create session manager
+    manager = SessionManager(db_path="test_sessions.db")
+    
+    # Test synchronous operations
+    print("\n=== Testing Synchronous Operations ===")
+    
+    # Create a session
+    session = manager.create_session(
+        user_data={'username': 'test_user', 'role': 'reviewer'},
+        ip_address='127.0.0.1',
+        user_agent='TestClient/1.0'
+    )
+    print(f"Created session: {session['session_id'][:8]}...")
+    print(f"CSRF Token: {session['csrf_token'][:16]}...")
+    
+    # Validate session
+    is_valid = manager.validate_session(
+        session['session_id'], 
+        session['csrf_token'],
+        '127.0.0.1'
+    )
+    print(f"Session valid: {is_valid}")
+    
+    # Get session data
+    data = manager.get_session_data(session['session_id'])
+    print(f"Session data: {data}")
+    
+    # Update session data
+    manager.update_session_data(
+        session['session_id'],
+        {'username': 'test_user', 'role': 'admin', 'decisions_made': 5}
+    )
+    
+    # Get activity log
+    activity = manager.get_session_activity(session['session_id'])
+    print(f"Session activity: {activity}")
+    
+    # Get active sessions count
+    count = manager.get_active_sessions_count()
+    print(f"Active sessions: {count}")
+    
+    # Cleanup
+    manager.cleanup_expired_sessions()
+    
+    # Test async operations
+    async def test_async():
+        print("\n=== Testing Async Operations ===")
+        
+        await manager.init_async_database()
+        
+        # Create async session
+        async_session = await manager.create_session_async(
+            user_data={'username': 'async_user'},
+            ip_address='192.168.1.1'
+        )
+        print(f"Created async session: {async_session['session_id'][:8]}...")
+        
+        # Validate async session
+        is_valid = await manager.validate_session_async(
+            async_session['session_id'],
+            async_session['csrf_token']
+        )
+        print(f"Async session valid: {is_valid}")
+    
+    # Run async tests
+    asyncio.run(test_async())
+    
+    print("\n=== Session Manager Tests Complete ===")#!/usr/bin/env python3
+"""
+Comprehensive Security Logging for Estate Planning Concierge v4.0
+Tracks security events, authentication attempts, and suspicious activities
+"""
+
+import logging
+import json
+import sqlite3
+import aiosqlite
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional, Any
+from pathlib import Path
+import hashlib
+import asyncio
+from enum import Enum
+
+class SecurityEventType(Enum):
+    """Types of security events to log"""
+    AUTH_SUCCESS = "authentication_success"
+    AUTH_FAILURE = "authentication_failure"
+    CSRF_VALIDATION_FAILED = "csrf_validation_failed"
+    RATE_LIMIT_EXCEEDED = "rate_limit_exceeded"
+    INVALID_INPUT = "invalid_input_detected"
+    SQL_INJECTION_ATTEMPT = "sql_injection_attempt"
+    XSS_ATTEMPT = "xss_attempt"
+    PATH_TRAVERSAL_ATTEMPT = "path_traversal_attempt"
+    SESSION_HIJACK_ATTEMPT = "session_hijack_attempt"
+    PRIVILEGE_ESCALATION = "privilege_escalation_attempt"
+    DATA_EXFILTRATION = "data_exfiltration_attempt"
+    BRUTE_FORCE_DETECTED = "brute_force_detected"
+    SUSPICIOUS_PATTERN = "suspicious_pattern"
+    API_ABUSE = "api_abuse"
+    FILE_UPLOAD_BLOCKED = "file_upload_blocked"
+
+class SecurityLogger:
+    """Comprehensive security event logger with SQLite backend"""
+    
+    def __init__(self, db_path: str = "security_events.db", 
+                 log_file: str = "security.log",
+                 alert_threshold: int = 5):
+        """
+        Initialize security logger
+        
+        Args:
+            db_path: Path to SQLite database for security events
+            log_file: Path to security log file
+            alert_threshold: Number of suspicious events before alerting
+        """
+        self.db_path = db_path
+        self.alert_threshold = alert_threshold
+        
+        # Setup file logger
+        self.logger = logging.getLogger('security')
+        self.logger.setLevel(logging.INFO)
+        
+        # File handler with rotation
+        from logging.handlers import RotatingFileHandler
+        handler = RotatingFileHandler(
+            log_file, 
+            maxBytes=10*1024*1024,  # 10MB
+            backupCount=10
+        )
+        formatter = logging.Formatter(
+            '%(asctime)s - %(levelname)s - [%(event_type)s] - %(message)s'
+        )
+        handler.setFormatter(formatter)
+        self.logger.addHandler(handler)
+        
+        # Initialize database
+        self._init_database()
+        
+        # Track recent events for pattern detection
+        self.recent_events = {}
+    
+    def _init_database(self):
+        """Initialize security events database"""
+        with sqlite3.connect(self.db_path) as conn:
+            # Main security events table
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS security_events (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    event_type TEXT NOT NULL,
+                    severity TEXT NOT NULL,
+                    ip_address TEXT,
+                    user_agent TEXT,
+                    session_id TEXT,
+                    user_id TEXT,
+                    endpoint TEXT,
+                    method TEXT,
+                    request_data TEXT,
+                    response_code INTEGER,
+                    message TEXT,
+                    stack_trace TEXT,
+                    timestamp REAL NOT NULL,
+                    handled BOOLEAN DEFAULT FALSE
+                )
+            """)
+            
+            # Create indexes for efficient querying
+            conn.execute("""
+                CREATE INDEX IF NOT EXISTS idx_events_timestamp 
+                ON security_events(timestamp DESC)
+            """)
+            
+            conn.execute("""
+                CREATE INDEX IF NOT EXISTS idx_events_ip 
+                ON security_events(ip_address)
+            """)
+            
+            conn.execute("""
+                CREATE INDEX IF NOT EXISTS idx_events_type 
+                ON security_events(event_type)
+            """)
+            
+            # IP reputation tracking
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS ip_reputation (
+                    ip_address TEXT PRIMARY KEY,
+                    threat_score INTEGER DEFAULT 0,
+                    total_events INTEGER DEFAULT 0,
+                    suspicious_events INTEGER DEFAULT 0,
+                    first_seen REAL NOT NULL,
+                    last_seen REAL NOT NULL,
+                    is_blocked BOOLEAN DEFAULT FALSE,
+                    block_reason TEXT,
+                    block_expires REAL
+                )
+            """)
+            
+            # Pattern detection table
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS attack_patterns (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    pattern_type TEXT NOT NULL,
+                    ip_address TEXT,
+                    detected_at REAL NOT NULL,
+                    event_count INTEGER,
+                    pattern_data TEXT,
+                    severity TEXT,
+                    mitigated BOOLEAN DEFAULT FALSE
+                )
+            """)
+            
+            conn.commit()
+    
+    def log_event(self, event_type: SecurityEventType, 
+                 severity: str = "medium",
+                 ip_address: Optional[str] = None,
+                 user_agent: Optional[str] = None,
+                 session_id: Optional[str] = None,
+                 user_id: Optional[str] = None,
+                 endpoint: Optional[str] = None,
+                 method: Optional[str] = None,
+                 request_data: Optional[Dict] = None,
+                 response_code: Optional[int] = None,
+                 message: Optional[str] = None,
+                 stack_trace: Optional[str] = None) -> int:
+        """
+        Log a security event
+        
+        Args:
+            event_type: Type of security event
+            severity: Event severity (low, medium, high, critical)
+            Other args: Event context information
+            
+        Returns:
+            Event ID
+        """
+        timestamp = datetime.now().timestamp()
+        
+        # Sanitize request data to prevent logging sensitive info
+        safe_request_data = self._sanitize_request_data(request_data) if request_data else None
+        
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.execute("""
+                INSERT INTO security_events 
+                (event_type, severity, ip_address, user_agent, session_id, 
+                 user_id, endpoint, method, request_data, response_code, 
+                 message, stack_trace, timestamp)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                event_type.value, severity, ip_address, user_agent, session_id,
+                user_id, endpoint, method, 
+                json.dumps(safe_request_data) if safe_request_data else None,
+                response_code, message, stack_trace, timestamp
+            ))
+            
+            event_id = cursor.lastrowid
+            
+            # Update IP reputation
+            if ip_address:
+                self._update_ip_reputation(conn, ip_address, event_type, severity)
+            
+            # Check for attack patterns
+            if severity in ['high', 'critical']:
+                self._detect_patterns(conn, ip_address, event_type)
+            
+            conn.commit()
+        
+        # Log to file
+        self.logger.log(
+            logging.WARNING if severity in ['high', 'critical'] else logging.INFO,
+            f"{message or event_type.value} - IP: {ip_address} - Session: {session_id}",
+            extra={'event_type': event_type.value}
+        )
+        
+        # Check if we need to trigger alerts
+        if severity in ['high', 'critical']:
+            self._check_alert_threshold(ip_address, event_type)
+        
+        return event_id
+    
+    async def log_event_async(self, event_type: SecurityEventType,
+                            severity: str = "medium",
+                            **kwargs) -> int:
+        """Async version of log_event"""
+        timestamp = datetime.now().timestamp()
+        
+        request_data = kwargs.get('request_data')
+        safe_request_data = self._sanitize_request_data(request_data) if request_data else None
+        
+        async with aiosqlite.connect(self.db_path) as conn:
+            cursor = await conn.execute("""
+                INSERT INTO security_events 
+                (event_type, severity, ip_address, user_agent, session_id, 
+                 user_id, endpoint, method, request_data, response_code, 
+                 message, stack_trace, timestamp)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                event_type.value, severity, 
+                kwargs.get('ip_address'), kwargs.get('user_agent'),
+                kwargs.get('session_id'), kwargs.get('user_id'),
+                kwargs.get('endpoint'), kwargs.get('method'),
+                json.dumps(safe_request_data) if safe_request_data else None,
+                kwargs.get('response_code'), kwargs.get('message'),
+                kwargs.get('stack_trace'), timestamp
+            ))
+            
+            event_id = cursor.lastrowid
+            await conn.commit()
+        
+        return event_id
+    
+    def _sanitize_request_data(self, data: Dict) -> Dict:
+        """Remove sensitive information from request data before logging"""
+        sensitive_keys = {
+            'password', 'token', 'api_key', 'secret', 'csrf_token',
+            'session_id', 'credit_card', 'ssn', 'bank_account'
+        }
+        
+        sanitized = {}
+        for key, value in data.items():
+            if any(sensitive in key.lower() for sensitive in sensitive_keys):
+                sanitized[key] = '[REDACTED]'
+            elif isinstance(value, dict):
+                sanitized[key] = self._sanitize_request_data(value)
+            elif isinstance(value, str) and len(value) > 1000:
+                sanitized[key] = value[:100] + '...[TRUNCATED]'
+            else:
+                sanitized[key] = value
+        
+        return sanitized
+    
+    def _update_ip_reputation(self, conn: sqlite3.Connection, 
+                            ip_address: str, 
+                            event_type: SecurityEventType,
+                            severity: str):
+        """Update IP reputation based on security events"""
+        now = datetime.now().timestamp()
+        
+        # Check if IP exists
+        cursor = conn.execute(
+            "SELECT threat_score, total_events, suspicious_events FROM ip_reputation WHERE ip_address = ?",
+            (ip_address,)
+        )
+        row = cursor.fetchone()
+        
+        if row:
+            threat_score, total_events, suspicious_events = row
+            total_events += 1
+            
+            # Increase threat score based on severity
+            if severity == 'critical':
+                threat_score += 10
+                suspicious_events += 1
+            elif severity == 'high':
+                threat_score += 5
+                suspicious_events += 1
+            elif severity == 'medium':
+                threat_score += 2
+            
+            conn.execute("""
+                UPDATE ip_reputation 
+                SET threat_score = ?, total_events = ?, suspicious_events = ?, last_seen = ?
+                WHERE ip_address = ?
+            """, (threat_score, total_events, suspicious_events, now, ip_address))
+            
+            # Auto-block if threat score too high
+            if threat_score >= 50:
+                block_expires = now + (24 * 3600)  # 24 hour block
+                conn.execute("""
+                    UPDATE ip_reputation 
+                    SET is_blocked = TRUE, block_reason = ?, block_expires = ?
+                    WHERE ip_address = ?
+                """, (f"High threat score: {threat_score}", block_expires, ip_address))
+                
+                self.logger.critical(f"IP {ip_address} auto-blocked due to high threat score: {threat_score}")
+        else:
+            # New IP
+            threat_score = 10 if severity == 'critical' else (5 if severity == 'high' else 0)
+            suspicious_events = 1 if severity in ['high', 'critical'] else 0
+            
+            conn.execute("""
+                INSERT INTO ip_reputation 
+                (ip_address, threat_score, total_events, suspicious_events, first_seen, last_seen)
+                VALUES (?, ?, 1, ?, ?, ?)
+            """, (ip_address, threat_score, suspicious_events, now, now))
+    
+    def _detect_patterns(self, conn: sqlite3.Connection, 
+                        ip_address: str, 
+                        event_type: SecurityEventType):
+        """Detect attack patterns from event sequences"""
+        now = datetime.now().timestamp()
+        window = now - 300  # 5 minute window
+        
+        # Count recent similar events
+        cursor = conn.execute("""
+            SELECT COUNT(*) FROM security_events 
+            WHERE ip_address = ? AND event_type = ? AND timestamp > ?
+        """, (ip_address, event_type.value, window))
+        
+        count = cursor.fetchone()[0]
+        
+        # Detect patterns
+        pattern_detected = None
+        
+        if count >= 10:
+            pattern_detected = "rapid_fire_attack"
+        elif event_type in [SecurityEventType.SQL_INJECTION_ATTEMPT, 
+                           SecurityEventType.XSS_ATTEMPT]:
+            pattern_detected = "injection_attack_pattern"
+        elif event_type == SecurityEventType.AUTH_FAILURE and count >= 5:
+            pattern_detected = "brute_force_pattern"
+        
+        if pattern_detected:
+            conn.execute("""
+                INSERT INTO attack_patterns 
+                (pattern_type, ip_address, detected_at, event_count, severity)
+                VALUES (?, ?, ?, ?, ?)
+            """, (pattern_detected, ip_address, now, count, 'high'))
+            
+            self.logger.warning(f"Attack pattern detected: {pattern_detected} from {ip_address}")
+    
+    def _check_alert_threshold(self, ip_address: str, event_type: SecurityEventType):
+        """Check if we need to trigger security alerts"""
+        key = f"{ip_address}:{event_type.value}"
+        now = datetime.now().timestamp()
+        
+        if key not in self.recent_events:
+            self.recent_events[key] = []
+        
+        # Add current event
+        self.recent_events[key].append(now)
+        
+        # Remove old events (older than 5 minutes)
+        self.recent_events[key] = [t for t in self.recent_events[key] if t > now - 300]
+        
+        # Check threshold
+        if len(self.recent_events[key]) >= self.alert_threshold:
+            self.trigger_alert(ip_address, event_type, len(self.recent_events[key]))
+    
+    def trigger_alert(self, ip_address: str, event_type: SecurityEventType, count: int):
+        """Trigger security alert (in production, send to monitoring system)"""
+        alert_message = f"SECURITY ALERT: {count} {event_type.value} events from {ip_address} in 5 minutes"
+        self.logger.critical(alert_message)
+        
+        # In production, integrate with:
+        # - Email alerts
+        # - Slack/Discord webhooks  
+        # - PagerDuty
+        # - SIEM systems
+        print(f"\n🚨 {alert_message}\n")
+    
+    def is_ip_blocked(self, ip_address: str) -> bool:
+        """Check if an IP address is blocked"""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.execute("""
+                SELECT is_blocked, block_expires FROM ip_reputation 
+                WHERE ip_address = ?
+            """, (ip_address,))
+            
+            row = cursor.fetchone()
+            if row:
+                is_blocked, block_expires = row
+                if is_blocked:
+                    if block_expires and datetime.now().timestamp() > block_expires:
+                        # Block expired, unblock
+                        conn.execute("""
+                            UPDATE ip_reputation 
+                            SET is_blocked = FALSE, block_expires = NULL 
+                            WHERE ip_address = ?
+                        """, (ip_address,))
+                        conn.commit()
+                        return False
+                    return True
+        
+        return False
+    
+    def get_threat_score(self, ip_address: str) -> int:
+        """Get threat score for an IP address"""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.execute(
+                "SELECT threat_score FROM ip_reputation WHERE ip_address = ?",
+                (ip_address,)
+            )
+            row = cursor.fetchone()
+            return row[0] if row else 0
+    
+    def get_recent_events(self, hours: int = 24, 
+                         severity_filter: Optional[str] = None) -> List[Dict]:
+        """Get recent security events"""
+        since = datetime.now().timestamp() - (hours * 3600)
+        
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            
+            query = """
+                SELECT * FROM security_events 
+                WHERE timestamp > ?
+            """
+            params = [since]
+            
+            if severity_filter:
+                query += " AND severity = ?"
+                params.append(severity_filter)
+            
+            query += " ORDER BY timestamp DESC LIMIT 1000"
+            
+            cursor = conn.execute(query, params)
+            return [dict(row) for row in cursor.fetchall()]
+    
+    def generate_security_report(self) -> Dict[str, Any]:
+        """Generate comprehensive security report"""
+        now = datetime.now().timestamp()
+        day_ago = now - (24 * 3600)
+        week_ago = now - (7 * 24 * 3600)
+        
+        with sqlite3.connect(self.db_path) as conn:
+            # Event statistics
+            cursor = conn.execute("""
+                SELECT 
+                    COUNT(*) as total,
+                    SUM(CASE WHEN severity = 'critical' THEN 1 ELSE 0 END) as critical,
+                    SUM(CASE WHEN severity = 'high' THEN 1 ELSE 0 END) as high,
+                    SUM(CASE WHEN severity = 'medium' THEN 1 ELSE 0 END) as medium,
+                    SUM(CASE WHEN severity = 'low' THEN 1 ELSE 0 END) as low
+                FROM security_events 
+                WHERE timestamp > ?
+            """, (day_ago,))
+            
+            stats = dict(cursor.fetchone())
+            
+            # Top threat IPs
+            cursor = conn.execute("""
+                SELECT ip_address, threat_score, suspicious_events, is_blocked
+                FROM ip_reputation 
+                ORDER BY threat_score DESC 
+                LIMIT 10
+            """)
+            top_threats = [dict(row) for row in cursor.fetchall()]
+            
+            # Recent patterns
+            cursor = conn.execute("""
+                SELECT pattern_type, COUNT(*) as count 
+                FROM attack_patterns 
+                WHERE detected_at > ?
+                GROUP BY pattern_type
+            """, (week_ago,))
+            patterns = dict(cursor.fetchall())
+            
+            # Event type distribution
+            cursor = conn.execute("""
+                SELECT event_type, COUNT(*) as count 
+                FROM security_events 
+                WHERE timestamp > ?
+                GROUP BY event_type 
+                ORDER BY count DESC
+            """, (day_ago,))
+            event_distribution = dict(cursor.fetchall())
+        
+        return {
+            'generated_at': datetime.now().isoformat(),
+            'period': '24_hours',
+            'statistics': stats,
+            'top_threat_ips': top_threats,
+            'attack_patterns': patterns,
+            'event_distribution': event_distribution,
+            'blocked_ips_count': len([ip for ip in top_threats if ip.get('is_blocked')])
+        }
+
+
+# Example usage and testing
+if __name__ == "__main__":
+    # Initialize security logger
+    sec_logger = SecurityLogger()
+    
+    # Test logging various security events
+    print("Testing Security Logger...")
+    
+    # Successful authentication
+    sec_logger.log_event(
+        SecurityEventType.AUTH_SUCCESS,
+        severity="low",
+        ip_address="192.168.1.100",
+        user_agent="Mozilla/5.0",
+        session_id="test_session_123",
+        endpoint="/api/login",
+        method="POST",
+        message="User authenticated successfully"
+    )
+    
+    # Failed authentication attempts (potential brute force)
+    for i in range(6):
+        sec_logger.log_event(
+            SecurityEventType.AUTH_FAILURE,
+            severity="medium",
+            ip_address="10.0.0.50",
+            user_agent="Suspicious Bot",
+            endpoint="/api/login",
+            method="POST",
+            message=f"Authentication failed - attempt {i+1}"
+        )
+    
+    # SQL injection attempt
+    sec_logger.log_event(
+        SecurityEventType.SQL_INJECTION_ATTEMPT,
+        severity="critical",
+        ip_address="10.0.0.50",
+        endpoint="/api/users",
+        method="GET",
+        request_data={"id": "1 OR 1=1"},
+        message="SQL injection detected in query parameter"
+    )
+    
+    # XSS attempt
+    sec_logger.log_event(
+        SecurityEventType.XSS_ATTEMPT,
+        severity="high",
+        ip_address="172.16.0.99",
+        endpoint="/api/comments",
+        method="POST",
+        request_data={"comment": "<script>alert('xss')</script>"},
+        message="XSS attempt blocked in user input"
+    )
+    
+    # Check IP reputation
+    print(f"\nIP 10.0.0.50 threat score: {sec_logger.get_threat_score('10.0.0.50')}")
+    print(f"IP 10.0.0.50 blocked: {sec_logger.is_ip_blocked('10.0.0.50')}")
+    
+    # Generate security report
+    report = sec_logger.generate_security_report()
+    print(f"\nSecurity Report:")
+    print(json.dumps(report, indent=2))
+    
+    print("\nSecurity Logger tests complete!")#!/usr/bin/env python3
+"""
+Synchronous Database Manager for Estate Planning Concierge v4.0
+Provides thread-safe connection pooling and synchronous database operations
+"""
+
+import sqlite3
+import json
+import logging
+from typing import Dict, List, Any, Optional
+from datetime import datetime
+from pathlib import Path
+from contextlib import contextmanager
+import threading
+from queue import Queue
+import time
+
+class DatabasePool:
+    """Thread-safe SQLite connection pool"""
+    
+    def __init__(self, db_path: str, pool_size: int = 10):
+        """
+        Initialize connection pool
+        
+        Args:
+            db_path: Path to SQLite database
+            pool_size: Maximum number of connections in pool
+        """
+        self.db_path = db_path
+        self.pool_size = pool_size
+        self.pool = Queue(maxsize=pool_size)
+        self.lock = threading.Lock()
+        self.logger = logging.getLogger(__name__)
+        
+        # Initialize the pool with connections
+        for _ in range(pool_size):
+            conn = self._create_connection()
+            self.pool.put(conn)
+        
+        self.logger.info(f"Database pool initialized with {pool_size} connections")
+    
+    def _create_connection(self) -> sqlite3.Connection:
+        """Create a new database connection with optimizations"""
+        conn = sqlite3.connect(
+            self.db_path,
+            check_same_thread=False,  # Allow multi-threading
+            timeout=30.0,  # 30 second timeout for locks
+            isolation_level='DEFERRED'  # Better concurrency
+        )
+        
+        # Enable optimizations
+        conn.execute("PRAGMA journal_mode=WAL")  # Write-Ahead Logging for better concurrency
+        conn.execute("PRAGMA synchronous=NORMAL")  # Faster writes, still safe
+        conn.execute("PRAGMA cache_size=10000")  # Larger cache
+        conn.execute("PRAGMA temp_store=MEMORY")  # Use memory for temp tables
+        
+        # Enable row factory for dict-like access
+        conn.row_factory = sqlite3.Row
+        
+        return conn
+    
+    @contextmanager
+    def get_connection(self):
+        """Get a connection from the pool"""
+        conn = None
+        try:
+            conn = self.pool.get(timeout=5)  # Wait up to 5 seconds
+            yield conn
+        finally:
+            if conn:
+                # Return connection to pool
+                self.pool.put(conn)
+    
+    def close_all(self):
+        """Close all connections in the pool"""
+        while not self.pool.empty():
+            try:
+                conn = self.pool.get_nowait()
+                conn.close()
+            except:
+                pass
+        self.logger.info("All database connections closed")
+
+
+class SyncAssetDatabase:
+    """Synchronous database operations with connection pooling"""
+    
+    def __init__(self, db_path: str = "asset_generation.db", pool_size: int = 10):
+        """
+        Initialize synchronous database manager
+        
+        Args:
+            db_path: Path to SQLite database
+            pool_size: Size of connection pool
+        """
+        self.db_path = db_path
+        self.pool = DatabasePool(db_path, pool_size)
+        self.logger = logging.getLogger(__name__)
+        self._init_database()
+    
+    def _init_database(self):
+        """Initialize database schema"""
+        with self.pool.get_connection() as conn:
+            # Create tables if they don't exist
+            conn.executescript("""
+                -- Prompt competitions table
+                CREATE TABLE IF NOT EXISTS prompt_competitions (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    asset_type TEXT NOT NULL,
+                    category TEXT NOT NULL,
+                    base_prompt TEXT NOT NULL,
+                    competition_status TEXT DEFAULT 'pending',
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+                
+                -- Quality evaluations table
+                CREATE TABLE IF NOT EXISTS quality_evaluations (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    competition_id INTEGER NOT NULL,
+                    model_source TEXT NOT NULL,
+                    prompt_text TEXT NOT NULL,
+                    overall_score REAL,
+                    weighted_score REAL,
+                    evaluation_details TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (competition_id) REFERENCES prompt_competitions(id)
+                );
+                
+                -- Human decisions table
+                CREATE TABLE IF NOT EXISTS human_decisions (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    competition_id INTEGER NOT NULL,
+                    selected_prompt_text TEXT NOT NULL,
+                    selected_model TEXT NOT NULL,
+                    decision_reasoning TEXT,
+                    quality_override REAL,
+                    custom_modifications TEXT,
+                    reviewer_name TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (competition_id) REFERENCES prompt_competitions(id)
+                );
+                
+                -- Create indexes for performance
+                CREATE INDEX IF NOT EXISTS idx_competitions_status 
+                ON prompt_competitions(competition_status);
+                
+                CREATE INDEX IF NOT EXISTS idx_evaluations_competition 
+                ON quality_evaluations(competition_id);
+                
+                CREATE INDEX IF NOT EXISTS idx_decisions_competition 
+                ON human_decisions(competition_id);
+            """)
+            conn.commit()
+    
+    def get_competitions(self, status: Optional[str] = None) -> List[Dict]:
+        """Get prompt competitions, optionally filtered by status"""
+        with self.pool.get_connection() as conn:
+            if status:
+                cursor = conn.execute(
+                    "SELECT * FROM prompt_competitions WHERE competition_status = ?",
+                    (status,)
+                )
+            else:
+                cursor = conn.execute("SELECT * FROM prompt_competitions")
+            
+            return [dict(row) for row in cursor.fetchall()]
+    
+    def get_competition_with_evaluations(self, competition_id: int) -> Dict:
+        """Get competition details with all evaluations"""
+        with self.pool.get_connection() as conn:
+            # Get competition
+            cursor = conn.execute(
+                "SELECT * FROM prompt_competitions WHERE id = ?",
+                (competition_id,)
+            )
+            competition = cursor.fetchone()
+            
+            if not competition:
+                return None
+            
+            # Get evaluations
+            cursor = conn.execute(
+                "SELECT * FROM quality_evaluations WHERE competition_id = ?",
+                (competition_id,)
+            )
+            evaluations = cursor.fetchall()
+            
+            # Get decision if exists
+            cursor = conn.execute(
+                "SELECT * FROM human_decisions WHERE competition_id = ?",
+                (competition_id,)
+            )
+            decision = cursor.fetchone()
+            
+            return {
+                'competition': dict(competition),
+                'evaluations': [dict(e) for e in evaluations],
+                'decision': dict(decision) if decision else None
+            }
+    
+    def store_human_decision(self, decision_data: Dict) -> int:
+        """Store a human decision for a competition"""
+        with self.pool.get_connection() as conn:
+            cursor = conn.execute("""
+                INSERT INTO human_decisions 
+                (competition_id, selected_prompt_text, selected_model, 
+                 decision_reasoning, quality_override, custom_modifications, 
+                 reviewer_name)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (
+                decision_data['competition_id'],
+                decision_data['selected_prompt_text'],
+                decision_data['selected_model'],
+                decision_data.get('decision_reasoning', ''),
+                decision_data.get('quality_override'),
+                decision_data.get('custom_modifications'),
+                decision_data.get('reviewer_name', 'Anonymous')
+            ))
+            
+            # Update competition status
+            conn.execute("""
+                UPDATE prompt_competitions 
+                SET competition_status = 'decided', updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            """, (decision_data['competition_id'],))
+            
+            conn.commit()
+            return cursor.lastrowid
+    
+    def get_progress_stats(self) -> Dict:
+        """Get review progress statistics"""
+        with self.pool.get_connection() as conn:
+            # Total evaluated competitions
+            cursor = conn.execute("""
+                SELECT COUNT(*) as total FROM prompt_competitions 
+                WHERE competition_status = 'evaluated'
+            """)
+            total_evaluations = cursor.fetchone()['total']
+            
+            # Completed decisions
+            cursor = conn.execute("""
+                SELECT COUNT(*) as total FROM human_decisions
+            """)
+            decisions_made = cursor.fetchone()['total']
+            
+            # Pending reviews
+            cursor = conn.execute("""
+                SELECT COUNT(*) as total FROM prompt_competitions 
+                WHERE competition_status = 'evaluated'
+                AND id NOT IN (SELECT competition_id FROM human_decisions)
+            """)
+            pending_reviews = cursor.fetchone()['total']
+            
+            return {
+                'total_evaluations': total_evaluations,
+                'decisions_made': decisions_made,
+                'pending_reviews': pending_reviews,
+                'completion_percentage': (decisions_made / total_evaluations * 100) if total_evaluations > 0 else 0
+            }
+    
+    def get_all_decisions(self) -> List[Dict]:
+        """Get all human decisions with competition details"""
+        with self.pool.get_connection() as conn:
+            cursor = conn.execute("""
+                SELECT hd.*, pc.asset_type, pc.category, pc.base_prompt
+                FROM human_decisions hd
+                JOIN prompt_competitions pc ON hd.competition_id = pc.id
+                ORDER BY hd.created_at DESC
+            """)
+            return [dict(row) for row in cursor.fetchall()]
+    
+    def cleanup_old_data(self, days: int = 30):
+        """Clean up old data from database"""
+        with self.pool.get_connection() as conn:
+            cutoff_date = datetime.now().timestamp() - (days * 86400)
+            
+            # Delete old evaluations
+            conn.execute("""
+                DELETE FROM quality_evaluations 
+                WHERE created_at < datetime(?, 'unixepoch')
+            """, (cutoff_date,))
+            
+            # Delete old competitions without decisions
+            conn.execute("""
+                DELETE FROM prompt_competitions 
+                WHERE created_at < datetime(?, 'unixepoch')
+                AND id NOT IN (SELECT competition_id FROM human_decisions)
+            """, (cutoff_date,))
+            
+            conn.commit()
+            
+            # Vacuum to reclaim space
+            conn.execute("VACUUM")
+    
+    def close(self):
+        """Close the database connection pool"""
+        self.pool.close_all()
+
+
+# Example usage
+if __name__ == "__main__":
+    import logging
+    logging.basicConfig(level=logging.INFO)
+    
+    # Create database manager with connection pool
+    db = SyncAssetDatabase(pool_size=5)
+    
+    # Test operations
+    print("Testing synchronous database operations...")
+    
+    # Get competitions
+    competitions = db.get_competitions(status='evaluated')
+    print(f"Found {len(competitions)} evaluated competitions")
+    
+    # Get progress stats
+    stats = db.get_progress_stats()
+    print(f"Progress stats: {stats}")
+    
+    # Simulate concurrent access
+    import threading
+    
+    def worker(thread_id):
+        for i in range(10):
+            stats = db.get_progress_stats()
+            print(f"Thread {thread_id} iteration {i}: {stats['decisions_made']} decisions")
+            time.sleep(0.1)
+    
+    threads = []
+    for i in range(5):
+        t = threading.Thread(target=worker, args=(i,))
+        threads.append(t)
+        t.start()
+    
+    for t in threads:
+        t.join()
+    
+    print("Concurrent access test complete")
+    
+    # Cleanup
+    db.close()
+    print("Database connections closed")let currentEvaluationIndex = 0;
+let totalEvaluations = 0;
+let sessionActive = false;
+let sessionId = null;
+let csrfToken = null;
+
+// Sanitization helper functions
+function sanitizeInput(input) {
+    if (typeof input !== 'string') return '';
+    return DOMPurify.sanitize(input, {
+        ALLOWED_TAGS: [],  // No HTML tags allowed
+        ALLOWED_ATTR: []   // No attributes allowed
+    });
+}
+
+function sanitizeHTML(html) {
+    return DOMPurify.sanitize(html, {
+        ALLOWED_TAGS: ['p', 'strong', 'em', 'br'],
+        ALLOWED_ATTR: []
+    });
+}
+
+// Loading state management
+function setLoading(element, isLoading) {
+    if (isLoading) {
+        element.classList.add('loading');
+        element.disabled = true;
+    } else {
+        element.classList.remove('loading');
+        element.disabled = false;
+    }
+}
+
+// Toast notifications
+function showToast(message, type = 'success') {
+    const toastContainer = document.querySelector('.toast-container') || createToastContainer();
+    
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = sanitizeInput(message);
+    
+    toastContainer.appendChild(toast);
+    
+    // Trigger animation
+    setTimeout(() => toast.classList.add('show'), 10);
+    
+    // Remove after 5 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 5000);
+}
+
+function createToastContainer() {
+    const container = document.createElement('div');
+    container.className = 'toast-container';
+    document.body.appendChild(container);
+    return container;
+}
+
+// CSRF Token Management
+async function getCSRFToken() {
+    try {
+        const response = await fetch('/api/get-csrf-token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-TOKEN': getAPIToken()
+            },
+            body: JSON.stringify({})
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            sessionId = result.session_id;
+            csrfToken = result.csrf_token;
+            return true;
+        } else {
+            console.error('Failed to get CSRF token:', result.error);
+            return false;
+        }
+    } catch (error) {
+        console.error('Error getting CSRF token:', error);
+        return false;
+    }
+}
+
+function getAPIToken() {
+    // Try to get from form field first, then from environment/storage
+    const tokenField = document.getElementById('api-token');
+    if (tokenField && tokenField.value) {
+        return tokenField.value;
+    }
+    return 'estate-planning-review-2024'; // Default for development
+}
+
+async function startSession() {
+    const reviewerName = sanitizeInput(document.getElementById('reviewer-name').value) || 'Anonymous';
+    const startButton = document.querySelector('button[onclick="startSession()"]');
+    
+    setLoading(startButton, true);
+    
+    // First get CSRF token
+    if (!await getCSRFToken()) {
+        showToast('Failed to get security token. Please check your API token.', 'error');
+        setLoading(startButton, false);
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/start-session', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-TOKEN': getAPIToken(),
+                'X-Session-ID': sessionId,
+                'X-CSRF-Token': csrfToken
+            },
+            body: JSON.stringify({reviewer_name: reviewerName})
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            sessionActive = true;
+            document.getElementById('session-status').textContent = `Active (${sanitizeInput(reviewerName)})`;
+            showToast('Review session started successfully!', 'success');
+        } else {
+            showToast('Failed to start session: ' + result.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error starting session:', error);
+        showToast('Error starting session: ' + error.message, 'error');
+    } finally {
+        setLoading(startButton, false);
+    }
+}
+
+async function loadEvaluations() {
+    if (!sessionActive) {
+        showToast('Please start a review session first', 'warning');
+        return;
+    }
+    
+    const loadButton = document.querySelector('button[onclick="loadEvaluations()"]');
+    setLoading(loadButton, true);
+    
+    try {
+        const response = await fetch('/api/load-evaluations', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-TOKEN': getAPIToken(),
+                'X-Session-ID': sessionId,
+                'X-CSRF-Token': csrfToken
+            },
+            body: JSON.stringify({file_path: 'quality_evaluation_results.json'})
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            totalEvaluations = result.evaluations_loaded;
+            document.getElementById('evaluations-count').textContent = totalEvaluations;
+            document.getElementById('export-btn').disabled = false;
+            
+            // Load first evaluation
+            await loadEvaluation(0);
+            
+            document.getElementById('pre-review-message').style.display = 'none';
+            document.getElementById('evaluation-display').style.display = 'block';
+            
+            showToast(`Loaded ${totalEvaluations} evaluations successfully!`, 'success');
+        } else {
+            showToast(`Failed to load evaluations: ${result.error}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error loading evaluations:', error);
+        showToast('Error loading evaluations: ' + error.message, 'error');
+    } finally {
+        setLoading(loadButton, false);
+    }
+}
+
+async function loadEvaluation(index) {
+    try {
+        const response = await fetch(`/api/get-evaluation/${index}`, {
+            headers: {
+                'X-API-TOKEN': getAPIToken()
+            }
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            const evaluation = result.evaluation;
+            
+            // Update header
+            document.getElementById('eval-title').textContent = sanitizeInput(evaluation.page_title);
+            document.getElementById('eval-category').textContent = sanitizeInput(evaluation.page_category);
+            document.getElementById('eval-type').textContent = sanitizeInput(evaluation.asset_type);
+            
+            // Update prompts container
+            const container = document.getElementById('prompts-container');
+            // Safe DOM manipulation - remove all children
+            while (container.firstChild) {
+                container.removeChild(container.firstChild);
+            }
+            
+            // Update selection dropdown
+            const select = document.getElementById('selected-prompt');
+            // Safe DOM manipulation - clear and add default option
+            while (select.firstChild) {
+                select.removeChild(select.firstChild);
+            }
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Select a prompt...';
+            select.appendChild(defaultOption);
+            
+            evaluation.prompts.forEach((prompt, idx) => {
+                // Create prompt display
+                const promptDiv = document.createElement('div');
+                promptDiv.className = 'prompt-container';
+                
+                // Create safe DOM elements instead of innerHTML
+                const promptHeader = document.createElement('div');
+                promptHeader.className = 'prompt-header';
+                
+                const modelSource = document.createElement('strong');
+                modelSource.textContent = sanitizeInput(prompt.model_source);
+                
+                const scoreBadge = document.createElement('span');
+                scoreBadge.className = 'score-badge';
+                scoreBadge.textContent = prompt.weighted_score.toFixed(2) + '/10';
+                
+                promptHeader.appendChild(modelSource);
+                promptHeader.appendChild(scoreBadge);
+                
+                const promptText = document.createElement('p');
+                promptText.textContent = sanitizeInput(prompt.text);
+                
+                const scoreDetails = document.createElement('small');
+                scoreDetails.textContent = `Overall Score: ${prompt.overall_score.toFixed(1)} | Weighted: ${prompt.weighted_score.toFixed(2)}`;
+                
+                promptDiv.appendChild(promptHeader);
+                promptDiv.appendChild(promptText);
+                promptDiv.appendChild(scoreDetails);
+                
+                if (evaluation.winner && prompt.id === evaluation.winner.id) {
+                    promptDiv.style.borderColor = '#28a745';
+                    promptDiv.style.borderWidth = '2px';
+                    const badge = document.createElement('span');
+                    badge.style.background = '#28a745';
+                    badge.style.color = 'white';
+                    badge.style.padding = '4px 8px';
+                    badge.style.borderRadius = '4px';
+                    badge.style.fontSize = '12px';
+                    badge.textContent = 'AI WINNER';
+                    promptDiv.querySelector('.prompt-header').appendChild(badge);
+                }
+                
+                container.appendChild(promptDiv);
+                
+                // Add to selection dropdown
+                const option = document.createElement('option');
+                option.value = prompt.id;
+                option.textContent = `${sanitizeInput(prompt.model_source)} (${prompt.weighted_score.toFixed(2)})`;
+                select.appendChild(option);
+            });
+            
+            currentEvaluationIndex = index;
+        } else {
+            showToast(`Error loading evaluation: ${result.error}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error loading evaluation:', error);
+        showToast('Error loading evaluation: ' + error.message, 'error');
+    }
+}
+
+async function makeDecision() {
+    const selectedPromptId = sanitizeInput(document.getElementById('selected-prompt').value);
+    const reasoning = sanitizeInput(document.getElementById('decision-reasoning').value);
+    const modifications = sanitizeInput(document.getElementById('custom-modifications').value);
+    
+    if (!selectedPromptId) {
+        showToast('Please select a prompt first', 'warning');
+        return;
+    }
+    
+    if (!reasoning.trim()) {
+        showToast('Please provide reasoning for your decision', 'warning');
+        return;
+    }
+    
+    const decisionButton = document.querySelector('button[onclick="makeDecision()"]');
+    setLoading(decisionButton, true);
+    
+    try {
+        const response = await fetch('/api/make-decision', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-TOKEN': getAPIToken(),
+                'X-Session-ID': sessionId,
+                'X-CSRF-Token': csrfToken
+            },
+            body: JSON.stringify({
+                page_title: document.getElementById('eval-title').textContent,
+                page_category: document.getElementById('eval-category').textContent,
+                asset_type: document.getElementById('eval-type').textContent,
+                selected_prompt_id: selectedPromptId,
+                selected_model: document.getElementById('selected-prompt').selectedOptions[0].textContent.split(' (')[0],
+                reasoning: reasoning,
+                custom_modifications: modifications
+            })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            // Update progress
+            document.getElementById('decisions-count').textContent = result.total_decisions;
+            const progress = (result.total_decisions / totalEvaluations) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+            document.getElementById('progress-text').textContent = progress.toFixed(1) + '% Complete';
+            
+            // Clear form
+            document.getElementById('selected-prompt').value = '';
+            document.getElementById('decision-reasoning').value = '';
+            document.getElementById('custom-modifications').value = '';
+            
+            showToast('Decision recorded successfully!', 'success');
+        } else {
+            showToast(`Error recording decision: ${result.error}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error making decision:', error);
+        showToast('Error recording decision: ' + error.message, 'error');
+    } finally {
+        setLoading(decisionButton, false);
+    }
+}
+
+async function nextEvaluation() {
+    if (currentEvaluationIndex < totalEvaluations - 1) {
+        await loadEvaluation(currentEvaluationIndex + 1);
+    } else {
+        showToast('No more evaluations to review!', 'warning');
+    }
+}
+
+async function exportDecisions() {
+    const exportButton = document.getElementById('export-btn');
+    setLoading(exportButton, true);
+    
+    try {
+        const response = await fetch('/api/export-decisions', {
+            headers: {
+                'X-API-TOKEN': getAPIToken()
+            }
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast(`Exported ${result.total_decisions} decisions to ${result.file_path}`, 'success');
+        } else {
+            showToast('Error exporting decisions', 'error');
+        }
+    } catch (error) {
+        console.error('Error exporting decisions:', error);
+        showToast('Error exporting decisions: ' + error.message, 'error');
+    } finally {
+        setLoading(exportButton, false);
+    }
+}
+
+// Auto-refresh progress every 30 seconds
+setInterval(async () => {
+    if (sessionActive) {
+        try {
+            const response = await fetch('/api/get-progress', {
+                headers: {
+                    'X-API-TOKEN': getAPIToken()
+                }
+            });
+            const progress = await response.json();
+            
+            document.getElementById('decisions-count').textContent = progress.decisions_made;
+            const percentage = progress.completion_percentage;
+            document.getElementById('progress-fill').style.width = percentage + '%';
+            document.getElementById('progress-text').textContent = percentage.toFixed(1) + '% Complete';
+        } catch (error) {
+            console.error('Error updating progress:', error);
+        }
+    }
+}, 30000);<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estate Planning Concierge v4.0 - Prompt Review Dashboard</title>
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <!-- DOMPurify for input sanitization -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
+</head>
+<body>
+    <div class="header">
+        <h1>🏛️ Estate Planning Concierge v4.0</h1>
+        <p>Ultra-Premium Prompt Review Dashboard</p>
+    </div>
+    
+    <main class="dashboard-container" role="main">
+        <section class="panel progress-panel" aria-labelledby="progress-heading">
+            <h2 id="progress-heading">📊 Review Progress</h2>
+            
+            <div id="progress-info">
+                <p><strong>Session:</strong> <span id="session-status">Not Started</span></p>
+                <p><strong>Evaluations Loaded:</strong> <span id="evaluations-count">0</span></p>
+                <p><strong>Decisions Made:</strong> <span id="decisions-count">0</span></p>
+            </div>
+            
+            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-fill progress-fill-init" id="progress-fill"></div>
+            </div>
+            <p id="progress-text">0% Complete</p>
+            
+            <h3 id="controls-heading">🎯 Session Controls</h3>
+            <label for="api-token">API Token</label>
+            <input type="password" id="api-token" class="form-input" aria-describedby="token-help" required aria-required="true">
+            <span id="token-help" class="sr-only">Enter your authentication token to access the review dashboard</span>
+            <label for="reviewer-name">Reviewer Name</label>
+            <input type="text" id="reviewer-name" class="form-input" aria-describedby="name-help">
+            <span id="name-help" class="sr-only">Enter your name for session tracking</span>
+            <button class="button" onclick="startSession()" aria-describedby="controls-heading">Start Review Session</button>
+            <button class="button" onclick="loadEvaluations()" aria-describedby="controls-heading">Load Evaluations</button>
+            <button class="button" onclick="exportDecisions()" disabled id="export-btn" aria-describedby="controls-heading">Export Decisions</button>
+            
+            <h3 id="metrics-heading">📈 Quality Metrics</h3>
+            <div id="quality-metrics" aria-labelledby="metrics-heading">
+                <p>Start a session to view metrics</p>
+            </div>
+        </section>
+        
+        <section class="panel review-area" aria-labelledby="review-heading">
+            <h2 id="review-heading">🎨 Prompt Review</h2>
+            
+            <div id="pre-review-message">
+                <p>👋 Welcome to the Estate Planning Concierge v4.0 Prompt Review Dashboard!</p>
+                <p>This interface allows you to review AI-generated prompts and make final selections for our luxury estate planning assets.</p>
+                <p>To get started:</p>
+                <ol>
+                    <li>Enter your API token and name, then start a review session</li>
+                    <li>Load evaluation results from the quality scorer</li>
+                    <li>Review competing prompts and make your selections</li>
+                    <li>Export your decisions for final generation</li>
+                </ol>
+            </div>
+            
+            <div id="evaluation-display">
+                <div class="evaluation-header">
+                    <h3 id="eval-title">Loading...</h3>
+                    <p id="eval-details">Category: <span id="eval-category"></span> | Type: <span id="eval-type"></span></p>
+                </div>
+                
+                <div id="prompts-container" aria-live="polite">
+                    <!-- Prompts will be loaded here -->
+                </div>
+                
+                <form class="decision-form" role="form" aria-labelledby="decision-heading">
+                    <h4 id="decision-heading">🤔 Make Your Decision</h4>
+                    <label for="selected-prompt">Select Prompt</label>
+                    <select id="selected-prompt" aria-describedby="prompt-help" required aria-required="true">
+                        <option value="">Select a prompt...</option>
+                    </select>
+                    <span id="prompt-help" class="sr-only">Choose the best prompt from the options above</span>
+                    <label for="decision-reasoning">Decision Reasoning</label>
+                    <textarea id="decision-reasoning" aria-describedby="reasoning-help" required aria-required="true" placeholder="Why did you choose this prompt? What makes it best for our estate planning users?"></textarea>
+                    <span id="reasoning-help" class="sr-only">Explain your reasoning for selecting this prompt</span>
+                    <label for="custom-modifications">Custom Modifications (Optional)</label>
+                    <textarea id="custom-modifications" aria-describedby="modifications-help" placeholder="Any modifications or improvements? (optional)"></textarea>
+                    <span id="modifications-help" class="sr-only">Optional: Suggest any improvements to the selected prompt</span>
+                    
+                    <button class="button" onclick="makeDecision()" type="button">Record Decision</button>
+                    <button class="button button-secondary" onclick="nextEvaluation()" type="button" aria-describedby="decision-heading">Next →</button>
+                </form>
+            </div>
+        </section>
+    </main>
+    
+    <!-- External JavaScript -->
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f8f9fa;
+}
+
+.header {
+    background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 2.2em;
+    font-weight: 300;
+}
+
+.header p {
+    margin: 5px 0 0 0;
+    opacity: 0.9;
+    font-size: 1.1em;
+}
+
+.dashboard-container {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.panel {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-left: 4px solid #8B4513;
+}
+
+.progress-panel {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.button {
+    background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin: 5px;
+}
+
+.button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(139,69,19,0.3);
+}
+
+.button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.prompt-container {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px 0;
+    background: #fafafa;
+}
+
+.prompt-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.score-badge {
+    background: #28a745;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 15px 0;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+    transition: width 0.3s ease;
+}
+
+.review-area {
+    min-height: 600px;
+}
+
+#evaluation-display {
+    display: none;
+}
+
+.decision-form {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+textarea {
+    width: 100%;
+    min-height: 60px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: inherit;
+    resize: vertical;
+}
+
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+input[type="text"], input[type="password"] {
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Loading states */
+.loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #8B4513;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Toast notifications */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.toast {
+    background: #333;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s ease;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.toast.success {
+    background: #28a745;
+}
+
+.toast.error {
+    background: #dc3545;
+}
+
+.toast.warning {
+    background: #ffc107;
+    color: #212529;
+}
+
+/* Accessibility improvements */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.button:focus {
+    outline: 2px solid #8B4513;
+    outline-offset: 2px;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: 2px solid #8B4513;
+    outline-offset: 2px;
+}
+
+/* Form inputs - extracted from inline styles */
+.form-input {
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Secondary button style */
+.button-secondary {
+    background: #6c757d !important;
+}
+
+/* Progress bar initial state */
+.progress-fill-init {
+    width: 0%;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .dashboard-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .header h1 {
+        font-size: 1.8em;
+    }
+    
+    .button {
+        display: block;
+        width: 100%;
+        margin: 10px 0;
+    }
+}

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Prompt Editor - Estate Planning Concierge v4.0</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <style>
+        .editor-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .prompt-editor {
+            width: 100%;
+            min-height: 500px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            padding: 20px;
+            border: 2px solid #8B7355;
+            border-radius: 8px;
+            background-color: #FAFAFA;
+            color: #2C1810;
+            resize: vertical;
+        }
+        
+        .prompt-editor:focus {
+            outline: none;
+            border-color: #6B5444;
+            box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
+        }
+        
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #8B7355;
+        }
+        
+        .editor-stats {
+            display: flex;
+            gap: 30px;
+            color: #6B5444;
+            font-size: 14px;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2C1810;
+        }
+        
+        .editor-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .btn-save {
+            background: linear-gradient(135deg, #8B7355 0%, #6B5444 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-save:hover {
+            background: linear-gradient(135deg, #6B5444 0%, #5B4434 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(107, 84, 68, 0.3);
+        }
+        
+        .btn-save:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #6B5444;
+            border: 2px solid #8B7355;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: #FAFAFA;
+            border-color: #6B5444;
+        }
+        
+        .save-status {
+            padding: 10px 20px;
+            border-radius: 6px;
+            margin-top: 15px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .save-status.success {
+            background: #E8F5E9;
+            color: #2E7D32;
+            border: 1px solid #4CAF50;
+        }
+        
+        .save-status.error {
+            background: #FFEBEE;
+            color: #C62828;
+            border: 1px solid #F44336;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .help-text {
+            background: #FFF8E1;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #F57C00;
+            margin-bottom: 20px;
+            color: #5D4037;
+        }
+        
+        .help-text h3 {
+            margin-top: 0;
+            color: #3E2723;
+        }
+        
+        .help-text ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .help-text li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏛️ Master Prompt Editor</h1>
+        <p class="subtitle">Estate Planning Concierge v4.0 - AI Generation Control</p>
+    </div>
+
+    <div class="editor-container">
+        <div class="help-text">
+            <h3>📝 Master Prompt Guidelines</h3>
+            <ul>
+                <li>This prompt controls ALL AI image generation behavior</li>
+                <li>Changes affect how prompts are generated for icons, covers, and textures</li>
+                <li>Focus on luxury branding, emotional sensitivity, and visual hierarchy</li>
+                <li>Backup is automatically created when you save changes</li>
+                <li>Character limit: 10,000 (currently using <span id="char-count-inline">{{ char_count }}</span>)</li>
+            </ul>
+        </div>
+
+        <div class="editor-header">
+            <h2>Edit Master Prompt</h2>
+            <div class="editor-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Characters</span>
+                    <span class="stat-value" id="char-count">{{ char_count }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Last Modified</span>
+                    <span class="stat-value">{{ last_modified }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Lines</span>
+                    <span class="stat-value" id="line-count">0</span>
+                </div>
+            </div>
+        </div>
+
+        <textarea id="master-prompt" class="prompt-editor" placeholder="Enter your master prompt here...">{{ current_prompt }}</textarea>
+
+        <div class="editor-actions">
+            <button class="btn-save" onclick="saveMasterPrompt()">
+                💾 Save Changes
+            </button>
+            <button class="btn-secondary" onclick="revertChanges()">
+                ↩️ Revert Changes
+            </button>
+            <button class="btn-secondary" onclick="window.location.href='/'">
+                🏠 Back to Dashboard
+            </button>
+            <button class="btn-secondary" onclick="startGeneration()">
+                🚀 Start Test Generation (3 Images)
+            </button>
+        </div>
+
+        <div id="save-status" class="save-status"></div>
+    </div>
+
+    <script>
+        // Store original content for revert
+        const originalContent = {{ current_prompt | tojson }};
+        let hasChanges = false;
+
+        // Update character and line counts
+        function updateCounts() {
+            const textarea = document.getElementById('master-prompt');
+            const content = textarea.value;
+            
+            // Update character count
+            const charCount = content.length;
+            document.getElementById('char-count').textContent = charCount.toLocaleString();
+            document.getElementById('char-count-inline').textContent = charCount.toLocaleString();
+            
+            // Update line count
+            const lineCount = content.split('\n').length;
+            document.getElementById('line-count').textContent = lineCount.toLocaleString();
+            
+            // Check if content has changed
+            hasChanges = content !== originalContent;
+            
+            // Update save button state
+            const saveBtn = document.querySelector('.btn-save');
+            if (hasChanges) {
+                saveBtn.textContent = '💾 Save Changes *';
+            } else {
+                saveBtn.textContent = '💾 Save Changes';
+            }
+        }
+
+        // Initialize counts on load
+        updateCounts();
+
+        // Update counts on input
+        document.getElementById('master-prompt').addEventListener('input', updateCounts);
+
+        // Save master prompt
+        async function saveMasterPrompt() {
+            const content = document.getElementById('master-prompt').value;
+            const saveBtn = document.querySelector('.btn-save');
+            const statusDiv = document.getElementById('save-status');
+            
+            // Disable button during save
+            saveBtn.disabled = true;
+            saveBtn.textContent = '⏳ Saving...';
+            
+            try {
+                // Get CSRF token first
+                const csrfResponse = await fetch('/api/get-csrf-token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                });
+                
+                const csrfData = await csrfResponse.json();
+                
+                if (!csrfData.success) {
+                    throw new Error('Failed to get CSRF token');
+                }
+                
+                // Save the master prompt
+                const response = await fetch('/api/save-master-prompt', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-TOKEN': '{{ api_token }}' || 'estate-planning-review-2024',
+                        'X-Session-ID': csrfData.session_id,
+                        'X-CSRF-Token': csrfData.csrf_token
+                    },
+                    body: JSON.stringify({ content: content })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    statusDiv.className = 'save-status success';
+                    statusDiv.textContent = '✅ ' + data.message;
+                    statusDiv.style.display = 'block';
+                    hasChanges = false;
+                    updateCounts();
+                } else {
+                    throw new Error(data.error || 'Failed to save');
+                }
+                
+            } catch (error) {
+                statusDiv.className = 'save-status error';
+                statusDiv.textContent = '❌ Error: ' + error.message;
+                statusDiv.style.display = 'block';
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.textContent = hasChanges ? '💾 Save Changes *' : '💾 Save Changes';
+                
+                // Hide status after 5 seconds
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Revert changes
+        function revertChanges() {
+            if (hasChanges && !confirm('Are you sure you want to revert all changes?')) {
+                return;
+            }
+            
+            document.getElementById('master-prompt').value = originalContent;
+            updateCounts();
+            
+            const statusDiv = document.getElementById('save-status');
+            statusDiv.className = 'save-status success';
+            statusDiv.textContent = '↩️ Changes reverted';
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // Start generation
+        async function startGeneration() {
+            if (hasChanges) {
+                if (!confirm('You have unsaved changes. Save before starting generation?')) {
+                    return;
+                }
+                await saveMasterPrompt();
+            }
+            
+            try {
+                // Get CSRF token
+                const csrfResponse = await fetch('/api/get-csrf-token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                });
+                
+                const csrfData = await csrfResponse.json();
+                
+                // Start generation
+                const response = await fetch('/api/start-generation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-TOKEN': '{{ api_token }}' || 'estate-planning-review-2024',
+                        'X-Session-ID': csrfData.session_id,
+                        'X-CSRF-Token': csrfData.csrf_token
+                    },
+                    body: JSON.stringify({
+                        mode: 'sample',
+                        test_pages: 3
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Redirect to main dashboard to see status
+                    window.location.href = '/?generation_started=true';
+                } else {
+                    throw new Error(data.error || 'Failed to start generation');
+                }
+                
+            } catch (error) {
+                const statusDiv = document.getElementById('save-status');
+                statusDiv.className = 'save-status error';
+                statusDiv.textContent = '❌ Failed to start generation: ' + error.message;
+                statusDiv.style.display = 'block';
+            }
+        }
+
+        // Warn before leaving with unsaved changes
+        window.addEventListener('beforeunload', function(e) {
+            if (hasChanges) {
+                e.preventDefault();
+                e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+S or Cmd+S to save
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                saveMasterPrompt();
+            }
+        });
+    </script>
+</body>
+</html>

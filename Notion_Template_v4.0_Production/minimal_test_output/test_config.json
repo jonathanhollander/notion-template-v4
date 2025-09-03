@@ -1,0 +1,53 @@
+{
+  "replicate": {
+    "api_key": "REDACTED",
+    "rate_limit": 1,
+    "models": {
+      "icons": {
+        "model_id": "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
+        "cost_per_image": 0.04
+      },
+      "covers": {
+        "model_id": "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
+        "cost_per_image": 0.04
+      },
+      "textures": {
+        "model_id": "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
+        "cost_per_image": 0.04
+      }
+    }
+  },
+  "openrouter": {
+    "api_key": "REDACTED",
+    "base_url": "https://openrouter.ai/api/v1/chat/completions",
+    "models": {
+      "claude": {
+        "id": "anthropic/claude-3-haiku-20240307",
+        "cost_per_1k_tokens": 0.00025
+      }
+    }
+  },
+  "budget": {
+    "sample_generation": {
+      "max_cost": 0.5
+    },
+    "mass_generation": {
+      "max_cost": 0.2
+    }
+  },
+  "output": {
+    "sample_directory": "minimal_test_output/samples",
+    "production_directory": "minimal_test_output/production",
+    "backup_directory": "minimal_test_output/backup"
+  },
+  "logging": {
+    "level": "INFO",
+    "log_file": "minimal_test_output/test.log",
+    "max_log_size": 10485760,
+    "backup_count": 3
+  },
+  "review": {
+    "port": 5003,
+    "approval_file": "minimal_test_output/APPROVED.txt"
+  }
+}

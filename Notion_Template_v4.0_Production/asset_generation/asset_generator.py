@@ -13,14 +13,52 @@ import logging.handlers
 import asyncio
 import replicate
 import yaml
+import requests
+from urllib.parse import urlparse
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Any, Union
 from colorama import init, Fore, Back, Style
 from tqdm import tqdm
 from tqdm.asyncio import tqdm as atqdm
 from git_operations import GitOperations
 from sync_yaml_comprehensive import sync_with_yaml as comprehensive_sync
+
+# Import new safety utilities
+try:
+    from utils.transaction_safety import TransactionManager, CircuitBreaker
+    from utils.path_validator import PathValidator
+    from utils.exceptions import (
+        BudgetExceededError, APIError, ImageDownloadError,
+        PathTraversalError, ValidationError
+    )
+    from utils.error_handler import ErrorHandler
+    
+    # Import Phase 2 modules
+    from utils.async_file_handler import AsyncFileHandler
+    from utils.resource_manager import ResourceManager, RateLimiter
+    from models.config_models import (
+        ApplicationConfig,
+        AssetGenerationRequest,
+        AssetGenerationResponse,
+        GenerationManifest,
+        ManifestEntry,
+        validate_config_file
+    )
+except ImportError as e:
+    print(f"Warning: Some modules not available: {e}")
+    # Fallback for when utils module is not available yet
+    TransactionManager = None
+    PathValidator = None
+    BudgetExceededError = Exception
+    APIError = Exception
+    ImageDownloadError = Exception
+    PathTraversalError = Exception
+    ValidationError = Exception
+    ErrorHandler = None
+    AsyncFileHandler = None
+    ResourceManager = None
+    ApplicationConfig = None
 
 # Initialize colorama for cross-platform colored output
 init(autoreset=True)
@@ -59,14 +97,40 @@ class AssetGenerator:
             'generation_mode': 'sample'
         }
         
-        # Load configuration
+        # Initialize path validator
+        self.path_validator = PathValidator() if PathValidator else None
+        
+        # Load and validate configuration
         self.config = self.load_config(config_path)
+        if self.path_validator:
+            self.config = self.path_validator.validate_config_paths(self.config)
         
         # Setup logging
         self.setup_logging()
         
+        # Initialize Phase 2 modules
+        self.async_file_handler = AsyncFileHandler(self.path_validator) if AsyncFileHandler else None
+        self.resource_manager = ResourceManager(self.logger) if ResourceManager else None
+        self.error_handler = ErrorHandler(self.logger) if ErrorHandler else None
+        
+        # Initialize transaction manager
+        self.transaction_manager = TransactionManager(self.config, self.logger) if TransactionManager else None
+        
+        # Initialize circuit breakers for each API
+        self.replicate_circuit = CircuitBreaker() if CircuitBreaker else None
+        self.openrouter_circuit = CircuitBreaker() if CircuitBreaker else None
+        
         # Initialize Replicate client
         self.setup_replicate()
+        
+        # Ensure output directories exist with path validation
+        for dir_key in ['sample_directory', 'production_directory', 'backup_directory']:
+            if self.path_validator:
+                dir_path = self.path_validator.ensure_directory_exists(self.config['output'][dir_key])
+            else:
+                dir_path = Path(self.config['output'][dir_key])
+                dir_path.mkdir(parents=True, exist_ok=True)
+            self.logger.info(f"✓ Directory ready: {dir_path}")
         
         # Log initialization
         self.logger.info("=" * 80)
@@ -78,8 +142,15 @@ class AssetGenerator:
         self.logger.info(f"Review server port: {self.config['review']['port']}")
         self.logger.info("=" * 80)
     
-    def load_config(self, config_path: str) -> Dict:
-        """Load configuration from JSON file"""
+    def load_config(self, config_path: str) -> Dict[str, Any]:
+        """Load configuration from JSON file
+        
+        Args:
+            config_path: Path to the configuration JSON file
+            
+        Returns:
+            Dictionary containing configuration settings
+        """
         config_file = Path(config_path)
         if not config_file.exists():
             raise FileNotFoundError(f"Configuration file not found: {config_path}")
@@ -95,8 +166,11 @@ class AssetGenerator:
         
         return config
     
-    def setup_logging(self):
-        """Setup comprehensive logging with colors and file output"""
+    def setup_logging(self) -> None:
+        """Setup comprehensive logging with colors and file output
+        
+        Creates both console and file handlers with appropriate formatting
+        """
         # Create logger
         self.logger = logging.getLogger('AssetGenerator')
         self.logger.setLevel(getattr(logging, self.config['logging']['level']))
@@ -122,8 +196,12 @@ class AssetGenerator:
         file_handler.setFormatter(file_formatter)
         self.logger.addHandler(file_handler)
     
-    def setup_replicate(self):
-        """Initialize Replicate client"""
+    def setup_replicate(self) -> None:
+        """Initialize Replicate client
+        
+        Raises:
+            ValueError: If Replicate API key is not configured
+        """
         api_key = self.config['replicate']['api_key']
         if not api_key:
             raise ValueError("REPLICATE_API_KEY not found in environment or config")
@@ -165,8 +243,14 @@ class AssetGenerator:
         
         return pages_by_type
     
-    def print_status(self, stage: str, message: str, level: str = "info"):
-        """Print formatted status message with timestamp and cost"""
+    def print_status(self, stage: str, message: str, level: str = "info") -> None:
+        """Print formatted status message with timestamp and cost
+        
+        Args:
+            stage: The stage/phase of generation
+            message: The status message to display
+            level: Log level (info, warning, error, success)
+        """
         elapsed = time.time() - self.start_time
         elapsed_str = f"{elapsed:.1f}s"
         cost_str = f"${self.total_cost:.3f}"
@@ -180,12 +264,107 @@ class AssetGenerator:
         else:
             self.logger.info(status_line)
     
-    async def generate_asset(self, asset_type: str, prompt: str, index: int, total: int) -> Optional[Dict]:
-        """Generate a single asset with progress tracking"""
+    def confirm_action(self, message: str, cost: float = 0) -> bool:
+        """Get user confirmation for critical actions"""
+        if cost > 0:
+            message += f" (Estimated cost: ${cost:.2f})"
+        
+        print(f"\n{Fore.YELLOW}⚠️  {message}{Style.RESET_ALL}")
+        response = input(f"{Fore.CYAN}Continue? (yes/no): {Style.RESET_ALL}")
+        return response.lower() in ['yes', 'y']
+    
+    async def generate_asset(self, asset_type: str, prompt: str, index: int, total: int) -> Optional[Dict[str, Any]]:
+        """Generate a single asset with progress tracking and transaction safety"""
         model_config = self.config['replicate']['models'][asset_type]
         model_id = model_config['model_id']
         cost = model_config['cost_per_image']
         
+        # Use transaction manager if available
+        if self.transaction_manager:
+            try:
+                # Check circuit breaker
+                if self.replicate_circuit and not self.replicate_circuit.can_attempt_call():
+                    self.logger.warning("Replicate API circuit breaker is open - skipping call")
+                    return None
+                
+                # Define API call function
+                async def api_call():
+                    await asyncio.sleep(1 / self.config['replicate']['rate_limit'])
+                    return await asyncio.to_thread(
+                        replicate.run,
+                        model_id,
+                        input={"prompt": prompt}
+                    )
+                
+                # Define download function
+                async def download_call(output):
+                    if not output:
+                        return False
+                    image_url = output[0] if isinstance(output, list) else output
+                    
+                    # Generate filename
+                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    filename = f"{asset_type}_{index:03d}_{timestamp}.png"
+                    if 'icon' in asset_type:
+                        filename = filename.replace('.png', '.svg')
+                    
+                    # Determine output directory with path validation
+                    if self.generation_stats.get('generation_mode') == 'production':
+                        output_dir = self.config['output']['production_directory']
+                    else:
+                        output_dir = self.config['output']['sample_directory']
+                    
+                    if self.path_validator:
+                        filepath = self.path_validator.sanitize_path(Path(output_dir) / filename)
+                    else:
+                        filepath = Path(output_dir) / filename
+                    
+                    # Download image
+                    response = await asyncio.to_thread(requests.get, image_url, stream=True, timeout=30)
+                    response.raise_for_status()
+                    
+                    with open(filepath, 'wb') as f:
+                        for chunk in response.iter_content(chunk_size=8192):
+                            if chunk:
+                                f.write(chunk)
+                    
+                    self.logger.info(f"✓ Image saved: {filepath}")
+                    return True
+                
+                # Execute with transaction safety
+                output = await self.transaction_manager.execute_with_transaction(
+                    asset_type=asset_type,
+                    cost=cost,
+                    api_call=api_call,
+                    download_call=download_call,
+                    prompt=prompt,
+                    is_production=(self.generation_stats.get('generation_mode') == 'production')
+                )
+                
+                # Update circuit breaker on success
+                if self.replicate_circuit:
+                    self.replicate_circuit.call_succeeded()
+                
+                # Update stats (cost already tracked by transaction manager)
+                self.total_cost = self.transaction_manager.total_cost
+                
+                return {
+                    'prompt': prompt,
+                    'asset_type': asset_type,
+                    'output': output,
+                    'cost': cost
+                }
+                
+            except BudgetExceededError as e:
+                self.logger.error(f"Budget exceeded: {e}")
+                return None
+            except Exception as e:
+                self.logger.error(f"Transaction failed: {e}")
+                if self.replicate_circuit:
+                    self.replicate_circuit.call_failed()
+                return None
+        
+        # Fallback to original implementation if transaction manager not available
         # Check budget
         if self.total_cost + cost > self.config['budget']['sample_generation']['max_cost']:
             self.print_status(
@@ -215,13 +394,32 @@ class AssetGenerator:
             self.total_cost += cost
             self.update_statistics(asset_type, count=1, cost=cost)
             
-            # Save asset
-            filename = f"{asset_type}_{index:03d}.png"
+            # Determine file extension based on asset type
+            file_ext = '.svg' if asset_type in ['icons', 'database_icons'] else '.png'
+            filename = f"{asset_type}_{index:03d}{file_ext}"
             filepath = Path(self.config['output']['sample_directory']) / filename
             filepath.parent.mkdir(parents=True, exist_ok=True)
             
-            # Download and save (simplified for example)
-            # In reality, you'd download the image from the URL returned
+            # Download the image from Replicate URL
+            if output:
+                # Replicate returns URL(s), handle both single and list
+                image_url = output[0] if isinstance(output, list) else output
+                
+                # Download the image with error handling
+                try:
+                    response = await asyncio.to_thread(requests.get, image_url, stream=True, timeout=30)
+                    response.raise_for_status()
+                    
+                    # Save to file
+                    with open(filepath, 'wb') as f:
+                        for chunk in response.iter_content(chunk_size=8192):
+                            if chunk:
+                                f.write(chunk)
+                    
+                    self.logger.debug(f"Downloaded {filename} from {image_url[:50]}...")
+                except requests.exceptions.RequestException as e:
+                    self.logger.error(f"Failed to download image: {str(e)}")
+                    raise
             
             self.print_status(
                 f"{asset_type.upper()}",
@@ -448,6 +646,121 @@ class AssetGenerator:
             self.logger.error(f"Sample generation failed: {str(e)}")
             return False
     
+    async def generate_mass_production(self):
+        """Generate all production assets after approval"""
+        self.logger.info("\n" + "="*80)
+        self.logger.info("STAGE 2: MASS PRODUCTION GENERATION")
+        self.logger.info("="*80)
+        
+        # Sync with YAML to get ALL pages
+        pages_by_type = self.sync_with_yaml()
+        
+        # Calculate total assets and estimated cost
+        total_assets = sum(len(items) for items in pages_by_type.values())
+        
+        # Estimate costs based on asset types
+        estimated_cost = 0.0
+        for asset_type, items in pages_by_type.items():
+            if asset_type in self.config['replicate']['models']:
+                cost_per_item = self.config['replicate']['models'][asset_type]['cost_per_image']
+                estimated_cost += len(items) * cost_per_item
+        
+        self.logger.info(f"Total assets to generate: {total_assets}")
+        self.logger.info(f"Estimated cost: ${estimated_cost:.2f}")
+        self.logger.info(f"Budget limit: ${self.config['budget']['mass_generation']['max_cost']:.2f}")
+        
+        # Confirmation prompt for safety
+        if not self.confirm_action(f"Mass generation will generate {total_assets} assets", estimated_cost):
+            self.logger.warning("Mass generation cancelled by user")
+            return False
+        
+        # Reset cost for production tracking
+        self.total_cost = 0.0
+        self.generated_assets = []
+        production_budget = self.config['budget']['mass_generation']['max_cost']
+        
+        # Switch to production directory
+        original_sample_dir = self.config['output']['sample_directory']
+        self.config['output']['sample_directory'] = self.config['output']['production_directory']
+        
+        try:
+            # Process each asset type with progress tracking
+            with tqdm(total=total_assets, desc="Mass Production", unit="asset") as pbar:
+                for asset_type, items in pages_by_type.items():
+                    if asset_type not in self.config['replicate']['models']:
+                        self.logger.warning(f"Skipping {asset_type}: no model configured")
+                        pbar.update(len(items))
+                        continue
+                    
+                    self.print_status("PRODUCTION", f"Generating {len(items)} {asset_type}")
+                    
+                    for i, item in enumerate(items, 1):
+                        # Check budget before each generation
+                        model_config = self.config['replicate']['models'][asset_type]
+                        cost = model_config['cost_per_image']
+                        
+                        if self.total_cost + cost > production_budget:
+                            self.logger.error(f"Budget limit would be exceeded: ${self.total_cost + cost:.2f} > ${production_budget:.2f}")
+                            self.logger.warning(f"Stopping after {len(self.generated_assets)} assets")
+                            return False
+                        
+                        # Generate the asset
+                        try:
+                            result = await self.generate_asset(asset_type, item['prompt'], i, len(items))
+                            if result:
+                                # Add metadata from YAML
+                                result['metadata'] = {
+                                    'title': item.get('title', 'Unknown'),
+                                    'slug': item.get('slug', ''),
+                                    'category': item.get('category', ''),
+                                    'production': True
+                                }
+                                self.generated_assets.append(result)
+                        except Exception as e:
+                            self.logger.error(f"Failed to generate {asset_type} #{i}: {str(e)}")
+                            self.errors.append({
+                                'type': asset_type,
+                                'index': i,
+                                'title': item.get('title', 'Unknown'),
+                                'error': str(e)
+                            })
+                        
+                        pbar.update(1)
+                        
+                        # Show periodic status updates
+                        if len(self.generated_assets) % 10 == 0:
+                            self.print_status(
+                                "PROGRESS",
+                                f"Generated {len(self.generated_assets)}/{total_assets} assets"
+                            )
+            
+            # Save production manifest
+            manifest_path = Path(self.config['output']['production_directory']) / "manifest.json"
+            with open(manifest_path, 'w') as f:
+                json.dump({
+                    'assets': self.generated_assets,
+                    'total_cost': self.total_cost,
+                    'errors': self.errors,
+                    'timestamp': datetime.now().isoformat(),
+                    'production': True,
+                    'total_generated': len(self.generated_assets),
+                    'total_expected': total_assets
+                }, f, indent=2)
+            
+            self.logger.info("\n" + "="*80)
+            self.logger.info(f"✅ MASS PRODUCTION COMPLETE")
+            self.logger.info(f"Generated: {len(self.generated_assets)} assets")
+            self.logger.info(f"Errors: {len(self.errors)}")
+            self.logger.info(f"Total Cost: ${self.total_cost:.2f}")
+            self.logger.info(f"Time Elapsed: {time.time() - self.start_time:.1f}s")
+            self.logger.info("="*80)
+            
+            return True
+            
+        finally:
+            # Restore original sample directory
+            self.config['output']['sample_directory'] = original_sample_dir
+    
     async def regenerate_specific_asset(self, asset_data: Dict) -> Optional[Dict]:
         """Regenerate a specific asset with new prompt"""
         asset_type = asset_data['type']
@@ -480,7 +793,17 @@ class AssetGenerator:
             
             # Save regenerated asset
             filepath = Path(self.config['output']['sample_directory']) / filename
-            # In reality, you'd download and save the actual image here
+            
+            # Download the regenerated image
+            if output:
+                image_url = output[0] if isinstance(output, list) else output
+                response = await asyncio.to_thread(requests.get, image_url, stream=True, timeout=30)
+                response.raise_for_status()
+                
+                with open(filepath, 'wb') as f:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        if chunk:
+                            f.write(chunk)
             
             self.logger.info(f"✅ Regenerated {filename} successfully")
             
@@ -675,8 +998,8 @@ async def main():
                 return
             
             generator.logger.info("Starting mass production...")
-            # TODO: Implement mass generation
-            generator.logger.info("Mass generation would start here...")
+            # Run mass generation with all safety checks
+            await generator.generate_mass_production()
             
             # Commit assets to Git after mass production
             if not args.no_commit:
@@ -690,8 +1013,8 @@ async def main():
                 # Process any regeneration requests
                 await generator.process_regeneration_queue()
                 
-                # TODO: Implement mass generation after approval
-                generator.logger.info("Mass generation would start here...")
+                # Run mass generation after approval
+                await generator.generate_mass_production()
                 
                 # Commit assets to Git after successful generation
                 if not args.no_commit:

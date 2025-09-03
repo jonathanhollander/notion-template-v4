@@ -1,0 +1,20 @@
+{
+  "approved_at": "2025-09-02T19:38:03.590863",
+  "approved_by": "minimal_live_test",
+  "approved_prompts": [
+    {
+      "type": "icons",
+      "prompts": [
+        "minimalist estate planning icon, gold and mahogany colors, professional, flat design",
+        "luxury document icon, premium materials, photorealistic, high detail"
+      ]
+    },
+    {
+      "type": "covers",
+      "prompts": [
+        "elegant mahogany desk with fountain pen and legal documents, warm lighting, luxury office"
+      ]
+    }
+  ],
+  "notes": "Minimal test with 2-3 real images"
+}

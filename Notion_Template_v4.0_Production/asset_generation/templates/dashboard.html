@@ -1,156 +1,13 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Estate Planning Concierge v4.0 - Prompt Review Dashboard</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f8f9fa;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        
-        .header h1 {
-            margin: 0;
-            font-size: 2.2em;
-            font-weight: 300;
-        }
-        
-        .header p {
-            margin: 5px 0 0 0;
-            opacity: 0.9;
-            font-size: 1.1em;
-        }
-        
-        .dashboard-container {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 30px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        .panel {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            border-left: 4px solid #8B4513;
-        }
-        
-        .progress-panel {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        }
-        
-        .button {
-            background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 500;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin: 5px;
-        }
-        
-        .button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(139,69,19,0.3);
-        }
-        
-        .button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .prompt-container {
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 10px 0;
-            background: #fafafa;
-        }
-        
-        .prompt-header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .score-badge {
-            background: #28a745;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 20px;
-            background-color: #e0e0e0;
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 15px 0;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
-            transition: width 0.3s ease;
-        }
-        
-        .review-area {
-            min-height: 600px;
-        }
-        
-        #evaluation-display {
-            display: none;
-        }
-        
-        .decision-form {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-        }
-        
-        textarea {
-            width: 100%;
-            min-height: 60px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: inherit;
-            resize: vertical;
-        }
-        
-        select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin: 10px 0;
-        }
-    </style>
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <!-- DOMPurify for input sanitization -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
 </head>
 <body>
     <div class="header">
@@ -158,42 +15,128 @@
         <p>Ultra-Premium Prompt Review Dashboard</p>
     </div>
     
-    <div class="dashboard-container">
-        <div class="panel progress-panel">
-            <h2>📊 Review Progress</h2>
-            
-            <div id="progress-info">
-                <p><strong>Session:</strong> <span id="session-status">Not Started</span></p>
-                <p><strong>Evaluations Loaded:</strong> <span id="evaluations-count">0</span></p>
-                <p><strong>Decisions Made:</strong> <span id="decisions-count">0</span></p>
+    <main class="dashboard-container" role="main">
+        <section class="panel progress-panel" aria-labelledby="progress-heading">
+            <!-- Authentication Section -->
+            <div class="auth-section">
+                <h2 id="auth-heading">🔐 Authentication</h2>
+                <label for="api-token">API Token <span class="required-indicator">*</span></label>
+                <input type="password" id="api-token" class="form-input" aria-describedby="token-help" required aria-required="true">
+                <span id="token-help" class="sr-only">Enter your authentication token to access the review dashboard</span>
+                <label for="reviewer-name">Reviewer Name <span class="optional-indicator">(Optional)</span></label>
+                <input type="text" id="reviewer-name" class="form-input" aria-describedby="name-help">
+                <span id="name-help" class="sr-only">Enter your name for session tracking</span>
+                <button class="button" onclick="startSession()" aria-describedby="auth-heading">Start Review Session</button>
             </div>
             
-            <div class="progress-bar">
-                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
-            </div>
-            <p id="progress-text">0% Complete</p>
+            <hr class="section-divider">
             
-            <h3>🎯 Session Controls</h3>
-            <input type="text" id="reviewer-name" placeholder="Enter your name" style="width: 100%; margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
-            <button class="button" onclick="startSession()">Start Review Session</button>
-            <button class="button" onclick="loadEvaluations()">Load Evaluations</button>
-            <button class="button" onclick="exportDecisions()" disabled id="export-btn">Export Decisions</button>
-            
-            <h3>📈 Quality Metrics</h3>
-            <div id="quality-metrics">
-                <p>Start a session to view metrics</p>
+            <!-- Session Status Section -->
+            <div class="session-status-section">
+                <h2 id="session-heading">📋 Session Status</h2>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <span class="status-label">Session:</span>
+                        <span id="session-status" class="status-value">Not Started</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Evaluations:</span>
+                        <span id="evaluations-count" class="status-value">0</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Decisions:</span>
+                        <span id="decisions-count" class="status-value">0</span>
+                    </div>
+                </div>
             </div>
-        </div>
+            
+            <hr class="section-divider">
+            
+            <!-- Progress Section -->
+            <div class="progress-section">
+                <h2 id="progress-heading">📊 Review Progress</h2>
+                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-fill progress-fill-init" id="progress-fill"></div>
+                </div>
+                <p id="progress-text">0% Complete</p>
+            </div>
+            
+            <hr class="section-divider">
+            
+            <!-- Actions Section -->
+            <div class="actions-section">
+                <h3 id="actions-heading">🎯 Actions</h3>
+                <button class="button button-primary" onclick="window.location.href='/edit-master-prompt'" aria-describedby="actions-heading" title="Edit Master Prompt">
+                    ✏️ Edit Master Prompt
+                </button>
+                <button class="button button-success" onclick="startTestGeneration()" aria-describedby="actions-heading" title="Start Test Generation">
+                    🚀 Start Test Generation (3 Images)
+                </button>
+                <button class="button" onclick="loadEvaluations()" aria-describedby="actions-heading" title="Ctrl+L">Load Evaluations</button>
+                <button class="button" onclick="exportDecisions()" disabled id="export-btn" aria-describedby="actions-heading" title="Ctrl+E">Export Decisions</button>
+                <button class="button button-secondary" onclick="showKeyboardShortcutsHelp()" aria-describedby="actions-heading" title="Press ?">
+                    ⌨️ Shortcuts
+                </button>
+            </div>
+            
+            <hr class="section-divider">
+            
+            <!-- Metrics Section -->
+            <div class="metrics-section">
+                <h3 id="metrics-heading">📈 Quality Metrics</h3>
+                <div id="quality-metrics" aria-labelledby="metrics-heading">
+                    <p>Start a session to view metrics</p>
+                </div>
+            </div>
+            
+            <hr class="section-divider">
+            
+            <!-- Real-Time Status Section -->
+            <div class="status-section" id="generation-status-panel" style="display: none;">
+                <h3 id="status-heading">🔄 Generation Status</h3>
+                <div class="status-indicator">
+                    <span class="status-label">Current Phase:</span>
+                    <span id="current-phase" class="status-value">Idle</span>
+                </div>
+                <div class="progress-bar-generation">
+                    <div class="progress-fill-generation" id="generation-progress" style="width: 0%"></div>
+                </div>
+                <div class="status-metrics">
+                    <div class="metric-item">
+                        <span class="metric-label">Prompts Generated:</span>
+                        <span id="prompts-count" class="metric-value">0</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">Images Created:</span>
+                        <span id="images-count" class="metric-value">0</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">Cost:</span>
+                        <span id="generation-cost" class="metric-value">$0.00</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">API Status:</span>
+                        <span id="api-status" class="metric-value status-ok">✅ OK</span>
+                    </div>
+                </div>
+                <div class="log-stream">
+                    <h4>📋 Live Log Stream</h4>
+                    <div id="log-container" class="log-container">
+                        <!-- Real-time logs will appear here -->
+                    </div>
+                </div>
+            </div>
+        </section>
         
-        <div class="panel review-area">
-            <h2>🎨 Prompt Review</h2>
+        <section class="panel review-area" aria-labelledby="review-heading">
+            <h2 id="review-heading">🎨 Prompt Review</h2>
             
             <div id="pre-review-message">
                 <p>👋 Welcome to the Estate Planning Concierge v4.0 Prompt Review Dashboard!</p>
                 <p>This interface allows you to review AI-generated prompts and make final selections for our luxury estate planning assets.</p>
                 <p>To get started:</p>
                 <ol>
-                    <li>Enter your name and start a review session</li>
+                    <li>Enter your API token and name, then start a review session</li>
                     <li>Load evaluation results from the quality scorer</li>
                     <li>Review competing prompts and make your selections</li>
                     <li>Export your decisions for final generation</li>
@@ -206,249 +149,54 @@
                     <p id="eval-details">Category: <span id="eval-category"></span> | Type: <span id="eval-type"></span></p>
                 </div>
                 
-                <div id="prompts-container">
+                <div id="prompts-container" aria-live="polite">
                     <!-- Prompts will be loaded here -->
                 </div>
                 
-                <div class="decision-form">
-                    <h4>🤔 Make Your Decision</h4>
-                    <select id="selected-prompt">
-                        <option value="">Select a prompt...</option>
-                    </select>
-                    <textarea id="decision-reasoning" placeholder="Why did you choose this prompt? What makes it best for our estate planning users?"></textarea>
-                    <textarea id="custom-modifications" placeholder="Any modifications or improvements? (optional)"></textarea>
+                <form class="decision-form" role="form" aria-labelledby="decision-heading">
+                    <h4 id="decision-heading">🤔 Decision Center</h4>
                     
-                    <button class="button" onclick="makeDecision()">Record Decision</button>
-                    <button class="button" onclick="nextEvaluation()" style="background: #6c757d;">Next →</button>
-                </div>
+                    <!-- Step 1: Selection -->
+                    <div class="form-step">
+                        <div class="step-indicator">Step 1: Choose</div>
+                        <label for="selected-prompt">Select Best Prompt <span class="required-indicator">*</span></label>
+                        <select id="selected-prompt" class="enhanced-select" aria-describedby="prompt-help" required aria-required="true">
+                            <option value="">Select a prompt...</option>
+                        </select>
+                        <span id="prompt-help" class="help-text">Review the prompts above and select the best option</span>
+                    </div>
+                    
+                    <!-- Step 2: Reasoning -->
+                    <div class="form-step">
+                        <div class="step-indicator">Step 2: Justify</div>
+                        <label for="decision-reasoning">Decision Reasoning <span class="required-indicator">*</span></label>
+                        <textarea id="decision-reasoning" class="enhanced-textarea" aria-describedby="reasoning-help" required aria-required="true" rows="4" placeholder="Explain why this prompt is best for estate planning users. Consider quality, tone, and completeness."></textarea>
+                        <span id="reasoning-help" class="help-text">Provide clear rationale for your selection</span>
+                    </div>
+                    
+                    <!-- Step 3: Optional Enhancements -->
+                    <div class="form-step">
+                        <div class="step-indicator">Step 3: Enhance <span class="optional-badge">Optional</span></div>
+                        <label for="custom-modifications">Suggested Improvements</label>
+                        <textarea id="custom-modifications" class="enhanced-textarea" aria-describedby="modifications-help" rows="3" placeholder="Any refinements or adjustments to make the prompt even better?"></textarea>
+                        <span id="modifications-help" class="help-text">Optional: Propose any improvements to the selected prompt</span>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="form-actions">
+                        <button class="button button-primary" onclick="makeDecision()" type="button" title="Ctrl+S">
+                            <span class="button-icon">✓</span> Record Decision
+                        </button>
+                        <button class="button button-secondary" onclick="nextEvaluation()" type="button" aria-describedby="decision-heading" title="Press N">
+                            Skip to Next <span class="button-icon">→</span>
+                        </button>
+                    </div>
+                </form>
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
     
-    <script>
-        let currentEvaluationIndex = 0;
-        let totalEvaluations = 0;
-        let sessionActive = false;
-        
-        async function startSession() {
-            const reviewerName = document.getElementById('reviewer-name').value || 'Anonymous';
-            
-            try {
-                const response = await fetch('/api/start-session', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({reviewer_name: reviewerName})
-                });
-                
-                const result = await response.json();
-                if (result.success) {
-                    sessionActive = true;
-                    document.getElementById('session-status').textContent = `Active (${reviewerName})`;
-                    alert('Review session started successfully!');
-                } else {
-                    alert('Failed to start session');
-                }
-            } catch (error) {
-                console.error('Error starting session:', error);
-                alert('Error starting session');
-            }
-        }
-        
-        async function loadEvaluations() {
-            if (!sessionActive) {
-                alert('Please start a review session first');
-                return;
-            }
-            
-            try {
-                const response = await fetch('/api/load-evaluations', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({file_path: 'quality_evaluation_results.json'})
-                });
-                
-                const result = await response.json();
-                if (result.success) {
-                    totalEvaluations = result.evaluations_loaded;
-                    document.getElementById('evaluations-count').textContent = totalEvaluations;
-                    document.getElementById('export-btn').disabled = false;
-                    
-                    // Load first evaluation
-                    await loadEvaluation(0);
-                    
-                    document.getElementById('pre-review-message').style.display = 'none';
-                    document.getElementById('evaluation-display').style.display = 'block';
-                    
-                    alert(`Loaded ${totalEvaluations} evaluations successfully!`);
-                } else {
-                    alert(`Failed to load evaluations: ${result.error}`);
-                }
-            } catch (error) {
-                console.error('Error loading evaluations:', error);
-                alert('Error loading evaluations');
-            }
-        }
-        
-        async function loadEvaluation(index) {
-            try {
-                const response = await fetch(`/api/get-evaluation/${index}`);
-                const result = await response.json();
-                
-                if (result.success) {
-                    const evaluation = result.evaluation;
-                    
-                    // Update header
-                    document.getElementById('eval-title').textContent = evaluation.page_title;
-                    document.getElementById('eval-category').textContent = evaluation.page_category;
-                    document.getElementById('eval-type').textContent = evaluation.asset_type;
-                    
-                    // Update prompts container
-                    const container = document.getElementById('prompts-container');
-                    container.innerHTML = '';
-                    
-                    // Update selection dropdown
-                    const select = document.getElementById('selected-prompt');
-                    select.innerHTML = '<option value="">Select a prompt...</option>';
-                    
-                    evaluation.prompts.forEach((prompt, idx) => {
-                        // Create prompt display
-                        const promptDiv = document.createElement('div');
-                        promptDiv.className = 'prompt-container';
-                        promptDiv.innerHTML = `
-                            <div class="prompt-header">
-                                <strong>${prompt.model_source}</strong>
-                                <span class="score-badge">${prompt.weighted_score.toFixed(2)}/10</span>
-                            </div>
-                            <p>${prompt.text}</p>
-                            <small>Overall Score: ${prompt.overall_score.toFixed(1)} | Weighted: ${prompt.weighted_score.toFixed(2)}</small>
-                        `;
-                        
-                        if (evaluation.winner && prompt.id === evaluation.winner.id) {
-                            promptDiv.style.borderColor = '#28a745';
-                            promptDiv.style.borderWidth = '2px';
-                            const badge = document.createElement('span');
-                            badge.style.background = '#28a745';
-                            badge.style.color = 'white';
-                            badge.style.padding = '4px 8px';
-                            badge.style.borderRadius = '4px';
-                            badge.style.fontSize = '12px';
-                            badge.textContent = 'AI WINNER';
-                            promptDiv.querySelector('.prompt-header').appendChild(badge);
-                        }
-                        
-                        container.appendChild(promptDiv);
-                        
-                        // Add to selection dropdown
-                        const option = document.createElement('option');
-                        option.value = prompt.id;
-                        option.textContent = `${prompt.model_source} (${prompt.weighted_score.toFixed(2)})`;
-                        select.appendChild(option);
-                    });
-                    
-                    currentEvaluationIndex = index;
-                } else {
-                    alert(`Error loading evaluation: ${result.error}`);
-                }
-            } catch (error) {
-                console.error('Error loading evaluation:', error);
-                alert('Error loading evaluation');
-            }
-        }
-        
-        async function makeDecision() {
-            const selectedPromptId = document.getElementById('selected-prompt').value;
-            const reasoning = document.getElementById('decision-reasoning').value;
-            const modifications = document.getElementById('custom-modifications').value;
-            
-            if (!selectedPromptId) {
-                alert('Please select a prompt first');
-                return;
-            }
-            
-            if (!reasoning.trim()) {
-                alert('Please provide reasoning for your decision');
-                return;
-            }
-            
-            try {
-                const response = await fetch('/api/make-decision', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        page_title: document.getElementById('eval-title').textContent,
-                        page_category: document.getElementById('eval-category').textContent,
-                        asset_type: document.getElementById('eval-type').textContent,
-                        selected_prompt_id: selectedPromptId,
-                        selected_model: document.getElementById('selected-prompt').selectedOptions[0].textContent.split(' (')[0],
-                        reasoning: reasoning,
-                        custom_modifications: modifications
-                    })
-                });
-                
-                const result = await response.json();
-                if (result.success) {
-                    // Update progress
-                    document.getElementById('decisions-count').textContent = result.total_decisions;
-                    const progress = (result.total_decisions / totalEvaluations) * 100;
-                    document.getElementById('progress-fill').style.width = progress + '%';
-                    document.getElementById('progress-text').textContent = progress.toFixed(1) + '% Complete';
-                    
-                    // Clear form
-                    document.getElementById('selected-prompt').value = '';
-                    document.getElementById('decision-reasoning').value = '';
-                    document.getElementById('custom-modifications').value = '';
-                    
-                    alert('Decision recorded successfully!');
-                } else {
-                    alert(`Error recording decision: ${result.error}`);
-                }
-            } catch (error) {
-                console.error('Error making decision:', error);
-                alert('Error recording decision');
-            }
-        }
-        
-        async function nextEvaluation() {
-            if (currentEvaluationIndex < totalEvaluations - 1) {
-                await loadEvaluation(currentEvaluationIndex + 1);
-            } else {
-                alert('No more evaluations to review!');
-            }
-        }
-        
-        async function exportDecisions() {
-            try {
-                const response = await fetch('/api/export-decisions');
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert(`Exported ${result.total_decisions} decisions to ${result.file_path}`);
-                } else {
-                    alert('Error exporting decisions');
-                }
-            } catch (error) {
-                console.error('Error exporting decisions:', error);
-                alert('Error exporting decisions');
-            }
-        }
-        
-        // Auto-refresh progress every 30 seconds
-        setInterval(async () => {
-            if (sessionActive) {
-                try {
-                    const response = await fetch('/api/get-progress');
-                    const progress = await response.json();
-                    
-                    document.getElementById('decisions-count').textContent = progress.decisions_made;
-                    const percentage = progress.completion_percentage;
-                    document.getElementById('progress-fill').style.width = percentage + '%';
-                    document.getElementById('progress-text').textContent = percentage.toFixed(1) + '% Complete';
-                } catch (error) {
-                    console.error('Error updating progress:', error);
-                }
-            }
-        }, 30000);
-    </script>
+    <!-- External JavaScript -->
+    <script src="/static/js/dashboard.js"></script>
 </body>
 </html>
-        

@@ -199,7 +199,10 @@ class SampleGenerator:
         
         self.logger.info(f"Sample matrix generation complete: {len(samples)} samples in {total_time:.1f}s")
         
-        return matrix, samples
+        # Store samples in matrix for access if needed
+        matrix.samples = samples
+        
+        return matrix
     
     async def _generate_single_sample(self, category: SampleCategory, asset_type: str, title: str) -> GeneratedSample:
         """Generate a single sample with competitive prompts"""
@@ -223,7 +226,7 @@ class SampleGenerator:
         )
         
         # Collect enhanced prompts from competition
-        enhanced_prompts = [variant.prompt for variant in competition.variants]
+        enhanced_prompts = [variant.structured_prompt.prompt for variant in competition.variants]
         
         # Aggregate emotional markers and luxury indicators
         emotional_markers = []

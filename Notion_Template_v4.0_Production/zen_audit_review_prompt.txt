@@ -1,0 +1,88 @@
+PROMPT FOR ZEN MULTI-MODEL AUDIT REVIEW:
+
+Please perform a comprehensive code audit using the consensus tool on the file 'image_generator_audit.txt' in the current directory. I need you to:
+
+1. AUDIT REVIEW PHASE:
+   Use the consensus tool to have THREE different AI models review the audit file for:
+   - Code quality and best practices violations
+   - Security vulnerabilities and risks
+   - Performance bottlenecks and inefficiencies
+   - Missing error handling or edge cases
+   - Architectural concerns or anti-patterns
+   - Dependencies that might cause issues
+   - Potential runtime failures
+   - API integration problems
+   - Hardcoded values that should be configurable
+   - Missing input validation
+   - Thread safety and concurrency issues
+   - Resource management (file handles, connections)
+   - Compliance with Python PEP standards
+
+2. SAVE INDIVIDUAL REVIEWS:
+   Save each model's complete audit findings to separate files:
+   - audit_review_gpt4.md (or latest GPT model available)
+   - audit_review_gemini.md 
+   - audit_review_qwen.md (or deepseek if qwen unavailable)
+
+   Each review file should contain:
+   - Executive summary of findings
+   - Critical issues (must fix)
+   - High priority issues (should fix)
+   - Medium priority issues (nice to fix)
+   - Low priority suggestions
+   - Security vulnerabilities found
+   - Performance optimization opportunities
+   - Code quality improvements
+   - Specific line numbers and file references where issues exist
+
+3. SYNTHESIS PHASE:
+   After getting all three reviews, create a fourth file 'audit_fixes_consensus.md' that:
+   - Combines and prioritizes all findings from the three models
+   - Removes duplicate findings
+   - Resolves any conflicting recommendations
+   - Creates a unified action plan with:
+     * CRITICAL FIXES (security/runtime failures)
+     * HIGH PRIORITY (major bugs/performance)
+     * MEDIUM PRIORITY (code quality/maintainability)
+     * LOW PRIORITY (style/optimization)
+   - Provides specific code fixes for each issue
+   - Estimates effort level for each fix (Quick/Medium/Complex)
+   - Suggests implementation order
+
+4. IMPLEMENTATION GUIDE:
+   At the end of audit_fixes_consensus.md, add:
+   - Step-by-step implementation plan
+   - Which fixes can be automated
+   - Which fixes need manual review
+   - Testing recommendations after fixes
+   - Estimated total time to implement all fixes
+
+Please use the following models configuration for consensus:
+- Model 1: GPT-4 or similar (stance: 'against' - looking for problems)
+- Model 2: Gemini (stance: 'against' - finding vulnerabilities)  
+- Model 3: Qwen/Deepseek (stance: 'against' - identifying issues)
+
+Set all models to be critical reviewers looking for problems rather than praising the code. We want to find and fix issues, not get compliments.
+
+Files to read:
+- image_generator_audit.txt (the audit file to review)
+
+Files to create:
+1. audit_review_gpt4.md
+2. audit_review_gemini.md
+3. audit_review_qwen.md
+4. audit_fixes_consensus.md (synthesized recommendations)
+
+Focus areas for the audit:
+- Production readiness
+- Security vulnerabilities
+- Error handling completeness
+- API integration robustness
+- Budget control mechanisms
+- File system operations safety
+- Async/concurrent operation issues
+- External dependency management
+- Input validation and sanitization
+- Logging and monitoring adequacy
+
+The audit file contains ~222KB of Python code for an AI image generation system that costs ~$20 to run, so financial safety and API error handling are critical.

@@ -6,27 +6,153 @@ Interactive web interface for reviewing and selecting competitive prompts
 
 import os
 import json
-import asyncio
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, asdict
 from datetime import datetime
 from pathlib import Path
 import logging
+from functools import wraps
+import secrets
+import hashlib
+import time
 
 # Web framework imports
 try:
-    from flask import Flask, render_template, request, jsonify, send_from_directory
+    from flask import Flask, render_template, request, jsonify, send_from_directory, make_response
     from flask_cors import CORS
+    from flask_limiter import Limiter
+    from flask_limiter.util import get_remote_address
+    from flask_socketio import SocketIO, emit
     FLASK_AVAILABLE = True
-except ImportError:
+    SOCKETIO_AVAILABLE = True
+except ImportError as e:
     FLASK_AVAILABLE = False
-    print("Flask not available. Install with: pip install flask flask-cors")
+    SOCKETIO_AVAILABLE = False
+    print(f"Flask dependencies not available: {e}")
+    print("Install with: pip install flask flask-cors Flask-Limiter flask-socketio")
 
 # Our modules
-from openrouter_orchestrator import OpenRouterOrchestrator, PromptCompetition
+from utils.sync_database_manager import SyncAssetDatabase
+from utils.session_manager import SessionManager
+# from services.prompt_competition_service import PromptCompetitionService  # TODO: Fix import issues
 from quality_scorer import QualityScorer, CompetitiveEvaluation
-from sample_generator import SampleGenerator
-from sync_yaml_comprehensive import YAMLSyncComprehensive
+
+# Security configuration
+REVIEW_API_TOKEN = os.getenv('REVIEW_API_TOKEN', 'estate-planning-review-2024')
+
+# Initialize SQLite-based session manager
+session_manager = SessionManager(
+    db_path="review_sessions.db",
+    session_lifetime=3600  # 1 hour session lifetime
+)
+
+def token_required(f):
+    """Decorator to require authentication token for sensitive endpoints"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        token = request.headers.get('X-API-TOKEN') or request.form.get('api_token') or request.args.get('api_token')
+        if token != REVIEW_API_TOKEN:
+            return jsonify({
+                'success': False, 
+                'error': 'Authentication required. Set X-API-TOKEN header or api_token parameter.',
+                'code': 'AUTH_REQUIRED'
+            }), 401
+        return f(*args, **kwargs)
+    return decorated_function
+
+def csrf_required(f):
+    """Decorator to require CSRF token for state-changing operations"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Skip CSRF for GET requests
+        if request.method == 'GET':
+            return f(*args, **kwargs)
+        
+        session_id = request.headers.get('X-Session-ID') or request.form.get('session_id')
+        csrf_token = request.headers.get('X-CSRF-Token') or request.form.get('csrf_token')
+        
+        if not session_id or not csrf_token:
+            return jsonify({
+                'success': False,
+                'error': 'CSRF token required. Include X-CSRF-Token header and X-Session-ID.',
+                'code': 'CSRF_REQUIRED'
+            }), 403
+        
+        # Get client IP for logging
+        client_ip = request.remote_addr or get_remote_address()
+        
+        if not session_manager.validate_session(session_id, csrf_token, client_ip):
+            return jsonify({
+                'success': False,
+                'error': 'Invalid or expired CSRF token.',
+                'code': 'CSRF_INVALID'
+            }), 403
+        
+        return f(*args, **kwargs)
+    return decorated_function
+
+def validate_json(required_fields=None, optional_fields=None, max_lengths=None):
+    """Decorator to validate JSON input for API endpoints"""
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            # Check Content-Type
+            if request.content_type and 'application/json' not in request.content_type:
+                return jsonify({
+                    'success': False,
+                    'error': 'Content-Type must be application/json',
+                    'code': 'INVALID_CONTENT_TYPE'
+                }), 400
+            
+            # Parse JSON
+            try:
+                data = request.get_json(force=True)
+                if data is None:
+                    data = {}
+            except Exception as e:
+                return jsonify({
+                    'success': False,
+                    'error': f'Invalid JSON: {str(e)}',
+                    'code': 'INVALID_JSON'
+                }), 400
+            
+            # Validate required fields
+            if required_fields:
+                missing_fields = [field for field in required_fields if field not in data]
+                if missing_fields:
+                    return jsonify({
+                        'success': False,
+                        'error': f'Missing required fields: {missing_fields}',
+                        'code': 'MISSING_FIELDS'
+                    }), 400
+            
+            # Validate field types and lengths
+            if max_lengths:
+                for field, max_len in max_lengths.items():
+                    if field in data and isinstance(data[field], str) and len(data[field]) > max_len:
+                        return jsonify({
+                            'success': False,
+                            'error': f'Field "{field}" exceeds maximum length of {max_len}',
+                            'code': 'FIELD_TOO_LONG'
+                        }), 400
+            
+            # Filter out unexpected fields
+            all_allowed_fields = set()
+            if required_fields:
+                all_allowed_fields.update(required_fields)
+            if optional_fields:
+                all_allowed_fields.update(optional_fields)
+            
+            if all_allowed_fields:
+                filtered_data = {k: v for k, v in data.items() if k in all_allowed_fields}
+            else:
+                filtered_data = data
+            
+            # Add validated data to kwargs
+            kwargs['validated_data'] = filtered_data
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
 
 @dataclass
 class ReviewSession:
@@ -60,27 +186,48 @@ class HumanDecision:
 class ReviewDashboard:
     """Web-based human review dashboard for prompt selection"""
     
-    def __init__(self, port: int = 5000):
+    def __init__(self, db_path: str = "estate_planning_assets.db", port: int = 5000):
         """Initialize the review dashboard"""
         if not FLASK_AVAILABLE:
-            raise ImportError("Flask is required. Install with: pip install flask flask-cors")
+            raise ImportError("Flask is required. Install with: pip install flask flask-cors flask-socketio")
             
         self.port = port
         self.app = Flask(__name__, template_folder='templates', static_folder='static')
         CORS(self.app)
         
-        # Initialize our components
-        self.orchestrator = OpenRouterOrchestrator()
+        # Initialize SocketIO for real-time updates
+        if SOCKETIO_AVAILABLE:
+            self.socketio = SocketIO(self.app, cors_allowed_origins="*", async_mode='threading')
+            self._setup_socketio_handlers()
+        else:
+            self.socketio = None
+            
+        # Initialize rate limiter (using memory storage for local deployment)
+        self.limiter = Limiter(
+            app=self.app,
+            key_func=get_remote_address,
+            default_limits=["1000 per hour", "100 per minute"],
+            storage_uri="memory://"  # Using memory for local laptop deployment
+        )
+        
+        # Initialize database with connection pooling (synchronous)
+        self.db = SyncAssetDatabase(db_path, pool_size=10)
+        # Note: prompt_service and quality_scorer may need sync versions too
+        # For now, we'll focus on the main database operations
         self.quality_scorer = QualityScorer()
-        self.sample_generator = SampleGenerator()
-        self.yaml_system = YAMLSyncComprehensive()
         
         self.logger = self._setup_logger()
         
         # Session management
         self.current_session: Optional[ReviewSession] = None
-        self.human_decisions: List[HumanDecision] = []
-        self.competitive_evaluations: List[CompetitiveEvaluation] = []
+        
+        # Initialize generation manager
+        from generation_manager import GenerationManager
+        self.generation_manager = GenerationManager(db_path=db_path)
+        
+        # Register callbacks for real-time updates
+        self.generation_manager.register_progress_callback(self._on_generation_progress)
+        self.generation_manager.register_status_callback(self._on_generation_status_change)
         
         # Setup routes
         self._setup_routes()
@@ -109,19 +256,91 @@ class ReviewDashboard:
     def _setup_routes(self):
         """Setup Flask routes for the dashboard"""
         
+        @self.app.route('/static/<path:filename>')
+        def static_files(filename):
+            """Serve static files (CSS, JS)"""
+            return send_from_directory('static', filename)
+
         @self.app.route('/')
         def index():
             """Main dashboard page"""
-            return render_template('dashboard.html', 
-                                 session=self.current_session,
-                                 total_evaluations=len(self.competitive_evaluations),
-                                 decisions_made=len(self.human_decisions))
+            try:
+                async def _get_stats():
+                    await self.db.init_database()
+                    async with self.db.get_connection() as conn:
+                        cursor = await conn.execute("SELECT COUNT(*) as total FROM prompt_competitions WHERE competition_status = 'evaluated'")
+                        total_row = await cursor.fetchone()
+                        cursor = await conn.execute("SELECT COUNT(*) as decided FROM prompt_competitions WHERE competition_status = 'decided'")
+                        decided_row = await cursor.fetchone()
+                        return total_row['total'] if total_row else 0, decided_row['decided'] if decided_row else 0
+                
+                # Run the async operation
+                total_evaluations, decisions_made = asyncio.run(_get_stats())
+            except:
+                total_evaluations, decisions_made = 0, 0
+            
+            # Create response with security headers
+            response = make_response(render_template('dashboard.html', 
+                                                   session=self.current_session,
+                                                   total_evaluations=total_evaluations,
+                                                   decisions_made=decisions_made))
+            
+            # Content Security Policy - Strict mode (no unsafe-inline)
+            response.headers['Content-Security-Policy'] = (
+                "default-src 'self'; "
+                "script-src 'self' https://cdn.jsdelivr.net/npm/dompurify@3.0.5/; "
+                "style-src 'self'; "  # Removed 'unsafe-inline' - all styles now external
+                "img-src 'self' data:; "
+                "connect-src 'self'; "
+                "font-src 'self'; "
+                "object-src 'none'; "
+                "media-src 'self'; "
+                "frame-src 'none';"
+            )
+            
+            # Additional security headers
+            response.headers['X-Content-Type-Options'] = 'nosniff'
+            response.headers['X-Frame-Options'] = 'DENY'
+            response.headers['X-XSS-Protection'] = '1; mode=block'
+            response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+            
+            return response
+        
+        @self.app.route('/api/get-csrf-token', methods=['POST'])
+        @self.limiter.limit("5 per minute")
+        @token_required
+        def get_csrf_token():
+            """Get a CSRF token for the session"""
+            # Get client info for session tracking
+            client_ip = request.remote_addr or get_remote_address()
+            user_agent = request.headers.get('User-Agent', 'Unknown')
+            
+            # Create session with SQLite backend
+            session_data = session_manager.create_session(
+                user_data={'api_token_validated': True},
+                ip_address=client_ip,
+                user_agent=user_agent
+            )
+            
+            return jsonify({
+                'success': True,
+                'session_id': session_data['session_id'],
+                'csrf_token': session_data['csrf_token'],
+                'expires_at': session_data['expires_at']
+            })
         
         @self.app.route('/api/start-session', methods=['POST'])
-        def start_session():
+        @self.limiter.limit("5 per minute")
+        @token_required
+        @csrf_required
+        @validate_json(optional_fields=['reviewer_name'], max_lengths={'reviewer_name': 100})
+        def start_session(validated_data):
             """Start a new review session"""
-            data = request.json
-            reviewer_name = data.get('reviewer_name', 'Anonymous')
+            reviewer_name = validated_data.get('reviewer_name', 'Anonymous')
+            
+            # Additional validation
+            if reviewer_name and not reviewer_name.strip():
+                reviewer_name = 'Anonymous'
             
             self.current_session = ReviewSession(
                 session_id=f"review_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
@@ -138,97 +357,148 @@ class ReviewDashboard:
             return jsonify({'success': True, 'session': asdict(self.current_session)})
         
         @self.app.route('/api/load-evaluations', methods=['POST'])
-        def load_evaluations():
-            """Load evaluation results for review"""
+        @self.limiter.limit("10 per minute")
+        @token_required
+        @csrf_required
+        @validate_json(optional_fields=[])
+        def load_evaluations(validated_data):
+            """Load evaluated competitions from database for review"""
             try:
-                data = request.json
-                file_path = data.get('file_path', 'quality_evaluation_results.json')
+                # Use synchronous database operations
+                competitions = self.db.get_competitions(status='evaluated')
                 
-                if Path(file_path).exists():
-                    with open(file_path, 'r') as f:
-                        results_data = json.load(f)
-                    
-                    # Convert back to CompetitiveEvaluation objects
-                    self.competitive_evaluations = self._parse_evaluation_results(results_data)
-                    
-                    return jsonify({
-                        'success': True,
-                        'evaluations_loaded': len(self.competitive_evaluations),
-                        'message': f'Loaded {len(self.competitive_evaluations)} competitive evaluations'
-                    })
-                else:
-                    return jsonify({'success': False, 'error': f'File not found: {file_path}'}), 404
+                return jsonify({
+                    'success': True,
+                    'competitions_loaded': len(competitions),
+                    'message': f'Loaded {len(competitions)} evaluated competitions for review',
+                    'competitions': [dict(comp) for comp in competitions]
+                })
                     
             except Exception as e:
-                self.logger.error(f"Failed to load evaluations: {e}")
+                self.logger.error(f"Failed to load evaluations from database: {e}")
                 return jsonify({'success': False, 'error': str(e)}), 500
         
-        @self.app.route('/api/get-evaluation/<int:index>')
-        def get_evaluation(index):
-            """Get specific evaluation for review"""
-            if 0 <= index < len(self.competitive_evaluations):
-                evaluation = self.competitive_evaluations[index]
+        @self.app.route('/api/get-competition/<int:competition_id>')
+        def get_competition(competition_id):
+            """Get specific competition details for review"""
+            # Validate competition_id parameter
+            if competition_id <= 0:
+                return jsonify({
+                    'success': False,
+                    'error': 'competition_id must be a positive integer',
+                    'code': 'INVALID_COMPETITION_ID'
+                }), 400
+            
+            try:
+                # Use synchronous database operations
+                result = self.db.get_competition_with_evaluations(competition_id)
+                
+                if not result:
+                    return jsonify({'success': False, 'error': 'Competition not found'}), 404
+                
+                competition = result['competition']
+                evaluations = result['evaluations']
                 
                 # Convert to dict for JSON serialization
                 eval_data = {
-                    'index': index,
-                    'page_title': evaluation.page_title,
-                    'page_category': evaluation.page_category,
-                    'asset_type': evaluation.asset_type,
+                    'competition_id': competition_id,
+                    'page_title': f"{competition['category']} {competition['index_in_category']}",
+                    'page_category': competition['category'],
+                    'asset_type': competition['asset_type'],
                     'prompts': [
                         {
-                            'id': pe.prompt_id,
-                            'text': pe.prompt_text,
-                            'model_source': pe.model_source,
-                            'overall_score': pe.overall_score,
-                            'weighted_score': pe.weighted_score,
-                            'score_breakdown': pe.score_breakdown
+                            'id': prompt['id'],
+                            'text': prompt['prompt_text'],
+                            'model_source': prompt['model_source'],
+                            'metadata': json.loads(prompt['metadata']) if prompt['metadata'] else {}
                         }
-                        for pe in evaluation.prompt_evaluations
+                        for prompt in prompts
                     ],
-                    'winner': {
-                        'id': evaluation.winner.prompt_id,
-                        'model_source': evaluation.winner.model_source,
-                        'score': evaluation.winner.weighted_score
-                    } if evaluation.winner else None,
-                    'consensus_scores': evaluation.consensus_scores,
-                    'evaluation_summary': evaluation.evaluation_summary
+                    'evaluations': [
+                        {
+                            'prompt_text': eval_row['prompt_text'],
+                            'model_source': eval_row['model_source'],
+                            'overall_score': eval_row['overall_score'],
+                            'weighted_score': eval_row['weighted_score'],
+                            'individual_scores': json.loads(eval_row['individual_scores']) if eval_row['individual_scores'] else [],
+                            'is_winner': eval_row['is_winner']
+                        }
+                        for eval_row in evaluations
+                    ],
+                    'winner': next((
+                        {
+                            'model_source': eval_row['model_source'],
+                            'weighted_score': eval_row['weighted_score']
+                        }
+                        for eval_row in evaluations if eval_row['is_winner']
+                    ), None)
                 }
                 
-                return jsonify({'success': True, 'evaluation': eval_data})
-            else:
-                return jsonify({'success': False, 'error': 'Invalid evaluation index'}), 400
+                return jsonify({'success': True, 'competition': eval_data})
+                
+            except Exception as e:
+                self.logger.error(f"Failed to get competition {competition_id}: {e}")
+                return jsonify({'success': False, 'error': str(e)}), 500
         
         @self.app.route('/api/make-decision', methods=['POST'])
-        def make_decision():
+        @self.limiter.limit("20 per minute")  # Rate limit decision making
+        @token_required
+        @csrf_required
+        @validate_json(
+            required_fields=['competition_id', 'selected_prompt_text', 'selected_model'],
+            optional_fields=['reasoning', 'quality_override', 'custom_modifications'],
+            max_lengths={
+                'selected_prompt_text': 10000,
+                'selected_model': 100,
+                'reasoning': 2000,
+                'custom_modifications': 2000
+            }
+        )
+        def make_decision(validated_data):
             """Record human decision on prompt selection"""
             try:
-                data = request.json
+                # Additional validation
+                competition_id = validated_data['competition_id']
+                if not isinstance(competition_id, int) or competition_id <= 0:
+                    return jsonify({
+                        'success': False,
+                        'error': 'competition_id must be a positive integer',
+                        'code': 'INVALID_COMPETITION_ID'
+                    }), 400
                 
-                decision = HumanDecision(
-                    page_title=data['page_title'],
-                    page_category=data['page_category'],
-                    asset_type=data['asset_type'],
-                    selected_prompt_id=data['selected_prompt_id'],
-                    selected_model=data['selected_model'],
-                    decision_reasoning=data.get('reasoning', ''),
-                    quality_override=data.get('quality_override'),
-                    custom_modifications=data.get('custom_modifications')
-                )
+                reasoning = validated_data.get('reasoning', '')
+                if reasoning and len(reasoning.strip()) < 10:
+                    return jsonify({
+                        'success': False,
+                        'error': 'reasoning must be at least 10 characters if provided',
+                        'code': 'REASONING_TOO_SHORT'
+                    }), 400
                 
-                self.human_decisions.append(decision)
+                # Use synchronous database operations
+                decision_data = {
+                    'competition_id': validated_data['competition_id'],
+                    'selected_prompt_text': validated_data['selected_prompt_text'],
+                    'selected_model': validated_data['selected_model'],
+                    'decision_reasoning': validated_data.get('reasoning', ''),
+                    'quality_override': validated_data.get('quality_override'),
+                    'custom_modifications': validated_data.get('custom_modifications'),
+                    'reviewer_name': self.current_session.reviewer_name if self.current_session else 'Anonymous'
+                }
+                
+                # Store the decision in database (synchronously)
+                decision_id = self.db.store_human_decision(decision_data)
                 
                 # Update session stats
                 if self.current_session:
                     self.current_session.decisions_made += 1
                     self.current_session.pages_reviewed += 1
                 
-                self.logger.info(f"Decision recorded: {decision.page_title} -> {decision.selected_model}")
+                self.logger.info(f"Decision recorded: Competition {validated_data['competition_id']} -> {validated_data['selected_model']}")
                 
                 return jsonify({
                     'success': True,
-                    'decision_id': len(self.human_decisions) - 1,
-                    'total_decisions': len(self.human_decisions)
+                    'decision_id': decision_id,
+                    'competition_id': validated_data['competition_id']
                 })
                 
             except Exception as e:
@@ -236,599 +506,571 @@ class ReviewDashboard:
                 return jsonify({'success': False, 'error': str(e)}), 500
         
         @self.app.route('/api/get-progress')
+        @self.limiter.limit("30 per minute")  # Rate limit progress checks
         def get_progress():
-            """Get current review progress"""
-            total_evaluations = len(self.competitive_evaluations)
-            decisions_made = len(self.human_decisions)
-            
-            progress_data = {
-                'total_evaluations': total_evaluations,
-                'decisions_made': decisions_made,
-                'completion_percentage': (decisions_made / total_evaluations * 100) if total_evaluations > 0 else 0,
-                'session': asdict(self.current_session) if self.current_session else None
-            }
-            
-            return jsonify(progress_data)
+            """Get current review progress from database"""
+            try:
+                # Use synchronous database operations
+                stats = self.db.get_progress_stats()
+                
+                progress_data = {
+                    'total_evaluations': stats['total_evaluations'],
+                    'decisions_made': stats['decisions_made'],
+                    'completion_percentage': stats['completion_percentage'],
+                    'pending_reviews': stats['pending_reviews'],
+                    'session': asdict(self.current_session) if self.current_session else None
+                }
+                
+                return jsonify(progress_data)
+                
+            except Exception as e:
+                self.logger.error(f"Failed to get progress: {e}")
+                return jsonify({'success': False, 'error': str(e)}), 500
         
         @self.app.route('/api/export-decisions')
+        @self.limiter.limit("5 per minute")  # Rate limit exports  
+        @token_required
         def export_decisions():
-            """Export all human decisions"""
-            export_data = {
-                'export_timestamp': datetime.now().isoformat(),
-                'session': asdict(self.current_session) if self.current_session else None,
-                'total_decisions': len(self.human_decisions),
-                'decisions': [asdict(decision) for decision in self.human_decisions],
-                'decision_summary': self._generate_decision_summary()
-            }
-            
-            output_file = f"human_decisions_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-            with open(output_file, 'w') as f:
-                json.dump(export_data, f, indent=2)
-            
-            self.logger.info(f"Exported {len(self.human_decisions)} decisions to {output_file}")
-            
-            return jsonify({
-                'success': True,
-                'file_path': output_file,
-                'total_decisions': len(self.human_decisions)
-            })
+            """Export all human decisions from database"""
+            try:
+                # Use synchronous database operations
+                decisions = self.db.get_all_decisions()
+                
+                export_data = {
+                    'export_timestamp': datetime.now().isoformat(),
+                    'session': asdict(self.current_session) if self.current_session else None,
+                    'total_decisions': len(decisions),
+                    'decisions': [dict(decision) for decision in decisions],
+                    'decision_summary': self._generate_decision_summary_from_db(decisions)
+                }
+                
+                output_file = f"human_decisions_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+                with open(output_file, 'w') as f:
+                    json.dump(export_data, f, indent=2)
+                
+                self.logger.info(f"Exported {len(decisions)} decisions to {output_file}")
+                
+                return jsonify({
+                    'success': True,
+                    'file_path': output_file,
+                    'total_decisions': len(decisions)
+                })
+                
+            except Exception as e:
+                self.logger.error(f"Failed to export decisions: {e}")
+                return jsonify({'success': False, 'error': str(e)}), 500
         
         @self.app.route('/api/generate-final-prompts')
+        @token_required
         def generate_final_prompts():
-            """Generate final prompt selections based on human decisions"""
-            final_prompts = {}
-            
-            for decision in self.human_decisions:
-                key = f"{decision.page_title}_{decision.asset_type}"
+            """Generate final prompt selections based on human decisions from database"""
+            try:
+                # Use synchronous database operations
+                decisions = self.db.get_all_decisions()
+                final_prompts = {}
                 
-                # Find the selected prompt from evaluations
-                selected_prompt = self._find_prompt_by_decision(decision)
-                
-                if selected_prompt:
+                for decision in decisions:
+                    key = f"{decision['page_category']}_{decision['index_in_category']}_{decision['asset_type']}"
                     final_prompts[key] = {
-                        'page_title': decision.page_title,
-                        'page_category': decision.page_category,
-                        'asset_type': decision.asset_type,
-                        'selected_prompt': selected_prompt,
-                        'human_reasoning': decision.decision_reasoning,
-                        'custom_modifications': decision.custom_modifications,
-                        'decision_timestamp': decision.decision_timestamp
+                        'page_title': f"{decision['page_category']} {decision['index_in_category']}",
+                        'page_category': decision['page_category'],
+                        'asset_type': decision['asset_type'],
+                        'selected_prompt': decision['selected_prompt_text'],
+                        'selected_model': decision['selected_model'],
+                        'human_reasoning': decision['decision_reasoning'],
+                        'custom_modifications': decision['custom_modifications'],
+                        'decision_timestamp': decision['decision_timestamp']
                     }
-            
-            # Save final prompts
-            output_file = f"final_selected_prompts_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-            with open(output_file, 'w') as f:
-                json.dump(final_prompts, f, indent=2)
-            
-            self.logger.info(f"Generated {len(final_prompts)} final prompt selections")
-            
-            return jsonify({
-                'success': True,
-                'final_prompts_file': output_file,
-                'total_selections': len(final_prompts)
-            })
-    
-    def _parse_evaluation_results(self, results_data: Dict[str, Any]) -> List[CompetitiveEvaluation]:
-        """Parse evaluation results back into objects"""
-        evaluations = []
-        
-        for eval_data in results_data.get('competitive_evaluations', []):
-            # This is a simplified parsing - in practice you'd want to reconstruct the full objects
-            evaluation = type('CompetitiveEvaluation', (), eval_data)()
-            evaluations.append(evaluation)
-        
-        return evaluations
-    
-    def _find_prompt_by_decision(self, decision: HumanDecision) -> Optional[str]:
-        """Find the actual prompt text based on human decision"""
-        for evaluation in self.competitive_evaluations:
-            if (evaluation.page_title == decision.page_title and 
-                evaluation.asset_type == decision.asset_type):
                 
-                for prompt_eval in evaluation.prompt_evaluations:
-                    if prompt_eval.prompt_id == decision.selected_prompt_id:
-                        return prompt_eval.prompt_text
+                # Save final prompts
+                output_file = f"final_selected_prompts_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+                with open(output_file, 'w') as f:
+                    json.dump(final_prompts, f, indent=2)
+                
+                self.logger.info(f"Generated {len(final_prompts)} final prompt selections")
+                
+                return jsonify({
+                    'success': True,
+                    'final_prompts_file': output_file,
+                    'total_selections': len(final_prompts)
+                })
+                
+            except Exception as e:
+                self.logger.error(f"Failed to generate final prompts: {e}")
+                return jsonify({'success': False, 'error': str(e)}), 500
         
-        return None
+        # Asset Generation API Endpoints
+        @self.app.route('/api/start-sample-generation', methods=['POST'])
+        @self.limiter.limit("2 per minute")
+        @token_required
+        def start_sample_generation():
+            """Start sample asset generation (max 10 images for testing)"""
+            try:
+                data = request.get_json() or {}
+                max_images = min(int(data.get('max_images', 5)), 10)  # Cap at 10 for safety
+                output_dir = data.get('output_dir')
+                
+                # Create generation job
+                job_id = self.generation_manager.create_sample_job(
+                    max_images=max_images,
+                    output_dir=output_dir
+                )
+                
+                # Start the job
+                success = self.generation_manager.start_job(job_id)
+                
+                if success:
+                    self.logger.info(f"Started sample generation job {job_id} for {max_images} images")
+                    return jsonify({
+                        'success': True,
+                        'job_id': job_id,
+                        'job_type': 'sample',
+                        'max_images': max_images,
+                        'estimated_cost': max_images * 0.04
+                    })
+                else:
+                    return jsonify({
+                        'success': False,
+                        'error': 'Failed to start generation job'
+                    }), 500
+                
+            except Exception as e:
+                self.logger.error(f"Error starting sample generation: {e}")
+                return jsonify({'success': False, 'error': str(e)}), 500
+        
+        @self.app.route('/api/start-full-generation', methods=['POST'])
+        @self.limiter.limit("1 per 5 minutes")  # Stricter rate limit for full generation
+        @token_required
+        def start_full_generation():
+            """Start full asset generation (~490 images, ~$20 cost)"""
+            try:
+                data = request.get_json() or {}
+                output_dir = data.get('output_dir')
+                
+                # Safety confirmation required
+                confirmed = data.get('confirmed', False)
+                if not confirmed:
+                    return jsonify({
+                        'success': False,
+                        'error': 'Full generation requires explicit confirmation',
+                        'requires_confirmation': True,
+                        'estimated_images': 490,
+                        'estimated_cost': 19.60
+                    }), 400
+                
+                # Create generation job
+                job_id = self.generation_manager.create_full_job(output_dir=output_dir)
+                
+                # Start the job
+                success = self.generation_manager.start_job(job_id)
+                
+                if success:
+                    self.logger.info(f"Started FULL generation job {job_id}")
+                    return jsonify({
+                        'success': True,
+                        'job_id': job_id,
+                        'job_type': 'full',
+                        'estimated_images': 490,
+                        'estimated_cost': 19.60
+                    })
+                else:
+                    return jsonify({
+                        'success': False,
+                        'error': 'Failed to start generation job'
+                    }), 500
+                
+            except Exception as e:
+                self.logger.error(f"Error starting full generation: {e}")
+                return jsonify({'success': False, 'error': str(e)}), 500
+        
+        @self.app.route('/api/generation-status/<job_id>')
+        @token_required
+        def get_generation_status(job_id):
+            """Get real-time status of a generation job"""
+            try:
+                status = self.generation_manager.get_job_status(job_id)
+                
+                if status:
+                    return jsonify({
+                        'success': True,
+                        'job_status': status
+                    })
+                else:
+                    return jsonify({
+                        'success': False,
+                        'error': 'Job not found'
+                    }), 404
+                
+            except Exception as e:
+                self.logger.error(f"Error getting job status: {e}")
+                return jsonify({'success': False, 'error': str(e)}), 500
+        
+        @self.app.route('/api/cancel-generation/<job_id>', methods=['POST'])
+        @token_required
+        def cancel_generation(job_id):
+            """Cancel a running generation job"""
+            try:
+                success = self.generation_manager.cancel_job(job_id)
+                
+                if success:
+                    self.logger.info(f"Cancelled generation job {job_id}")
+                    return jsonify({
+                        'success': True,
+                        'message': f'Job {job_id} cancelled successfully'
+                    })
+                else:
+                    return jsonify({
+                        'success': False,
+                        'error': 'Job not found or cannot be cancelled'
+                    }), 400
+                
+            except Exception as e:
+                self.logger.error(f"Error cancelling job: {e}")
+                return jsonify({'success': False, 'error': str(e)}), 500
+        
+        @self.app.route('/api/generation-jobs')
+        @token_required
+        def get_generation_jobs():
+            """Get all active and historical generation jobs"""
+            try:
+                active_jobs = self.generation_manager.get_active_jobs()
+                job_history = self.generation_manager.get_job_history()
+                current_job = self.generation_manager.get_current_job()
+                
+                return jsonify({
+                    'success': True,
+                    'active_jobs': active_jobs,
+                    'job_history': job_history[-10:],  # Last 10 jobs
+                    'current_job': current_job
+                })
+                
+            except Exception as e:
+                self.logger.error(f"Error getting generation jobs: {e}")
+                return jsonify({'success': False, 'error': str(e)}), 500
+        
+        @self.app.route('/api/generation-logs/<job_id>')
+        @token_required
+        def get_generation_logs(job_id):
+            """Get logs for a specific generation job"""
+            try:
+                # For now, return basic log info
+                # In a full implementation, this would read from log files
+                logs = [
+                    f"Job {job_id} initialized",
+                    f"Starting generation process...",
+                    f"Processing images..."
+                ]
+                
+                return jsonify({
+                    'success': True,
+                    'job_id': job_id,
+                    'logs': logs
+                })
+                
+            except Exception as e:
+                self.logger.error(f"Error getting generation logs: {e}")
+                return jsonify({'success': False, 'error': str(e)}), 500
+        
+        @self.app.route('/edit-master-prompt')
+        def edit_master_prompt():
+            """Display the master prompt editor page"""
+            try:
+                # Read current master prompt
+                master_prompt_path = Path(__file__).parent / 'meta_prompts' / 'master_prompt.txt'
+                if master_prompt_path.exists():
+                    with open(master_prompt_path, 'r', encoding='utf-8') as f:
+                        current_prompt = f.read()
+                else:
+                    current_prompt = "# Master prompt file not found. Please create one."
+                
+                # Get character count and last modified time
+                char_count = len(current_prompt)
+                last_modified = datetime.fromtimestamp(
+                    master_prompt_path.stat().st_mtime
+                ).strftime('%Y-%m-%d %H:%M:%S') if master_prompt_path.exists() else 'Never'
+                
+                return render_template('master_prompt_editor.html',
+                                     current_prompt=current_prompt,
+                                     char_count=char_count,
+                                     last_modified=last_modified)
+                                     
+            except Exception as e:
+                self.logger.error(f"Error loading master prompt editor: {e}")
+                return render_template('error.html', error=str(e)), 500
+        
+        @self.app.route('/api/get-master-prompt', methods=['GET'])
+        def get_master_prompt():
+            """Get the current master prompt content"""
+            try:
+                master_prompt_path = Path(__file__).parent / 'meta_prompts' / 'master_prompt.txt'
+                if master_prompt_path.exists():
+                    with open(master_prompt_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                    
+                    return jsonify({
+                        'success': True,
+                        'content': content,
+                        'char_count': len(content),
+                        'last_modified': datetime.fromtimestamp(
+                            master_prompt_path.stat().st_mtime
+                        ).isoformat()
+                    })
+                else:
+                    return jsonify({
+                        'success': False,
+                        'error': 'Master prompt file not found'
+                    }), 404
+                    
+            except Exception as e:
+                self.logger.error(f"Error getting master prompt: {e}")
+                return jsonify({'success': False, 'error': str(e)}), 500
+        
+        @self.app.route('/api/save-master-prompt', methods=['POST'])
+        @csrf_required
+        @token_required
+        @validate_json(required_fields=['content'], max_lengths={'content': 10000})
+        def save_master_prompt(validated_data=None):
+            """Save the updated master prompt"""
+            try:
+                content = validated_data['content']
+                
+                # Validate content is not empty
+                if not content.strip():
+                    return jsonify({
+                        'success': False,
+                        'error': 'Master prompt cannot be empty'
+                    }), 400
+                
+                # Create backup of current prompt
+                master_prompt_path = Path(__file__).parent / 'meta_prompts' / 'master_prompt.txt'
+                if master_prompt_path.exists():
+                    backup_path = master_prompt_path.with_suffix('.txt.backup')
+                    with open(master_prompt_path, 'r', encoding='utf-8') as f:
+                        backup_content = f.read()
+                    with open(backup_path, 'w', encoding='utf-8') as f:
+                        f.write(backup_content)
+                
+                # Save new prompt
+                master_prompt_path.parent.mkdir(parents=True, exist_ok=True)
+                with open(master_prompt_path, 'w', encoding='utf-8') as f:
+                    f.write(content)
+                
+                self.logger.info(f"Master prompt updated - {len(content)} characters")
+                
+                return jsonify({
+                    'success': True,
+                    'message': 'Master prompt saved successfully',
+                    'char_count': len(content),
+                    'backup_created': True
+                })
+                
+            except Exception as e:
+                self.logger.error(f"Error saving master prompt: {e}")
+                return jsonify({'success': False, 'error': str(e)}), 500
+        
+        @self.app.route('/api/start-generation', methods=['POST'])
+        @csrf_required
+        @token_required
+        @validate_json(
+            required_fields=['mode'],
+            optional_fields=['test_pages'],
+            max_lengths={'mode': 50}
+        )
+        def start_generation(validated_data=None):
+            """Start the asset generation process from web UI"""
+            try:
+                import subprocess
+                import threading
+                
+                mode = validated_data.get('mode', 'sample')
+                test_pages = validated_data.get('test_pages', 3)
+                
+                # Validate mode
+                if mode not in ['sample', 'production']:
+                    return jsonify({
+                        'success': False,
+                        'error': 'Invalid mode. Must be "sample" or "production"'
+                    }), 400
+                
+                # Check if generation is already running
+                if hasattr(self, 'generation_process') and self.generation_process and self.generation_process.poll() is None:
+                    return jsonify({
+                        'success': False,
+                        'error': 'Generation already in progress'
+                    }), 400
+                
+                # Build command
+                cmd = ['python3', 'asset_generator.py']
+                if mode == 'sample':
+                    cmd.extend(['--test-pages', str(test_pages)])
+                else:
+                    cmd.append('--mass-production')
+                
+                # Start generation in subprocess
+                def run_generation():
+                    try:
+                        self.generation_process = subprocess.Popen(
+                            cmd,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
+                            text=True,
+                            cwd=Path(__file__).parent
+                        )
+                        
+                        # Stream output (this could be enhanced with WebSocket)
+                        for line in iter(self.generation_process.stdout.readline, ''):
+                            if line:
+                                self.logger.info(f"Generation: {line.strip()}")
+                        
+                        self.generation_process.wait()
+                        
+                    except Exception as e:
+                        self.logger.error(f"Generation process error: {e}")
+                
+                # Start in background thread
+                generation_thread = threading.Thread(target=run_generation)
+                generation_thread.daemon = True
+                generation_thread.start()
+                
+                return jsonify({
+                    'success': True,
+                    'message': f'Started {mode} generation',
+                    'mode': mode,
+                    'test_pages': test_pages if mode == 'sample' else None
+                })
+                
+            except Exception as e:
+                self.logger.error(f"Error starting generation: {e}")
+                return jsonify({'success': False, 'error': str(e)}), 500
     
-    def _generate_decision_summary(self) -> Dict[str, Any]:
-        """Generate summary statistics for human decisions"""
-        if not self.human_decisions:
+    def _setup_socketio_handlers(self):
+        """Setup WebSocket event handlers"""
+        if not self.socketio:
+            return
+            
+        @self.socketio.on('connect')
+        def handle_connect():
+            """Handle client connection"""
+            self.logger.info(f"Client connected: {request.sid}")
+            emit('connected', {'message': 'Connected to generation status stream'})
+        
+        @self.socketio.on('disconnect')
+        def handle_disconnect():
+            """Handle client disconnection"""
+            self.logger.info(f"Client disconnected: {request.sid}")
+        
+        @self.socketio.on('request_status')
+        def handle_status_request():
+            """Handle status request from client"""
+            if hasattr(self, 'generation_status'):
+                emit('status_update', self.generation_status)
+            else:
+                emit('status_update', {'phase': 'idle', 'progress': 0})
+    
+    def broadcast_status(self, event_type: str, data: Dict[str, Any]):
+        """Broadcast status updates to all connected clients"""
+        if self.socketio:
+            self.socketio.emit(event_type, data)
+            self.logger.debug(f"Broadcast {event_type}: {data}")
+    
+    def update_generation_status(self, phase: str, progress: int, **kwargs):
+        """Update and broadcast generation status"""
+        self.generation_status = {
+            'phase': phase,
+            'progress': progress,
+            'timestamp': datetime.now().isoformat(),
+            **kwargs
+        }
+        self.broadcast_status('generation_status', self.generation_status)
+    
+    def _generate_decision_summary_from_db(self, decisions: List[Dict]) -> Dict[str, Any]:
+        """Generate summary statistics for human decisions from database records"""
+        if not decisions:
             return {}
         
         model_preferences = {}
         asset_type_counts = {}
         
-        for decision in self.human_decisions:
+        for decision in decisions:
             # Count model preferences
-            model_preferences[decision.selected_model] = model_preferences.get(decision.selected_model, 0) + 1
+            model = decision['selected_model']
+            model_preferences[model] = model_preferences.get(model, 0) + 1
             
             # Count asset types
-            asset_type_counts[decision.asset_type] = asset_type_counts.get(decision.asset_type, 0) + 1
+            asset_type = decision['asset_type']
+            asset_type_counts[asset_type] = asset_type_counts.get(asset_type, 0) + 1
         
         return {
-            'total_decisions': len(self.human_decisions),
+            'total_decisions': len(decisions),
             'model_preference_ranking': sorted(model_preferences.items(), key=lambda x: x[1], reverse=True),
             'asset_type_distribution': asset_type_counts,
-            'decisions_with_custom_modifications': sum(1 for d in self.human_decisions if d.custom_modifications),
-            'decisions_with_quality_override': sum(1 for d in self.human_decisions if d.quality_override),
-            'average_decision_reasoning_length': sum(len(d.decision_reasoning) for d in self.human_decisions) / len(self.human_decisions)
+            'decisions_with_custom_modifications': sum(1 for d in decisions if d.get('custom_modifications')),
+            'decisions_with_quality_override': sum(1 for d in decisions if d.get('quality_override')),
+            'average_decision_reasoning_length': sum(len(d.get('decision_reasoning', '')) for d in decisions) / len(decisions) if decisions else 0
         }
     
     def _create_templates(self):
-        """Create HTML templates for the dashboard"""
+        """Ensure template directory exists (templates are now external files)"""
         templates_dir = Path('templates')
         templates_dir.mkdir(exist_ok=True)
         
-        # Main dashboard template
-        dashboard_html = """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estate Planning Concierge v4.0 - Prompt Review Dashboard</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f8f9fa;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        
-        .header h1 {
-            margin: 0;
-            font-size: 2.2em;
-            font-weight: 300;
-        }
-        
-        .header p {
-            margin: 5px 0 0 0;
-            opacity: 0.9;
-            font-size: 1.1em;
-        }
-        
-        .dashboard-container {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 30px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        .panel {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            border-left: 4px solid #8B4513;
-        }
-        
-        .progress-panel {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        }
-        
-        .button {
-            background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 500;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin: 5px;
-        }
-        
-        .button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(139,69,19,0.3);
-        }
-        
-        .button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .prompt-container {
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 10px 0;
-            background: #fafafa;
-        }
-        
-        .prompt-header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .score-badge {
-            background: #28a745;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 20px;
-            background-color: #e0e0e0;
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 15px 0;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
-            transition: width 0.3s ease;
-        }
-        
-        .review-area {
-            min-height: 600px;
-        }
-        
-        #evaluation-display {
-            display: none;
-        }
-        
-        .decision-form {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-        }
-        
-        textarea {
-            width: 100%;
-            min-height: 60px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: inherit;
-            resize: vertical;
-        }
-        
-        select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin: 10px 0;
-        }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>🏛️ Estate Planning Concierge v4.0</h1>
-        <p>Ultra-Premium Prompt Review Dashboard</p>
-    </div>
+        # Dashboard template is now an external file at templates/dashboard.html
+        self.logger.info("Template directory confirmed")
     
-    <div class="dashboard-container">
-        <div class="panel progress-panel">
-            <h2>📊 Review Progress</h2>
-            
-            <div id="progress-info">
-                <p><strong>Session:</strong> <span id="session-status">Not Started</span></p>
-                <p><strong>Evaluations Loaded:</strong> <span id="evaluations-count">0</span></p>
-                <p><strong>Decisions Made:</strong> <span id="decisions-count">0</span></p>
-            </div>
-            
-            <div class="progress-bar">
-                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
-            </div>
-            <p id="progress-text">0% Complete</p>
-            
-            <h3>🎯 Session Controls</h3>
-            <input type="text" id="reviewer-name" placeholder="Enter your name" style="width: 100%; margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
-            <button class="button" onclick="startSession()">Start Review Session</button>
-            <button class="button" onclick="loadEvaluations()">Load Evaluations</button>
-            <button class="button" onclick="exportDecisions()" disabled id="export-btn">Export Decisions</button>
-            
-            <h3>📈 Quality Metrics</h3>
-            <div id="quality-metrics">
-                <p>Start a session to view metrics</p>
-            </div>
-        </div>
-        
-        <div class="panel review-area">
-            <h2>🎨 Prompt Review</h2>
-            
-            <div id="pre-review-message">
-                <p>👋 Welcome to the Estate Planning Concierge v4.0 Prompt Review Dashboard!</p>
-                <p>This interface allows you to review AI-generated prompts and make final selections for our luxury estate planning assets.</p>
-                <p>To get started:</p>
-                <ol>
-                    <li>Enter your name and start a review session</li>
-                    <li>Load evaluation results from the quality scorer</li>
-                    <li>Review competing prompts and make your selections</li>
-                    <li>Export your decisions for final generation</li>
-                </ol>
-            </div>
-            
-            <div id="evaluation-display">
-                <div class="evaluation-header">
-                    <h3 id="eval-title">Loading...</h3>
-                    <p id="eval-details">Category: <span id="eval-category"></span> | Type: <span id="eval-type"></span></p>
-                </div>
-                
-                <div id="prompts-container">
-                    <!-- Prompts will be loaded here -->
-                </div>
-                
-                <div class="decision-form">
-                    <h4>🤔 Make Your Decision</h4>
-                    <select id="selected-prompt">
-                        <option value="">Select a prompt...</option>
-                    </select>
-                    <textarea id="decision-reasoning" placeholder="Why did you choose this prompt? What makes it best for our estate planning users?"></textarea>
-                    <textarea id="custom-modifications" placeholder="Any modifications or improvements? (optional)"></textarea>
-                    
-                    <button class="button" onclick="makeDecision()">Record Decision</button>
-                    <button class="button" onclick="nextEvaluation()" style="background: #6c757d;">Next →</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    def _on_generation_progress(self, job_id: str, progress_data: Dict[str, Any]):
+        """Handle generation progress updates"""
+        self.logger.info(f"Generation progress {job_id}: {progress_data['progress']:.1f}% ({progress_data['completed']}/{progress_data['total']})")
+        # Future enhancement: Could implement WebSocket broadcasting here
+        # For now, progress is available via the /api/generation-status/<job_id> endpoint
     
-    <script>
-        let currentEvaluationIndex = 0;
-        let totalEvaluations = 0;
-        let sessionActive = false;
-        
-        async function startSession() {
-            const reviewerName = document.getElementById('reviewer-name').value || 'Anonymous';
-            
-            try {
-                const response = await fetch('/api/start-session', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({reviewer_name: reviewerName})
-                });
-                
-                const result = await response.json();
-                if (result.success) {
-                    sessionActive = true;
-                    document.getElementById('session-status').textContent = `Active (${reviewerName})`;
-                    alert('Review session started successfully!');
-                } else {
-                    alert('Failed to start session');
-                }
-            } catch (error) {
-                console.error('Error starting session:', error);
-                alert('Error starting session');
-            }
-        }
-        
-        async function loadEvaluations() {
-            if (!sessionActive) {
-                alert('Please start a review session first');
-                return;
-            }
-            
-            try {
-                const response = await fetch('/api/load-evaluations', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({file_path: 'quality_evaluation_results.json'})
-                });
-                
-                const result = await response.json();
-                if (result.success) {
-                    totalEvaluations = result.evaluations_loaded;
-                    document.getElementById('evaluations-count').textContent = totalEvaluations;
-                    document.getElementById('export-btn').disabled = false;
-                    
-                    // Load first evaluation
-                    await loadEvaluation(0);
-                    
-                    document.getElementById('pre-review-message').style.display = 'none';
-                    document.getElementById('evaluation-display').style.display = 'block';
-                    
-                    alert(`Loaded ${totalEvaluations} evaluations successfully!`);
-                } else {
-                    alert(`Failed to load evaluations: ${result.error}`);
-                }
-            } catch (error) {
-                console.error('Error loading evaluations:', error);
-                alert('Error loading evaluations');
-            }
-        }
-        
-        async function loadEvaluation(index) {
-            try {
-                const response = await fetch(`/api/get-evaluation/${index}`);
-                const result = await response.json();
-                
-                if (result.success) {
-                    const evaluation = result.evaluation;
-                    
-                    // Update header
-                    document.getElementById('eval-title').textContent = evaluation.page_title;
-                    document.getElementById('eval-category').textContent = evaluation.page_category;
-                    document.getElementById('eval-type').textContent = evaluation.asset_type;
-                    
-                    // Update prompts container
-                    const container = document.getElementById('prompts-container');
-                    container.innerHTML = '';
-                    
-                    // Update selection dropdown
-                    const select = document.getElementById('selected-prompt');
-                    select.innerHTML = '<option value="">Select a prompt...</option>';
-                    
-                    evaluation.prompts.forEach((prompt, idx) => {
-                        // Create prompt display
-                        const promptDiv = document.createElement('div');
-                        promptDiv.className = 'prompt-container';
-                        promptDiv.innerHTML = `
-                            <div class="prompt-header">
-                                <strong>${prompt.model_source}</strong>
-                                <span class="score-badge">${prompt.weighted_score.toFixed(2)}/10</span>
-                            </div>
-                            <p>${prompt.text}</p>
-                            <small>Overall Score: ${prompt.overall_score.toFixed(1)} | Weighted: ${prompt.weighted_score.toFixed(2)}</small>
-                        `;
-                        
-                        if (evaluation.winner && prompt.id === evaluation.winner.id) {
-                            promptDiv.style.borderColor = '#28a745';
-                            promptDiv.style.borderWidth = '2px';
-                            const badge = document.createElement('span');
-                            badge.style.background = '#28a745';
-                            badge.style.color = 'white';
-                            badge.style.padding = '4px 8px';
-                            badge.style.borderRadius = '4px';
-                            badge.style.fontSize = '12px';
-                            badge.textContent = 'AI WINNER';
-                            promptDiv.querySelector('.prompt-header').appendChild(badge);
-                        }
-                        
-                        container.appendChild(promptDiv);
-                        
-                        // Add to selection dropdown
-                        const option = document.createElement('option');
-                        option.value = prompt.id;
-                        option.textContent = `${prompt.model_source} (${prompt.weighted_score.toFixed(2)})`;
-                        select.appendChild(option);
-                    });
-                    
-                    currentEvaluationIndex = index;
-                } else {
-                    alert(`Error loading evaluation: ${result.error}`);
-                }
-            } catch (error) {
-                console.error('Error loading evaluation:', error);
-                alert('Error loading evaluation');
-            }
-        }
-        
-        async function makeDecision() {
-            const selectedPromptId = document.getElementById('selected-prompt').value;
-            const reasoning = document.getElementById('decision-reasoning').value;
-            const modifications = document.getElementById('custom-modifications').value;
-            
-            if (!selectedPromptId) {
-                alert('Please select a prompt first');
-                return;
-            }
-            
-            if (!reasoning.trim()) {
-                alert('Please provide reasoning for your decision');
-                return;
-            }
-            
-            try {
-                const response = await fetch('/api/make-decision', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        page_title: document.getElementById('eval-title').textContent,
-                        page_category: document.getElementById('eval-category').textContent,
-                        asset_type: document.getElementById('eval-type').textContent,
-                        selected_prompt_id: selectedPromptId,
-                        selected_model: document.getElementById('selected-prompt').selectedOptions[0].textContent.split(' (')[0],
-                        reasoning: reasoning,
-                        custom_modifications: modifications
-                    })
-                });
-                
-                const result = await response.json();
-                if (result.success) {
-                    // Update progress
-                    document.getElementById('decisions-count').textContent = result.total_decisions;
-                    const progress = (result.total_decisions / totalEvaluations) * 100;
-                    document.getElementById('progress-fill').style.width = progress + '%';
-                    document.getElementById('progress-text').textContent = progress.toFixed(1) + '% Complete';
-                    
-                    // Clear form
-                    document.getElementById('selected-prompt').value = '';
-                    document.getElementById('decision-reasoning').value = '';
-                    document.getElementById('custom-modifications').value = '';
-                    
-                    alert('Decision recorded successfully!');
-                } else {
-                    alert(`Error recording decision: ${result.error}`);
-                }
-            } catch (error) {
-                console.error('Error making decision:', error);
-                alert('Error recording decision');
-            }
-        }
-        
-        async function nextEvaluation() {
-            if (currentEvaluationIndex < totalEvaluations - 1) {
-                await loadEvaluation(currentEvaluationIndex + 1);
-            } else {
-                alert('No more evaluations to review!');
-            }
-        }
-        
-        async function exportDecisions() {
-            try {
-                const response = await fetch('/api/export-decisions');
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert(`Exported ${result.total_decisions} decisions to ${result.file_path}`);
-                } else {
-                    alert('Error exporting decisions');
-                }
-            } catch (error) {
-                console.error('Error exporting decisions:', error);
-                alert('Error exporting decisions');
-            }
-        }
-        
-        // Auto-refresh progress every 30 seconds
-        setInterval(async () => {
-            if (sessionActive) {
-                try {
-                    const response = await fetch('/api/get-progress');
-                    const progress = await response.json();
-                    
-                    document.getElementById('decisions-count').textContent = progress.decisions_made;
-                    const percentage = progress.completion_percentage;
-                    document.getElementById('progress-fill').style.width = percentage + '%';
-                    document.getElementById('progress-text').textContent = percentage.toFixed(1) + '% Complete';
-                } catch (error) {
-                    console.error('Error updating progress:', error);
-                }
-            }
-        }, 30000);
-    </script>
-</body>
-</html>
-        """
-        
-        with open(templates_dir / 'dashboard.html', 'w') as f:
-            f.write(dashboard_html)
-        
-        self.logger.info("Created dashboard template")
-    
+    def _on_generation_status_change(self, job_id: str, status):
+        """Handle generation status changes"""
+        self.logger.info(f"Generation status change {job_id}: {status.value}")
+        # Future enhancement: Could implement WebSocket broadcasting for real-time UI updates
+        # For now, status changes are available via the polling endpoint
+
     def run(self, debug: bool = True):
         """Run the dashboard server"""
+        # Setup periodic session cleanup (every 5 minutes)
+        import threading
+        
+        def cleanup_sessions():
+            while True:
+                time.sleep(300)  # 5 minutes
+                try:
+                    expired = session_manager.cleanup_expired_sessions()
+                    if expired > 0:
+                        self.logger.info(f"Cleaned up {expired} expired sessions")
+                except Exception as e:
+                    self.logger.error(f"Session cleanup error: {e}")
+        
+        cleanup_thread = threading.Thread(target=cleanup_sessions, daemon=True)
+        cleanup_thread.start()
+        
         self.logger.info(f"Starting Review Dashboard on http://localhost:{self.port}")
         print(f"\n🌐 Estate Planning Concierge v4.0 - Review Dashboard")
         print(f"📊 Open http://localhost:{self.port} to start reviewing prompts")
         print(f"🎯 Use this interface to review AI-generated prompts and make final selections")
+        print(f"🔐 Authentication Token: {REVIEW_API_TOKEN}")
+        print(f"   Set REVIEW_API_TOKEN environment variable to customize")
         
-        self.app.run(host='0.0.0.0', port=self.port, debug=debug)
+        # Initialize database before starting server
+        async def _init_db():
+            await self.db.init_database()
+            self.logger.info("Database initialized successfully")
+        
+        try:
+            asyncio.run(_init_db())
+        except Exception as e:
+            self.logger.error(f"Database initialization failed: {e}")
+            print(f"Warning: Database initialization failed - {e}")
+        
+        # Start server with SocketIO if available, otherwise regular Flask
+        if self.socketio:
+            print(f"🔄 WebSocket support enabled for real-time updates")
+            self.socketio.run(self.app, host='0.0.0.0', port=self.port, debug=debug)
+        else:
+            self.app.run(host='0.0.0.0', port=self.port, debug=debug)
 
 
 def create_dashboard_server(port: int = 5000):

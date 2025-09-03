@@ -69,7 +69,7 @@ class OpenRouterOrchestrator:
                 'strengths': ['creativity', 'luxury', 'sophistication']
             },
             'gemini': {
-                'id': 'google/gemini-pro',
+                'id': 'google/gemini-2.5-flash',
                 'perspective': 'technical_precision',
                 'strengths': ['precision', 'consistency', 'structure']
             }
