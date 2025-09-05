@@ -284,11 +284,7 @@ async function loadEvaluations() {
 
 async function loadEvaluation(index) {
     try {
-        const response = await fetch(`/api/get-evaluation/${index}`, {
-            headers: {
-                'X-API-TOKEN': getAPIToken()
-            }
-        });
+        const response = await fetch(`/api/get-evaluation/${index}`);
         const result = await response.json();
         
         if (result.success) {
