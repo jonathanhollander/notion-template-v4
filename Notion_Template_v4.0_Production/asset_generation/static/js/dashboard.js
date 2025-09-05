@@ -163,7 +163,36 @@ async function startSession() {
         if (result.success) {
             sessionActive = true;
             document.getElementById('session-status').textContent = `Active (${sanitizeInput(reviewerName)})`;
+            
+            // Enhanced visual feedback and workflow progression
             showToast('Review session started successfully!', 'success');
+            
+            // Add progress indication
+            const authSection = document.querySelector('.auth-section');
+            const progressIndicator = document.createElement('div');
+            progressIndicator.className = 'workflow-progress';
+            progressIndicator.innerHTML = `
+                <div class="progress-step completed">
+                    <span class="step-number">1</span>
+                    <span class="step-text">Session Started ✓</span>
+                </div>
+                <div class="progress-step active">
+                    <span class="step-number">2</span>
+                    <span class="step-text">Loading Evaluations...</span>
+                </div>
+                <div class="progress-step">
+                    <span class="step-number">3</span>
+                    <span class="step-text">Begin Review</span>
+                </div>
+            `;
+            authSection.appendChild(progressIndicator);
+            
+            // Auto-advance to next step after a brief delay
+            setTimeout(() => {
+                showToast('Auto-loading evaluations...', 'info');
+                loadEvaluations();
+            }, 1500);
+            
         } else {
             showToast('Failed to start session: ' + result.error, 'error');
         }
@@ -209,8 +238,37 @@ async function loadEvaluations() {
             // Load first evaluation
             await loadEvaluation(0);
             
-            document.getElementById('pre-review-message').style.display = 'none';
-            document.getElementById('evaluation-display').style.display = 'block';
+            // Update workflow progress indicator
+            const progressIndicator = document.querySelector('.workflow-progress');
+            if (progressIndicator) {
+                const steps = progressIndicator.querySelectorAll('.progress-step');
+                if (steps.length >= 3) {
+                    // Mark step 2 as completed
+                    steps[1].classList.remove('active');
+                    steps[1].classList.add('completed');
+                    steps[1].querySelector('.step-text').textContent = 'Evaluations Loaded ✓';
+                    
+                    // Activate step 3
+                    steps[2].classList.add('active');
+                    steps[2].querySelector('.step-text').textContent = 'Review Ready - Begin!';
+                }
+            }
+            
+            // Smooth transition between states
+            const preReviewMessage = document.getElementById('pre-review-message');
+            const evaluationDisplay = document.getElementById('evaluation-display');
+            
+            // Hide pre-review message with animation
+            preReviewMessage.classList.add('hidden');
+            
+            // Show evaluation display with animation after brief delay
+            setTimeout(() => {
+                preReviewMessage.style.display = 'none';
+                evaluationDisplay.style.display = 'block';
+                // Trigger reflow for animation
+                evaluationDisplay.offsetHeight;
+                evaluationDisplay.classList.add('visible');
+            }, 300);
             
             showToast(`Loaded ${totalEvaluations} evaluations successfully!`, 'success');
         } else {
@@ -662,13 +720,19 @@ function updateGenerationStatus(data) {
     }
 }
 
-// Append log message to the log stream
+// Append log message to the log stream (Enhanced for full-width log system)
 function appendLogMessage(data) {
     const logContainer = document.getElementById('log-container');
     if (!logContainer) return;
     
+    // Remove placeholder if it exists
+    const placeholder = logContainer.querySelector('.log-placeholder');
+    if (placeholder) {
+        placeholder.remove();
+    }
+    
     const logEntry = document.createElement('div');
-    logEntry.className = 'log-entry log-' + (data.level || 'info');
+    logEntry.className = 'log-entry log-' + (data.level || 'info') + ' new-entry';
     
     const timestamp = new Date(data.timestamp || Date.now()).toLocaleTimeString();
     logEntry.innerHTML = '<span class="log-timestamp">[' + timestamp + ']</span> ' +
@@ -676,11 +740,21 @@ function appendLogMessage(data) {
     
     logContainer.appendChild(logEntry);
     
-    // Auto-scroll to bottom
-    logContainer.scrollTop = logContainer.scrollHeight;
+    // Auto-scroll to bottom if enabled
+    if (isAutoScrollEnabled()) {
+        logContainer.scrollTop = logContainer.scrollHeight;
+    }
+    
+    // Update log count
+    updateLogCount();
+    
+    // Remove new-entry class after animation
+    setTimeout(() => {
+        logEntry.classList.remove('new-entry');
+    }, 300);
     
     // Limit log entries to prevent memory issues
-    while (logContainer.children.length > 500) {
+    while (logContainer.children.length > 1000) {
         logContainer.removeChild(logContainer.firstChild);
     }
 }
@@ -732,16 +806,178 @@ async function startTestGeneration() {
     }
 }
 
-// Initialize WebSocket on page load
+// ============================================
+// FULL-WIDTH LOG SYSTEM ENHANCEMENTS
+// ============================================
+
+// Auto-scroll state management
+let autoScrollEnabled = true;
+let logCount = 0;
+
+// Check if auto-scroll is enabled
+function isAutoScrollEnabled() {
+    return autoScrollEnabled;
+}
+
+// Toggle auto-scroll functionality
+function toggleLogAutoScroll() {
+    autoScrollEnabled = !autoScrollEnabled;
+    const btn = document.getElementById('autoscroll-btn');
+    const logContainer = document.getElementById('log-container');
+    
+    if (btn) {
+        btn.textContent = `📜 Auto-scroll: ${autoScrollEnabled ? 'ON' : 'OFF'}`;
+        btn.title = `Auto-scroll is ${autoScrollEnabled ? 'enabled' : 'disabled'}`;
+    }
+    
+    if (logContainer) {
+        if (autoScrollEnabled) {
+            logContainer.classList.add('auto-scroll');
+            logContainer.scrollTop = logContainer.scrollHeight;
+        } else {
+            logContainer.classList.remove('auto-scroll');
+        }
+    }
+}
+
+// Clear all log entries
+function clearLogs() {
+    const logContainer = document.getElementById('log-container');
+    if (logContainer) {
+        // Add placeholder back
+        logContainer.innerHTML = `
+            <div class="log-placeholder">
+                <p>🗑️ Logs cleared</p>
+                <p>New system events will appear here in real-time.</p>
+            </div>
+        `;
+        logCount = 0;
+        updateLogCount();
+        
+        // Show brief confirmation
+        showToast('Log cleared successfully', 'info');
+    }
+}
+
+// Export logs to downloadable file
+function exportLogs() {
+    const logContainer = document.getElementById('log-container');
+    if (!logContainer) return;
+    
+    const logEntries = logContainer.querySelectorAll('.log-entry');
+    if (logEntries.length === 0) {
+        showToast('No logs to export', 'warning');
+        return;
+    }
+    
+    let logContent = '# Estate Planning Concierge v4.0 - System Log Export\n';
+    logContent += `# Generated: ${new Date().toLocaleString()}\n`;
+    logContent += `# Total Entries: ${logEntries.length}\n\n`;
+    
+    logEntries.forEach(entry => {
+        const timestamp = entry.querySelector('.log-timestamp')?.textContent || '';
+        const message = entry.querySelector('.log-message')?.textContent || '';
+        const level = entry.className.includes('log-error') ? 'ERROR' :
+                     entry.className.includes('log-warning') ? 'WARNING' :
+                     entry.className.includes('log-success') ? 'SUCCESS' :
+                     entry.className.includes('log-debug') ? 'DEBUG' : 'INFO';
+        
+        logContent += `${timestamp} [${level}] ${message}\n`;
+    });
+    
+    // Create and download file
+    const blob = new Blob([logContent], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `system-log-${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+    
+    showToast(`Exported ${logEntries.length} log entries`, 'success');
+}
+
+// Update log count display
+function updateLogCount() {
+    const logHeader = document.querySelector('.log-header');
+    if (logHeader) {
+        const actualCount = document.querySelectorAll('#log-container .log-entry').length;
+        logHeader.setAttribute('data-log-count', actualCount.toString());
+    }
+}
+
+// Auto-open log section on page load (as requested)
+function autoOpenLogSection() {
+    const logSection = document.querySelector('.log-section');
+    if (logSection) {
+        // Ensure log section is visible
+        logSection.style.display = 'block';
+        
+        // Scroll to log section smoothly
+        setTimeout(() => {
+            logSection.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'end' 
+            });
+        }, 500);
+        
+        // Add initial system message
+        appendLogMessage({
+            level: 'info',
+            message: '🏛️ Estate Planning Concierge v4.0 Dashboard initialized - Live logging active',
+            timestamp: Date.now()
+        });
+    }
+}
+
+// Enhanced WebSocket connection with comprehensive logging
+function enhancedInitWebSocket() {
+    initWebSocket(); // Call original function
+    
+    // Add connection status logging
+    if (socket) {
+        socket.on('connect', function() {
+            appendLogMessage({
+                level: 'success',
+                message: '🔗 WebSocket connected successfully - Real-time updates enabled',
+                timestamp: Date.now()
+            });
+        });
+        
+        socket.on('disconnect', function() {
+            appendLogMessage({
+                level: 'warning',
+                message: '⚠️ WebSocket disconnected - Attempting to reconnect...',
+                timestamp: Date.now()
+            });
+        });
+        
+        socket.on('reconnect', function() {
+            appendLogMessage({
+                level: 'success',
+                message: '🔄 WebSocket reconnected successfully',
+                timestamp: Date.now()
+            });
+        });
+    }
+}
+
+// Initialize WebSocket on page load with enhancements
 document.addEventListener('DOMContentLoaded', function() {
     // Load Socket.IO library if not already loaded
     if (typeof io === 'undefined') {
         const script = document.createElement('script');
-        script.src = 'https://cdn.socket.io/4.7.5/socket.io.min.js';
-        script.onload = initWebSocket;
+        script.src = '/static/js/socket.io.min.js';
+        script.onload = () => {
+            enhancedInitWebSocket();
+            autoOpenLogSection(); // Auto-open as requested
+        };
         document.head.appendChild(script);
     } else {
-        initWebSocket();
+        enhancedInitWebSocket();
+        autoOpenLogSection(); // Auto-open as requested
     }
     
     // Check for generation started flag
@@ -752,5 +988,27 @@ document.addEventListener('DOMContentLoaded', function() {
             panel.style.display = 'block';
         }
     }
+    
+    // Initialize log count
+    updateLogCount();
+    
+    // Add keyboard shortcuts for log controls
+    document.addEventListener('keydown', function(e) {
+        // Ctrl+Shift+C: Clear logs
+        if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+            e.preventDefault();
+            clearLogs();
+        }
+        // Ctrl+Shift+E: Export logs
+        else if (e.ctrlKey && e.shiftKey && e.key === 'E') {
+            e.preventDefault();
+            exportLogs();
+        }
+        // Ctrl+Shift+A: Toggle auto-scroll
+        else if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+            e.preventDefault();
+            toggleLogAutoScroll();
+        }
+    });
 });
 

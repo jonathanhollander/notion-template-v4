@@ -276,6 +276,17 @@
         </div>
     </div>
 
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg" style="background-color: white; border-bottom: 1px solid #dee2e6; margin-bottom: 2rem;">
+        <div class="container">
+            <div class="navbar-nav">
+                <a class="nav-link" href="/"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a class="nav-link" href="/edit-master-prompt"><i class="fas fa-edit"></i> Edit Prompts</a>
+                <a class="nav-link active" href="/emotional-config"><i class="fas fa-brain"></i> Emotional Config</a>
+            </div>
+        </div>
+    </nav>
+
     <div class="container">
         <!-- System Information -->
         <div class="config-section">
@@ -430,31 +441,13 @@
         class EmotionalConfigManager {
             constructor() {
                 this.config = null;
-                this.csrfToken = null;
                 this.apiBaseUrl = '';
                 this.init();
             }
 
             async init() {
-                await this.getCsrfToken();
                 await this.loadCurrentConfig();
                 this.bindEvents();
-            }
-
-            async getCsrfToken() {
-                try {
-                    const response = await fetch('/api/get-csrf-token', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                    const data = await response.json();
-                    this.csrfToken = data.csrf_token;
-                } catch (error) {
-                    console.error('Failed to get CSRF token:', error);
-                    this.showNotification('Failed to get CSRF token', 'error');
-                }
             }
 
             async loadCurrentConfig() {
@@ -821,8 +814,7 @@
                     const response = await fetch('/api/update-emotional-config', {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': this.csrfToken
+                            'Content-Type': 'application/json'
                         },
                         body: JSON.stringify(this.config)
                     });
@@ -848,8 +840,7 @@
                     const response = await fetch('/api/reset-emotional-config', {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': this.csrfToken
+                            'Content-Type': 'application/json'
                         }
                     });
 
@@ -890,8 +881,7 @@
                     const response = await fetch('/api/preview-config-changes', {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': this.csrfToken
+                            'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
                             config: this.config,

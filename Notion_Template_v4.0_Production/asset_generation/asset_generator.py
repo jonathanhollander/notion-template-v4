@@ -27,6 +27,18 @@ from openrouter_orchestrator import OpenRouterOrchestrator
 from websocket_broadcaster import get_broadcaster
 from approval_gate import ApprovalGate
 
+# Import mass generation components
+try:
+    from utils.mass_generation_integration import (
+        MassGenerationCoordinator,
+        MassGenerationConfig
+    )
+    MASS_GENERATION_AVAILABLE = True
+except ImportError:
+    MassGenerationCoordinator = None
+    MassGenerationConfig = None
+    MASS_GENERATION_AVAILABLE = False
+
 # Import new safety utilities
 try:
     from utils.transaction_safety import TransactionManager, CircuitBreaker
@@ -115,6 +127,17 @@ class AssetGenerator:
         self.async_file_handler = AsyncFileHandler(self.path_validator) if AsyncFileHandler else None
         self.resource_manager = ResourceManager(self.logger) if ResourceManager else None
         self.error_handler = ErrorHandler(self.logger) if ErrorHandler else None
+        
+        # Dynamic pricing based on actual Replicate costs (2025 rates)
+        self.model_pricing = {
+            'stability-ai/sdxl': 0.012,  # $0.012 per run
+            'black-forest-labs/flux-1.1-pro': 0.04,  # $0.04 per image
+            'black-forest-labs/flux-pro': 0.04,  # $0.04 per image
+            'black-forest-labs/flux-dev': 0.025,  # $0.025 per image
+            'black-forest-labs/flux-schnell': 0.003,  # $0.003 per image
+            # Default fallback for unknown models (conservative estimate)
+            'default': 0.02
+        }
         
         # Initialize transaction manager
         self.transaction_manager = TransactionManager(self.config, self.logger) if TransactionManager else None
@@ -245,7 +268,7 @@ class AssetGenerator:
                 'asset_name': item.get('page_title', item.get('title', 'Unknown')),
                 'asset_type': item.get('asset_type', 'unknown'),
                 'prompt': item.get('prompt', '')[:500] + '...' if item.get('prompt') else '',
-                'estimated_cost': 0.04,  # Default cost per image
+                'estimated_cost': self.get_model_price(model_id) if hasattr(self, 'get_model_price') else 0.02,  # Dynamic pricing
                 'metadata': {
                     'original_item': item
                 }
@@ -385,6 +408,15 @@ class AssetGenerator:
         else:
             self.logger.info(status_line)
     
+    def get_model_price(self, model_id: str) -> float:
+        """Get dynamic pricing for a model based on actual Replicate costs"""
+        # Extract base model identifier for pricing lookup
+        for pricing_key in self.model_pricing:
+            if pricing_key in model_id:
+                return self.model_pricing[pricing_key]
+        # Return default price if model not found
+        return self.model_pricing.get('default', 0.02)
+    
     def confirm_action(self, message: str, cost: float = 0) -> bool:
         """Get user confirmation for critical actions"""
         if cost > 0:
@@ -398,7 +430,8 @@ class AssetGenerator:
         """Generate a single asset with progress tracking and transaction safety"""
         model_config = self.config['replicate']['models'][asset_type]
         model_id = model_config['model_id']
-        cost = model_config['cost_per_image']
+        # Use dynamic pricing instead of config value
+        cost = self.get_model_price(model_id)
         
         # Use transaction manager if available
         if self.transaction_manager:
@@ -673,7 +706,7 @@ class AssetGenerator:
                         self.generated_assets.append(result)
                         
                         # Update cost tracking
-                        item_cost = result.get('cost', 0.04)
+                        item_cost = result.get('cost', self.get_model_price(model_id))
                         self.broadcaster.update_cost(
                             item_cost=item_cost,
                             total_cost=self.total_cost,
@@ -1160,6 +1193,224 @@ class AssetGenerator:
         except Exception as e:
             self.logger.error(f"Error during Git commit: {str(e)}")
             return False
+    
+    async def mass_generate_with_confirmation(
+        self, 
+        pages: List[Dict[str, Any]],
+        user_id: Optional[str] = None
+    ) -> Optional[Dict[str, Any]]:
+        """Execute mass generation with safety checks and user confirmation
+        
+        Args:
+            pages: List of pages needing assets
+            user_id: Optional user identifier for permissions
+            
+        Returns:
+            Generation results or None if cancelled
+        """
+        if not MASS_GENERATION_AVAILABLE:
+            self.logger.error("Mass generation module not available")
+            return None
+        
+        try:
+            self.logger.info("="*80)
+            self.logger.info("🚀 MASS GENERATION MODE ACTIVATED")
+            self.logger.info("="*80)
+            
+            # Initialize coordinator with safety config
+            config = MassGenerationConfig(
+                base_output_dir=Path(self.config['output']['production_directory']) / "mass",
+                max_total_items=self.config.get('mass_generation', {}).get('max_items', 500),
+                max_total_cost=self.config.get('mass_generation', {}).get('max_cost', 20.0),
+                require_confirmation=True,
+                confirmation_threshold=10,
+                concurrent_downloads=5,
+                concurrent_generations=3,
+                enable_audit_log=True
+            )
+            
+            coordinator = MassGenerationCoordinator(config)
+            
+            # Check user permissions
+            permissions = coordinator.get_user_permissions(user_id or "default")
+            if not permissions['can_mass_generate']:
+                self.logger.error(f"User {user_id} does not have mass generation permissions")
+                return None
+            
+            # Prepare prompts from pages
+            all_prompts = []
+            asset_types = []
+            
+            for page in pages:
+                if page.get('icon_file') and not Path(self.config['output']['production_directory']) / page['icon_file'].exists():
+                    prompt = await self._generate_enhanced_prompt(page, 'icon')
+                    all_prompts.append(prompt)
+                    asset_types.append('icons')
+                
+                if page.get('cover_file') and not Path(self.config['output']['production_directory']) / page['cover_file'].exists():
+                    prompt = await self._generate_enhanced_prompt(page, 'cover')
+                    all_prompts.append(prompt)
+                    asset_types.append('covers')
+            
+            if not all_prompts:
+                self.logger.info("No assets need generation")
+                return None
+            
+            self.logger.info(f"📊 Found {len(all_prompts)} assets to generate:")
+            self.logger.info(f"   • Icons: {asset_types.count('icons')}")
+            self.logger.info(f"   • Covers: {asset_types.count('covers')}")
+            
+            # Prepare batch with confirmation
+            batch_id = await coordinator.prepare_mass_generation(
+                prompts=all_prompts,
+                asset_type="mixed",  # Mixed type batch
+                user_id=user_id
+            )
+            
+            if not batch_id:
+                self.logger.warning("Mass generation cancelled by user or safety checks")
+                return None
+            
+            # Define actual generator function
+            async def generate_image_for_queue(
+                prompt: str, 
+                asset_type: str,
+                metadata: Dict[str, Any]
+            ) -> Optional[str]:
+                """Generate single image for queue processing"""
+                try:
+                    # Use existing generation method
+                    output = await self.replicate_client.predictions.create(
+                        model=self.config['replicate']['model_version'],
+                        input={
+                            "prompt": prompt,
+                            "width": 1024,
+                            "height": 1024,
+                            "num_outputs": 1
+                        }
+                    )
+                    
+                    # Wait for completion
+                    while output.status not in ['succeeded', 'failed']:
+                        await asyncio.sleep(1)
+                        output = await self.replicate_client.predictions.get(output.id)
+                    
+                    if output.status == 'succeeded' and output.output:
+                        return output.output[0] if isinstance(output.output, list) else output.output
+                    
+                    return None
+                    
+                except Exception as e:
+                    self.logger.error(f"Generation failed: {e}")
+                    return None
+            
+            # Progress callback for WebSocket updates
+            def progress_callback(task_id: str, status: str, result: Any):
+                """Update progress via WebSocket"""
+                if self.broadcaster:
+                    self.broadcaster.broadcast({
+                        'type': 'mass_generation_progress',
+                        'task_id': task_id,
+                        'status': status,
+                        'result': str(result) if result else None
+                    })
+            
+            # Execute mass generation
+            self.logger.info(f"🎯 Starting batch {batch_id}...")
+            results = await coordinator.execute_mass_generation(
+                batch_id=batch_id,
+                generator_func=generate_image_for_queue,
+                progress_callback=progress_callback
+            )
+            
+            # Update statistics
+            self.generation_stats['mass_generation'] = {
+                'batch_id': batch_id,
+                'completed': results['completed'],
+                'failed': results['failed'],
+                'downloaded': results['downloaded'],
+                'total_cost': results['total_cost']
+            }
+            
+            self.total_cost += results['total_cost']
+            
+            # Print summary
+            self.logger.info("="*80)
+            self.logger.info("✅ MASS GENERATION COMPLETE")
+            self.logger.info(f"   • Generated: {results['completed']} images")
+            self.logger.info(f"   • Downloaded: {results['downloaded']} files")
+            self.logger.info(f"   • Failed: {results['failed']} items")
+            self.logger.info(f"   • Total Cost: ${results['total_cost']:.2f}")
+            self.logger.info("="*80)
+            
+            # Cleanup
+            await coordinator.cleanup()
+            
+            return results
+            
+        except Exception as e:
+            self.logger.error(f"Mass generation failed: {e}")
+            import traceback
+            self.logger.debug(traceback.format_exc())
+            return None
+    
+    async def download_images_batch(self, image_urls: Dict[str, str]) -> Dict[str, bool]:
+        """Download multiple images using async downloader
+        
+        Args:
+            image_urls: Dictionary mapping filenames to URLs
+            
+        Returns:
+            Dictionary mapping filenames to success status
+        """
+        if not MASS_GENERATION_AVAILABLE:
+            # Fallback to sequential download
+            results = {}
+            for filename, url in image_urls.items():
+                try:
+                    filepath = Path(self.config['output']['production_directory']) / filename
+                    response = await asyncio.to_thread(requests.get, url, stream=True, timeout=30)
+                    response.raise_for_status()
+                    
+                    with open(filepath, 'wb') as f:
+                        for chunk in response.iter_content(chunk_size=8192):
+                            if chunk:
+                                f.write(chunk)
+                    results[filename] = True
+                except Exception as e:
+                    self.logger.error(f"Failed to download {filename}: {e}")
+                    results[filename] = False
+            return results
+        
+        # Use async downloader for efficient batch downloads
+        try:
+            from utils.async_downloader import AsyncImageDownloader
+            
+            downloader = AsyncImageDownloader(
+                max_concurrent=5,
+                timeout=30,
+                retry_delay=2.0,
+                max_retries=3
+            )
+            
+            output_dir = Path(self.config['output']['production_directory'])
+            successful, failed = await downloader.download_urls(
+                url_map=image_urls,
+                output_dir=output_dir
+            )
+            
+            # Create results dictionary
+            results = {}
+            for filename in image_urls:
+                filepath = output_dir / filename
+                results[filename] = filepath in successful
+            
+            await downloader.cleanup()
+            return results
+            
+        except Exception as e:
+            self.logger.error(f"Batch download failed: {e}")
+            return {filename: False for filename in image_urls}
 
 async def main():
     """Main entry point with CLI arguments"""
@@ -1179,9 +1430,17 @@ async def main():
     parser.add_argument('--dry-run', action='store_true',
                        help='Preview Git operations without executing them')
     parser.add_argument('--test', action='store_true',
-                       help='Test mode: Generate only 3 items for testing')
+                       help='Test mode: Generate 15 diverse items for comprehensive testing')
     parser.add_argument('--test-type', type=str, choices=['icons', 'covers', 'all'],
                        default='icons', help='Type of assets to test (default: icons)')
+    parser.add_argument('--mass-generate', action='store_true',
+                       help='Enable mass generation mode with safety checks')
+    parser.add_argument('--user-id', type=str, default='default',
+                       help='User ID for permissions and audit logging')
+    parser.add_argument('--max-items', type=int, default=500,
+                       help='Maximum items for mass generation (default: 500)')
+    parser.add_argument('--max-cost', type=float, default=20.0,
+                       help='Maximum cost limit for mass generation (default: $20)')
     
     args = parser.parse_args()
     
@@ -1189,24 +1448,48 @@ async def main():
     
     try:
         if args.test:
-            # Test mode: Generate only 3 items
-            generator.logger.info(f"TEST MODE: Generating 3 {args.test_type} for testing...")
+            # Test mode: Generate 15 diverse items for comprehensive testing
+            generator.logger.info(f"TEST MODE: Generating 15 diverse items for comprehensive testing...")
             
             # Get pages that need assets
             pages_by_type = generator.sync_with_yaml()
             
-            # Select test items based on type
+            # Select test items with comprehensive sampling (15 total)
             test_items = []
-            if args.test_type == 'icons' or args.test_type == 'all':
-                icon_pages = [(page, 'icons') for page in pages_by_type.get('icons', [])]
-                test_items.extend(icon_pages[:3])
             
-            if args.test_type == 'covers' or args.test_type == 'all':
-                cover_pages = [(page, 'covers') for page in pages_by_type.get('covers', [])]
-                if args.test_type == 'all':
-                    test_items.extend(cover_pages[:1])  # Add 1 cover if testing all
-                else:
-                    test_items.extend(cover_pages[:3])  # Add 3 covers if testing covers only
+            # 7 icons from different categories
+            icon_pages = [(page, 'icons') for page in pages_by_type.get('icons', [])]
+            if icon_pages:
+                # Sample every N-th item to get diversity
+                step = max(1, len(icon_pages) // 7)
+                for i in range(0, min(7 * step, len(icon_pages)), step):
+                    test_items.append(icon_pages[i])
+                    if len([item for item in test_items if item[1] == 'icons']) >= 7:
+                        break
+            
+            # 5 covers from different tiers
+            cover_pages = [(page, 'covers') for page in pages_by_type.get('covers', [])]
+            if cover_pages:
+                step = max(1, len(cover_pages) // 5)
+                for i in range(0, min(5 * step, len(cover_pages)), step):
+                    test_items.append(cover_pages[i])
+                    if len([item for item in test_items if item[1] == 'covers']) >= 5:
+                        break
+            
+            # 1 letter header
+            letter_headers = [(page, 'letter_headers') for page in pages_by_type.get('letter_headers', [])]
+            if letter_headers:
+                test_items.append(letter_headers[0])
+            
+            # 1 database icon
+            db_icons = [(page, 'database_icons') for page in pages_by_type.get('database_icons', [])]
+            if db_icons:
+                test_items.append(db_icons[0])
+            
+            # 1 texture
+            textures = [(page, 'textures') for page in pages_by_type.get('textures', [])]
+            if textures:
+                test_items.append(textures[0])
             
             # Generate test items
             generator.logger.info(f"Generating {len(test_items)} test items...")
@@ -1229,6 +1512,44 @@ async def main():
             # Process regeneration queue
             generator.logger.info("Processing regeneration queue...")
             await generator.process_regeneration_queue()
+            
+        elif args.mass_generate:
+            # Mass generation mode with safety checks
+            generator.logger.info("Initializing mass generation mode...")
+            
+            # Update config with CLI arguments
+            if 'mass_generation' not in generator.config:
+                generator.config['mass_generation'] = {}
+            generator.config['mass_generation']['max_items'] = args.max_items
+            generator.config['mass_generation']['max_cost'] = args.max_cost
+            
+            # Get pages needing assets
+            pages_by_type = generator.sync_with_yaml()
+            all_pages = []
+            for asset_type, pages in pages_by_type.items():
+                all_pages.extend(pages)
+            
+            if not all_pages:
+                generator.logger.info("No pages need assets")
+                return
+            
+            # Execute mass generation with confirmation
+            results = await generator.mass_generate_with_confirmation(
+                pages=all_pages,
+                user_id=args.user_id
+            )
+            
+            if results:
+                generator.logger.info("Mass generation completed successfully")
+                
+                # Optionally commit to git
+                if not args.no_commit:
+                    await generator.commit_assets_to_git(
+                        mode="mass_production",
+                        dry_run=args.dry_run
+                    )
+            else:
+                generator.logger.warning("Mass generation was cancelled or failed")
             
         elif args.edit_prompts:
             # Launch review server for prompt editing only

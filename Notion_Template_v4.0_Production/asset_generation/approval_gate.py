@@ -134,7 +134,7 @@ class ApprovalGate:
                 asset_name=item.get('asset_name', f'Asset {i+1}'),
                 asset_type=item.get('asset_type', 'unknown'),
                 prompt=item.get('prompt', ''),
-                estimated_cost=item.get('estimated_cost', 0.04),
+                estimated_cost=item.get('estimated_cost', 0.02),  # Average cost estimate
                 priority=item.get('priority', 1),
                 metadata=item.get('metadata', {})
             )
@@ -355,19 +355,19 @@ async def test_approval_gate():
             'asset_name': 'Estate Planning Overview',
             'asset_type': 'icon',
             'prompt': 'Create an icon representing estate planning...',
-            'estimated_cost': 0.04
+            'estimated_cost': 0.012  # SDXL actual cost
         },
         {
             'asset_name': 'Trust Management',
             'asset_type': 'cover',
             'prompt': 'Design a cover image for trust management...',
-            'estimated_cost': 0.04
+            'estimated_cost': 0.04  # Flux Pro actual cost
         },
         {
             'asset_name': 'Tax Planning',
             'asset_type': 'icon',
             'prompt': 'Create an icon for tax planning strategies...',
-            'estimated_cost': 0.04
+            'estimated_cost': 0.012  # SDXL actual cost
         }
     ]
     

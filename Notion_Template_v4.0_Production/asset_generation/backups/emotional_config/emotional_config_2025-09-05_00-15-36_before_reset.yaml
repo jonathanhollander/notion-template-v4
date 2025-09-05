@@ -1,0 +1,217 @@
+created: '2025-09-05'
+description: Immutable baseline emotional configuration - DO NOT EDIT - This is the
+  safety reset point
+emotional_mappings:
+  asset_type_preferences:
+    cover:
+    - lighting
+    - composition
+    - materials
+    icon:
+    - objects
+    - composition
+    letter_header:
+    - textures
+    - colors
+    - materials
+  page_categories:
+    digital: tech_bridge
+    executor: trusted_guide
+    family: family_heritage
+    financial: secure_protection
+    legacy: living_continuity
+    legal: secure_protection
+    memorial: peaceful_transition
+    welcome: warm_welcome
+emotional_tones:
+  family_heritage:
+    description: Family sections - warmth and generational connection
+    emotional_weight: warm_nostalgic
+    intensity: 0.85
+    keywords:
+    - familial
+    - generational
+    - legacy
+    - heritage
+    - connection
+    name: Family Heritage
+    use_cases:
+    - family planning
+    - legacy sections
+    - personal stories
+  living_continuity:
+    description: Legacy sections - life continuing and enduring impact
+    emotional_weight: enduring_positive
+    intensity: 0.8
+    keywords:
+    - continuing
+    - enduring
+    - lasting
+    - perpetual
+    - ongoing
+    name: Living Continuity
+    use_cases:
+    - legacy planning
+    - memorial sections
+    - impact planning
+  peaceful_transition:
+    description: Difficult topics - gentle and comforting approach
+    emotional_weight: soft_reassuring
+    intensity: 0.7
+    keywords:
+    - gentle
+    - peaceful
+    - comforting
+    - serene
+    - graceful
+    name: Peaceful Transition
+    use_cases:
+    - end-of-life planning
+    - difficult conversations
+    - sensitive topics
+  secure_protection:
+    description: Financial/legal - safety and security emphasis
+    emotional_weight: strong_protective
+    intensity: 0.95
+    keywords:
+    - secure
+    - protected
+    - safe
+    - reliable
+    - fortress-like
+    name: Secure Protection
+    use_cases:
+    - financial planning
+    - legal documents
+    - security features
+  tech_bridge:
+    description: Digital sections - bridging traditional and digital worlds
+    emotional_weight: balanced_progressive
+    intensity: 0.75
+    keywords:
+    - bridging
+    - connecting
+    - modern
+    - accessible
+    - integrative
+    name: Tech Bridge
+    use_cases:
+    - digital assets
+    - technology integration
+    - modern tools
+  trusted_guide:
+    description: Executor sections - reliable and professional guidance
+    emotional_weight: strong_confident
+    intensity: 0.9
+    keywords:
+    - reliable
+    - professional
+    - authoritative
+    - trustworthy
+    - competent
+    name: Trusted Guide
+    use_cases:
+    - executor tools
+    - guidance sections
+    - process explanations
+  warm_welcome:
+    description: Entry points - welcoming and accessible tone for landing pages
+    emotional_weight: light_positive
+    intensity: 0.8
+    keywords:
+    - welcoming
+    - inviting
+    - accessible
+    - comfortable
+    - open
+    name: Warm Welcome
+    use_cases:
+    - dashboard
+    - welcome pages
+    - introductory sections
+last_modified: '2025-09-04'
+style_elements:
+  colors:
+  - estate blues
+  - heritage golds
+  - comfort whites
+  - wisdom grays
+  - family burgundy
+  - trust navy
+  - warmth ivory
+  - legacy bronze
+  - serenity sage
+  - strength charcoal
+  - hope cream
+  - endurance copper
+  composition:
+  - centered balance
+  - flowing connection
+  - protective embrace
+  - guiding pathway
+  - stable foundation
+  - graceful transition
+  - harmonious unity
+  - enduring strength
+  - gentle guidance
+  - timeless elegance
+  - secure shelter
+  - bridging elements
+  lighting:
+  - gentle morning light
+  - golden hour warmth
+  - soft ambient glow
+  - filtered natural light
+  - warm candlelight
+  - library reading light
+  - sunset through windows
+  - diffused studio lighting
+  - fireplace warmth
+  - dappled sunlight
+  - evening lamplight
+  - heritage glow
+  materials:
+  - warm wood grain
+  - brushed metal accents
+  - soft leather textures
+  - natural stone surfaces
+  - aged parchment
+  - polished marble
+  - hand-crafted elements
+  - time-worn patina
+  - rich mahogany
+  - cream linen
+  - antique brass
+  - weathered oak
+  objects:
+  - family heirlooms
+  - trusted documents
+  - connecting bridges
+  - protective shields
+  - guiding compasses
+  - legacy trees
+  - generational keys
+  - wisdom books
+  - heritage watches
+  - memory boxes
+  - continuity chains
+  - foundation stones
+  textures:
+  - leather-bound surfaces
+  - hand-crafted details
+  - time-worn elegance
+  - smooth stone finish
+  - rich fabric weave
+  - polished wood grain
+  - embossed patterns
+  - gentle weathering
+  - silk-like smoothness
+  - organic roughness
+  - vintage patina
+  - heritage depth
+system_info:
+  backup_before_changes: true
+  baseline_version: 4.0.0
+  can_reset_to_baseline: true
+  validated: true
+version: 4.0.0

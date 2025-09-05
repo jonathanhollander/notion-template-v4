@@ -1,0 +1,248 @@
+/* Estate Planning v4.0 - Emotional Configuration CSS */
+:root {
+    --estate-blue: #1e3a8a;
+    --estate-gold: #f59e0b;
+    --estate-gray: #6b7280;
+    --estate-light: #f8fafc;
+    --success-green: #10b981;
+    --warning-orange: #f59e0b;
+    --danger-red: #ef4444;
+}
+
+body {
+    background-color: var(--estate-light);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.config-header {
+    background: linear-gradient(135deg, var(--estate-blue), #3b82f6);
+    color: white;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+}
+
+.config-section {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+    padding: 2rem;
+}
+
+.section-header {
+    border-bottom: 2px solid var(--estate-gold);
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.section-title {
+    color: var(--estate-blue);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tone-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.tone-card:hover {
+    border-color: var(--estate-blue);
+    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.1);
+}
+
+.tone-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.tone-name {
+    color: var(--estate-blue);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.intensity-slider {
+    margin: 1rem 0;
+}
+
+.intensity-value {
+    background: var(--estate-gold);
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    min-width: 50px;
+    text-align: center;
+}
+
+.keyword-tag {
+    background: #e0e7ff;
+    color: var(--estate-blue);
+    padding: 0.3rem 0.6rem;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    margin: 0.2rem;
+    display: inline-block;
+    position: relative;
+}
+
+.keyword-tag .remove-keyword {
+    color: #dc2626;
+    margin-left: 0.5rem;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.style-category {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.style-category-header {
+    color: var(--estate-blue);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: between;
+}
+
+.style-element {
+    background: #f3f4f6;
+    color: #374151;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    margin: 0.2rem;
+    display: inline-block;
+    position: relative;
+    border: 1px solid #d1d5db;
+}
+
+.style-element .remove-element {
+    color: #dc2626;
+    margin-left: 0.5rem;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.action-buttons {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    padding: 1.5rem 0;
+    border-top: 1px solid #e5e7eb;
+    margin-top: 2rem;
+    z-index: 100;
+}
+
+.btn-primary-custom {
+    background-color: var(--estate-blue);
+    border-color: var(--estate-blue);
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.btn-primary-custom:hover {
+    background-color: #1e40af;
+    border-color: #1e40af;
+}
+
+.btn-warning-custom {
+    background-color: var(--estate-gold);
+    border-color: var(--estate-gold);
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.btn-danger-custom {
+    background-color: var(--danger-red);
+    border-color: var(--danger-red);
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.preview-area {
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    margin: 1rem 0;
+}
+
+.preview-area.generating {
+    border-color: var(--estate-blue);
+    background: #eff6ff;
+}
+
+.config-status {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem;
+    border-radius: 8px;
+    z-index: 1050;
+    display: none;
+}
+
+.config-status.success {
+    background: var(--success-green);
+    color: white;
+}
+
+.config-status.error {
+    background: var(--danger-red);
+    color: white;
+}
+
+.config-status.info {
+    background: var(--estate-blue);
+    color: white;
+}
+
+.add-input-group {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.loading-spinner {
+    display: none;
+    margin: 0.5rem;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.generating {
+    animation: pulse 2s infinite;
+}
+
+/* Additional CSS class for inline style conversion */
+.preview-progress-bar {
+    width: 0%;
+}

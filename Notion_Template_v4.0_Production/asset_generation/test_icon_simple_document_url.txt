@@ -1,0 +1,3 @@
+Test: simple_document
+Prompt: Simple flat icon of a document, minimalist design, single color, no background, vector style, UI icon
+URL: https://replicate.delivery/xezq/4wbaGH6zFnKxGtH852rZesDVmzlwADscs1tV6Zx3PKEmbBpKA/out-0.png

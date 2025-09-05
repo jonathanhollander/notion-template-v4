@@ -122,7 +122,7 @@ class GenerationManager:
             total_images=max_images,
             completed_images=0,
             progress_percent=0.0,
-            estimated_cost=max_images * 0.04,  # Approximate cost per image
+            estimated_cost=max_images * 0.02,  # Average cost estimate (mix of SDXL $0.012 and Flux $0.04)
             actual_cost=0.0,
             output_directory=output_dir,
             generation_config={
@@ -145,7 +145,7 @@ class GenerationManager:
         
         # Estimate based on known asset count (approximately 490 assets)
         estimated_images = 490
-        estimated_cost = estimated_images * 0.04  # Approximate cost per image
+        estimated_cost = estimated_images * 0.02  # Average cost estimate (mix of SDXL $0.012 and Flux $0.04)
         
         job = GenerationJob(
             job_id=job_id,
@@ -265,7 +265,7 @@ class GenerationManager:
             
             job.completed_images = len(results) if results else 0
             job.progress_percent = 100 if job.completed_images > 0 else 0
-            job.actual_cost = sum(r.get('cost', 0.04) for r in results) if results else 0
+            job.actual_cost = sum(r.get('cost', 0.02) for r in results) if results else 0
             
             progress_data = {
                 "completed": job.completed_images,

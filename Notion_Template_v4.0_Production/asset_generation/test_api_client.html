@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Client Module Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #b6d4ea;
+            color: #0c5460;
+        }
+        .test-status {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>API Client Module Test</h1>
+    
+    <div class="test-container">
+        <h2>API Client Module Tests</h2>
+        <div class="test-status">Status: <span id="test-status">Ready</span></div>
+        
+        <button class="test-button" onclick="testModuleLoading()">Test Module Loading</button>
+        <button class="test-button" onclick="testHealthCheck()">Test Health Check</button>
+        <button class="test-button" onclick="testCSRFInitialization()">Test CSRF Initialization</button>
+        <button class="test-button" onclick="testConfigurationLoad()">Test Load Configuration</button>
+        <button class="test-button" onclick="testAllMethods()">Test All Methods</button>
+        
+        <div id="test-results"></div>
+    </div>
+
+    <!-- Load the API client module -->
+    <script src="static/js/modules/api-client.js"></script>
+    
+    <script>
+        let apiClient = null;
+        
+        // Test utilities
+        function logResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('test-results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${type}`;
+            resultDiv.textContent = message;
+            resultsDiv.appendChild(resultDiv);
+            console.log(message);
+        }
+        
+        function updateStatus(status) {
+            document.getElementById('test-status').textContent = status;
+        }
+        
+        // Test 1: Module Loading
+        function testModuleLoading() {
+            updateStatus('Testing module loading...');
+            
+            try {
+                // Test if class exists
+                if (typeof EmotionalConfigAPIClient === 'undefined') {
+                    throw new Error('EmotionalConfigAPIClient class not found');
+                }
+                
+                // Test instantiation
+                apiClient = new EmotionalConfigAPIClient();
+                
+                // Test basic properties
+                if (!apiClient.baseUrl) {
+                    throw new Error('Base URL not set');
+                }
+                
+                if (apiClient.csrfToken !== null) {
+                    throw new Error('CSRF token should initially be null');
+                }
+                
+                logResult('✓ Module loading test passed', 'success');
+                logResult(`  - Class loaded successfully`, 'info');
+                logResult(`  - Instance created successfully`, 'info');
+                logResult(`  - Base URL: ${apiClient.baseUrl}`, 'info');
+                logResult(`  - Initial CSRF token: ${apiClient.csrfToken}`, 'info');
+                
+                updateStatus('Module loading - PASSED');
+                
+            } catch (error) {
+                logResult(`✗ Module loading test failed: ${error.message}`, 'error');
+                updateStatus('Module loading - FAILED');
+            }
+        }
+        
+        // Test 2: Health Check (doesn't require actual server)
+        async function testHealthCheck() {
+            if (!apiClient) {
+                logResult('✗ Please run module loading test first', 'error');
+                return;
+            }
+            
+            updateStatus('Testing health check...');
+            
+            try {
+                // Test method exists
+                if (typeof apiClient.healthCheck !== 'function') {
+                    throw new Error('healthCheck method not found');
+                }
+                
+                logResult('✓ Health check method exists', 'success');
+                
+                // Note: We can't test the actual API call without a running server
+                // But we can verify the method structure
+                const healthCheckCode = apiClient.healthCheck.toString();
+                if (!healthCheckCode.includes('fetch')) {
+                    throw new Error('Health check method should use fetch');
+                }
+                
+                if (!healthCheckCode.includes('/api/health')) {
+                    throw new Error('Health check should call /api/health endpoint');
+                }
+                
+                logResult('✓ Health check method structure validated', 'success');
+                logResult('  - Method uses fetch API', 'info');
+                logResult('  - Calls correct endpoint (/api/health)', 'info');
+                
+                updateStatus('Health check - PASSED');
+                
+            } catch (error) {
+                logResult(`✗ Health check test failed: ${error.message}`, 'error');
+                updateStatus('Health check - FAILED');
+            }
+        }
+        
+        // Test 3: CSRF Initialization (structure test only)
+        async function testCSRFInitialization() {
+            if (!apiClient) {
+                logResult('✗ Please run module loading test first', 'error');
+                return;
+            }
+            
+            updateStatus('Testing CSRF initialization...');
+            
+            try {
+                // Test method exists
+                if (typeof apiClient.initializeCSRF !== 'function') {
+                    throw new Error('initializeCSRF method not found');
+                }
+                
+                // Test getHeaders method exists
+                if (typeof apiClient.getHeaders !== 'function') {
+                    throw new Error('getHeaders method not found');
+                }
+                
+                // Test getHeaders without CSRF token
+                const headersWithoutCSRF = apiClient.getHeaders();
+                if (!headersWithoutCSRF['Content-Type'] || headersWithoutCSRF['X-CSRFToken']) {
+                    throw new Error('getHeaders should include Content-Type but not CSRF when token is null');
+                }
+                
+                // Simulate CSRF token being set
+                apiClient.csrfToken = 'test-csrf-token';
+                const headersWithCSRF = apiClient.getHeaders();
+                if (headersWithCSRF['X-CSRFToken'] !== 'test-csrf-token') {
+                    throw new Error('getHeaders should include CSRF token when set');
+                }
+                
+                // Reset CSRF token
+                apiClient.csrfToken = null;
+                
+                logResult('✓ CSRF initialization methods validated', 'success');
+                logResult('  - initializeCSRF method exists', 'info');
+                logResult('  - getHeaders method exists and works correctly', 'info');
+                logResult('  - CSRF token handling validated', 'info');
+                
+                updateStatus('CSRF initialization - PASSED');
+                
+            } catch (error) {
+                logResult(`✗ CSRF initialization test failed: ${error.message}`, 'error');
+                updateStatus('CSRF initialization - FAILED');
+            }
+        }
+        
+        // Test 4: Configuration Load (structure test only)
+        async function testConfigurationLoad() {
+            if (!apiClient) {
+                logResult('✗ Please run module loading test first', 'error');
+                return;
+            }
+            
+            updateStatus('Testing configuration load...');
+            
+            try {
+                // Test method exists
+                if (typeof apiClient.loadConfiguration !== 'function') {
+                    throw new Error('loadConfiguration method not found');
+                }
+                
+                // Check method structure
+                const loadConfigCode = apiClient.loadConfiguration.toString();
+                if (!loadConfigCode.includes('fetch')) {
+                    throw new Error('loadConfiguration should use fetch');
+                }
+                
+                if (!loadConfigCode.includes('/load')) {
+                    throw new Error('loadConfiguration should call /load endpoint');
+                }
+                
+                if (!loadConfigCode.includes('getHeaders')) {
+                    throw new Error('loadConfiguration should use getHeaders method');
+                }
+                
+                logResult('✓ Configuration load method validated', 'success');
+                logResult('  - Method exists and uses fetch', 'info');
+                logResult('  - Calls correct endpoint', 'info');
+                logResult('  - Uses proper headers', 'info');
+                
+                updateStatus('Configuration load - PASSED');
+                
+            } catch (error) {
+                logResult(`✗ Configuration load test failed: ${error.message}`, 'error');
+                updateStatus('Configuration load - FAILED');
+            }
+        }
+        
+        // Test 5: All Methods Structure
+        async function testAllMethods() {
+            if (!apiClient) {
+                logResult('✗ Please run module loading test first', 'error');
+                return;
+            }
+            
+            updateStatus('Testing all methods...');
+            
+            try {
+                const requiredMethods = [
+                    'initializeCSRF',
+                    'getHeaders', 
+                    'loadConfiguration',
+                    'saveConfiguration',
+                    'resetToDefaults',
+                    'previewChanges',
+                    'generateTestAssets',
+                    'healthCheck',
+                    'getSystemStatus'
+                ];
+                
+                const missingMethods = [];
+                const presentMethods = [];
+                
+                for (const methodName of requiredMethods) {
+                    if (typeof apiClient[methodName] === 'function') {
+                        presentMethods.push(methodName);
+                    } else {
+                        missingMethods.push(methodName);
+                    }
+                }
+                
+                if (missingMethods.length > 0) {
+                    throw new Error(`Missing methods: ${missingMethods.join(', ')}`);
+                }
+                
+                logResult('✓ All required methods present', 'success');
+                logResult(`  - Found ${presentMethods.length} methods:`, 'info');
+                presentMethods.forEach(method => {
+                    logResult(`    - ${method}`, 'info');
+                });
+                
+                // Test that all methods that should make HTTP calls have proper structure
+                const httpMethods = ['loadConfiguration', 'saveConfiguration', 'resetToDefaults', 
+                                   'previewChanges', 'generateTestAssets', 'getSystemStatus'];
+                
+                for (const methodName of httpMethods) {
+                    const methodCode = apiClient[methodName].toString();
+                    if (!methodCode.includes('fetch')) {
+                        throw new Error(`${methodName} should use fetch`);
+                    }
+                    if (!methodCode.includes('getHeaders') && methodName !== 'healthCheck') {
+                        throw new Error(`${methodName} should use getHeaders`);
+                    }
+                }
+                
+                logResult('✓ All HTTP methods use proper structure', 'success');
+                
+                updateStatus('All methods - PASSED');
+                
+            } catch (error) {
+                logResult(`✗ All methods test failed: ${error.message}`, 'error');
+                updateStatus('All methods - FAILED');
+            }
+        }
+        
+        // Auto-run basic test on page load
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                testModuleLoading();
+            }, 100);
+        });
+    </script>
+</body>
+</html>

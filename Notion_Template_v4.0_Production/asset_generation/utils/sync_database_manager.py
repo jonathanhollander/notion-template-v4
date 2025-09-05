@@ -293,6 +293,10 @@ class SyncAssetDatabase:
             # Vacuum to reclaim space
             conn.execute("VACUUM")
     
+    def init_database(self):
+        """Alias for _init_database for backward compatibility"""
+        return self._init_database()
+    
     def close(self):
         """Close the database connection pool"""
         self.pool.close_all()

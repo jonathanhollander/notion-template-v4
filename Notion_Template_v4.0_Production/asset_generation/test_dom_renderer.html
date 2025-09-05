@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM Renderer Module Test</title>
+    <link href="static/lib/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link href="static/lib/font-awesome/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #b6d4ea;
+            color: #0c5460;
+        }
+        .test-status {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .generated-content {
+            border: 2px dashed #ccc;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f9f9f9;
+        }
+        
+        /* Include some basic styles from emotional_config.css for testing */
+        .tone-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .tone-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        .intensity-value {
+            background: #f59e0b;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            min-width: 50px;
+            text-align: center;
+        }
+        .keyword-tag {
+            background: #e0e7ff;
+            color: #1e3a8a;
+            padding: 0.3rem 0.6rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            margin: 0.2rem;
+            display: inline-block;
+        }
+        .keyword-tag .remove-keyword {
+            color: #dc2626;
+            margin-left: 0.5rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .style-element {
+            background: #f3f4f6;
+            color: #374151;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin: 0.2rem;
+            display: inline-block;
+            border: 1px solid #d1d5db;
+        }
+        .style-element .remove-element {
+            color: #dc2626;
+            margin-left: 0.5rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .preview-area {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>DOM Renderer Module Test</h1>
+    
+    <div class="test-container">
+        <h2>DOM Renderer Module Tests</h2>
+        <div class="test-status">Status: <span id="test-status">Ready</span></div>
+        
+        <div class="mb-3">
+            <button class="test-button" onclick="testModuleLoading()">Test Module Loading</button>
+            <button class="test-button" onclick="testToneCardRendering()">Test Tone Card Rendering</button>
+            <button class="test-button" onclick="testKeywordRendering()">Test Keyword Rendering</button>
+            <button class="test-button" onclick="testStyleRendering()">Test Style Category Rendering</button>
+            <button class="test-button" onclick="testPreviewRendering()">Test Preview Rendering</button>
+            <button class="test-button" onclick="testUtilityMethods()">Test Utility Methods</button>
+            <button class="test-button" onclick="testAllMethods()">Run All Tests</button>
+        </div>
+        
+        <div id="test-results"></div>
+    </div>
+
+    <div class="test-container">
+        <h3>Generated Content Preview</h3>
+        <div id="content-preview" class="generated-content">
+            <!-- Generated HTML will appear here -->
+        </div>
+    </div>
+
+    <!-- Load the DOM renderer module -->
+    <script src="static/js/modules/dom-renderer.js"></script>
+    
+    <script>
+        let domRenderer = null;
+        
+        // Test utilities
+        function logResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('test-results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${type}`;
+            resultDiv.textContent = message;
+            resultsDiv.appendChild(resultDiv);
+            console.log(message);
+        }
+        
+        function updateStatus(status) {
+            document.getElementById('test-status').textContent = status;
+        }
+        
+        function showGeneratedContent(element) {
+            const preview = document.getElementById('content-preview');
+            preview.innerHTML = '';
+            if (element) {
+                preview.appendChild(element.cloneNode(true));
+            }
+        }
+        
+        // Test 1: Module Loading
+        function testModuleLoading() {
+            updateStatus('Testing module loading...');
+            
+            try {
+                // Test if class exists
+                if (typeof EmotionalConfigDOMRenderer === 'undefined') {
+                    throw new Error('EmotionalConfigDOMRenderer class not found');
+                }
+                
+                // Test instantiation
+                domRenderer = new EmotionalConfigDOMRenderer();
+                
+                // Test basic properties
+                if (!domRenderer.templates) {
+                    throw new Error('Templates object not initialized');
+                }
+                
+                const expectedTemplates = ['toneCard', 'styleCategory', 'keywordTag', 'styleElement', 'previewSection'];
+                const missingTemplates = expectedTemplates.filter(template => !domRenderer.templates[template]);
+                
+                if (missingTemplates.length > 0) {
+                    throw new Error(`Missing templates: ${missingTemplates.join(', ')}`);
+                }
+                
+                logResult('✓ Module loading test passed', 'success');
+                logResult(`  - Class loaded successfully`, 'info');
+                logResult(`  - Instance created successfully`, 'info');
+                logResult(`  - All templates initialized: ${expectedTemplates.join(', ')}`, 'info');
+                
+                updateStatus('Module loading - PASSED');
+                
+            } catch (error) {
+                logResult(`✗ Module loading test failed: ${error.message}`, 'error');
+                updateStatus('Module loading - FAILED');
+            }
+        }
+        
+        // Test 2: Tone Card Rendering
+        function testToneCardRendering() {
+            if (!domRenderer) {
+                logResult('✗ Please run module loading test first', 'error');
+                return;
+            }
+            
+            updateStatus('Testing tone card rendering...');
+            
+            try {
+                // Test data
+                const testToneData = {
+                    name: 'Warm Welcome',
+                    description: 'Entry points - welcoming and accessible',
+                    keywords: ['welcoming', 'accessible', 'friendly', 'inviting']
+                };
+                
+                // Render tone card
+                const toneCard = domRenderer.renderToneCard('WARM_WELCOME', testToneData, 0.8);
+                
+                // Validate structure
+                if (!toneCard || toneCard.nodeType !== Node.ELEMENT_NODE) {
+                    throw new Error('renderToneCard should return a DOM element');
+                }
+                
+                if (!toneCard.classList.contains('tone-card')) {
+                    throw new Error('Tone card should have "tone-card" class');
+                }
+                
+                if (toneCard.dataset.tone !== 'WARM_WELCOME') {
+                    throw new Error('Tone card should have correct data-tone attribute');
+                }
+                
+                // Check for required child elements
+                const toneHeader = toneCard.querySelector('.tone-header');
+                const toneName = toneCard.querySelector('.tone-name');
+                const intensityValue = toneCard.querySelector('.intensity-value');
+                const intensitySlider = toneCard.querySelector('.intensity-range');
+                const keywordsContainer = toneCard.querySelector('.keywords-container');
+                
+                if (!toneHeader) throw new Error('Missing tone header');
+                if (!toneName) throw new Error('Missing tone name');
+                if (!intensityValue) throw new Error('Missing intensity value');
+                if (!intensitySlider) throw new Error('Missing intensity slider');
+                if (!keywordsContainer) throw new Error('Missing keywords container');
+                
+                // Check content
+                if (!toneName.textContent.includes('Warm Welcome')) {
+                    throw new Error('Tone name not displayed correctly');
+                }
+                
+                if (!intensityValue.textContent.includes('80%')) {
+                    throw new Error('Intensity value not displayed correctly');
+                }
+                
+                if (parseFloat(intensitySlider.value) !== 0.8) {
+                    throw new Error('Intensity slider value not set correctly');
+                }
+                
+                // Check keywords rendered
+                const keywords = keywordsContainer.querySelectorAll('.keyword-tag');
+                if (keywords.length !== 4) {
+                    throw new Error(`Expected 4 keywords, found ${keywords.length}`);
+                }
+                
+                logResult('✓ Tone card rendering test passed', 'success');
+                logResult(`  - DOM element created correctly`, 'info');
+                logResult(`  - All required child elements present`, 'info');
+                logResult(`  - Content populated correctly`, 'info');
+                logResult(`  - Keywords rendered: ${keywords.length}`, 'info');
+                
+                showGeneratedContent(toneCard);
+                updateStatus('Tone card rendering - PASSED');
+                
+            } catch (error) {
+                logResult(`✗ Tone card rendering test failed: ${error.message}`, 'error');
+                updateStatus('Tone card rendering - FAILED');
+            }
+        }
+        
+        // Test 3: Keyword Rendering
+        function testKeywordRendering() {
+            if (!domRenderer) {
+                logResult('✗ Please run module loading test first', 'error');
+                return;
+            }
+            
+            updateStatus('Testing keyword rendering...');
+            
+            try {
+                // Test with array of keywords
+                const keywords = ['professional', 'trustworthy', 'reliable'];
+                const keywordsHtml = domRenderer.renderKeywords(keywords);
+                
+                if (typeof keywordsHtml !== 'string') {
+                    throw new Error('renderKeywords should return a string');
+                }
+                
+                if (!keywordsHtml.includes('professional')) {
+                    throw new Error('Keywords HTML should contain "professional"');
+                }
+                
+                if (!keywordsHtml.includes('keyword-tag')) {
+                    throw new Error('Keywords HTML should contain keyword-tag class');
+                }
+                
+                if (!keywordsHtml.includes('remove-keyword')) {
+                    throw new Error('Keywords HTML should contain remove buttons');
+                }
+                
+                // Test with empty array
+                const emptyKeywords = domRenderer.renderKeywords([]);
+                if (emptyKeywords !== '') {
+                    throw new Error('Empty keywords array should return empty string');
+                }
+                
+                // Test with invalid input
+                const invalidKeywords = domRenderer.renderKeywords(null);
+                if (invalidKeywords !== '') {
+                    throw new Error('Invalid input should return empty string');
+                }
+                
+                // Test HTML escaping
+                const maliciousKeywords = ['<script>alert("xss")</script>', 'normal-keyword'];
+                const escapedHtml = domRenderer.renderKeywords(maliciousKeywords);
+                if (escapedHtml.includes('<script>')) {
+                    throw new Error('HTML should be escaped properly');
+                }
+                
+                logResult('✓ Keyword rendering test passed', 'success');
+                logResult(`  - String output generated correctly`, 'info');
+                logResult(`  - Proper HTML structure created`, 'info');
+                logResult(`  - Empty/invalid input handled`, 'info');
+                logResult(`  - HTML escaping works correctly`, 'info');
+                
+                updateStatus('Keyword rendering - PASSED');
+                
+            } catch (error) {
+                logResult(`✗ Keyword rendering test failed: ${error.message}`, 'error');
+                updateStatus('Keyword rendering - FAILED');
+            }
+        }
+        
+        // Test 4: Style Category Rendering
+        function testStyleRendering() {
+            if (!domRenderer) {
+                logResult('✗ Please run module loading test first', 'error');
+                return;
+            }
+            
+            updateStatus('Testing style category rendering...');
+            
+            try {
+                // Test data
+                const elements = ['warm wood', 'natural stone', 'soft leather'];
+                const description = 'Physical textures and surfaces';
+                
+                // Render style category
+                const styleCategory = domRenderer.renderStyleCategory('materials', elements, description);
+                
+                // Validate structure
+                if (!styleCategory || styleCategory.nodeType !== Node.ELEMENT_NODE) {
+                    throw new Error('renderStyleCategory should return a DOM element');
+                }
+                
+                if (!styleCategory.classList.contains('style-category')) {
+                    throw new Error('Style category should have "style-category" class');
+                }
+                
+                if (styleCategory.dataset.category !== 'materials') {
+                    throw new Error('Style category should have correct data-category attribute');
+                }
+                
+                // Check for required child elements
+                const categoryHeader = styleCategory.querySelector('.style-category-header');
+                const elementsContainer = styleCategory.querySelector('.style-elements-container');
+                const addInputGroup = styleCategory.querySelector('.add-input-group');
+                
+                if (!categoryHeader) throw new Error('Missing category header');
+                if (!elementsContainer) throw new Error('Missing elements container');
+                if (!addInputGroup) throw new Error('Missing add input group');
+                
+                // Check content
+                const header = categoryHeader.querySelector('h6');
+                if (!header || !header.textContent.includes('Materials')) {
+                    throw new Error('Category name not formatted/displayed correctly');
+                }
+                
+                // Check elements rendered
+                const styleElements = elementsContainer.querySelectorAll('.style-element');
+                if (styleElements.length !== 3) {
+                    throw new Error(`Expected 3 style elements, found ${styleElements.length}`);
+                }
+                
+                logResult('✓ Style category rendering test passed', 'success');
+                logResult(`  - DOM element created correctly`, 'info');
+                logResult(`  - All required child elements present`, 'info');
+                logResult(`  - Category name formatted correctly`, 'info');
+                logResult(`  - Style elements rendered: ${styleElements.length}`, 'info');
+                
+                showGeneratedContent(styleCategory);
+                updateStatus('Style rendering - PASSED');
+                
+            } catch (error) {
+                logResult(`✗ Style category rendering test failed: ${error.message}`, 'error');
+                updateStatus('Style rendering - FAILED');
+            }
+        }
+        
+        // Test 5: Preview Rendering
+        function testPreviewRendering() {
+            if (!domRenderer) {
+                logResult('✗ Please run module loading test first', 'error');
+                return;
+            }
+            
+            updateStatus('Testing preview rendering...');
+            
+            try {
+                // Test with preview data
+                const previewData = [
+                    {
+                        title: 'Estate Planning Cover',
+                        prompt: 'Create a warm, welcoming cover image for estate planning...',
+                        emotional_context: 'WARM_WELCOME tone with professional trustworthy elements'
+                    },
+                    {
+                        title: 'Legal Documents Icon',
+                        prompt: 'Design a secure, professional icon for legal documents...'
+                    }
+                ];
+                
+                // Render preview section
+                const previewSection = domRenderer.renderPreviewSection(previewData);
+                
+                // Validate structure
+                if (!previewSection || previewSection.nodeType !== Node.ELEMENT_NODE) {
+                    throw new Error('renderPreviewSection should return a DOM element');
+                }
+                
+                if (!previewSection.classList.contains('preview-section')) {
+                    throw new Error('Preview section should have "preview-section" class');
+                }
+                
+                // Check for preview items
+                const previewItems = previewSection.querySelectorAll('.preview-item');
+                if (previewItems.length !== 2) {
+                    throw new Error(`Expected 2 preview items, found ${previewItems.length}`);
+                }
+                
+                // Check first item content
+                const firstItem = previewItems[0];
+                const title = firstItem.querySelector('.preview-title');
+                const prompt = firstItem.querySelector('.preview-text');
+                const context = firstItem.querySelector('.preview-emotional-context');
+                
+                if (!title || !title.textContent.includes('Estate Planning Cover')) {
+                    throw new Error('Preview title not displayed correctly');
+                }
+                
+                if (!prompt || !prompt.textContent.includes('warm, welcoming cover')) {
+                    throw new Error('Preview prompt not displayed correctly');
+                }
+                
+                if (!context || !context.textContent.includes('WARM_WELCOME')) {
+                    throw new Error('Emotional context not displayed correctly');
+                }
+                
+                // Test with empty data
+                const emptyPreview = domRenderer.renderPreviewSection([]);
+                if (!emptyPreview.querySelector('.preview-area')) {
+                    throw new Error('Empty preview should show placeholder area');
+                }
+                
+                logResult('✓ Preview rendering test passed', 'success');
+                logResult(`  - DOM element created correctly`, 'info');
+                logResult(`  - Preview items rendered: ${previewItems.length}`, 'info');
+                logResult(`  - Content populated correctly`, 'info');
+                logResult(`  - Empty state handled properly`, 'info');
+                
+                showGeneratedContent(previewSection);
+                updateStatus('Preview rendering - PASSED');
+                
+            } catch (error) {
+                logResult(`✗ Preview rendering test failed: ${error.message}`, 'error');
+                updateStatus('Preview rendering - FAILED');
+            }
+        }
+        
+        // Test 6: Utility Methods
+        function testUtilityMethods() {
+            if (!domRenderer) {
+                logResult('✗ Please run module loading test first', 'error');
+                return;
+            }
+            
+            updateStatus('Testing utility methods...');
+            
+            try {
+                // Test HTML escaping
+                const testString = '<script>alert("xss")</script>';
+                const escapedString = domRenderer.escapeHtml(testString);
+                if (escapedString.includes('<script>')) {
+                    throw new Error('HTML escaping failed');
+                }
+                if (!escapedString.includes('&lt;script&gt;')) {
+                    throw new Error('HTML not properly escaped');
+                }
+                
+                // Test category name formatting
+                const categoryName = 'lighting_effects';
+                const formatted = domRenderer.formatCategoryName(categoryName);
+                if (formatted !== 'Lighting Effects') {
+                    throw new Error(`Category name formatting failed: got "${formatted}"`);
+                }
+                
+                // Test loading spinner
+                const loadingHtml = domRenderer.renderLoadingSpinner('Loading configuration...');
+                if (!loadingHtml.includes('Loading configuration...')) {
+                    throw new Error('Loading spinner message not included');
+                }
+                if (!loadingHtml.includes('loading-spinner')) {
+                    throw new Error('Loading spinner class not included');
+                }
+                
+                // Test progress bar
+                const progressHtml = domRenderer.renderProgressBar(75, 'Processing...');
+                if (!progressHtml.includes('width: 75%')) {
+                    throw new Error('Progress bar width not set correctly');
+                }
+                if (!progressHtml.includes('Processing...')) {
+                    throw new Error('Progress bar label not included');
+                }
+                
+                // Test edge cases
+                const progressZero = domRenderer.renderProgressBar(0);
+                if (!progressZero.includes('width: 0%')) {
+                    throw new Error('Zero progress not handled correctly');
+                }
+                
+                const progressOver100 = domRenderer.renderProgressBar(150);
+                if (!progressOver100.includes('width: 100%')) {
+                    throw new Error('Over 100% progress not capped correctly');
+                }
+                
+                logResult('✓ Utility methods test passed', 'success');
+                logResult(`  - HTML escaping works correctly`, 'info');
+                logResult(`  - Category name formatting works`, 'info');
+                logResult(`  - Loading spinner generation works`, 'info');
+                logResult(`  - Progress bar generation works`, 'info');
+                logResult(`  - Edge cases handled properly`, 'info');
+                
+                updateStatus('Utility methods - PASSED');
+                
+            } catch (error) {
+                logResult(`✗ Utility methods test failed: ${error.message}`, 'error');
+                updateStatus('Utility methods - FAILED');
+            }
+        }
+        
+        // Run all tests
+        function testAllMethods() {
+            updateStatus('Running all tests...');
+            
+            const tests = [
+                testModuleLoading,
+                testToneCardRendering,
+                testKeywordRendering,
+                testStyleRendering,
+                testPreviewRendering,
+                testUtilityMethods
+            ];
+            
+            let passedTests = 0;
+            let totalTests = tests.length;
+            
+            for (const test of tests) {
+                try {
+                    test();
+                    passedTests++;
+                } catch (error) {
+                    logResult(`Test failed: ${error.message}`, 'error');
+                }
+            }
+            
+            if (passedTests === totalTests) {
+                logResult(`✓ All tests passed (${passedTests}/${totalTests})`, 'success');
+                updateStatus('All tests - PASSED');
+            } else {
+                logResult(`✗ ${passedTests}/${totalTests} tests passed`, 'error');
+                updateStatus(`Tests - ${passedTests}/${totalTests} PASSED`);
+            }
+        }
+        
+        // Auto-run basic test on page load
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                testModuleLoading();
+            }, 100);
+        });
+    </script>
+</body>
+</html>

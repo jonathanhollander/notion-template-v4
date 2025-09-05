@@ -70,7 +70,19 @@
       "Read(//Users/jonathanhollander/**)",
       "Bash(kill:*)",
       "Bash(timeout:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(open test_api_client.html)",
+      "Bash(node:*)",
+      "Bash(open test_dom_renderer.html)",
+      "Bash(open http://localhost:4500/emotional-config)",
+      "mcp__task-master__get_task",
+      "mcp__task-master__next_task",
+      "WebFetch(domain:replicate.com)",
+      "Bash(open http://localhost:4500)",
+      "WebFetch(domain:github.com)",
+      "WebSearch",
+      "mcp__task-master__remove_task",
+      "Bash(PORT=4501 python3 review_dashboard.py)"
     ],
     "deny": [],
     "ask": []

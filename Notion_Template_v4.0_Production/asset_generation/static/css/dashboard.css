@@ -364,6 +364,27 @@ body {
 
 #evaluation-display {
     display: none;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s ease-in-out;
+}
+
+#evaluation-display.visible {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#pre-review-message {
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.3s ease-out;
+}
+
+#pre-review-message.hidden {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
 }
 
 .decision-form {
@@ -1268,5 +1289,349 @@ label {
 
 @keyframes spin {
     to { transform: rotate(360deg); }
+}
+
+/* =====================================================
+   FULL-WIDTH LOG SECTION STYLES 
+   ===================================================== */
+
+/* Main log section container */
+.log-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-top: 2px solid var(--color-primary);
+    margin-top: 2rem;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: 0 -4px 20px rgba(139, 69, 19, 0.1);
+}
+
+/* Log header with title and controls */
+.log-header {
+    background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.log-header h2 {
+    margin: 0;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Log control buttons */
+.log-controls {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.log-controls .button {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 0.5rem 1rem;
+    font-size: var(--font-size-sm);
+    border-radius: 6px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.log-controls .button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.log-controls .button:active {
+    transform: translateY(0);
+}
+
+/* Log content area */
+.log-content {
+    padding: 0;
+    background: #ffffff;
+}
+
+/* Full-width log container */
+.log-container-fullwidth {
+    min-height: 400px;
+    max-height: 600px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    font-family: var(--font-family-monospace);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+    padding: 1rem;
+    background: linear-gradient(180deg, #fefefe 0%, #f8f9fa 100%);
+    border: none;
+    position: relative;
+}
+
+/* Log placeholder when empty */
+.log-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    color: var(--text-secondary);
+    text-align: center;
+    gap: 1rem;
+}
+
+.log-placeholder p {
+    margin: 0;
+    font-size: var(--font-size-lg);
+}
+
+.log-placeholder p:first-child {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-primary);
+}
+
+/* Enhanced log entry styles */
+.log-container-fullwidth .log-entry {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    margin: 0.25rem 0;
+    border-left: 3px solid transparent;
+    border-radius: 0 6px 6px 0;
+    background: rgba(255, 255, 255, 0.7);
+    transition: all 0.2s ease;
+    word-wrap: break-word;
+    position: relative;
+}
+
+.log-container-fullwidth .log-entry:hover {
+    background: rgba(139, 69, 19, 0.05);
+    border-left-color: var(--color-primary);
+    transform: translateX(2px);
+}
+
+/* Log level specific styles */
+.log-container-fullwidth .log-entry.log-info {
+    border-left-color: #17a2b8;
+    background: rgba(23, 162, 184, 0.05);
+}
+
+.log-container-fullwidth .log-entry.log-warning {
+    border-left-color: #ffc107;
+    background: rgba(255, 193, 7, 0.1);
+}
+
+.log-container-fullwidth .log-entry.log-error {
+    border-left-color: #dc3545;
+    background: rgba(220, 53, 69, 0.1);
+    font-weight: var(--font-weight-medium);
+}
+
+.log-container-fullwidth .log-entry.log-success {
+    border-left-color: #28a745;
+    background: rgba(40, 167, 69, 0.1);
+}
+
+.log-container-fullwidth .log-entry.log-debug {
+    border-left-color: #6f42c1;
+    background: rgba(111, 66, 193, 0.05);
+    opacity: 0.8;
+}
+
+/* Log timestamp */
+.log-container-fullwidth .log-timestamp {
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+    margin-right: 0.75rem;
+    font-weight: var(--font-weight-normal);
+    letter-spacing: var(--letter-spacing-wide);
+}
+
+/* Log message */
+.log-container-fullwidth .log-message {
+    color: var(--text-primary);
+    font-weight: var(--font-weight-normal);
+}
+
+/* Custom scrollbar for full-width log container */
+.log-container-fullwidth::-webkit-scrollbar {
+    width: 12px;
+}
+
+.log-container-fullwidth::-webkit-scrollbar-track {
+    background: linear-gradient(180deg, #f1f3f5 0%, #e9ecef 100%);
+    border-radius: 6px;
+}
+
+.log-container-fullwidth::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+.log-container-fullwidth::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+}
+
+/* Auto-scroll indicator */
+.log-container-fullwidth.auto-scroll::after {
+    content: "📜 Auto-scrolling enabled";
+    position: sticky;
+    bottom: 0;
+    right: 0;
+    background: rgba(139, 69, 19, 0.9);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    font-size: var(--font-size-xs);
+    border-radius: 4px 0 0 0;
+    float: right;
+    clear: both;
+    margin-top: 0.5rem;
+}
+
+/* Responsive design for log section */
+@media (max-width: 768px) {
+    .log-header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .log-controls {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .log-container-fullwidth {
+        min-height: 300px;
+        max-height: 400px;
+        padding: 0.75rem;
+    }
+    
+    .log-controls .button {
+        padding: 0.4rem 0.8rem;
+        font-size: var(--font-size-xs);
+    }
+}
+
+/* Animation for new log entries */
+@keyframes slideInLog {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.log-container-fullwidth .log-entry.new-entry {
+    animation: slideInLog 0.3s ease-out;
+}
+
+/* Log entry counter badge */
+.log-header::after {
+    content: attr(data-log-count) " entries";
+    background: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.9);
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: var(--font-size-xs);
+    margin-left: auto;
+    margin-right: 1rem;
+}
+
+/* ============================================
+   WORKFLOW PROGRESS INDICATOR STYLES
+   ============================================ */
+   
+.workflow-progress {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 2px solid var(--color-success);
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.progress-step {
+    display: flex;
+    align-items: center;
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.progress-step.completed {
+    background-color: rgba(40, 167, 69, 0.1);
+    border-left: 4px solid var(--color-success);
+}
+
+.progress-step.active {
+    background-color: rgba(0, 123, 255, 0.1);
+    border-left: 4px solid var(--color-info);
+    animation: pulse-active 2s infinite;
+}
+
+.progress-step.pending {
+    background-color: rgba(108, 117, 125, 0.1);
+    border-left: 4px solid var(--color-muted);
+}
+
+.step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    margin-right: 0.75rem;
+    background: var(--color-primary);
+    color: white;
+    border-radius: 50%;
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-sm);
+}
+
+.progress-step.completed .step-number {
+    background: var(--color-success);
+}
+
+.progress-step.active .step-number {
+    background: var(--color-info);
+}
+
+.step-text {
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    font-size: var(--font-size-base);
+}
+
+.progress-step.completed .step-text {
+    color: var(--color-success-dark);
+}
+
+.progress-step.active .step-text {
+    color: var(--color-info-dark);
+}
+
+@keyframes pulse-active {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.02);
+    }
 }
 

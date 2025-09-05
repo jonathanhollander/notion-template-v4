@@ -266,7 +266,7 @@ class WebSocketBroadcaster:
         """Request human approval for batch"""
         self.emit('approval_needed', {
             'prompts': prompts,
-            'estimated_cost': len(prompts) * 0.04
+            'estimated_cost': len(prompts) * 0.02  # Average cost estimate
         })
     
     def handle_pause(self):

@@ -1,0 +1,3 @@
+Test: negative_prompt
+Prompt: Flat document icon, simple geometric shape, solid color || NOT: complex scene, NOT: realistic, NOT: 3D, NOT: background, NOT: decorative, NOT: detailed
+URL: https://replicate.delivery/xezq/yKGvHoX6SRrGLJp5IXeNm4zCVBem2MdzxL3bvfF7B7d9uFkqA/out-0.png

@@ -1,0 +1,199 @@
+{
+  "theme": {
+    "name": "Estate Planning Executive",
+    "version": "1.0.0",
+    "description": "A sophisticated, premium theme for high-net-worth estate planning clients",
+    "created": "2025-01-05",
+    "author": "Estate Planning Concierge v4.0"
+  },
+  
+  "style_guide": {
+    "color_palette": {
+      "primary": {
+        "deep_navy": "#0A1628",
+        "description": "Primary brand color - sophisticated, trustworthy"
+      },
+      "secondary": {
+        "gold": "#D4AF37",
+        "description": "Accent color - luxury, premium quality"
+      },
+      "neutral": {
+        "charcoal_grey": "#2C3E50",
+        "off_white": "#F8F6F3",
+        "warm_grey": "#7F8C8D",
+        "description": "Supporting neutral colors for balance"
+      },
+      "background": {
+        "light": "#FFFFFF",
+        "dark": "#0A1628",
+        "gradient_start": "#0A1628",
+        "gradient_end": "#1A2B3F"
+      }
+    },
+    
+    "typography": {
+      "primary_font": "Playfair Display",
+      "secondary_font": "Montserrat",
+      "icon_style": "minimalist geometric",
+      "text_hierarchy": {
+        "heading": "serif, elegant",
+        "body": "sans-serif, clean",
+        "accent": "light, sophisticated"
+      }
+    },
+    
+    "visual_style": {
+      "mood_keywords": [
+        "sophisticated",
+        "minimalist",
+        "corporate",
+        "premium",
+        "trustworthy",
+        "elegant",
+        "professional",
+        "refined",
+        "luxurious",
+        "authoritative"
+      ],
+      "design_principles": [
+        "Clean lines and geometric shapes",
+        "Generous white space",
+        "Subtle gradients and shadows",
+        "Premium material textures",
+        "Balanced composition",
+        "Timeless aesthetic"
+      ],
+      "avoid": [
+        "Overly bright colors",
+        "Cluttered layouts",
+        "Playful or casual elements",
+        "Trendy design fads",
+        "Low-quality imagery"
+      ]
+    }
+  },
+  
+  "asset_specifications": {
+    "icons": {
+      "count": 162,
+      "dimensions": "512x512",
+      "format": "PNG",
+      "style": "vector art, minimalist, single object, consistent color palette, on transparent background",
+      "base_prompt": "minimalist vector icon, {subject}, deep navy and gold accent, geometric design, premium quality, isolated on transparent background, professional estate planning theme",
+      "categories": [
+        "document_types",
+        "financial_instruments",
+        "legal_concepts",
+        "family_structures",
+        "asset_classes",
+        "planning_tools",
+        "professional_services",
+        "security_features"
+      ]
+    },
+    
+    "covers": {
+      "count": 162,
+      "dimensions": "1500x400",
+      "format": "JPG",
+      "style": "elegant header image, subtle gradient, professional composition",
+      "base_prompt": "elegant Notion page cover, {subject}, deep navy gradient background, gold accent elements, sophisticated minimal design, premium estate planning theme, 1500px width",
+      "categories": [
+        "section_headers",
+        "document_covers",
+        "welcome_pages",
+        "financial_sections",
+        "legal_sections",
+        "family_sections",
+        "planning_sections",
+        "resource_sections"
+      ]
+    },
+    
+    "letter_headers": {
+      "count": 3,
+      "dimensions": "2100x600",
+      "format": "PNG",
+      "style": "professional letterhead, corporate branding, elegant typography",
+      "base_prompt": "professional letterhead design, Estate Planning Executive theme, deep navy and gold, elegant serif typography, minimalist luxury design, suitable for official documents",
+      "types": [
+        "formal_correspondence",
+        "legal_documents",
+        "client_communications"
+      ]
+    },
+    
+    "textures": {
+      "count": 10,
+      "dimensions": "1920x1080",
+      "format": "JPG",
+      "style": "subtle background pattern, premium material texture",
+      "base_prompt": "subtle luxury texture pattern, {material}, deep navy and gold tones, sophisticated background, seamless pattern, premium quality, estate planning theme",
+      "materials": [
+        "brushed_metal",
+        "fine_linen",
+        "marble_veining",
+        "leather_grain",
+        "wood_grain",
+        "geometric_pattern",
+        "watermark_pattern",
+        "gradient_mesh",
+        "dot_matrix",
+        "crosshatch"
+      ]
+    }
+  },
+  
+  "generation_settings": {
+    "model": "flux-schnell",
+    "quality": "high",
+    "guidance_scale": 7.5,
+    "num_inference_steps": 4,
+    "budget": {
+      "total_limit": 13.11,
+      "per_icon": 0.04,
+      "per_cover": 0.04,
+      "per_header": 0.05,
+      "per_texture": 0.05,
+      "estimated_total": 13.09
+    },
+    "batch_settings": {
+      "icons_per_batch": 20,
+      "covers_per_batch": 20,
+      "headers_per_batch": 3,
+      "textures_per_batch": 10,
+      "delay_between_batches": 2
+    }
+  },
+  
+  "quality_checks": {
+    "automated": {
+      "dimension_check": true,
+      "format_check": true,
+      "file_size_check": true,
+      "naming_convention_check": true
+    },
+    "manual_review": {
+      "visual_consistency": true,
+      "brand_alignment": true,
+      "quality_threshold": true,
+      "notion_compatibility": true
+    }
+  },
+  
+  "directory_structure": {
+    "base_path": "/assets/themes/estate_planning_executive/",
+    "subdirectories": {
+      "icons": "icons/",
+      "covers": "covers/",
+      "headers": "headers/",
+      "textures": "textures/"
+    },
+    "naming_convention": {
+      "icons": "icon_{category}_{name}.png",
+      "covers": "cover_{category}_{name}.jpg",
+      "headers": "header_{type}_{number}.png",
+      "textures": "texture_{material}_{number}.jpg"
+    }
+  }
+}

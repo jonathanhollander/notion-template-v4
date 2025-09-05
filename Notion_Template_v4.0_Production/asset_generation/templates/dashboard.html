@@ -7,7 +7,7 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="/static/css/dashboard.css">
     <!-- DOMPurify for input sanitization -->
-    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
+    <script src="/static/js/dompurify.min.js"></script>
 </head>
 <body>
     <div class="header">
@@ -72,7 +72,7 @@
                     ✏️ Edit Master Prompt
                 </button>
                 <button class="button button-success" onclick="startTestGeneration()" aria-describedby="actions-heading" title="Start Test Generation">
-                    🚀 Start Test Generation (3 Images)
+                    🚀 Start Test Generation (15 Images)
                 </button>
                 <button class="button" onclick="loadEvaluations()" aria-describedby="actions-heading" title="Ctrl+L">Load Evaluations</button>
                 <button class="button" onclick="exportDecisions()" disabled id="export-btn" aria-describedby="actions-heading" title="Ctrl+E">Export Decisions</button>
@@ -119,12 +119,6 @@
                     <div class="metric-item">
                         <span class="metric-label">API Status:</span>
                         <span id="api-status" class="metric-value status-ok">✅ OK</span>
-                    </div>
-                </div>
-                <div class="log-stream">
-                    <h4>📋 Live Log Stream</h4>
-                    <div id="log-container" class="log-container">
-                        <!-- Real-time logs will appear here -->
                     </div>
                 </div>
             </div>
@@ -197,6 +191,32 @@
             </div>
         </section>
     </main>
+    
+    <!-- Full-Width Log Section -->
+    <section class="log-section" aria-labelledby="log-heading">
+        <div class="log-header">
+            <h2 id="log-heading">📋 Live System Log</h2>
+            <div class="log-controls">
+                <button class="button button-secondary" onclick="clearLogs()" title="Clear all logs">
+                    🗑️ Clear
+                </button>
+                <button class="button button-secondary" onclick="toggleLogAutoScroll()" id="autoscroll-btn" title="Toggle auto-scroll">
+                    📜 Auto-scroll: ON
+                </button>
+                <button class="button button-secondary" onclick="exportLogs()" title="Export logs to file">
+                    💾 Export
+                </button>
+            </div>
+        </div>
+        <div class="log-content">
+            <div id="log-container" class="log-container-fullwidth">
+                <div class="log-placeholder">
+                    <p>🔄 Connecting to live log stream...</p>
+                    <p>All system events, errors, and operations will appear here in real-time.</p>
+                </div>
+            </div>
+        </div>
+    </section>
     
     <!-- External JavaScript -->
     <script src="/static/js/dashboard.js"></script>

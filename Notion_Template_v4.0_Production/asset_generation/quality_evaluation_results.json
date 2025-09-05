@@ -1,0 +1,90 @@
+{
+  "pages": [
+    {
+      "page_id": "sample_1",
+      "page_title": "Estate Planning Dashboard",
+      "description": "Main dashboard for estate planning management",
+      "asset_type": "icon",
+      "prompts": [
+        {
+          "model": "claude-3-sonnet",
+          "prompt": "Luxury estate planning dashboard icon with gold accents, leather textures, and sophisticated mahogany desk elements, photorealistic style",
+          "quality_score": 8.5,
+          "emotional_score": 9.0
+        },
+        {
+          "model": "gpt-4-vision",
+          "prompt": "Premium estate planning interface icon featuring platinum and crystal elements with luxury office background",
+          "quality_score": 8.2,
+          "emotional_score": 8.5
+        },
+        {
+          "model": "gemini-pro",
+          "prompt": "High-end estate planning dashboard icon with marble and gold finishes in executive office setting",
+          "quality_score": 8.7,
+          "emotional_score": 8.8
+        }
+      ]
+    },
+    {
+      "page_id": "sample_2",
+      "page_title": "Trust Formation",
+      "description": "Comprehensive trust formation and management",
+      "asset_type": "cover",
+      "prompts": [
+        {
+          "model": "claude-3-sonnet",
+          "prompt": "Elegant trust formation cover image with legal documents on mahogany desk, gold fountain pen, crystal paperweight",
+          "quality_score": 9.0,
+          "emotional_score": 8.7
+        },
+        {
+          "model": "gpt-4-vision",
+          "prompt": "Sophisticated trust management cover featuring leather-bound documents and luxury office environment",
+          "quality_score": 8.8,
+          "emotional_score": 9.2
+        },
+        {
+          "model": "gemini-pro",
+          "prompt": "Premium trust formation visual with marble conference table and gold-accented legal materials",
+          "quality_score": 8.6,
+          "emotional_score": 8.9
+        }
+      ]
+    },
+    {
+      "page_id": "sample_3",
+      "page_title": "Will Creation",
+      "description": "Professional will drafting and management",
+      "asset_type": "icon",
+      "prompts": [
+        {
+          "model": "claude-3-sonnet",
+          "prompt": "Luxury will creation icon with gold seal, premium parchment, and mahogany writing desk elements",
+          "quality_score": 8.4,
+          "emotional_score": 8.6
+        },
+        {
+          "model": "gpt-4-vision",
+          "prompt": "Elegant will drafting icon featuring platinum pen and crystal inkwell on leather surface",
+          "quality_score": 8.3,
+          "emotional_score": 8.8
+        },
+        {
+          "model": "gemini-pro",
+          "prompt": "High-end will creation icon with gold embossing and luxury office atmosphere",
+          "quality_score": 8.5,
+          "emotional_score": 8.7
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "generation_date": "2025-09-05",
+    "total_pages": 3,
+    "total_prompts": 9,
+    "average_quality_score": 8.56,
+    "average_emotional_score": 8.82,
+    "models_used": ["claude-3-sonnet", "gpt-4-vision", "gemini-pro"]
+  }
+}
