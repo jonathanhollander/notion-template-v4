@@ -328,41 +328,37 @@ async function loadEvaluation(index) {
                 
                 const scoreBadge = document.createElement('span');
                 scoreBadge.className = 'score-badge';
-                scoreBadge.textContent = prompt.weighted_score.toFixed(2) + '/10';
+                // Use quality_score from API response
+                const score = prompt.quality_score || 0;
+                scoreBadge.textContent = score.toFixed(2) + '/10';
                 
                 promptHeader.appendChild(modelSource);
                 promptHeader.appendChild(scoreBadge);
                 
                 const promptText = document.createElement('div');
                 promptText.className = 'prompt-text';
-                promptText.textContent = sanitizeInput(prompt.text);
+                // Use prompt_text from API response
+                promptText.textContent = sanitizeInput(prompt.prompt_text || '');
                 
                 const scoreDetails = document.createElement('div');
                 scoreDetails.className = 'score-details';
-                scoreDetails.innerHTML = `<span><strong>Overall:</strong> ${prompt.overall_score.toFixed(1)}</span><span><strong>Weighted:</strong> ${prompt.weighted_score.toFixed(2)}</span>`;
+                // Use quality_score and emotional_score from API response
+                const qualityScore = prompt.quality_score || 0;
+                const emotionalScore = prompt.emotional_score || 0;
+                scoreDetails.innerHTML = `<span><strong>Quality:</strong> ${qualityScore.toFixed(1)}</span><span><strong>Emotional:</strong> ${emotionalScore.toFixed(1)}</span>`;
                 
                 promptDiv.appendChild(promptHeader);
                 promptDiv.appendChild(promptText);
                 promptDiv.appendChild(scoreDetails);
                 
-                if (evaluation.winner && prompt.id === evaluation.winner.id) {
-                    promptDiv.classList.add('ai-winner');  // Use new enhanced class
-                    const badge = document.createElement('span');
-                    badge.style.background = '#28a745';
-                    badge.style.color = 'white';
-                    badge.style.padding = '4px 8px';
-                    badge.style.borderRadius = '4px';
-                    badge.style.fontSize = '12px';
-                    badge.textContent = 'AI WINNER';
-                    promptDiv.querySelector('.prompt-header').appendChild(badge);
-                }
-                
+                // Skip AI winner check since we don't have ID fields
                 container.appendChild(promptDiv);
                 
-                // Add to selection dropdown
+                // Add to selection dropdown - use index as value since we don't have IDs
                 const option = document.createElement('option');
-                option.value = prompt.id;
-                option.textContent = `${sanitizeInput(prompt.model_source)} (${prompt.weighted_score.toFixed(2)})`;
+                option.value = index; // Use the array index as the identifier
+                const optionScore = prompt.quality_score || 0;
+                option.textContent = `${sanitizeInput(prompt.model_source)} (${optionScore.toFixed(2)})`;
                 select.appendChild(option);
             });
             
