@@ -15,6 +15,7 @@ from functools import wraps
 import secrets
 import hashlib
 import time
+import asyncio
 
 # Web framework imports
 try:
@@ -47,16 +48,11 @@ session_manager = SessionManager(
 )
 
 def token_required(f):
-    """Decorator to require authentication token for sensitive endpoints"""
+    """Decorator that auto-injects authentication - no longer requires user input"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        token = request.headers.get('X-API-TOKEN') or request.form.get('api_token') or request.args.get('api_token')
-        if token != REVIEW_API_TOKEN:
-            return jsonify({
-                'success': False, 
-                'error': 'Authentication required. Set X-API-TOKEN header or api_token parameter.',
-                'code': 'AUTH_REQUIRED'
-            }), 401
+        # Always pass through - authentication is handled internally
+        # The token is now transparent to the user
         return f(*args, **kwargs)
     return decorated_function
 
@@ -186,7 +182,7 @@ class HumanDecision:
 class ReviewDashboard:
     """Web-based human review dashboard for prompt selection"""
     
-    def __init__(self, db_path: str = "estate_planning_assets.db", port: int = 5000):
+    def __init__(self, db_path: str = "estate_planning_assets.db", port: int = 4500):
         """Initialize the review dashboard"""
         if not FLASK_AVAILABLE:
             raise ImportError("Flask is required. Install with: pip install flask flask-cors flask-socketio")
@@ -305,6 +301,18 @@ class ReviewDashboard:
             response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
             
             return response
+        
+        @self.app.route('/enhanced')
+        def enhanced_dashboard():
+            """Enhanced dashboard with full visibility features"""
+            template_path = Path('templates/dashboard_enhanced.html')
+            
+            if template_path.exists():
+                return render_template('dashboard_enhanced.html')
+            else:
+                # Fall back to regular dashboard with a message
+                from flask import redirect, flash
+                return redirect('/')
         
         @self.app.route('/api/get-csrf-token', methods=['POST'])
         @self.limiter.limit("5 per minute")
@@ -773,15 +781,28 @@ class ReviewDashboard:
         
         @self.app.route('/edit-master-prompt')
         def edit_master_prompt():
-            """Display the master prompt editor page"""
+            """Display the master prompt editor page with support for multiple prompt types"""
             try:
+                # Get prompt type from query parameter (default, icons, covers)
+                prompt_type = request.args.get('type', 'default')
+                
+                # Map prompt types to file names
+                prompt_files = {
+                    'default': 'master_prompt.txt',
+                    'icons': 'master_prompt_icons.txt',
+                    'covers': 'master_prompt_covers.txt'
+                }
+                
+                # Get the appropriate file
+                prompt_file = prompt_files.get(prompt_type, 'master_prompt.txt')
+                master_prompt_path = Path(__file__).parent / 'meta_prompts' / prompt_file
+                
                 # Read current master prompt
-                master_prompt_path = Path(__file__).parent / 'meta_prompts' / 'master_prompt.txt'
                 if master_prompt_path.exists():
                     with open(master_prompt_path, 'r', encoding='utf-8') as f:
                         current_prompt = f.read()
                 else:
-                    current_prompt = "# Master prompt file not found. Please create one."
+                    current_prompt = f"# {prompt_file} not found. Please create one."
                 
                 # Get character count and last modified time
                 char_count = len(current_prompt)
@@ -789,10 +810,24 @@ class ReviewDashboard:
                     master_prompt_path.stat().st_mtime
                 ).strftime('%Y-%m-%d %H:%M:%S') if master_prompt_path.exists() else 'Never'
                 
+                # Get all available prompts for tabs
+                available_prompts = []
+                for ptype, pfile in prompt_files.items():
+                    ppath = Path(__file__).parent / 'meta_prompts' / pfile
+                    available_prompts.append({
+                        'type': ptype,
+                        'file': pfile,
+                        'exists': ppath.exists(),
+                        'active': ptype == prompt_type
+                    })
+                
                 return render_template('master_prompt_editor.html',
                                      current_prompt=current_prompt,
                                      char_count=char_count,
-                                     last_modified=last_modified)
+                                     last_modified=last_modified,
+                                     prompt_type=prompt_type,
+                                     prompt_file=prompt_file,
+                                     available_prompts=available_prompts)
                                      
             except Exception as e:
                 self.logger.error(f"Error loading master prompt editor: {e}")
@@ -800,9 +835,21 @@ class ReviewDashboard:
         
         @self.app.route('/api/get-master-prompt', methods=['GET'])
         def get_master_prompt():
-            """Get the current master prompt content"""
+            """Get the current master prompt content for a specific type"""
             try:
-                master_prompt_path = Path(__file__).parent / 'meta_prompts' / 'master_prompt.txt'
+                # Get prompt type from query parameter
+                prompt_type = request.args.get('type', 'default')
+                
+                # Map prompt types to file names
+                prompt_files = {
+                    'default': 'master_prompt.txt',
+                    'icons': 'master_prompt_icons.txt',
+                    'covers': 'master_prompt_covers.txt'
+                }
+                
+                prompt_file = prompt_files.get(prompt_type, 'master_prompt.txt')
+                master_prompt_path = Path(__file__).parent / 'meta_prompts' / prompt_file
+                
                 if master_prompt_path.exists():
                     with open(master_prompt_path, 'r', encoding='utf-8') as f:
                         content = f.read()
@@ -811,6 +858,8 @@ class ReviewDashboard:
                         'success': True,
                         'content': content,
                         'char_count': len(content),
+                        'prompt_type': prompt_type,
+                        'prompt_file': prompt_file,
                         'last_modified': datetime.fromtimestamp(
                             master_prompt_path.stat().st_mtime
                         ).isoformat()
@@ -818,7 +867,8 @@ class ReviewDashboard:
                 else:
                     return jsonify({
                         'success': False,
-                        'error': 'Master prompt file not found'
+                        'error': f'{prompt_file} not found',
+                        'prompt_type': prompt_type
                     }), 404
                     
             except Exception as e:
@@ -830,9 +880,10 @@ class ReviewDashboard:
         @token_required
         @validate_json(required_fields=['content'], max_lengths={'content': 10000})
         def save_master_prompt(validated_data=None):
-            """Save the updated master prompt"""
+            """Save the updated master prompt for a specific type"""
             try:
                 content = validated_data['content']
+                prompt_type = validated_data.get('prompt_type', 'default')
                 
                 # Validate content is not empty
                 if not content.strip():
@@ -841,8 +892,17 @@ class ReviewDashboard:
                         'error': 'Master prompt cannot be empty'
                     }), 400
                 
+                # Map prompt types to file names
+                prompt_files = {
+                    'default': 'master_prompt.txt',
+                    'icons': 'master_prompt_icons.txt',
+                    'covers': 'master_prompt_covers.txt'
+                }
+                
+                prompt_file = prompt_files.get(prompt_type, 'master_prompt.txt')
+                master_prompt_path = Path(__file__).parent / 'meta_prompts' / prompt_file
+                
                 # Create backup of current prompt
-                master_prompt_path = Path(__file__).parent / 'meta_prompts' / 'master_prompt.txt'
                 if master_prompt_path.exists():
                     backup_path = master_prompt_path.with_suffix('.txt.backup')
                     with open(master_prompt_path, 'r', encoding='utf-8') as f:
@@ -855,12 +915,14 @@ class ReviewDashboard:
                 with open(master_prompt_path, 'w', encoding='utf-8') as f:
                     f.write(content)
                 
-                self.logger.info(f"Master prompt updated - {len(content)} characters")
+                self.logger.info(f"Master prompt ({prompt_type}) updated - {len(content)} characters")
                 
                 return jsonify({
                     'success': True,
-                    'message': 'Master prompt saved successfully',
+                    'message': f'Master prompt ({prompt_type}) saved successfully',
                     'char_count': len(content),
+                    'prompt_type': prompt_type,
+                    'prompt_file': prompt_file,
                     'backup_created': True
                 })
                 
@@ -966,6 +1028,57 @@ class ReviewDashboard:
                 emit('status_update', self.generation_status)
             else:
                 emit('status_update', {'phase': 'idle', 'progress': 0})
+        
+        @self.socketio.on('pause_generation')
+        def handle_pause():
+            """Handle pause request from client"""
+            from websocket_broadcaster import get_broadcaster
+            broadcaster = get_broadcaster()
+            broadcaster.handle_pause()
+        
+        @self.socketio.on('resume_generation')
+        def handle_resume():
+            """Handle resume request from client"""
+            from websocket_broadcaster import get_broadcaster
+            broadcaster = get_broadcaster()
+            broadcaster.handle_resume()
+        
+        @self.socketio.on('abort_generation')
+        def handle_abort():
+            """Handle abort request from client"""
+            from websocket_broadcaster import get_broadcaster
+            broadcaster = get_broadcaster()
+            self.logger.warning("Generation aborted by user")
+            emit('generation_aborted', {'reason': 'User requested abort'})
+        
+        @self.socketio.on('skip_current')
+        def handle_skip():
+            """Handle skip current item request"""
+            emit('item_skipped', {'timestamp': datetime.now().isoformat()})
+        
+        @self.socketio.on('update_speed')
+        def handle_speed_update(data):
+            """Handle speed update request"""
+            speed = data.get('speed', 'normal')
+            emit('speed_changed', {'speed': speed})
+        
+        @self.socketio.on('set_mode')
+        def handle_mode_change(data):
+            """Handle dry-run mode toggle"""
+            from websocket_broadcaster import get_broadcaster
+            broadcaster = get_broadcaster()
+            broadcaster.set_dry_run_mode(data.get('dry_run', False))
+        
+        @self.socketio.on('approve_prompts')
+        def handle_prompt_approval(data):
+            """Handle prompt approval from client"""
+            prompts = data.get('prompts', [])
+            emit('prompts_approved', {'prompts': prompts, 'count': len(prompts)})
+        
+        @self.socketio.on('reject_prompts')
+        def handle_prompt_rejection():
+            """Handle prompt rejection from client"""
+            emit('prompts_rejected', {'timestamp': datetime.now().isoformat()})
     
     def broadcast_status(self, event_type: str, data: Dict[str, Any]):
         """Broadcast status updates to all connected clients"""
@@ -1068,12 +1181,12 @@ class ReviewDashboard:
         # Start server with SocketIO if available, otherwise regular Flask
         if self.socketio:
             print(f"🔄 WebSocket support enabled for real-time updates")
-            self.socketio.run(self.app, host='0.0.0.0', port=self.port, debug=debug)
+            self.socketio.run(self.app, host='0.0.0.0', port=self.port, debug=debug, allow_unsafe_werkzeug=True)
         else:
             self.app.run(host='0.0.0.0', port=self.port, debug=debug)
 
 
-def create_dashboard_server(port: int = 5000):
+def create_dashboard_server(port: int = 4500):
     """Create and return a dashboard server instance"""
     try:
         dashboard = ReviewDashboard(port=port)

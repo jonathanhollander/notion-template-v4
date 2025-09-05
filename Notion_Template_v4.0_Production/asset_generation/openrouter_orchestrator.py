@@ -9,6 +9,7 @@ import json
 import asyncio
 import aiohttp
 from typing import Dict, List, Any, Optional, Tuple
+from websocket_broadcaster import get_broadcaster
 from dataclasses import dataclass, asdict
 from datetime import datetime
 import logging
@@ -57,6 +58,15 @@ class OpenRouterOrchestrator:
             raise ValueError("OpenRouter API key is required")
         
         # Model configurations for different perspectives
+
+        
+        # Initialize WebSocket broadcaster for real-time visibility
+        try:
+            self.broadcaster = get_broadcaster()
+            self.logger.info("✓ WebSocket broadcaster initialized in OpenRouter orchestrator")
+        except Exception as e:
+            self.broadcaster = None
+            self.logger.warning(f"WebSocket broadcaster not available: {e}")
         self.models = {
             'claude': {
                 'id': 'anthropic/claude-3-opus-20240229',
@@ -77,7 +87,7 @@ class OpenRouterOrchestrator:
         
         self.base_url = "https://openrouter.ai/api/v1/chat/completions"
         self.logger = self._setup_logger()
-        self.master_prompt = self._load_master_prompt()
+        # Master prompt is now loaded dynamically based on asset_type
         self.logs_dir = Path("logs/llm_generations")
         self.logs_dir.mkdir(parents=True, exist_ok=True)
         
@@ -101,17 +111,48 @@ class OpenRouterOrchestrator:
         
         return logger
     
-    def _load_master_prompt(self) -> str:
-        """Load the master prompt from file"""
-        master_prompt_path = Path("meta_prompts/master_prompt.txt")
+    def _load_master_prompt(self, asset_type: str = None) -> str:
+        """Load the master prompt from file based on asset type
+        
+        Args:
+            asset_type: Type of asset ('icons', 'covers', etc.)
+                       If None, loads the default master_prompt.txt
+        """
+        # Determine which master prompt file to use
+        if asset_type in ['icons', 'database_icons']:
+            # Use icon-specific master prompt for icon assets
+            master_prompt_file = "master_prompt_icons.txt"
+        elif asset_type in ['covers', 'cover']:
+            # Use cover-specific master prompt for cover assets
+            master_prompt_file = "master_prompt_covers.txt"
+        else:
+            # Use default master prompt for other assets or when not specified
+            master_prompt_file = "master_prompt.txt"
+        
+        master_prompt_path = Path("meta_prompts") / master_prompt_file
+        
+        # Try to load the specific master prompt, fall back to default if not found
         try:
             with open(master_prompt_path, 'r', encoding='utf-8') as f:
                 content = f.read()
-            self.logger.info(f"Loaded master prompt from {master_prompt_path}")
+            self.logger.info(f"Loaded master prompt from {master_prompt_path} for asset_type: {asset_type}")
             return content
         except FileNotFoundError:
-            self.logger.error(f"Master prompt file not found: {master_prompt_path}")
-            raise ValueError(f"Master prompt file not found: {master_prompt_path}")
+            if master_prompt_file != "master_prompt.txt":
+                # Try to fall back to default master prompt
+                self.logger.warning(f"Master prompt file not found: {master_prompt_path}, trying default")
+                default_path = Path("meta_prompts/master_prompt.txt")
+                try:
+                    with open(default_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                    self.logger.info(f"Loaded default master prompt from {default_path}")
+                    return content
+                except FileNotFoundError:
+                    self.logger.error(f"Default master prompt file not found: {default_path}")
+                    raise ValueError(f"Neither specific nor default master prompt file found")
+            else:
+                self.logger.error(f"Master prompt file not found: {master_prompt_path}")
+                raise ValueError(f"Master prompt file not found: {master_prompt_path}")
         except Exception as e:
             self.logger.error(f"Failed to load master prompt: {e}")
             raise
@@ -195,12 +236,16 @@ class OpenRouterOrchestrator:
             "X-Title": "Estate Planning Concierge v4.0"
         }
         
+        # Load the appropriate master prompt based on asset type
+        asset_type = context_data.get('asset_type', 'UNKNOWN')
+        master_prompt = self._load_master_prompt(asset_type)
+        
         # Build context section for the master prompt
         context_section = f"""
 CONTEXT DATA:
 - Visual Tier: {context_data.get('tier', 'UNKNOWN')}
 - Emotional Context: {context_data.get('emotional_context', 'UNKNOWN')}
-- Asset Type: {context_data.get('asset_type', 'UNKNOWN')}
+- Asset Type: {asset_type}
 - Title: {context_data.get('title', 'UNKNOWN')}
 - Category: {context_data.get('category', 'UNKNOWN')}
 - Section: {context_data.get('section', 'general')}
@@ -208,7 +253,7 @@ CONTEXT DATA:
 """
         
         # Combine master prompt with context data - NO system message, NO other parameters
-        full_prompt = self.master_prompt + context_section
+        full_prompt = master_prompt + context_section
         
         payload = {
             "model": model_id,
@@ -277,6 +322,14 @@ CONTEXT DATA:
         """Generate competitive prompts using structured master prompt system"""
         self.logger.info(f"Generating competitive prompts for: {page_info['title']}")
         
+        # Emit model competition start event
+        if self.broadcaster:
+            self.broadcaster.emit('model_competition_start', {
+                'asset_name': page_info.get('title', 'Unknown'),
+                'models': list(self.models.keys()),
+                'timestamp': datetime.now().isoformat()
+            })
+        
         # Create tasks for parallel execution using new structured approach
         tasks = []
         for model_name, model_config in self.models.items():
@@ -288,6 +341,16 @@ CONTEXT DATA:
         results = []
         for model_name, task in tasks:
             result = await task
+            
+            # Emit prompt generation event
+            if self.broadcaster and result['success']:
+                self.broadcaster.emit('prompt_generated', {
+                    'model': model_name,
+                    'asset_name': page_info.get('title', 'Unknown'),
+                    'success': True,
+                    'timestamp': datetime.now().isoformat()
+                })
+            
             if result['success']:
                 structured_prompt = result['structured_prompt']
                 
@@ -501,6 +564,26 @@ Provide scores in JSON format:
         
         return output_path
 
+
+
+    def emit_progress(self, message: str, level: str = "info"):
+        """Emit progress update via WebSocket"""
+        if self.broadcaster:
+            self.broadcaster.emit_log(message, level)
+    
+    def emit_cost_update(self, model: str, cost: float):
+        """Emit cost tracking update"""
+        if self.broadcaster:
+            self.broadcaster.emit('openrouter_cost', {
+                'model': model,
+                'cost': cost,
+                'timestamp': datetime.now().isoformat()
+            })
+    
+    def emit_model_decision(self, winner_model: str, reasons: List[str]):
+        """Emit model decision reasoning"""
+        if self.broadcaster:
+            self.broadcaster.model_decision(winner_model, reasons)
 
 async def test_orchestrator():
     """Test the orchestrator with sample pages"""

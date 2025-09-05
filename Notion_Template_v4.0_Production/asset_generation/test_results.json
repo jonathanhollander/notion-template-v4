@@ -1,0 +1,26 @@
+{
+  "timestamp": "2025-09-04T11:57:34.398590",
+  "total_tests": 3,
+  "successful": 3,
+  "failed": 0,
+  "results": [
+    {
+      "title": "Test Icon 1",
+      "type": "icons",
+      "file": "{'prompt': 'A simple test icon with geometric shapes', 'asset_type': 'icons', 'output': [<replicate.helpers.FileOutput object at 0x10845e900>], 'cost': 0.04}",
+      "status": "success"
+    },
+    {
+      "title": "Test Cover 1",
+      "type": "covers",
+      "file": "{'prompt': 'A test cover image with abstract patterns', 'asset_type': 'covers', 'output': <replicate.helpers.FileOutput object at 0x1083ebb10>, 'cost': 0.04}",
+      "status": "success"
+    },
+    {
+      "title": "Test Icon 2",
+      "type": "icons",
+      "file": "{'prompt': 'Another test icon with circular design', 'asset_type': 'icons', 'output': [<replicate.helpers.FileOutput object at 0x108748e90>], 'cost': 0.04}",
+      "status": "success"
+    }
+  ]
+}

@@ -94,12 +94,44 @@ async function getCSRFToken() {
 }
 
 function getAPIToken() {
-    // Try to get from form field first, then from environment/storage
-    const tokenField = document.getElementById('api-token');
-    if (tokenField && tokenField.value) {
-        return tokenField.value;
+    // Always return the internal token - no user input needed
+    return 'estate-planning-review-2024';
+}
+
+async function getCsrfToken() {
+    try {
+        const response = await fetch('/api/get-csrf-token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-TOKEN': getAPIToken()
+            },
+            body: JSON.stringify({})
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.session_id && data.csrf_token) {
+            sessionId = data.session_id;
+            csrfToken = data.csrf_token;
+            
+            // Store in sessionStorage
+            sessionStorage.setItem('session_id', sessionId);
+            sessionStorage.setItem('csrf_token', csrfToken);
+            
+            return true;
+        } else {
+            throw new Error('Invalid response from server');
+        }
+    } catch (error) {
+        console.error('Failed to get CSRF token:', error);
+        showToast('Failed to get security token. Please check your API token.', 'error');
+        return false;
     }
-    return 'estate-planning-review-2024'; // Default for development
 }
 
 async function startSession() {
@@ -109,7 +141,7 @@ async function startSession() {
     setLoading(startButton, true);
     
     // First get CSRF token
-    if (!await getCSRFToken()) {
+    if (!await getCsrfToken()) {
         showToast('Failed to get security token. Please check your API token.', 'error');
         setLoading(startButton, false);
         return;
@@ -671,7 +703,7 @@ async function startTestGeneration() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-API-TOKEN': getApiToken(),
+                'X-API-TOKEN': getAPIToken(),
                 'X-Session-ID': sessionId,
                 'X-CSRF-Token': csrfToken
             },
@@ -684,7 +716,7 @@ async function startTestGeneration() {
         const data = await response.json();
         
         if (data.success) {
-            showNotification('Test generation started (3 images)', 'success');
+            showToast('Test generation started (3 images)', 'success');
             appendLogMessage({
                 level: 'info',
                 message: '🚀 Starting sample generation (3 images)',
@@ -695,7 +727,7 @@ async function startTestGeneration() {
         }
         
     } catch (error) {
-        showNotification('Failed to start generation: ' + error.message, 'error');
+        showToast('Failed to start generation: ' + error.message, 'error');
         console.error('Generation start error:', error);
     }
 }

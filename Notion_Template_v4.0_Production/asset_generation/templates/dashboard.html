@@ -17,16 +17,13 @@
     
     <main class="dashboard-container" role="main">
         <section class="panel progress-panel" aria-labelledby="progress-heading">
-            <!-- Authentication Section -->
+            <!-- Session Start Section -->
             <div class="auth-section">
-                <h2 id="auth-heading">🔐 Authentication</h2>
-                <label for="api-token">API Token <span class="required-indicator">*</span></label>
-                <input type="password" id="api-token" class="form-input" aria-describedby="token-help" required aria-required="true">
-                <span id="token-help" class="sr-only">Enter your authentication token to access the review dashboard</span>
+                <h2 id="auth-heading">👋 Start Session</h2>
                 <label for="reviewer-name">Reviewer Name <span class="optional-indicator">(Optional)</span></label>
-                <input type="text" id="reviewer-name" class="form-input" aria-describedby="name-help">
+                <input type="text" id="reviewer-name" class="form-input" aria-describedby="name-help" placeholder="Enter your name or leave blank">
                 <span id="name-help" class="sr-only">Enter your name for session tracking</span>
-                <button class="button" onclick="startSession()" aria-describedby="auth-heading">Start Review Session</button>
+                <button class="button button-primary" onclick="startSession()" aria-describedby="auth-heading">Start Review Session</button>
             </div>
             
             <hr class="section-divider">
@@ -136,7 +133,7 @@
                 <p>This interface allows you to review AI-generated prompts and make final selections for our luxury estate planning assets.</p>
                 <p>To get started:</p>
                 <ol>
-                    <li>Enter your API token and name, then start a review session</li>
+                    <li>Click "Start Review Session" to begin (name is optional)</li>
                     <li>Load evaluation results from the quality scorer</li>
                     <li>Review competing prompts and make your selections</li>
                     <li>Export your decisions for final generation</li>

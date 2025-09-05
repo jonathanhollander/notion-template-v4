@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estate Planning Concierge v4.0 - Prompt Review Dashboard</title>
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <!-- DOMPurify for input sanitization -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
+</head>
+<body>
+    <div class="header">
+        <h1>🏛️ Estate Planning Concierge v4.0</h1>
+        <p>Ultra-Premium Prompt Review Dashboard</p>
+    </div>
+    
+    <main class="dashboard-container" role="main">
+        <section class="panel progress-panel" aria-labelledby="progress-heading">
+            <!-- Authentication Section -->
+            <div class="auth-section">
+                <h2 id="auth-heading">🔐 Authentication</h2>
+                <label for="api-token">API Token <span class="required-indicator">*</span></label>
+                <input type="password" id="api-token" class="form-input" aria-describedby="token-help" required aria-required="true">
+                <span id="token-help" class="sr-only">Enter your authentication token to access the review dashboard</span>
+                <label for="reviewer-name">Reviewer Name <span class="optional-indicator">(Optional)</span></label>
+                <input type="text" id="reviewer-name" class="form-input" aria-describedby="name-help">
+                <span id="name-help" class="sr-only">Enter your name for session tracking</span>
+                <button class="button" onclick="startSession()" aria-describedby="auth-heading">Start Review Session</button>
+            </div>
+            
+            <hr class="section-divider">
+            
+            <!-- Session Status Section -->
+            <div class="session-status-section">
+                <h2 id="session-heading">📋 Session Status</h2>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <span class="status-label">Session:</span>
+                        <span id="session-status" class="status-value">Not Started</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Evaluations:</span>
+                        <span id="evaluations-count" class="status-value">0</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Decisions:</span>
+                        <span id="decisions-count" class="status-value">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <hr class="section-divider">
+            
+            <!-- Progress Section -->
+            <div class="progress-section">
+                <h2 id="progress-heading">📊 Review Progress</h2>
+                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-fill progress-fill-init" id="progress-fill"></div>
+                </div>
+                <p id="progress-text">0% Complete</p>
+            </div>
+            
+            <hr class="section-divider">
+            
+            <!-- Actions Section -->
+            <div class="actions-section">
+                <h3 id="actions-heading">🎯 Actions</h3>
+                <button class="button button-primary" onclick="window.location.href='/edit-master-prompt'" aria-describedby="actions-heading" title="Edit Master Prompt">
+                    ✏️ Edit Master Prompt
+                </button>
+                <button class="button button-success" onclick="startTestGeneration()" aria-describedby="actions-heading" title="Start Test Generation">
+                    🚀 Start Test Generation (3 Images)
+                </button>
+                <button class="button" onclick="loadEvaluations()" aria-describedby="actions-heading" title="Ctrl+L">Load Evaluations</button>
+                <button class="button" onclick="exportDecisions()" disabled id="export-btn" aria-describedby="actions-heading" title="Ctrl+E">Export Decisions</button>
+                <button class="button button-secondary" onclick="showKeyboardShortcutsHelp()" aria-describedby="actions-heading" title="Press ?">
+                    ⌨️ Shortcuts
+                </button>
+            </div>
+            
+            <hr class="section-divider">
+            
+            <!-- Metrics Section -->
+            <div class="metrics-section">
+                <h3 id="metrics-heading">📈 Quality Metrics</h3>
+                <div id="quality-metrics" aria-labelledby="metrics-heading">
+                    <p>Start a session to view metrics</p>
+                </div>
+            </div>
+            
+            <hr class="section-divider">
+            
+            <!-- Real-Time Status Section -->
+            <div class="status-section" id="generation-status-panel" style="display: none;">
+                <h3 id="status-heading">🔄 Generation Status</h3>
+                <div class="status-indicator">
+                    <span class="status-label">Current Phase:</span>
+                    <span id="current-phase" class="status-value">Idle</span>
+                </div>
+                <div class="progress-bar-generation">
+                    <div class="progress-fill-generation" id="generation-progress" style="width: 0%"></div>
+                </div>
+                <div class="status-metrics">
+                    <div class="metric-item">
+                        <span class="metric-label">Prompts Generated:</span>
+                        <span id="prompts-count" class="metric-value">0</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">Images Created:</span>
+                        <span id="images-count" class="metric-value">0</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">Cost:</span>
+                        <span id="generation-cost" class="metric-value">$0.00</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">API Status:</span>
+                        <span id="api-status" class="metric-value status-ok">✅ OK</span>
+                    </div>
+                </div>
+                <div class="log-stream">
+                    <h4>📋 Live Log Stream</h4>
+                    <div id="log-container" class="log-container">
+                        <!-- Real-time logs will appear here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="panel review-area" aria-labelledby="review-heading">
+            <h2 id="review-heading">🎨 Prompt Review</h2>
+            
+            <div id="pre-review-message">
+                <p>👋 Welcome to the Estate Planning Concierge v4.0 Prompt Review Dashboard!</p>
+                <p>This interface allows you to review AI-generated prompts and make final selections for our luxury estate planning assets.</p>
+                <p>To get started:</p>
+                <ol>
+                    <li>Enter your API token and name, then start a review session</li>
+                    <li>Load evaluation results from the quality scorer</li>
+                    <li>Review competing prompts and make your selections</li>
+                    <li>Export your decisions for final generation</li>
+                </ol>
+            </div>
+            
+            <div id="evaluation-display">
+                <div class="evaluation-header">
+                    <h3 id="eval-title">Loading...</h3>
+                    <p id="eval-details">Category: <span id="eval-category"></span> | Type: <span id="eval-type"></span></p>
+                </div>
+                
+                <div id="prompts-container" aria-live="polite">
+                    <!-- Prompts will be loaded here -->
+                </div>
+                
+                <form class="decision-form" role="form" aria-labelledby="decision-heading">
+                    <h4 id="decision-heading">🤔 Decision Center</h4>
+                    
+                    <!-- Step 1: Selection -->
+                    <div class="form-step">
+                        <div class="step-indicator">Step 1: Choose</div>
+                        <label for="selected-prompt">Select Best Prompt <span class="required-indicator">*</span></label>
+                        <select id="selected-prompt" class="enhanced-select" aria-describedby="prompt-help" required aria-required="true">
+                            <option value="">Select a prompt...</option>
+                        </select>
+                        <span id="prompt-help" class="help-text">Review the prompts above and select the best option</span>
+                    </div>
+                    
+                    <!-- Step 2: Reasoning -->
+                    <div class="form-step">
+                        <div class="step-indicator">Step 2: Justify</div>
+                        <label for="decision-reasoning">Decision Reasoning <span class="required-indicator">*</span></label>
+                        <textarea id="decision-reasoning" class="enhanced-textarea" aria-describedby="reasoning-help" required aria-required="true" rows="4" placeholder="Explain why this prompt is best for estate planning users. Consider quality, tone, and completeness."></textarea>
+                        <span id="reasoning-help" class="help-text">Provide clear rationale for your selection</span>
+                    </div>
+                    
+                    <!-- Step 3: Optional Enhancements -->
+                    <div class="form-step">
+                        <div class="step-indicator">Step 3: Enhance <span class="optional-badge">Optional</span></div>
+                        <label for="custom-modifications">Suggested Improvements</label>
+                        <textarea id="custom-modifications" class="enhanced-textarea" aria-describedby="modifications-help" rows="3" placeholder="Any refinements or adjustments to make the prompt even better?"></textarea>
+                        <span id="modifications-help" class="help-text">Optional: Propose any improvements to the selected prompt</span>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="form-actions">
+                        <button class="button button-primary" onclick="makeDecision()" type="button" title="Ctrl+S">
+                            <span class="button-icon">✓</span> Record Decision
+                        </button>
+                        <button class="button button-secondary" onclick="nextEvaluation()" type="button" aria-describedby="decision-heading" title="Press N">
+                            Skip to Next <span class="button-icon">→</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+    
+    <!-- External JavaScript -->
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

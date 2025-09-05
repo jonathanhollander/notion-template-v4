@@ -23,6 +23,9 @@ from tqdm import tqdm
 from tqdm.asyncio import tqdm as atqdm
 from git_operations import GitOperations
 from sync_yaml_comprehensive import sync_with_yaml as comprehensive_sync
+from openrouter_orchestrator import OpenRouterOrchestrator
+from websocket_broadcaster import get_broadcaster
+from approval_gate import ApprovalGate
 
 # Import new safety utilities
 try:
@@ -123,6 +126,24 @@ class AssetGenerator:
         # Initialize Replicate client
         self.setup_replicate()
         
+        # Initialize OpenRouter Orchestrator for prompt generation
+        try:
+            self.orchestrator = OpenRouterOrchestrator()
+            self.logger.info("✓ OpenRouter Orchestrator initialized")
+        except Exception as e:
+            self.logger.warning(f"Could not initialize OpenRouter Orchestrator: {e}")
+            self.orchestrator = None
+        
+        # Initialize WebSocket broadcaster for real-time visibility
+        self.broadcaster = get_broadcaster()
+        
+        # Initialize approval gate for batch approvals
+        self.approval_gate = ApprovalGate(timeout_seconds=300)  # 5 minute timeout
+        self.require_approval = True  # Can be configured
+        self.approval_threshold = 10  # Require approval for batches > 10 items
+        self.broadcaster.budget_limit = self.config['budget']['mass_generation']['max_cost']
+        self.logger.info("✓ WebSocket broadcaster initialized for real-time updates")
+        
         # Ensure output directories exist with path validation
         for dir_key in ['sample_directory', 'production_directory', 'backup_directory']:
             if self.path_validator:
@@ -166,6 +187,103 @@ class AssetGenerator:
         
         return config
     
+
+    async def check_control_flags(self):
+        """Check for pause/abort/skip commands from WebSocket"""
+        
+        # Check if paused
+        while self.broadcaster.generation_paused:
+            self.broadcaster.emit_log("⏸️ Generation paused", "info")
+            await asyncio.sleep(1)
+        
+        # Check if aborted
+        if hasattr(self.broadcaster, 'generation_aborted') and self.broadcaster.generation_aborted:
+            self.broadcaster.emit_log("🛑 Generation aborted", "error")
+            raise Exception("Generation aborted by user")
+        
+        # Check if skip requested
+        if hasattr(self.broadcaster, 'skip_current') and self.broadcaster.skip_current:
+            self.broadcaster.skip_current = False
+            return "skip"
+        
+        # Apply speed control
+        speed = self.broadcaster.generation_speed
+        if speed == "slow":
+            await asyncio.sleep(2)
+        elif speed == "fast":
+            pass  # No delay
+        else:  # normal
+            await asyncio.sleep(0.5)
+        
+        return None
+
+    async def request_batch_approval(self, items: List[Dict], batch_type: str = "generation") -> List[Dict]:
+        """
+        Request approval for a batch of items
+        
+        Args:
+            items: List of items to approve
+            batch_type: Type of batch (generation, sample, production)
+        
+        Returns:
+            List of approved items only
+        """
+        if not self.require_approval:
+            return items
+        
+        # Skip approval for small batches
+        if len(items) <= self.approval_threshold:
+            self.logger.info(f"Auto-approving {len(items)} items (below threshold)")
+            return items
+        
+        self.logger.info(f"Requesting approval for {len(items)} items...")
+        
+        # Prepare items for approval
+        approval_items = []
+        for item in items:
+            approval_items.append({
+                'asset_name': item.get('page_title', item.get('title', 'Unknown')),
+                'asset_type': item.get('asset_type', 'unknown'),
+                'prompt': item.get('prompt', '')[:500] + '...' if item.get('prompt') else '',
+                'estimated_cost': 0.04,  # Default cost per image
+                'metadata': {
+                    'original_item': item
+                }
+            })
+        
+        # Request approval via approval gate
+        try:
+            batch = await self.approval_gate.request_approval(
+                items=approval_items,
+                batch_id=f"{batch_type}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            )
+            
+            # Get only approved items
+            approved_items = self.approval_gate.get_approved_items(batch)
+            
+            # Extract original items from approved
+            approved_originals = []
+            for approved in approved_items:
+                if approved.metadata and 'original_item' in approved.metadata:
+                    # Apply any prompt modifications
+                    original = approved.metadata['original_item']
+                    if approved.prompt and not approved.prompt.endswith('...'):
+                        original['prompt'] = approved.prompt
+                    approved_originals.append(original)
+            
+            self.logger.info(f"Approved {len(approved_originals)} out of {len(items)} items")
+            
+            if len(approved_originals) == 0:
+                self.logger.warning("No items approved - skipping generation")
+            
+            return approved_originals
+            
+        except Exception as e:
+            self.logger.error(f"Approval gate error: {e}")
+            # Fallback to auto-approve on error
+            self.logger.info("Auto-approving due to approval gate error")
+            return items
+
     def setup_logging(self) -> None:
         """Setup comprehensive logging with colors and file output
         
@@ -202,11 +320,14 @@ class AssetGenerator:
         Raises:
             ValueError: If Replicate API key is not configured
         """
-        api_key = self.config['replicate']['api_key']
+        # Support both REPLICATE_API_TOKEN and REPLICATE_API_KEY for compatibility
+        api_key = os.getenv('REPLICATE_API_TOKEN') or os.getenv('REPLICATE_API_KEY') or self.config['replicate']['api_key']
         if not api_key:
-            raise ValueError("REPLICATE_API_KEY not found in environment or config")
+            raise ValueError("REPLICATE_API_TOKEN not found in environment or config")
         
+        # Set both variables for compatibility
         os.environ['REPLICATE_API_TOKEN'] = api_key
+        os.environ['REPLICATE_API_KEY'] = api_key
         self.logger.info("✓ Replicate API client initialized")
     
     def sync_with_yaml(self) -> Dict[str, List[Dict]]:
@@ -305,8 +426,9 @@ class AssetGenerator:
                     # Generate filename
                     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                     filename = f"{asset_type}_{index:03d}_{timestamp}.png"
-                    if 'icon' in asset_type:
-                        filename = filename.replace('.png', '.svg')
+                    # Keep all files as PNG - models don't generate true SVG
+                    # if 'icon' in asset_type:
+                    #     filename = filename.replace('.png', '.svg')
                     
                     # Determine output directory with path validation
                     if self.generation_stats.get('generation_mode') == 'production':
@@ -395,7 +517,8 @@ class AssetGenerator:
             self.update_statistics(asset_type, count=1, cost=cost)
             
             # Determine file extension based on asset type
-            file_ext = '.svg' if asset_type in ['icons', 'database_icons'] else '.png'
+            # Use PNG for all files - models don't generate true SVG
+            file_ext = '.png'  # Was: '.svg' if asset_type in ['icons', 'database_icons'] else '.png'
             filename = f"{asset_type}_{index:03d}{file_ext}"
             filepath = Path(self.config['output']['sample_directory']) / filename
             filepath.parent.mkdir(parents=True, exist_ok=True)
@@ -457,6 +580,11 @@ class AssetGenerator:
         self.logger.info("STAGE 1: COMPREHENSIVE SAMPLE GENERATION")
         self.logger.info("="*80)
         
+        # Start visibility session
+        self.broadcaster.start_generation(mode="sample", total_items=0)
+        self.broadcaster.update_pipeline_stage("discovery")
+        self.broadcaster.emit_log("📁 Discovering assets from YAML files...", "info")
+        
         # Sync with YAML to get dynamic page list
         pages_by_type = self.sync_with_yaml()
         
@@ -509,7 +637,30 @@ class AssetGenerator:
                 
                 tasks = []
                 for i, page_data in enumerate(page_items, 1):
+                    # Check for pause/abort controls
+                    if await self.check_control_flags() == "skip":
+                        self.broadcaster.emit_log(f"⏭️ Skipped {page_data.get('page_title')}", "warning")
+                        continue
+                    
+                    # Notify prompt generation
+                    asset_name = page_data.get('page_title', f'{asset_type}_{i}')
+                    self.broadcaster.update_pipeline_stage("prompt")
+                    self.broadcaster.prompt_generating_start(asset_name, 'OpenRouter')
+                    
                     prompt = page_data['prompt']
+                    
+                    # Emit prompt created
+                    self.broadcaster.prompt_created(
+                        asset_name=asset_name,
+                        model='OpenRouter',
+                        prompt=prompt[:500] + '...',
+                        confidence=95.0,
+                        selected=True
+                    )
+                    
+                    # Update to image stage
+                    self.broadcaster.update_pipeline_stage("image")
+                    
                     # Pass page data for metadata
                     task = self.generate_asset_with_metadata(asset_type, prompt, i, count, page_data)
                     tasks.append(task)
@@ -520,6 +671,21 @@ class AssetGenerator:
                     if result:
                         samples.append(result)
                         self.generated_assets.append(result)
+                        
+                        # Update cost tracking
+                        item_cost = result.get('cost', 0.04)
+                        self.broadcaster.update_cost(
+                            item_cost=item_cost,
+                            total_cost=self.total_cost,
+                            images_completed=len(self.generated_assets)
+                        )
+                        
+                        # Update progress
+                        self.broadcaster.update_progress(
+                            len(self.generated_assets),
+                            total_samples,
+                            f"Generated {result.get('filename', 'asset')}"
+                        )
                     pbar.update(1)
         
         # Save sample manifest with enhanced metadata
@@ -562,6 +728,10 @@ class AssetGenerator:
             with open(prompts_path, 'w') as f:
                 json.dump(prompts_data, f, indent=2)
         
+        # Complete the session
+        self.broadcaster.update_pipeline_stage("save")
+        self.broadcaster.complete_generation()
+        
         self.logger.info("\n" + "="*80)
         self.logger.info(f"SAMPLE GENERATION COMPLETE")
         self.logger.info(f"Generated: {len(samples)} samples")
@@ -574,8 +744,45 @@ class AssetGenerator:
     
     async def generate_asset_with_metadata(self, asset_type: str, prompt: str, index: int, total: int, page_data: Dict) -> Optional[Dict]:
         """Generate a single asset with enhanced metadata for editing"""
-        # Call the original generate_asset function
-        result = await self.generate_asset(asset_type, prompt, index, total)
+        
+        # If orchestrator is available, use it to generate enhanced prompts
+        final_prompt = prompt  # Default to original prompt
+        
+        if self.orchestrator:
+            try:
+                # Create context for orchestrator (not full prompt!)
+                page_info = {
+                    'title': page_data.get('title', 'Unknown'),
+                    'category': page_data.get('category', 'general'),
+                    'asset_type': asset_type,
+                    'section': page_data.get('section', 'general'),
+                    'tier': page_data.get('visual_tier', 'tier_2_section')
+                }
+                
+                # Generate enhanced prompt using master_prompt files
+                self.logger.info(f"Using OpenRouter to enhance prompt for: {page_info['title']}")
+                competition = await self.orchestrator.generate_competitive_prompts(page_info)
+                
+                # Use the winning prompt or first variant
+                if competition and competition.variants:
+                    # Get the winning variant or use the first one
+                    if competition.winner:
+                        final_prompt = competition.winner.structured_prompt.prompt
+                    else:
+                        # Use the first variant's prompt
+                        final_prompt = competition.variants[0].structured_prompt.prompt
+                    
+                    self.logger.info(f"✓ OpenRouter enhanced prompt generated")
+                else:
+                    self.logger.warning("OpenRouter did not return variants, using original")
+                    
+            except Exception as e:
+                self.logger.warning(f"OpenRouter enhancement failed: {e}, using original prompt")
+        else:
+            self.logger.info("OpenRouter not available, using original prompt")
+        
+        # Call the original generate_asset function with the enhanced prompt
+        result = await self.generate_asset(asset_type, final_prompt, index, total)
         
         if result:
             # Add page metadata for context during review
@@ -584,10 +791,12 @@ class AssetGenerator:
                 'page_description': page_data.get('description', ''),
                 'page_slug': page_data.get('slug', ''),
                 'page_role': page_data.get('role', ''),
-                'original_prompt': prompt,  # Store original for comparison
+                'original_prompt': prompt,  # Store original from YAML system
+                'enhanced_prompt': final_prompt,  # Store OpenRouter enhanced version
+                'used_orchestrator': self.orchestrator is not None,
                 'editable': True,
                 'regeneration_count': 0,
-                'prompt_history': [prompt],  # Track prompt evolution
+                'prompt_history': [prompt, final_prompt] if final_prompt != prompt else [prompt],  # Track prompt evolution
             }
             
             # Add regeneration info
@@ -969,13 +1178,54 @@ async def main():
                        help='Skip automatic Git commit after generation')
     parser.add_argument('--dry-run', action='store_true',
                        help='Preview Git operations without executing them')
+    parser.add_argument('--test', action='store_true',
+                       help='Test mode: Generate only 3 items for testing')
+    parser.add_argument('--test-type', type=str, choices=['icons', 'covers', 'all'],
+                       default='icons', help='Type of assets to test (default: icons)')
     
     args = parser.parse_args()
     
     generator = AssetGenerator()
     
     try:
-        if args.regenerate:
+        if args.test:
+            # Test mode: Generate only 3 items
+            generator.logger.info(f"TEST MODE: Generating 3 {args.test_type} for testing...")
+            
+            # Get pages that need assets
+            pages_by_type = generator.sync_with_yaml()
+            
+            # Select test items based on type
+            test_items = []
+            if args.test_type == 'icons' or args.test_type == 'all':
+                icon_pages = [(page, 'icons') for page in pages_by_type.get('icons', [])]
+                test_items.extend(icon_pages[:3])
+            
+            if args.test_type == 'covers' or args.test_type == 'all':
+                cover_pages = [(page, 'covers') for page in pages_by_type.get('covers', [])]
+                if args.test_type == 'all':
+                    test_items.extend(cover_pages[:1])  # Add 1 cover if testing all
+                else:
+                    test_items.extend(cover_pages[:3])  # Add 3 covers if testing covers only
+            
+            # Generate test items
+            generator.logger.info(f"Generating {len(test_items)} test items...")
+            for i, (page_data, asset_type) in enumerate(test_items, 1):
+                prompt = page_data['prompt']  # Prompt is already in the page_data
+                generator.logger.info(f"[{i}/{len(test_items)}] Generating {asset_type} for: {page_data.get('title', 'Unknown')}")
+                result = await generator.generate_asset_with_metadata(asset_type, prompt, i, len(test_items), page_data)
+                if result and 'filename' in result:
+                    generator.logger.info(f"✅ Generated: {result['filename']}")
+                    generator.generated_assets.append(result)
+                elif result:
+                    generator.logger.info(f"✅ Generated asset {i}/{len(test_items)}")
+                    generator.generated_assets.append(result)
+            
+            generator.logger.info(f"\n✅ TEST COMPLETE: Generated {len(generator.generated_assets)} test items")
+            generator.logger.info(f"Total cost: ${generator.total_cost:.3f}")
+            generator.logger.info(f"Check output/samples/ directory for results")
+            
+        elif args.regenerate:
             # Process regeneration queue
             generator.logger.info("Processing regeneration queue...")
             await generator.process_regeneration_queue()

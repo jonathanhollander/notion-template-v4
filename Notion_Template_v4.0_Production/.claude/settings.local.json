@@ -54,7 +54,21 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git push:*)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "mcp__zen__thinkdeep",
+      "Bash(test:*)",
+      "Bash(curl:*)",
+      "Bash(lsof:*)",
+      "Bash(timeout 30 python3:*)",
+      "Bash(REPLICATE_API_KEY=\"$REPLICATE_API_TOKEN\" python3 asset_generator.py --dry-run)",
+      "Bash(do echo \"$f:\")",
+      "Bash(then mv \"$f\" \"$f%.svg.png\")",
+      "Bash(echo:*)",
+      "Bash(cd:*)",
+      "Bash(source .env)",
+      "Bash(export REPLICATE_API_TOKEN=\"test_mode_only\")",
+      "Read(//Users/jonathanhollander/**)",
+      "Bash(kill:*)"
     ],
     "deny": [],
     "ask": []

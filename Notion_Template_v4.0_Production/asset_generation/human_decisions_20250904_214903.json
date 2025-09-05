@@ -1,0 +1,16 @@
+{
+  "export_timestamp": "2025-09-04T21:49:03.237734",
+  "session": {
+    "session_id": "review_20250904_214903",
+    "reviewer_name": "Test User",
+    "start_time": "2025-09-04T21:49:03.233934",
+    "pages_reviewed": 0,
+    "decisions_made": 0,
+    "quality_feedback": [],
+    "session_notes": "",
+    "completion_status": "active"
+  },
+  "total_decisions": 0,
+  "decisions": [],
+  "decision_summary": {}
+}

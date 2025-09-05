@@ -5,6 +5,8 @@ Manages structured prompt generation with emotional intelligence and luxury aest
 """
 
 from typing import Dict, List, Optional, Any
+from datetime import datetime
+from websocket_broadcaster import get_broadcaster
 from dataclasses import dataclass, field
 from enum import Enum
 import json
@@ -223,6 +225,16 @@ class PromptTemplateManager:
                      custom_elements: Dict[str, Any] = None) -> str:
         """Create a complete prompt with all elements"""
         
+        # Emit prompt template creation start
+        if self.broadcaster:
+            self.broadcaster.emit('prompt_template_start', {
+                'title': title,
+                'category': category,
+                'asset_type': asset_type,
+                'tier': tier,
+                'timestamp': datetime.now().isoformat()
+            })
+        
         # Determine asset type enum
         asset_enum = AssetType(asset_type.lower())
         
@@ -341,42 +353,6 @@ class PromptTemplateManager:
         
         return complete_prompt
     
-    def create_prompt_variants(self, base_info: Dict[str, Any], num_variants: int = 3) -> List[str]:
-        """Create multiple variants of a prompt for comparison"""
-        variants = []
-        
-        # Variant 1: Emphasis on emotional warmth
-        variant1 = self.create_prompt(
-            title=base_info['title'],
-            category=base_info['category'],
-            asset_type=base_info['asset_type'],
-            tier=base_info.get('tier'),
-            custom_elements={'additional_elements': 'emphasizing human warmth and personal connection'}
-        )
-        variants.append(variant1)
-        
-        # Variant 2: Emphasis on luxury aesthetics
-        variant2 = self.create_prompt(
-            title=base_info['title'],
-            category=base_info['category'],
-            asset_type=base_info['asset_type'],
-            tier=base_info.get('tier'),
-            custom_elements={'additional_elements': 'emphasizing ultra-premium materials and sophisticated luxury'}
-        )
-        variants.append(variant2)
-        
-        # Variant 3: Emphasis on technical precision
-        variant3 = self.create_prompt(
-            title=base_info['title'],
-            category=base_info['category'],
-            asset_type=base_info['asset_type'],
-            tier=base_info.get('tier'),
-            custom_elements={'additional_elements': 'emphasizing precise composition and visual consistency'}
-        )
-        variants.append(variant3)
-        
-        return variants[:num_variants]
-    
     def save_templates(self, output_file: str = "prompt_templates.json"):
         """Save all templates to file"""
         data = {
@@ -450,4 +426,35 @@ def test_prompt_templates():
 
 
 if __name__ == "__main__":
+
+    def emit_template_complete(self, title: str, prompt_length: int, complexity: str = "standard"):
+        """Emit template completion event"""
+        if self.broadcaster:
+            self.broadcaster.emit('prompt_template_complete', {
+                'title': title,
+                'prompt_length': prompt_length,
+                'complexity': complexity,
+                'timestamp': datetime.now().isoformat()
+            })
+    
+    def emit_style_elements(self, title: str, elements: List[str]):
+        """Emit style elements being applied"""
+        if self.broadcaster:
+            self.broadcaster.emit('style_elements_applied', {
+                'title': title,
+                'elements': elements,
+                'count': len(elements),
+                'timestamp': datetime.now().isoformat()
+            })
+    
+    def emit_luxury_indicators(self, title: str, indicators: List[str]):
+        """Emit luxury indicators being applied"""
+        if self.broadcaster:
+            self.broadcaster.emit('luxury_indicators_applied', {
+                'title': title,
+                'indicators': indicators,
+                'count': len(indicators),
+                'timestamp': datetime.now().isoformat()
+            })
+
     test_prompt_templates()

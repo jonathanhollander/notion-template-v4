@@ -6,31 +6,31 @@
     "retry": 3,
     "models": {
       "icons": {
-        "model_id": "black-forest-labs/recraft-v3-svg",
+        "model_id": "stability-ai/sdxl:7762fd07cf82c948538e41f63f77d685e02b063e37e496e96eefd46c929f9bdc",
         "cost_per_image": 0.04,
         "style": "realistic_image",
         "purpose": "Technical drawing icons with mechanical poetry aesthetic"
       },
       "covers": {
-        "model_id": "black-forest-labs/flux-1.1-pro",
+        "model_id": "black-forest-labs/flux-1.1-pro:80a09d66baa990429c2f5ae8a4306bf778a1b3775afd01cc2cc8bdbe9033769c",
         "cost_per_image": 0.04,
         "style": "photorealistic",
         "purpose": "Blueprint-style technical covers with layered compositions"
       },
       "textures": {
-        "model_id": "stability-ai/sdxl",
+        "model_id": "stability-ai/sdxl:7762fd07cf82c948538e41f63f77d685e02b063e37e496e96eefd46c929f9bdc",
         "cost_per_image": 0.003,
         "style": "texture",
         "purpose": "Background textures and patterns"
       },
       "letter_headers": {
-        "model_id": "black-forest-labs/flux-1.1-pro",
+        "model_id": "black-forest-labs/flux-1.1-pro:80a09d66baa990429c2f5ae8a4306bf778a1b3775afd01cc2cc8bdbe9033769c",
         "cost_per_image": 0.04,
         "style": "professional_letterhead",
         "purpose": "Formal letterhead designs for template letters"
       },
       "database_icons": {
-        "model_id": "black-forest-labs/recraft-v3-svg",
+        "model_id": "stability-ai/sdxl:7762fd07cf82c948538e41f63f77d685e02b063e37e496e96eefd46c929f9bdc",
         "cost_per_image": 0.04,
         "style": "data_visualization",
         "purpose": "Clean icons for database category organization"
@@ -63,10 +63,10 @@
   "assets": {
     "icons": {
       "count": "dynamic",
-      "format": "svg",
+      "format": "png",
       "dimensions": "64x64",
       "style": "mechanical_poetry",
-      "comment": "~230 icons discovered from YAML"
+      "comment": "~230 icons discovered from YAML (PNG format - models don't generate true SVG)"
     },
     "covers": {
       "count": "dynamic",
@@ -89,7 +89,7 @@
     },
     "database_icons": {
       "count": 10,
-      "format": "svg",
+      "format": "png",
       "dimensions": "48x48",
       "style": "data_visualization"
     }

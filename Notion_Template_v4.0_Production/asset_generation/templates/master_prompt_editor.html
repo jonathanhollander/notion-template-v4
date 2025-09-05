@@ -72,6 +72,65 @@
             margin-top: 20px;
         }
         
+        /* Tabs styling */
+        .prompt-tabs {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #8B7355;
+            padding-bottom: 0;
+        }
+        
+        .tab-button {
+            padding: 12px 24px;
+            background: #F5F5F5;
+            border: 2px solid #8B7355;
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #6B5444;
+            transition: all 0.3s ease;
+            position: relative;
+            bottom: -2px;
+        }
+        
+        .tab-button:hover {
+            background: #EFEFEF;
+        }
+        
+        .tab-button.active {
+            background: white;
+            color: #2C1810;
+            border-bottom: 2px solid white;
+        }
+        
+        .tab-button.tab-default.active {
+            background: linear-gradient(to bottom, white 90%, #F0F0F0 100%);
+        }
+        
+        .tab-button.tab-icons.active {
+            background: linear-gradient(to bottom, white 90%, #E6F3FF 100%);
+        }
+        
+        .tab-button.tab-covers.active {
+            background: linear-gradient(to bottom, white 90%, #FFF9E6 100%);
+        }
+        
+        .prompt-type-indicator {
+            margin-bottom: 10px;
+            padding: 8px 15px;
+            background: #F9F7F5;
+            border-left: 4px solid #8B7355;
+            font-size: 13px;
+            color: #6B5444;
+        }
+        
+        .prompt-type-indicator strong {
+            color: #2C1810;
+        }
+        
         .btn-save {
             background: linear-gradient(135deg, #8B7355 0%, #6B5444 100%);
             color: white;
@@ -175,11 +234,63 @@
     </div>
 
     <div class="editor-container">
+        <h1 class="dashboard-title">
+            ✏️ Master Prompt Editor
+        </h1>
+        
+        <div class="editor-header">
+            <h2>Estate Planning Concierge v4.0 - Image Generation Master Prompts</h2>
+            <div class="editor-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Characters</span>
+                    <span class="stat-value" id="char-count">{{ char_count|default(0) }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Last Modified</span>
+                    <span class="stat-value">{{ last_modified|default('Never') }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Lines</span>
+                    <span class="stat-value" id="line-count">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs for different prompt types -->
+        <div class="prompt-tabs">
+            <button class="tab-button tab-default {% if prompt_type == 'default' %}active{% endif %}" 
+                    onclick="switchPromptType('default')" title="Default prompt for general assets">
+                📄 Default Prompt
+            </button>
+            <button class="tab-button tab-icons {% if prompt_type == 'icons' %}active{% endif %}" 
+                    onclick="switchPromptType('icons')" title="Prompt for generating simple, flat UI icons">
+                🎨 Icon Prompt
+            </button>
+            <button class="tab-button tab-covers {% if prompt_type == 'covers' %}active{% endif %}" 
+                    onclick="switchPromptType('covers')" title="Prompt for generating luxury cover images">
+                🖼️ Cover Prompt
+            </button>
+        </div>
+
+        <!-- Indicator showing which file is being edited -->
+        <div class="prompt-type-indicator">
+            <strong>Currently Editing:</strong> {{ prompt_file }} 
+            {% if prompt_type == 'icons' %}
+            - Used for generating simple, flat UI icons
+            {% elif prompt_type == 'covers' %}
+            - Used for generating luxury cover images
+            {% else %}
+            - Default prompt for general assets
+            {% endif %}
+        </div>
+        
         <div class="help-text">
             <h3>📝 Master Prompt Guidelines</h3>
             <ul>
-                <li>This prompt controls ALL AI image generation behavior</li>
-                <li>Changes affect how prompts are generated for icons, covers, and textures</li>
+                <li>Each prompt type controls specific asset generation behavior</li>
+                <li>Icon Prompt: Controls generation of simple, flat UI icons</li>
+                <li>Cover Prompt: Controls generation of luxury cover images</li>
+                <li>Default Prompt: Used for all other asset types</li>
                 <li>Focus on luxury branding, emotional sensitivity, and visual hierarchy</li>
                 <li>Backup is automatically created when you save changes</li>
                 <li>Character limit: 10,000 (currently using <span id="char-count-inline">{{ char_count }}</span>)</li>
@@ -204,7 +315,7 @@
             </div>
         </div>
 
-        <textarea id="master-prompt" class="prompt-editor" placeholder="Enter your master prompt here...">{{ current_prompt }}</textarea>
+        <textarea id="master-prompt" class="prompt-editor" placeholder="Enter your master prompt here..." data-prompt-type="{{ prompt_type }}">{{ current_prompt }}</textarea>
 
         <div class="editor-actions">
             <button class="btn-save" onclick="saveMasterPrompt()">
@@ -225,9 +336,32 @@
     </div>
 
     <script>
-        // Store original content for revert
-        const originalContent = {{ current_prompt | tojson }};
+        // Store original content for revert (per prompt type)
+        let originalContent = {{ current_prompt | tojson }};
+        let currentPromptType = '{{ prompt_type }}';
         let hasChanges = false;
+        let unsavedPrompts = {};  // Track unsaved changes per prompt type
+        
+        // Function to switch between prompt types
+        async function switchPromptType(newType) {
+            // Check if current prompt has unsaved changes
+            if (hasChanges) {
+                unsavedPrompts[currentPromptType] = document.getElementById('master-prompt').value;
+                if (!confirm(`You have unsaved changes in the ${currentPromptType} prompt. Switch anyway?`)) {
+                    return;
+                }
+            }
+            
+            // If we have unsaved content for this type, use it
+            if (unsavedPrompts[newType]) {
+                // Switch to the new tab with unsaved content
+                window.location.href = `/edit-master-prompt?type=${newType}`;
+                return;
+            }
+            
+            // Otherwise, load fresh from server
+            window.location.href = `/edit-master-prompt?type=${newType}`;
+        }
 
         // Update character and line counts
         function updateCounts() {
@@ -264,6 +398,7 @@
         // Save master prompt
         async function saveMasterPrompt() {
             const content = document.getElementById('master-prompt').value;
+            const promptType = document.getElementById('master-prompt').dataset.promptType || 'default';
             const saveBtn = document.querySelector('.btn-save');
             const statusDiv = document.getElementById('save-status');
             
@@ -287,7 +422,7 @@
                     throw new Error('Failed to get CSRF token');
                 }
                 
-                // Save the master prompt
+                // Save the master prompt with prompt type
                 const response = await fetch('/api/save-master-prompt', {
                     method: 'POST',
                     headers: {
@@ -296,17 +431,24 @@
                         'X-Session-ID': csrfData.session_id,
                         'X-CSRF-Token': csrfData.csrf_token
                     },
-                    body: JSON.stringify({ content: content })
+                    body: JSON.stringify({ 
+                        content: content,
+                        prompt_type: promptType
+                    })
                 });
                 
                 const data = await response.json();
                 
                 if (data.success) {
+                    // Update original content
+                    originalContent = content;
+                    hasChanges = false;
+                    delete unsavedPrompts[currentPromptType];  // Clear unsaved changes
+                    updateCounts();
+                    
                     statusDiv.className = 'save-status success';
                     statusDiv.textContent = '✅ ' + data.message;
                     statusDiv.style.display = 'block';
-                    hasChanges = false;
-                    updateCounts();
                 } else {
                     throw new Error(data.error || 'Failed to save');
                 }

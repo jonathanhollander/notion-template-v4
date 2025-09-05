@@ -128,10 +128,19 @@ body {
 
 .dashboard-container {
     display: grid;
-    grid-template-columns: 350px 1fr;
+    grid-template-columns: minmax(300px, 350px) 1fr;
     gap: 30px;
     max-width: 1400px;
     margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Responsive layout for smaller screens */
+@media (max-width: 768px) {
+    .dashboard-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
 }
 
 .panel {
@@ -159,7 +168,9 @@ body {
     letter-spacing: var(--letter-spacing-wide);
     text-transform: uppercase;
     transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
-    margin: 5px;
+    margin: 8px 5px;
+    display: inline-block;
+    width: auto;
 }
 
 .button:hover {
@@ -354,6 +365,24 @@ input[type="text"], input[type="password"] {
     border: 1px solid #ddd;
     border-radius: 4px;
     box-sizing: border-box;
+}
+
+/* Auth/Session Section Styles */
+.auth-section {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border-light);
+    margin-bottom: 20px;
+}
+
+.auth-section h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: var(--font-size-xl);
+}
+
+.auth-section .button {
+    width: 100%;
+    margin-top: 10px;
 }
 
 /* Enhanced Loading States */
