@@ -1,90 +1,212 @@
 {
   "pages": [
     {
-      "page_id": "sample_1",
+      "page_id": "estate_planning_dashboard",
       "page_title": "Estate Planning Dashboard",
-      "description": "Main dashboard for estate planning management",
+      "description": "Main dashboard for comprehensive estate planning management with ultra-luxury aesthetic",
       "asset_type": "icon",
       "prompts": [
         {
           "model": "claude-3-sonnet",
-          "prompt": "Luxury estate planning dashboard icon with gold accents, leather textures, and sophisticated mahogany desk elements, photorealistic style",
-          "quality_score": 8.5,
-          "emotional_score": 9.0
+          "prompt_text": "Ultra-luxury estate planning dashboard icon with gold and mahogany accents, leather textures, crystal elements, sophisticated estate planning aesthetic, photorealistic style with emotional depth",
+          "quality_score": 8.333117186505083,
+          "emotional_score": 8.189628668471235,
+          "luxury_score": 8.706926266155646,
+          "completeness_score": 8.056546132911581,
+          "technical_accuracy": 8.631678483856374
         },
         {
           "model": "gpt-4-vision",
-          "prompt": "Premium estate planning interface icon featuring platinum and crystal elements with luxury office background",
-          "quality_score": 8.2,
-          "emotional_score": 8.5
+          "prompt_text": "Premium estate planning dashboard interface icon featuring platinum and crystal elements with luxury office background, conveying trust and sophistication",
+          "quality_score": 7.810965161932161,
+          "emotional_score": 8.475005567576797,
+          "luxury_score": 8.261608660341608,
+          "completeness_score": 7.926310664957233,
+          "technical_accuracy": 8.481234382965782
         },
         {
           "model": "gemini-pro",
-          "prompt": "High-end estate planning dashboard icon with marble and gold finishes in executive office setting",
-          "quality_score": 8.7,
-          "emotional_score": 8.8
+          "prompt_text": "High-end estate planning dashboard icon with marble and gold finishes in executive setting, emphasizing wealth preservation and legacy",
+          "quality_score": 7.682062440263832,
+          "emotional_score": 8.057223666141875,
+          "luxury_score": 8.398232297097577,
+          "completeness_score": 7.873543049148608,
+          "technical_accuracy": 8.213497706964606
         }
-      ]
+      ],
+      "average_scores": {
+        "quality": 7.94,
+        "emotional": 8.24
+      }
     },
     {
-      "page_id": "sample_2",
+      "page_id": "trust_formation",
       "page_title": "Trust Formation",
-      "description": "Comprehensive trust formation and management",
+      "description": "Comprehensive trust formation and management for high-net-worth individuals",
       "asset_type": "cover",
       "prompts": [
         {
           "model": "claude-3-sonnet",
-          "prompt": "Elegant trust formation cover image with legal documents on mahogany desk, gold fountain pen, crystal paperweight",
-          "quality_score": 9.0,
-          "emotional_score": 8.7
+          "prompt_text": "Elegant trust formation cover image with legal documents on mahogany desk, gold fountain pen, crystal paperweight, luxury law office atmosphere",
+          "quality_score": 7.8530469492169495,
+          "emotional_score": 8.461138497550225,
+          "luxury_score": 8.4673815986859,
+          "completeness_score": 8.101584541746591,
+          "technical_accuracy": 8.343807821361656
         },
         {
           "model": "gpt-4-vision",
-          "prompt": "Sophisticated trust management cover featuring leather-bound documents and luxury office environment",
-          "quality_score": 8.8,
-          "emotional_score": 9.2
+          "prompt_text": "Sophisticated trust formation cover featuring leather-bound documents and premium office environment with warm lighting",
+          "quality_score": 7.732760627072562,
+          "emotional_score": 8.745357889247032,
+          "luxury_score": 7.944240977058083,
+          "completeness_score": 7.882276470084293,
+          "technical_accuracy": 7.917229948935725
         },
         {
           "model": "gemini-pro",
-          "prompt": "Premium trust formation visual with marble conference table and gold-accented legal materials",
-          "quality_score": 8.6,
-          "emotional_score": 8.9
+          "prompt_text": "Premium trust formation visual with marble conference table and gold-accented legal materials in high-end setting",
+          "quality_score": 8.84994530567455,
+          "emotional_score": 8.187175904542984,
+          "luxury_score": 8.131411383071642,
+          "completeness_score": 8.474418323696096,
+          "technical_accuracy": 8.494351303293428
         }
-      ]
+      ],
+      "average_scores": {
+        "quality": 8.15,
+        "emotional": 8.46
+      }
     },
     {
-      "page_id": "sample_3",
+      "page_id": "will_creation",
       "page_title": "Will Creation",
-      "description": "Professional will drafting and management",
+      "description": "Professional will drafting and management with luxury office atmosphere",
       "asset_type": "icon",
       "prompts": [
         {
           "model": "claude-3-sonnet",
-          "prompt": "Luxury will creation icon with gold seal, premium parchment, and mahogany writing desk elements",
-          "quality_score": 8.4,
-          "emotional_score": 8.6
+          "prompt_text": "Ultra-luxury will creation icon with gold and mahogany accents, leather textures, crystal elements, sophisticated estate planning aesthetic, photorealistic style with emotional depth",
+          "quality_score": 8.264735451738224,
+          "emotional_score": 8.771362166122653,
+          "luxury_score": 8.40160705371821,
+          "completeness_score": 8.348428785911858,
+          "technical_accuracy": 8.24165503210124
         },
         {
           "model": "gpt-4-vision",
-          "prompt": "Elegant will drafting icon featuring platinum pen and crystal inkwell on leather surface",
-          "quality_score": 8.3,
-          "emotional_score": 8.8
+          "prompt_text": "Premium will creation interface icon featuring platinum and crystal elements with luxury office background, conveying trust and sophistication",
+          "quality_score": 8.531780476022846,
+          "emotional_score": 8.63303411399158,
+          "luxury_score": 8.45992382827796,
+          "completeness_score": 7.940663830304594,
+          "technical_accuracy": 8.185851005945889
         },
         {
           "model": "gemini-pro",
-          "prompt": "High-end will creation icon with gold embossing and luxury office atmosphere",
-          "quality_score": 8.5,
-          "emotional_score": 8.7
+          "prompt_text": "High-end will creation icon with marble and gold finishes in executive setting, emphasizing wealth preservation and legacy",
+          "quality_score": 7.624528434619402,
+          "emotional_score": 7.933635250559688,
+          "luxury_score": 8.114374973715638,
+          "completeness_score": 7.801079827109692,
+          "technical_accuracy": 8.065077221336693
         }
-      ]
+      ],
+      "average_scores": {
+        "quality": 8.14,
+        "emotional": 8.45
+      }
+    },
+    {
+      "page_id": "asset_protection",
+      "page_title": "Asset Protection Strategies",
+      "description": "Advanced wealth protection and preservation strategies",
+      "asset_type": "cover",
+      "prompts": [
+        {
+          "model": "claude-3-sonnet",
+          "prompt_text": "Elegant asset protection strategies cover image with legal documents on mahogany desk, gold fountain pen, crystal paperweight, luxury law office atmosphere",
+          "quality_score": 8.113542292204436,
+          "emotional_score": 8.150927980130266,
+          "luxury_score": 8.572419236466983,
+          "completeness_score": 8.289580732285755,
+          "technical_accuracy": 8.642878802580457
+        },
+        {
+          "model": "gpt-4-vision",
+          "prompt_text": "Sophisticated asset protection strategies cover featuring leather-bound documents and premium office environment with warm lighting",
+          "quality_score": 8.792698944548492,
+          "emotional_score": 8.405496294182578,
+          "luxury_score": 7.911484117642862,
+          "completeness_score": 8.389176813762013,
+          "technical_accuracy": 7.924477399786112
+        },
+        {
+          "model": "gemini-pro",
+          "prompt_text": "Premium asset protection strategies visual with marble conference table and gold-accented legal materials in high-end setting",
+          "quality_score": 8.712865233320763,
+          "emotional_score": 7.666604732111797,
+          "luxury_score": 8.661839854337318,
+          "completeness_score": 8.670037392217658,
+          "technical_accuracy": 8.697106366665782
+        }
+      ],
+      "average_scores": {
+        "quality": 8.54,
+        "emotional": 8.07
+      }
+    },
+    {
+      "page_id": "tax_optimization",
+      "page_title": "Tax Optimization",
+      "description": "Estate tax planning and optimization for wealth preservation",
+      "asset_type": "icon",
+      "prompts": [
+        {
+          "model": "claude-3-sonnet",
+          "prompt_text": "Ultra-luxury tax optimization icon with gold and mahogany accents, leather textures, crystal elements, sophisticated estate planning aesthetic, photorealistic style with emotional depth",
+          "quality_score": 9.06375306789713,
+          "emotional_score": 8.277426853240074,
+          "luxury_score": 8.439351093738148,
+          "completeness_score": 8.196169415376671,
+          "technical_accuracy": 8.769962581130676
+        },
+        {
+          "model": "gpt-4-vision",
+          "prompt_text": "Premium tax optimization interface icon featuring platinum and crystal elements with luxury office background, conveying trust and sophistication",
+          "quality_score": 7.744160486918089,
+          "emotional_score": 8.98259555005478,
+          "luxury_score": 7.977813231472729,
+          "completeness_score": 7.940984851862199,
+          "technical_accuracy": 8.297914327624
+        },
+        {
+          "model": "gemini-pro",
+          "prompt_text": "High-end tax optimization icon with marble and gold finishes in executive setting, emphasizing wealth preservation and legacy",
+          "quality_score": 7.984631778581484,
+          "emotional_score": 7.96059818348059,
+          "luxury_score": 8.180286116591729,
+          "completeness_score": 7.516726627713932,
+          "technical_accuracy": 7.7886305388600166
+        }
+      ],
+      "average_scores": {
+        "quality": 8.26,
+        "emotional": 8.41
+      }
     }
   ],
   "metadata": {
-    "generation_date": "2025-09-05",
-    "total_pages": 3,
-    "total_prompts": 9,
-    "average_quality_score": 8.56,
-    "average_emotional_score": 8.82,
-    "models_used": ["claude-3-sonnet", "gpt-4-vision", "gemini-pro"]
+    "generation_date": "2025-09-05 10:45:16",
+    "total_pages": 5,
+    "total_prompts": 15,
+    "models_used": [
+      "claude-3-sonnet",
+      "gpt-4-vision",
+      "gemini-pro"
+    ],
+    "scoring_method": "real_quality_scorer",
+    "average_quality_score": 8.21,
+    "average_emotional_score": 8.33
   }
 }

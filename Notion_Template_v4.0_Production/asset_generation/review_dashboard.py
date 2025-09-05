@@ -646,7 +646,7 @@ class ReviewDashboard:
                 for prompt_data in page.get('prompts', []):
                     prompt_obj = {
                         'model_source': prompt_data.get('model', 'unknown'),
-                        'prompt_text': prompt_data.get('prompt', ''),
+                        'prompt_text': prompt_data.get('prompt_text', ''),
                         'quality_score': prompt_data.get('quality_score', 0),
                         'emotional_score': prompt_data.get('emotional_score', 0)
                     }
