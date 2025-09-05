@@ -68,7 +68,9 @@
       "Bash(source .env)",
       "Bash(export REPLICATE_API_TOKEN=\"test_mode_only\")",
       "Read(//Users/jonathanhollander/**)",
-      "Bash(kill:*)"
+      "Bash(kill:*)",
+      "Bash(timeout:*)",
+      "Bash(pkill:*)"
     ],
     "deny": [],
     "ask": []

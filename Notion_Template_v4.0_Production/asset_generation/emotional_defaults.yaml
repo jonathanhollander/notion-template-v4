@@ -1,0 +1,239 @@
+# Estate Planning v4.0 - Immutable Emotional Intelligence Baseline Configuration
+# DO NOT EDIT - This is the safety reset point
+# Created: 2025-09-05
+# Version: 4.0.0
+
+version: "4.0.0"
+created: "2025-09-05"
+description: "Immutable baseline emotional configuration - DO NOT EDIT - This is the safety reset point"
+
+system_info:
+  source: "prompt_templates.py EmotionalTone enum and StyleElements dataclass"
+  verified_working: "2025-09-05"
+  total_tones: 7
+  total_style_categories: 6
+
+# Core emotional tones that drive prompt generation
+emotional_tones:
+  warm_welcome:
+    name: "Warm Welcome"
+    description: "Entry points - welcoming and accessible tone for landing pages"
+    keywords:
+      - "welcoming"
+      - "inviting" 
+      - "accessible"
+      - "comfortable"
+      - "open"
+    intensity: 0.8
+    use_cases:
+      - "dashboard"
+      - "welcome pages"
+      - "introductory sections"
+    emotional_weight: "light_positive"
+
+  trusted_guide:
+    name: "Trusted Guide"
+    description: "Executor sections - reliable and professional guidance"
+    keywords:
+      - "reliable"
+      - "professional"
+      - "authoritative"
+      - "trustworthy"
+      - "competent"
+    intensity: 0.9
+    use_cases:
+      - "executor tools"
+      - "guidance sections"
+      - "process explanations"
+    emotional_weight: "strong_confident"
+
+  family_heritage:
+    name: "Family Heritage"
+    description: "Family sections - warmth and generational connection"
+    keywords:
+      - "familial"
+      - "generational"
+      - "legacy"
+      - "heritage"
+      - "connection"
+    intensity: 0.85
+    use_cases:
+      - "family planning"
+      - "legacy sections"
+      - "personal stories"
+    emotional_weight: "warm_nostalgic"
+
+  secure_protection:
+    name: "Secure Protection"
+    description: "Financial/legal - safety and security emphasis"
+    keywords:
+      - "secure"
+      - "protected"
+      - "safe"
+      - "reliable"
+      - "fortress-like"
+    intensity: 0.95
+    use_cases:
+      - "financial planning"
+      - "legal documents"
+      - "security features"
+    emotional_weight: "strong_protective"
+
+  peaceful_transition:
+    name: "Peaceful Transition"
+    description: "Difficult topics - gentle and comforting approach"
+    keywords:
+      - "gentle"
+      - "peaceful"
+      - "comforting"
+      - "serene"
+      - "graceful"
+    intensity: 0.7
+    use_cases:
+      - "end-of-life planning"
+      - "difficult conversations"
+      - "sensitive topics"
+    emotional_weight: "soft_reassuring"
+
+  living_continuity:
+    name: "Living Continuity"
+    description: "Legacy sections - life continuing and enduring impact"
+    keywords:
+      - "continuing"
+      - "enduring"
+      - "lasting"
+      - "perpetual"
+      - "ongoing"
+    intensity: 0.8
+    use_cases:
+      - "legacy planning"
+      - "memorial sections"
+      - "impact planning"
+    emotional_weight: "enduring_positive"
+
+  tech_bridge:
+    name: "Tech Bridge"
+    description: "Digital sections - bridging traditional and digital worlds"
+    keywords:
+      - "bridging"
+      - "connecting"
+      - "modern"
+      - "accessible"
+      - "integrative"
+    intensity: 0.75
+    use_cases:
+      - "digital assets"
+      - "technology integration"
+      - "modern tools"
+    emotional_weight: "balanced_progressive"
+
+# Visual style elements that enhance emotional impact
+style_elements:
+  materials:
+    - "warm wood grain"
+    - "brushed metal accents"
+    - "soft leather textures"
+    - "natural stone surfaces"
+    - "aged parchment"
+    - "polished marble"
+    - "hand-crafted elements"
+    - "time-worn patina"
+    - "rich mahogany"
+    - "cream linen"
+    - "antique brass"
+    - "weathered oak"
+
+  lighting:
+    - "gentle morning light"
+    - "golden hour warmth"
+    - "soft ambient glow"
+    - "filtered natural light"
+    - "warm candlelight"
+    - "library reading light"
+    - "sunset through windows"
+    - "diffused studio lighting"
+    - "fireplace warmth"
+    - "dappled sunlight"
+    - "evening lamplight"
+    - "heritage glow"
+
+  colors:
+    - "estate blues"
+    - "heritage golds"
+    - "comfort whites"
+    - "wisdom grays"
+    - "family burgundy"
+    - "trust navy"
+    - "warmth ivory"
+    - "legacy bronze"
+    - "serenity sage"
+    - "strength charcoal"
+    - "hope cream"
+    - "endurance copper"
+
+  textures:
+    - "leather-bound surfaces"
+    - "hand-crafted details"
+    - "time-worn elegance"
+    - "smooth stone finish"
+    - "rich fabric weave"
+    - "polished wood grain"
+    - "embossed patterns"
+    - "gentle weathering"
+    - "silk-like smoothness"
+    - "organic roughness"
+    - "vintage patina"
+    - "heritage depth"
+
+  objects:
+    - "family heirlooms"
+    - "trusted documents"
+    - "connecting bridges"
+    - "protective shields"
+    - "guiding compasses"
+    - "legacy trees"
+    - "generational keys"
+    - "wisdom books"
+    - "heritage watches"
+    - "memory boxes"
+    - "continuity chains"
+    - "foundation stones"
+
+  composition:
+    - "centered balance"
+    - "flowing connection"
+    - "protective embrace"
+    - "guiding pathway"
+    - "stable foundation"
+    - "graceful transition"
+    - "harmonious unity"
+    - "enduring strength"
+    - "gentle guidance"
+    - "timeless elegance"
+    - "secure shelter"
+    - "bridging elements"
+
+# Intelligent mapping system for automatic tone selection
+emotional_mappings:
+  page_categories:
+    executor: "trusted_guide"
+    family: "family_heritage"
+    financial: "secure_protection"
+    legal: "secure_protection"
+    digital: "tech_bridge"
+    memorial: "peaceful_transition"
+    legacy: "living_continuity"
+    welcome: "warm_welcome"
+
+  asset_type_preferences:
+    icon:
+      - "objects"
+      - "composition"
+    cover:
+      - "lighting"
+      - "composition"
+      - "materials"
+    letter_header:
+      - "textures"
+      - "colors"
+      - "materials"

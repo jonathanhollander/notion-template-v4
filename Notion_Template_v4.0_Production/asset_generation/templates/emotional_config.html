@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotional Intelligence Configuration - Estate Planning v4.0</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- js-yaml for YAML parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+    
+    <style>
+        :root {
+            --estate-blue: #1e3a8a;
+            --estate-gold: #f59e0b;
+            --estate-gray: #6b7280;
+            --estate-light: #f8fafc;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --danger-red: #ef4444;
+        }
+
+        body {
+            background-color: var(--estate-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .config-header {
+            background: linear-gradient(135deg, var(--estate-blue), #3b82f6);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .config-section {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            padding: 2rem;
+        }
+
+        .section-header {
+            border-bottom: 2px solid var(--estate-gold);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-title {
+            color: var(--estate-blue);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tone-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .tone-card:hover {
+            border-color: var(--estate-blue);
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.1);
+        }
+
+        .tone-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .tone-name {
+            color: var(--estate-blue);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .intensity-slider {
+            margin: 1rem 0;
+        }
+
+        .intensity-value {
+            background: var(--estate-gold);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .keyword-tag {
+            background: #e0e7ff;
+            color: var(--estate-blue);
+            padding: 0.3rem 0.6rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            margin: 0.2rem;
+            display: inline-block;
+            position: relative;
+        }
+
+        .keyword-tag .remove-keyword {
+            color: #dc2626;
+            margin-left: 0.5rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .style-category {
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .style-category-header {
+            color: var(--estate-blue);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: between;
+        }
+
+        .style-element {
+            background: #f3f4f6;
+            color: #374151;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin: 0.2rem;
+            display: inline-block;
+            position: relative;
+            border: 1px solid #d1d5db;
+        }
+
+        .style-element .remove-element {
+            color: #dc2626;
+            margin-left: 0.5rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .action-buttons {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 1.5rem 0;
+            border-top: 1px solid #e5e7eb;
+            margin-top: 2rem;
+            z-index: 100;
+        }
+
+        .btn-primary-custom {
+            background-color: var(--estate-blue);
+            border-color: var(--estate-blue);
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .btn-primary-custom:hover {
+            background-color: #1e40af;
+            border-color: #1e40af;
+        }
+
+        .btn-warning-custom {
+            background-color: var(--estate-gold);
+            border-color: var(--estate-gold);
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .btn-danger-custom {
+            background-color: var(--danger-red);
+            border-color: var(--danger-red);
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .preview-area {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .preview-area.generating {
+            border-color: var(--estate-blue);
+            background: #eff6ff;
+        }
+
+        .config-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem;
+            border-radius: 8px;
+            z-index: 1050;
+            display: none;
+        }
+
+        .config-status.success {
+            background: var(--success-green);
+            color: white;
+        }
+
+        .config-status.error {
+            background: var(--danger-red);
+            color: white;
+        }
+
+        .config-status.info {
+            background: var(--estate-blue);
+            color: white;
+        }
+
+        .add-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .loading-spinner {
+            display: none;
+            margin: 0.5rem;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .generating {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Status notification -->
+    <div id="configStatus" class="config-status">
+        <i class="fas fa-check-circle"></i>
+        <span id="statusMessage"></span>
+    </div>
+
+    <!-- Main header -->
+    <div class="config-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h1><i class="fas fa-brain"></i> Emotional Intelligence Configuration</h1>
+                    <p class="mb-0">Customize emotional tones and style elements for the Estate Planning v4.0 Asset Generation System</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- System Information -->
+        <div class="config-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-info-circle"></i>
+                    System Information
+                </h2>
+                <div class="d-flex gap-2">
+                    <button id="loadCurrentConfig" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <strong>Configuration Version:</strong>
+                    <span id="configVersion" class="text-muted">Loading...</span>
+                </div>
+                <div class="col-md-4">
+                    <strong>Last Modified:</strong>
+                    <span id="lastModified" class="text-muted">Loading...</span>
+                </div>
+                <div class="col-md-4">
+                    <strong>Backup Status:</strong>
+                    <span id="backupStatus" class="text-success">
+                        <i class="fas fa-check"></i> Enabled
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Emotional Tones Configuration -->
+        <div class="config-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-heart"></i>
+                    Emotional Tones
+                </h2>
+                <div class="text-muted small">
+                    Configure the 7 core emotional tones that drive asset generation
+                </div>
+            </div>
+            <div id="emotionalTones">
+                <!-- Emotional tone cards will be populated here -->
+            </div>
+        </div>
+
+        <!-- Style Elements Configuration -->
+        <div class="config-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-palette"></i>
+                    Style Elements
+                </h2>
+                <div class="text-muted small">
+                    Customize visual style elements across 6 categories
+                </div>
+            </div>
+            <div id="styleElements">
+                <!-- Style element categories will be populated here -->
+            </div>
+        </div>
+
+        <!-- Preview Section -->
+        <div class="config-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-eye"></i>
+                    Live Preview
+                </h2>
+                <div class="text-muted small">
+                    Generate real images to test your configuration changes
+                </div>
+            </div>
+            <div class="preview-area" id="previewArea">
+                <i class="fas fa-image fa-3x text-muted mb-3"></i>
+                <h4>Click "Preview Changes" to generate test images</h4>
+                <p class="text-muted">This will generate 3 sample images using your current configuration (~$0.25)</p>
+            </div>
+            <div class="text-center">
+                <button id="previewChanges" class="btn btn-warning-custom">
+                    <i class="fas fa-magic"></i>
+                    Preview Changes (3 Images)
+                    <span class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 d-flex justify-content-between align-items-center">
+                        <div>
+                            <button id="resetToDefaults" class="btn btn-danger-custom">
+                                <i class="fas fa-undo-alt"></i>
+                                Reset to Defaults
+                            </button>
+                            <small class="text-muted ms-2">Restore immutable baseline configuration</small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button id="saveConfig" class="btn btn-primary-custom">
+                                <i class="fas fa-save"></i>
+                                Save Configuration
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Confirmation Modal -->
+    <div class="modal fade" id="resetConfirmModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exclamation-triangle text-warning"></i>
+                        Confirm Reset to Defaults
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>This action will:</strong></p>
+                    <ul>
+                        <li>Create a backup of your current configuration</li>
+                        <li>Reset all emotional tones to baseline values</li>
+                        <li>Reset all style elements to baseline collections</li>
+                        <li>Restore the immutable v4.0.0 configuration</li>
+                    </ul>
+                    <p class="text-warning"><strong>This cannot be undone</strong> (except by restoring from backup).</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button id="confirmReset" type="button" class="btn btn-danger">
+                        <i class="fas fa-undo-alt"></i>
+                        Reset Configuration
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        class EmotionalConfigManager {
+            constructor() {
+                this.config = null;
+                this.csrfToken = null;
+                this.apiBaseUrl = '';
+                this.init();
+            }
+
+            async init() {
+                await this.getCsrfToken();
+                await this.loadCurrentConfig();
+                this.bindEvents();
+            }
+
+            async getCsrfToken() {
+                try {
+                    const response = await fetch('/api/get-csrf-token', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    const data = await response.json();
+                    this.csrfToken = data.csrf_token;
+                } catch (error) {
+                    console.error('Failed to get CSRF token:', error);
+                    this.showNotification('Failed to get CSRF token', 'error');
+                }
+            }
+
+            async loadCurrentConfig() {
+                try {
+                    const response = await fetch('/api/get-emotional-config');
+                    if (response.ok) {
+                        this.config = await response.json();
+                        this.renderConfiguration();
+                        this.showNotification('Configuration loaded successfully', 'success');
+                    } else {
+                        throw new Error(`Failed to load configuration: ${response.status}`);
+                    }
+                } catch (error) {
+                    console.error('Failed to load configuration:', error);
+                    this.showNotification('Failed to load configuration', 'error');
+                }
+            }
+
+            renderConfiguration() {
+                if (!this.config) return;
+
+                // Update system information
+                document.getElementById('configVersion').textContent = this.config.version || 'Unknown';
+                document.getElementById('lastModified').textContent = this.config.last_modified || 'Unknown';
+
+                // Render emotional tones
+                this.renderEmotionalTones();
+                
+                // Render style elements
+                this.renderStyleElements();
+            }
+
+            renderEmotionalTones() {
+                const container = document.getElementById('emotionalTones');
+                container.innerHTML = '';
+
+                if (!this.config.emotional_tones) {
+                    container.innerHTML = '<p class="text-muted">No emotional tones configured</p>';
+                    return;
+                }
+
+                Object.entries(this.config.emotional_tones).forEach(([key, tone]) => {
+                    const card = this.createToneCard(key, tone);
+                    container.appendChild(card);
+                });
+            }
+
+            createToneCard(key, tone) {
+                const card = document.createElement('div');
+                card.className = 'tone-card';
+                card.innerHTML = `
+                    <div class="tone-header">
+                        <div class="tone-name">${tone.name}</div>
+                        <div class="intensity-value">${(tone.intensity * 100).toFixed(0)}%</div>
+                    </div>
+                    <p class="text-muted mb-3">${tone.description}</p>
+                    
+                    <div class="intensity-slider">
+                        <label class="form-label">Intensity Level</label>
+                        <input type="range" class="form-range intensity-range" 
+                               min="0" max="1" step="0.01" 
+                               value="${tone.intensity}" 
+                               data-tone-key="${key}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Keywords</label>
+                        <div class="keywords-container" data-tone-key="${key}">
+                            ${tone.keywords.map(keyword => `
+                                <span class="keyword-tag">
+                                    ${keyword}
+                                    <span class="remove-keyword" data-keyword="${keyword}" data-tone-key="${key}">×</span>
+                                </span>
+                            `).join('')}
+                        </div>
+                        <div class="add-input-group">
+                            <input type="text" class="form-control form-control-sm add-keyword-input" 
+                                   placeholder="Add new keyword" data-tone-key="${key}">
+                            <button class="btn btn-outline-primary btn-sm add-keyword-btn" data-tone-key="${key}">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Use Cases</label>
+                        <div class="use-cases-container" data-tone-key="${key}">
+                            ${tone.use_cases.map(useCase => `
+                                <span class="keyword-tag">
+                                    ${useCase}
+                                    <span class="remove-keyword" data-use-case="${useCase}" data-tone-key="${key}">×</span>
+                                </span>
+                            `).join('')}
+                        </div>
+                        <div class="add-input-group">
+                            <input type="text" class="form-control form-control-sm add-use-case-input" 
+                                   placeholder="Add new use case" data-tone-key="${key}">
+                            <button class="btn btn-outline-primary btn-sm add-use-case-btn" data-tone-key="${key}">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Emotional Weight</label>
+                            <input type="text" class="form-control form-control-sm" 
+                                   value="${tone.emotional_weight}" 
+                                   data-tone-key="${key}" 
+                                   data-field="emotional_weight">
+                        </div>
+                    </div>
+                `;
+
+                return card;
+            }
+
+            renderStyleElements() {
+                const container = document.getElementById('styleElements');
+                container.innerHTML = '';
+
+                if (!this.config.style_elements) {
+                    container.innerHTML = '<p class="text-muted">No style elements configured</p>';
+                    return;
+                }
+
+                const categories = ['materials', 'lighting', 'colors', 'textures', 'objects', 'composition'];
+                
+                categories.forEach(category => {
+                    const elements = this.config.style_elements[category] || [];
+                    const categoryDiv = this.createStyleCategory(category, elements);
+                    container.appendChild(categoryDiv);
+                });
+            }
+
+            createStyleCategory(category, elements) {
+                const div = document.createElement('div');
+                div.className = 'style-category';
+                div.innerHTML = `
+                    <div class="style-category-header">
+                        <strong>${category.charAt(0).toUpperCase() + category.slice(1)}</strong>
+                        <small class="text-muted">(${elements.length} elements)</small>
+                    </div>
+                    <div class="elements-container" data-category="${category}">
+                        ${elements.map(element => `
+                            <span class="style-element">
+                                ${element}
+                                <span class="remove-element" data-element="${element}" data-category="${category}">×</span>
+                            </span>
+                        `).join('')}
+                    </div>
+                    <div class="add-input-group">
+                        <input type="text" class="form-control form-control-sm add-element-input" 
+                               placeholder="Add new ${category.slice(0, -1)}" data-category="${category}">
+                        <button class="btn btn-outline-primary btn-sm add-element-btn" data-category="${category}">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                `;
+
+                return div;
+            }
+
+            bindEvents() {
+                // Refresh configuration
+                document.getElementById('loadCurrentConfig').addEventListener('click', () => {
+                    this.loadCurrentConfig();
+                });
+
+                // Save configuration
+                document.getElementById('saveConfig').addEventListener('click', () => {
+                    this.saveConfiguration();
+                });
+
+                // Reset to defaults
+                document.getElementById('resetToDefaults').addEventListener('click', () => {
+                    const modal = new bootstrap.Modal(document.getElementById('resetConfirmModal'));
+                    modal.show();
+                });
+
+                document.getElementById('confirmReset').addEventListener('click', () => {
+                    this.resetToDefaults();
+                    bootstrap.Modal.getInstance(document.getElementById('resetConfirmModal')).hide();
+                });
+
+                // Preview changes
+                document.getElementById('previewChanges').addEventListener('click', () => {
+                    this.previewChanges();
+                });
+
+                // Event delegation for dynamic elements
+                document.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('remove-keyword')) {
+                        this.removeKeyword(e.target);
+                    } else if (e.target.classList.contains('add-keyword-btn')) {
+                        this.addKeyword(e.target);
+                    } else if (e.target.classList.contains('add-use-case-btn')) {
+                        this.addUseCase(e.target);
+                    } else if (e.target.classList.contains('remove-element')) {
+                        this.removeStyleElement(e.target);
+                    } else if (e.target.classList.contains('add-element-btn')) {
+                        this.addStyleElement(e.target);
+                    }
+                });
+
+                // Enter key support for inputs
+                document.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        if (e.target.classList.contains('add-keyword-input')) {
+                            const btn = e.target.nextElementSibling;
+                            if (btn) btn.click();
+                        } else if (e.target.classList.contains('add-use-case-input')) {
+                            const btn = e.target.nextElementSibling;
+                            if (btn) btn.click();
+                        } else if (e.target.classList.contains('add-element-input')) {
+                            const btn = e.target.nextElementSibling;
+                            if (btn) btn.click();
+                        }
+                    }
+                });
+
+                // Intensity slider changes
+                document.addEventListener('input', (e) => {
+                    if (e.target.classList.contains('intensity-range')) {
+                        const toneKey = e.target.dataset.toneKey;
+                        const value = parseFloat(e.target.value);
+                        const percentageSpan = e.target.closest('.tone-card').querySelector('.intensity-value');
+                        percentageSpan.textContent = `${(value * 100).toFixed(0)}%`;
+                        
+                        // Update configuration
+                        if (this.config.emotional_tones[toneKey]) {
+                            this.config.emotional_tones[toneKey].intensity = value;
+                        }
+                    }
+                });
+
+                // Text field changes
+                document.addEventListener('change', (e) => {
+                    if (e.target.dataset.toneKey && e.target.dataset.field) {
+                        const toneKey = e.target.dataset.toneKey;
+                        const field = e.target.dataset.field;
+                        const value = e.target.value;
+                        
+                        if (this.config.emotional_tones[toneKey]) {
+                            this.config.emotional_tones[toneKey][field] = value;
+                        }
+                    }
+                });
+            }
+
+            removeKeyword(element) {
+                const keyword = element.dataset.keyword;
+                const toneKey = element.dataset.toneKey;
+                
+                if (this.config.emotional_tones[toneKey]) {
+                    const keywords = this.config.emotional_tones[toneKey].keywords;
+                    const index = keywords.indexOf(keyword);
+                    if (index > -1) {
+                        keywords.splice(index, 1);
+                        element.parentElement.remove();
+                    }
+                }
+            }
+
+            addKeyword(button) {
+                const toneKey = button.dataset.toneKey;
+                const input = button.previousElementSibling;
+                const keyword = input.value.trim();
+                
+                if (!keyword) return;
+                
+                if (this.config.emotional_tones[toneKey]) {
+                    this.config.emotional_tones[toneKey].keywords.push(keyword);
+                    
+                    const container = document.querySelector(`.keywords-container[data-tone-key="${toneKey}"]`);
+                    const tag = document.createElement('span');
+                    tag.className = 'keyword-tag';
+                    tag.innerHTML = `
+                        ${keyword}
+                        <span class="remove-keyword" data-keyword="${keyword}" data-tone-key="${toneKey}">×</span>
+                    `;
+                    container.appendChild(tag);
+                    
+                    input.value = '';
+                }
+            }
+
+            addUseCase(button) {
+                const toneKey = button.dataset.toneKey;
+                const input = button.previousElementSibling;
+                const useCase = input.value.trim();
+                
+                if (!useCase) return;
+                
+                if (this.config.emotional_tones[toneKey]) {
+                    this.config.emotional_tones[toneKey].use_cases.push(useCase);
+                    
+                    const container = document.querySelector(`.use-cases-container[data-tone-key="${toneKey}"]`);
+                    const tag = document.createElement('span');
+                    tag.className = 'keyword-tag';
+                    tag.innerHTML = `
+                        ${useCase}
+                        <span class="remove-keyword" data-use-case="${useCase}" data-tone-key="${toneKey}">×</span>
+                    `;
+                    container.appendChild(tag);
+                    
+                    input.value = '';
+                }
+            }
+
+            removeStyleElement(element) {
+                const elementValue = element.dataset.element;
+                const category = element.dataset.category;
+                
+                if (this.config.style_elements[category]) {
+                    const elements = this.config.style_elements[category];
+                    const index = elements.indexOf(elementValue);
+                    if (index > -1) {
+                        elements.splice(index, 1);
+                        element.parentElement.remove();
+                        
+                        // Update count
+                        const header = document.querySelector(`[data-category="${category}"]`).previousElementSibling;
+                        const countSpan = header.querySelector('small');
+                        countSpan.textContent = `(${elements.length} elements)`;
+                    }
+                }
+            }
+
+            addStyleElement(button) {
+                const category = button.dataset.category;
+                const input = button.previousElementSibling;
+                const element = input.value.trim();
+                
+                if (!element) return;
+                
+                if (this.config.style_elements[category]) {
+                    this.config.style_elements[category].push(element);
+                    
+                    const container = document.querySelector(`.elements-container[data-category="${category}"]`);
+                    const tag = document.createElement('span');
+                    tag.className = 'style-element';
+                    tag.innerHTML = `
+                        ${element}
+                        <span class="remove-element" data-element="${element}" data-category="${category}">×</span>
+                    `;
+                    container.appendChild(tag);
+                    
+                    // Update count
+                    const header = container.parentElement.querySelector('.style-category-header small');
+                    header.textContent = `(${this.config.style_elements[category].length} elements)`;
+                    
+                    input.value = '';
+                }
+            }
+
+            async saveConfiguration() {
+                if (!this.config) {
+                    this.showNotification('No configuration to save', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/update-emotional-config', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': this.csrfToken
+                        },
+                        body: JSON.stringify(this.config)
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        this.showNotification('Configuration saved successfully!', 'success');
+                        
+                        // Update last modified
+                        document.getElementById('lastModified').textContent = new Date().toISOString().split('T')[0];
+                    } else {
+                        const error = await response.json();
+                        throw new Error(error.error || 'Failed to save configuration');
+                    }
+                } catch (error) {
+                    console.error('Failed to save configuration:', error);
+                    this.showNotification(`Failed to save: ${error.message}`, 'error');
+                }
+            }
+
+            async resetToDefaults() {
+                try {
+                    const response = await fetch('/api/reset-emotional-config', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': this.csrfToken
+                        }
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        this.showNotification('Configuration reset to defaults successfully!', 'success');
+                        await this.loadCurrentConfig(); // Reload the UI
+                    } else {
+                        const error = await response.json();
+                        throw new Error(error.error || 'Failed to reset configuration');
+                    }
+                } catch (error) {
+                    console.error('Failed to reset configuration:', error);
+                    this.showNotification(`Failed to reset: ${error.message}`, 'error');
+                }
+            }
+
+            async previewChanges() {
+                const button = document.getElementById('previewChanges');
+                const previewArea = document.getElementById('previewArea');
+                const spinner = button.querySelector('.loading-spinner');
+                
+                // Show loading state
+                button.disabled = true;
+                spinner.style.display = 'inline-block';
+                previewArea.classList.add('generating');
+                previewArea.innerHTML = `
+                    <i class="fas fa-magic fa-3x text-primary mb-3 generating"></i>
+                    <h4>Generating Preview Images...</h4>
+                    <p class="text-muted">Using your current configuration to generate 3 test images</p>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                             style="width: 0%" id="previewProgress"></div>
+                    </div>
+                `;
+
+                try {
+                    const response = await fetch('/api/preview-config-changes', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': this.csrfToken
+                        },
+                        body: JSON.stringify({
+                            config: this.config,
+                            test_pages: 3
+                        })
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        this.displayPreviewResults(result);
+                        this.showNotification('Preview generated successfully!', 'success');
+                    } else {
+                        const error = await response.json();
+                        throw new Error(error.error || 'Failed to generate preview');
+                    }
+                } catch (error) {
+                    console.error('Failed to generate preview:', error);
+                    this.showNotification(`Preview failed: ${error.message}`, 'error');
+                    previewArea.innerHTML = `
+                        <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+                        <h4>Preview Generation Failed</h4>
+                        <p class="text-muted">${error.message}</p>
+                    `;
+                } finally {
+                    // Reset loading state
+                    button.disabled = false;
+                    spinner.style.display = 'none';
+                    previewArea.classList.remove('generating');
+                }
+            }
+
+            displayPreviewResults(result) {
+                const previewArea = document.getElementById('previewArea');
+                
+                if (result.images && result.images.length > 0) {
+                    let imagesHtml = '<div class="row">';
+                    result.images.forEach((image, index) => {
+                        imagesHtml += `
+                            <div class="col-md-4 mb-3">
+                                <div class="card">
+                                    <img src="${image.url}" class="card-img-top" alt="Preview ${index + 1}">
+                                    <div class="card-body">
+                                        <small class="text-muted">${image.title || `Preview ${index + 1}`}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    imagesHtml += '</div>';
+                    
+                    previewArea.innerHTML = `
+                        <h4 class="text-success mb-4">
+                            <i class="fas fa-check-circle"></i>
+                            Preview Generated Successfully
+                        </h4>
+                        ${imagesHtml}
+                        <div class="mt-3 text-muted">
+                            <small>
+                                Generated ${result.images.length} images • 
+                                Cost: ~$${(result.images.length * 0.08).toFixed(2)} • 
+                                Session: ${result.session_id || 'Unknown'}
+                            </small>
+                        </div>
+                    `;
+                } else {
+                    previewArea.innerHTML = `
+                        <i class="fas fa-question-circle fa-3x text-warning mb-3"></i>
+                        <h4>No Images Generated</h4>
+                        <p class="text-muted">No images were returned from the generation process</p>
+                    `;
+                }
+            }
+
+            showNotification(message, type = 'info') {
+                const notification = document.getElementById('configStatus');
+                const messageSpan = document.getElementById('statusMessage');
+                
+                notification.className = `config-status ${type}`;
+                messageSpan.textContent = message;
+                notification.style.display = 'block';
+                
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new EmotionalConfigManager();
+        });
+    </script>
+</body>
+</html>

@@ -10,7 +10,9 @@ from websocket_broadcaster import get_broadcaster
 from dataclasses import dataclass, field
 from enum import Enum
 import json
+import yaml
 from pathlib import Path
+from emotional_config_loader import EmotionalConfigLoader, EmotionalConfig, ConfigValidationError
 
 class AssetType(Enum):
     """Types of assets to generate"""
@@ -73,9 +75,29 @@ class PromptTemplate:
 class PromptTemplateManager:
     """Manages prompt templates with emotional intelligence and luxury aesthetics"""
     
-    def __init__(self):
-        """Initialize template manager with predefined templates"""
+    def __init__(self, use_config_files: bool = True):
+        """Initialize template manager with predefined templates or config files"""
         self.templates = {}
+        self.use_config_files = use_config_files
+        self.config_loader = None
+        self.emotional_config = None
+        
+        if use_config_files:
+            try:
+                self.config_loader = EmotionalConfigLoader()
+                self.emotional_config = self.config_loader.load_active_config()
+                self.section_themes = self._initialize_section_themes()
+                self.emotional_mappings = self._initialize_emotional_mappings_from_config()
+                self.style_library = self._initialize_style_library_from_config()
+            except (ConfigValidationError, FileNotFoundError) as e:
+                print(f"Warning: Could not load config files, falling back to hardcoded: {e}")
+                self.use_config_files = False
+                self._initialize_fallback_templates()
+        else:
+            self._initialize_fallback_templates()
+    
+    def _initialize_fallback_templates(self):
+        """Initialize with hardcoded templates as fallback"""
         self.section_themes = self._initialize_section_themes()
         self.emotional_mappings = self._initialize_emotional_mappings()
         self.style_library = self._initialize_style_library()
@@ -134,8 +156,37 @@ class PromptTemplateManager:
             }
         }
     
+    def _initialize_emotional_mappings_from_config(self) -> Dict[EmotionalTone, EmotionalElements]:
+        """Initialize emotional element mappings from configuration files"""
+        if not self.emotional_config:
+            return self._initialize_emotional_mappings()
+        
+        mappings = {}
+        
+        # Create EmotionalTone enum values from config
+        for tone_key, tone_config in self.emotional_config.emotional_tones.items():
+            try:
+                # Try to match existing enum values first
+                tone_enum = EmotionalTone(tone_key.lower())
+            except ValueError:
+                # If not found, create dynamic mapping using fallback
+                tone_enum = EmotionalTone.WARM_WELCOME  # Default fallback
+            
+            # Create emotional elements from config keywords and style elements
+            elements = EmotionalElements(
+                comfort_symbols=tone_config.keywords[:3] if len(tone_config.keywords) >= 3 else tone_config.keywords,
+                human_touches=[f"{kw} touches" for kw in tone_config.keywords[:2]],
+                continuity_metaphors=[f"{kw} metaphor" for kw in tone_config.keywords[:2]],
+                warmth_markers=self.emotional_config.style_elements.colors[:3],
+                life_elements=self.emotional_config.style_elements.objects[:3]
+            )
+            
+            mappings[tone_enum] = elements
+        
+        return mappings
+    
     def _initialize_emotional_mappings(self) -> Dict[EmotionalTone, EmotionalElements]:
-        """Initialize emotional element mappings"""
+        """Initialize emotional element mappings (fallback hardcoded version)"""
         return {
             EmotionalTone.WARM_WELCOME: EmotionalElements(
                 comfort_symbols=['open door', 'warm tea', 'soft blanket'],
@@ -188,8 +239,43 @@ class PromptTemplateManager:
             )
         }
     
+    def _initialize_style_library_from_config(self) -> Dict[str, StyleElements]:
+        """Initialize reusable style elements from configuration files"""
+        if not self.emotional_config:
+            return self._initialize_style_library()
+        
+        # Build style library from config
+        config_elements = self.emotional_config.style_elements
+        
+        return {
+            'luxury_base': StyleElements(
+                materials=config_elements.materials[:5],
+                lighting=config_elements.lighting[:4], 
+                colors=config_elements.colors[:4],
+                textures=config_elements.textures[:4],
+                objects=config_elements.objects[:4],
+                composition=config_elements.composition[:4]
+            ),
+            'emotional_warmth': StyleElements(
+                materials=[m for m in config_elements.materials if any(word in m.lower() for word in ['warm', 'soft', 'weathered', 'worn'])],
+                lighting=[l for l in config_elements.lighting if any(word in l.lower() for word in ['warm', 'soft', 'gentle', 'golden'])],
+                colors=[c for c in config_elements.colors if any(word in c.lower() for word in ['warm', 'honey', 'cream', 'sage'])],
+                textures=[t for t in config_elements.textures if any(word in t.lower() for word in ['soft', 'gentle', 'smooth', 'comfortable'])],
+                objects=[o for o in config_elements.objects if any(word in o.lower() for word in ['family', 'memory', 'heritage', 'personal'])],
+                composition=[c for c in config_elements.composition if any(word in c.lower() for word in ['gentle', 'warm', 'welcoming', 'embracing'])]
+            ),
+            'professional_trust': StyleElements(
+                materials=[m for m in config_elements.materials if any(word in m.lower() for word in ['metal', 'stone', 'polished', 'marble'])],
+                lighting=[l for l in config_elements.lighting if any(word in l.lower() for word in ['focused', 'professional', 'clear', 'strong'])],
+                colors=[c for c in config_elements.colors if any(word in c.lower() for word in ['navy', 'trust', 'strength', 'wisdom'])],
+                textures=[t for t in config_elements.textures if any(word in t.lower() for word in ['polished', 'smooth', 'professional', 'refined'])],
+                objects=[o for o in config_elements.objects if any(word in o.lower() for word in ['documents', 'keys', 'shields', 'books'])],
+                composition=[c for c in config_elements.composition if any(word in c.lower() for word in ['balance', 'strength', 'stable', 'secure'])]
+            )
+        }
+    
     def _initialize_style_library(self) -> Dict[str, StyleElements]:
-        """Initialize reusable style elements"""
+        """Initialize reusable style elements (fallback hardcoded version)"""
         return {
             'luxury_base': StyleElements(
                 materials=['mahogany', 'leather', 'brass', 'marble', 'silk'],
@@ -217,6 +303,19 @@ class PromptTemplateManager:
             )
         }
     
+    def reload_config(self):
+        """Reload configuration from files"""
+        if self.use_config_files and self.config_loader:
+            try:
+                self.emotional_config = self.config_loader.load_active_config()
+                self.emotional_mappings = self._initialize_emotional_mappings_from_config()
+                self.style_library = self._initialize_style_library_from_config()
+                return True
+            except Exception as e:
+                print(f"Warning: Could not reload config: {e}")
+                return False
+        return False
+    
     def create_prompt(self, 
                      title: str,
                      category: str,
@@ -226,12 +325,14 @@ class PromptTemplateManager:
         """Create a complete prompt with all elements"""
         
         # Emit prompt template creation start
-        if self.broadcaster:
-            self.broadcaster.emit('prompt_template_start', {
+        broadcaster = get_broadcaster()
+        if broadcaster:
+            broadcaster.emit('prompt_template_start', {
                 'title': title,
                 'category': category,
                 'asset_type': asset_type,
                 'tier': tier,
+                'config_source': 'yaml_config' if self.use_config_files else 'hardcoded',
                 'timestamp': datetime.now().isoformat()
             })
         
@@ -385,6 +486,126 @@ class PromptTemplateManager:
             json.dump(data, f, indent=2)
         
         return output_file
+
+
+class ConfigurablePromptTemplates(PromptTemplateManager):
+    """Extended template manager with configuration management features"""
+    
+    def __init__(self):
+        """Initialize with configuration file support enabled"""
+        super().__init__(use_config_files=True)
+    
+    def reset_to_defaults(self) -> bool:
+        """Reset emotional configuration to immutable baseline"""
+        try:
+            if not self.config_loader:
+                raise ConfigValidationError("Configuration loader not available")
+            
+            # Reset configuration
+            self.emotional_config = self.config_loader.reset_to_defaults()
+            
+            # Reload templates from new configuration
+            self.emotional_mappings = self._initialize_emotional_mappings_from_config()
+            self.style_library = self._initialize_style_library_from_config()
+            
+            return True
+            
+        except Exception as e:
+            print(f"Reset to defaults failed: {e}")
+            return False
+    
+    def update_emotional_tone(self, tone_key: str, tone_data: Dict[str, Any]) -> bool:
+        """Update a specific emotional tone configuration"""
+        try:
+            if not self.config_loader:
+                raise ConfigValidationError("Configuration loader not available")
+            
+            from emotional_config_loader import EmotionalToneConfig
+            
+            # Create tone config object
+            tone_config = EmotionalToneConfig(
+                name=tone_data['name'],
+                description=tone_data['description'], 
+                keywords=tone_data['keywords'],
+                intensity=tone_data['intensity'],
+                use_cases=tone_data['use_cases'],
+                emotional_weight=tone_data['emotional_weight']
+            )
+            
+            # Update configuration
+            self.emotional_config = self.config_loader.update_emotional_tone(tone_key, tone_config)
+            
+            # Reload templates
+            self.emotional_mappings = self._initialize_emotional_mappings_from_config()
+            
+            return True
+            
+        except Exception as e:
+            print(f"Update emotional tone failed: {e}")
+            return False
+    
+    def add_style_element(self, category: str, element: str) -> bool:
+        """Add a new style element to a category"""
+        try:
+            if not self.config_loader:
+                raise ConfigValidationError("Configuration loader not available")
+            
+            # Update configuration
+            self.emotional_config = self.config_loader.add_style_element(category, element)
+            
+            # Reload style library
+            self.style_library = self._initialize_style_library_from_config()
+            
+            return True
+            
+        except Exception as e:
+            print(f"Add style element failed: {e}")
+            return False
+    
+    def remove_style_element(self, category: str, element: str) -> bool:
+        """Remove a style element from a category"""
+        try:
+            if not self.config_loader:
+                raise ConfigValidationError("Configuration loader not available")
+            
+            # Update configuration
+            self.emotional_config = self.config_loader.remove_style_element(category, element)
+            
+            # Reload style library 
+            self.style_library = self._initialize_style_library_from_config()
+            
+            return True
+            
+        except Exception as e:
+            print(f"Remove style element failed: {e}")
+            return False
+    
+    def get_current_config(self) -> Dict[str, Any]:
+        """Get current configuration as dictionary for API responses"""
+        if not self.emotional_config:
+            return {}
+        
+        return self.config_loader._config_to_dict(self.emotional_config)
+    
+    def validate_current_config(self) -> List[str]:
+        """Validate current configuration and return issues"""
+        if not self.emotional_config or not self.config_loader:
+            return ["Configuration not loaded"]
+        
+        return self.config_loader.validate_config(self.emotional_config)
+    
+    def backup_current_config(self, custom_suffix: str = None) -> str:
+        """Create backup of current configuration"""
+        try:
+            if not self.config_loader:
+                raise ConfigValidationError("Configuration loader not available")
+            
+            backup_path = self.config_loader.backup_config(custom_suffix=custom_suffix)
+            return str(backup_path)
+            
+        except Exception as e:
+            print(f"Backup failed: {e}")
+            return ""
 
 
 def test_prompt_templates():
