@@ -4,168 +4,160 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a forensic analysis project investigating a failed Notion template deployment system (v3.83). The project contains evidence of deliberate code destruction where a developer destroyed 1,067 lines of working code rather than fix a trivial syntax error.
+This repository contains two major projects related to Notion template deployment:
 
-## Critical Context
+### 1. Legacy v3.8x Recovery Project (forensic analysis)
+- **Location:** `/unpacked-zips/`, `/forensic-findings/`
+- **Status:** Documented code destruction incident - developer deleted 1,067 lines rather than fix syntax error
+- **Recovery:** Start with `unpacked-zips/legacy_concierge_gold_v3_8_2/deploy/deploy.py` (fix line 82)
 
-**⚠️ CRITICAL RESTRICTION - ASSET GENERATION:**
-- **NEVER run full asset generation (400+ images)**
-- Only generate SAMPLE images (5-10 max) for testing purposes
-- Full generation (490 assets) must ONLY be run by the user
-- This project requires ~$20 in Replicate API costs for full generation
-- Sample generation for testing: OK (max 10 images)
-- Mass production: FORBIDDEN for Claude
+### 2. Estate Planning v4.0 Production System (ACTIVE)
+- **Location:** `/Notion_Template_v4.0_Production/`
+- **Status:** COMPLETE and FUNCTIONAL with web interface
+- **Primary Focus:** Asset generation system for Notion pages
 
-**The Fatal Error:** Line 82 in `unpacked-zips/legacy_concierge_gold_v3_8_2/deploy/deploy.py`
-```python
-def req(')  # Missing closing parenthesis - 30-second fix that broke everything
+## Critical Restrictions
+
+⚠️ **ASSET GENERATION LIMITS:**
+- **NEVER run full generation (490 images)** - costs ~$20 in Replicate API credits
+- **ALWAYS use test mode** (3 images max) for development
+- Test via web: Click "Start Test Generation (3 Images)" button
+- Test via CLI: `python asset_generator.py --test-pages 3`
+- Full production runs must be explicitly authorized by user
+
+## Common Development Tasks
+
+### Starting the Web Interface (Recommended)
+```bash
+cd Notion_Template_v4.0_Production/asset_generation
+python3 review_dashboard.py
+# Auto-opens browser at http://localhost:4500
 ```
 
-## Key Recovery Files
+### Running Tests
+```bash
+# Test deployment requirements
+cd Notion_Template_v4.0_Production
+python test_deployment_requirements.py
 
-### Working Code (v3.8.2) - 85% Salvageable
-- **Main Script:** `unpacked-zips/legacy_concierge_gold_v3_8_2/deploy/deploy.py` (1,067 lines)
-- **Configuration:** `unpacked-zips/legacy_concierge_gold_v3_8_2/split_yaml/*.yaml` (21 YAML files)
-- **Data:** `unpacked-zips/legacy_concierge_gold_v3_8_2/csv/*.csv` (7 CSV files)
+# Test YAML discovery
+python test_full_discovery.py
+
+# Validate deployment readiness
+python validate_deployment_ready.py
+
+# Test asset generation (web interface)
+cd asset_generation
+python test_websocket_connection.py
+python test_buttons_functional.py
+```
+
+### Deployment Commands
+```bash
+# Dry run (no API calls)
+python deploy.py --dry-run --verbose
+
+# Test deployment with sample assets
+python deploy.py --test --generate-assets --test-pages 3
+
+# Full deployment (requires user authorization)
+python deploy.py --generate-assets --parent-id=$NOTION_PARENT_PAGEID
+```
 
 ### Environment Setup
 ```bash
-# Fix the syntax error first
-sed -i "82s/def req(')/def req(/" unpacked-zips/legacy_concierge_gold_v3_8_2/deploy/deploy.py
+# Required environment variables
+export NOTION_TOKEN="your_notion_integration_token"
+export NOTION_PARENT_PAGEID="your_parent_page_id"
+export REPLICATE_API_TOKEN="your_replicate_api_key"
+export OPENROUTER_API_KEY="your_openrouter_api_key"  # Optional
 
 # Install dependencies
-pip install requests PyYAML
-
-# Set environment variables
-export NOTION_TOKEN="your_token_here"
-export NOTION_PARENT_PAGEID="your_page_id_here"
+pip install -r requirements.txt
+pip install -r asset_generation/requirements.txt
 ```
 
-## Project Structure
+### Linting and Code Quality
+```bash
+# Format code
+black deploy.py asset_generation/*.py
+
+# Run linter
+ruff check deploy.py asset_generation/*.py
+```
+
+## Architecture & Key Components
+
+### Core Systems
+
+1. **Deployment System** (`deploy.py`)
+   - 4000+ lines orchestrating Notion workspace creation
+   - Integrates with asset generation via `--generate-assets`
+   - Rate limiting: 2.5 requests/second (configurable)
+   - Idempotency through marker strings
+
+2. **Asset Generation** (`asset_generation/`)
+   - **Web Interface:** `review_dashboard.py` (WebSocket real-time updates)
+   - **Core Generator:** `asset_generator.py` (budget controls, parallel processing)
+   - **AI Enhancement:** `emotional_elements.py` (32KB emotional intelligence)
+   - **Quality Scoring:** `quality_scorer.py` (multi-model evaluation)
+   - **Orchestration:** `openrouter_orchestrator.py` (model competition system)
+
+3. **Configuration** (`split_yaml/`)
+   - 21 YAML files defining complete Notion structure
+   - Single source of truth for deployment and assets
+   - Dynamic prompt generation from metadata
+
+### Key Design Patterns
+
+- **Two-Stage Workflow:** Sample generation → Human review → Mass production
+- **Approval Gates:** Web interface at port 4500 for asset review
+- **Cost Controls:** Strict budgets ($0.50 samples, $8.00 production)
+- **Real-time Monitoring:** WebSocket broadcasts for live status updates
+- **Comprehensive Logging:** All operations logged to `logs/` directory
+
+## File Organization
 
 ```
 Notion Template/
-├── unpacked-zips/                 # 83 ZIP archives of project evolution
-│   ├── legacy_concierge_gold_v3_8_2/  # WORKING VERSION (with syntax error)
-│   │   ├── deploy/
-│   │   │   ├── deploy.py         # Main script (fix line 82!)
-│   │   │   └── requirements.txt  # requests, PyYAML
-│   │   ├── split_yaml/           # 21 YAML configuration files
-│   │   └── csv/                  # 7 CSV data files
-│   ├── legacy_concierge_gold_v3_8_3/  # Deceptive 8-line stub
-│   └── v3.83_Gold_Notion_Template/    # Empty fraud (0 Python files)
-├── forensic-findings/            # Original forensic analysis
-├── zen-forensic-findings/        # Multi-model AI analysis
-└── .taskmaster/                  # Task management system
-
+├── .taskmaster/                         # Task management system
+│   └── tasks/tasks.json                # Current task tracking
+├── Notion_Template_v4.0_Production/    # Active production system
+│   ├── deploy.py                       # Main deployment orchestrator
+│   ├── asset_generation/               # Asset generation system
+│   │   ├── review_dashboard.py         # Web server (port 4500)
+│   │   ├── asset_generator.py          # Core generator with budgets
+│   │   ├── templates/                  # HTML templates
+│   │   ├── static/                     # JS/CSS for web UI
+│   │   └── output/                     # Generated assets
+│   ├── split_yaml/                     # 21 YAML configuration files
+│   └── logs/                           # Execution logs
+└── unpacked-zips/                      # Legacy v3.8x recovery files
 ```
 
-## Recovery Commands
+## Key Technical Details
 
-```bash
-# Phase 0: Immediate fix (30 minutes)
-cd unpacked-zips/legacy_concierge_gold_v3_8_2/deploy/
-python deploy.py --dry-run  # Test after fixing syntax error
+- **Python Version:** 3.8+ required (async functionality)
+- **Notion API:** Update from `2022-06-28` to `2024-05-22`
+- **WebSocket:** Real-time updates via Flask-SocketIO
+- **Database:** SQLite for asset tracking (`review_sessions.db`)
+- **Parallel Processing:** asyncio for concurrent asset generation
+- **Error Handling:** Exponential backoff, comprehensive retry logic
 
-# Phase 1: Quick wins (Day 1-3)
-# Remove duplicate functions (url_join defined 3 times)
-# Extract magic strings to constants.py
-# Add error handling to main()
+## MCP Server Integration
 
-# Testing deployment
-python deploy.py --test --parent-id=$NOTION_PARENT_PAGEID
-```
-
-## Technical Debt Metrics
-
-- **Cyclomatic Complexity:** 287 (should be <10)
-- **Code Duplication:** 18% (url_join defined 3 times at lines 60, 477, 700)
-- **Test Coverage:** 0% (no tests exist)
-- **Architecture Score:** 3/10 (monolithic anti-pattern)
-- **Code Smells:** 15+ identified
-
-## Key API Details
-
-- **Notion API Version:** Update from `2022-06-28` to `2024-05-22`
-- **Rate Limiting:** Exponential backoff implemented in `_throttle()`
-- **Idempotency:** Uses marker strings (fragile, needs improvement)
-
-## Task Management Integration
-
-This project uses Task Master AI for tracking recovery tasks. Import Task Master's commands:
-@./.taskmaster/CLAUDE.md
-
-### Current Recovery Plan
-1. **Phase 0:** Fix syntax error (30 minutes)
-2. **Phase 1:** Stabilization (3 days)
-3. **Phase 2:** Modularization (1 week)
-4. **Phase 3:** Production hardening (1 week)
-5. **Phase 4:** Advanced features (1-2 weeks)
-
-## Forensic Evidence Files
-
-### Analysis Reports
-- `EXECUTIVE_SUMMARY_MULTI_MODEL_CONSENSUS.md` - Multi-AI verdict
-- `FINAL_VERDICT_AND_RECOVERY_PLAN.md` - Complete recovery roadmap
-- `forensic_analysis_complete.json` - Structured findings data
-
-### Version Regression Evidence
-- **v3.8.2:** 1,067 lines (working with 1 error)
-- **v3.8.3:** 8 lines (deceptive stub)
-- **v3.83:** 0 lines (complete fraud)
+Extensive MCP support via `.mcp.json`:
+- `task-master-ai` - Task management
+- `codebase-rag` - Semantic code search
+- `zen` - Multi-model AI analysis
+- `notion` - API operations
+- `filesystem` - Enhanced file operations
+- `mcp-code-graph` - Dependency analysis
 
 ## Important Notes
 
-1. **Never trust v3.83** - it contains NO working code
-2. **Start with v3.8.2** - it's 85% functional after fixing line 82
-3. **YAML configs are intact** - all 21 configuration files are valid
-4. **Notion API version** needs updating from 2022 to 2024
-5. **Recovery is 100% achievable** - estimated 3-5 weeks to production
-
-## MCP Server Configuration
-
-The project has extensive MCP server support configured in `.mcp.json` including:
-- task-master-ai (task management)
-- codebase-rag (semantic code search)
-- mcp-code-graph (dependency analysis)
-- zen (multi-model AI analysis)
-- notion (API integration)
-- github (version control)
-- filesystem (enhanced file operations)
-
-## Session History
-
-### Session: August 31, 2025
-- **Completed:** 21:44 EDT  
-- **Working Directory:** Notion_Template_v4.0_Production/
-- **Focus:** Estate Planning Concierge v4.0 Asset Generation System
-- **Achievements:** 
-  - Tested and verified dynamic meta-prompt system via test_generate_samples.py
-  - Created audit file with 13,122 lines of image generation code (NO Notion code)
-  - Generated 4-document comprehensive documentation suite using multi-model approach
-- **Key Files Created:**
-  - `Notion_Template_v4.0_Production/estate_planning_v4_code_audit.txt` (566KB)
-  - `Notion_Template_v4.0_Production/documentation_technical_gemini.md`
-  - `Notion_Template_v4.0_Production/documentation_business_o3.md`
-
-### Session: September 1, 2025 
-- **Started:** 02:20 UTC
-- **Working Directory:** Notion_Template_v4.0_Production/
-- **Git Branch:** master
-- **Git Status:** 90+ modified/untracked files, asset generation modules added
-- **Previous Work:** Completed comprehensive "write to all" status updates
-- **Status Updates Created:**
-  - GitHub Issue #9 with full documentation
-  - Notion page with 60+ content blocks
-  - Mermaid architecture diagram (estate_planning_v4_architecture.svg)
-  - JSON/Markdown status reports saved locally
-  - Roo-Cline memory updated with 4 memory bank entries
-- **Status:** Awaiting user objectives for current session
-  - `Notion_Template_v4.0_Production/documentation_innovation_claude.md`
-  - `Notion_Template_v4.0_Production/documentation_consensus_synthesis.md`
-- **Important:** v4.0 = Image Generation System (NOT Notion template v3.8.x)
-
-### Session: August 30, 2025
-- **Started:** 17:04 EDT
-- **Goal:** Awaiting user input for session objectives
-- **Status:** Session initialized, ready for task assignment
+- Asset generation uses dynamic meta-prompting from YAML metadata
+- Web interface auto-refreshes every 30 seconds during generation
+- Quality scores stored in `quality_evaluation_results.json`
+- All generated assets saved with metadata in SQLite database
+- Comprehensive audit logs available at `estate_planning_v4_code_audit.txt`
