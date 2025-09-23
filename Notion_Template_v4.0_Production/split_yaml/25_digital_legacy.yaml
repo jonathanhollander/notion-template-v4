@@ -138,7 +138,7 @@ pages:
   - type: heading_2
     content: What Happens to Memorialized Accounts
   - type: bulleted_list_item
-    content: "Memorialized" appears next to the name
+    content: '"Memorialized" appears next to the name'
   - type: bulleted_list_item
     content: Posts remain visible to current audience
   - type: bulleted_list_item

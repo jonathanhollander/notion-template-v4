@@ -226,7 +226,7 @@ db:
         Type: Life
         Carrier: Life Insurance Company A
         'Policy #': 'LIFE-123456'
-        Notes: $500,000 term life policy. Beneficiaries: Spouse (100%). Claim number: 1-800-CLAIMS.
+        Notes: "$500,000 term life policy. Beneficiaries: Spouse (100%). Claim number: 1-800-CLAIMS."
         Related Page Title: Insurance
         Tags: [Life, Claims]
         

@@ -391,7 +391,7 @@ pages:
     - type: heading_2
       content: Introduction Video Series (5 Videos)
     - type: toggle
-      content: Video 1: Estate Planning System Overview (5 minutes)
+      content: "Video 1: Estate Planning System Overview (5 minutes)"
       blocks:
         - type: paragraph
           content: "Script outline for system introduction video:"
@@ -411,7 +411,7 @@ pages:
           content: "4:30-5:00: Next steps and getting started guidance"
     
     - type: toggle
-      content: Video 2: Family Access and Roles (4 minutes)
+      content: "Video 2: Family Access and Roles (4 minutes)"
       blocks:
         - type: paragraph
           content: "Script for explaining family member access and responsibilities:"
@@ -429,7 +429,7 @@ pages:
           content: "3:00-4:00: Communication tools and asking questions"
     
     - type: toggle
-      content: Video 3: Understanding Your Estate Plan (8 minutes)
+      content: "Video 3: Understanding Your Estate Plan (8 minutes)"
       blocks:
         - type: paragraph
           content: "Educational content about estate planning fundamentals:"
@@ -449,7 +449,7 @@ pages:
     - type: heading_2
       content: Technical How-To Series (4 Videos)
     - type: toggle
-      content: Video 4: Using the Progress Dashboard (3 minutes)
+      content: "Video 4: Using the Progress Dashboard (3 minutes)"
       blocks:
         - type: paragraph
           content: "Technical walkthrough of progress tracking features:"
@@ -463,7 +463,7 @@ pages:
           content: "2:30-3:00: Customizing your progress view"
     
     - type: toggle
-      content: Video 5: Mobile Access and Notifications (4 minutes)
+      content: "Video 5: Mobile Access and Notifications (4 minutes)"
       blocks:
         - type: paragraph
           content: "Guide to mobile features and notification management:"

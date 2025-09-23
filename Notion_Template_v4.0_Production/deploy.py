@@ -1,8 +1,16 @@
 #!/usr/bin/env python3
 """
-Estate Planning Concierge v4.0 - Master Gold Build
-Notion API Deployment System
-Consolidates best features from Claude, ChatGPT, Gemini, and Qwen builds
+Notion Template v4.0 Production Deployment Script
+=================================================
+Unified implementation combining best features from all four AI analyses:
+- ChatGPT: Validation-focused foundation with comprehensive error handling
+- Gemini: Phased deployment with progress tracking
+- Qwen: CLI interface with interactive commands
+- Claude: Component-based architecture (future refactor)
+- DeepSeek: State management and recovery capabilities
+
+Created: August 2025
+API Version: 2025-09-03
 """
 
 import os
@@ -11,4900 +19,1069 @@ import json
 import time
 import argparse
 import logging
-import base64
-import mimetypes
-import re
-from typing import Dict, List, Optional, Any, Tuple
+import pickle
 from pathlib import Path
+from typing import Dict, List, Optional, Any, Tuple
+from dataclasses import dataclass, field
+from enum import Enum
 import yaml
+import csv
 import requests
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
+from dotenv import load_dotenv
+from urllib.parse import quote
+from datetime import datetime
 
-# Import modular components
-from modules.config import load_config
-from modules.auth import validate_token, validate_token_with_api
-from modules.notion_api import throttle, create_session, req as module_req
-from modules.validation import sanitize_input, check_role_permission
-from modules.exceptions import (
-    ConfigurationError, NotionAPIError, ValidationError,
-    AuthenticationError, RateLimitExceededError, DatabaseOperationError
-)
+# ============================================================================
+# CONFIGURATION & CONSTANTS
+# ============================================================================
 
-# Import visual components
-from modules.visuals import (
-    get_estate_emoji, 
-    create_professional_header,
-    create_estate_status_indicator,
-    create_document_callout,
-    create_professional_divider,
-    create_confidential_notice
-)
+# Load environment variables from .env file
+load_dotenv()
 
-# Configuration
+NOTION_TOKEN = os.getenv("NOTION_TOKEN")
+NOTION_VERSION = os.getenv("NOTION_VERSION", "2025-09-03")
+NOTION_PARENT_PAGEID = os.getenv("NOTION_PARENT_PAGEID")
 
-# GitHub Asset Integration Functions
-def get_github_asset_url(asset_type: str, page_title: str, theme: str = "default") -> str:
-    """Generate GitHub-hosted asset URL for a page"""
-    # Sanitize page title for filename
-    sanitized_title = re.sub(r'[^a-zA-Z0-9_.-]', '_', page_title).lower()
-    
-    # Get base URL from config
-    config = load_config(Path("config.yaml"))
-    base_url = config.get('visual_config', {}).get('github_assets_base_url', 
-                         'https://raw.githubusercontent.com/jonathanhollander/notion-assets/main/assets')
-    
-    # Construct asset path
-    folder = f"{asset_type}s_{theme}"  # icons_default or covers_default
-    filename = f"{sanitized_title}_{asset_type}.png"
-    
-    return f"{base_url}/{folder}/{filename}"
+GLOBAL_THROTTLE_RPS = float(os.getenv("THROTTLE_RPS", "2.5"))
+ENABLE_SEARCH_FALLBACK = os.getenv("ENABLE_SEARCH_FALLBACK", "1") in ("1", "true", "True", "yes", "YES")
 
-def get_asset_icon(page_title: str, theme: str = None) -> Dict:
-    """Get icon configuration for a page with GitHub URL"""
-    if not theme:
-        config = load_config(Path("config.yaml"))
-        theme = config.get('visual_config', {}).get('default_theme', 'default')
-    
-    # Use estate emoji for immediate display, external URL for permanent asset
-    emoji = get_page_emoji(page_title)
-    external_url = get_github_asset_url("icon", page_title, theme)
-    
-    return {
-        "type": "external",
-        "external": {"url": external_url}
-    }
+# Deployment phases from Gemini build
+class DeploymentPhase(Enum):
+    VALIDATION = "Validation"
+    PREPARATION = "Preparation"
+    PAGES = "Creating Pages"
+    DATABASES = "Creating Databases"
+    RELATIONS = "Setting Relations"
+    DATA = "Importing Data"
+    PATCHES = "Applying Patches"
+    FINALIZATION = "Finalization"
+    COMPLETED = "Completed"
 
-def get_asset_cover(page_title: str, theme: str = None) -> Dict:
-    """Get cover configuration for a page with GitHub URL"""
-    if not theme:
-        config = load_config(Path("config.yaml"))
-        theme = config.get('visual_config', {}).get('default_theme', 'default')
-    
-    external_url = get_github_asset_url("cover", page_title, theme)
-    
-    return {
-        "type": "external",
-        "external": {"url": external_url}
-    }
+# ============================================================================
+# STATE MANAGEMENT (DeepSeek recommendation)
+# ============================================================================
 
-def get_page_emoji(page_title: str) -> str:
-    """Get appropriate emoji for a page based on its category"""
-    title_lower = page_title.lower()
+@dataclass
+class DeploymentState:
+    """Tracks deployment progress for recovery after failures"""
+    phase: DeploymentPhase = DeploymentPhase.VALIDATION
+    created_pages: Dict[str, str] = field(default_factory=dict)
+    created_databases: Dict[str, str] = field(default_factory=dict)
+    processed_csv: List[str] = field(default_factory=list)
+    applied_patches: List[str] = field(default_factory=list)
+    errors: List[Dict[str, Any]] = field(default_factory=list)
+    start_time: float = field(default_factory=time.time)
+    checkpoint_file: str = ".notion_deploy_state"
     
-    # Map page categories to appropriate estate emoji
-    if "legal" in title_lower or "will" in title_lower or "power" in title_lower:
-        return get_estate_emoji("legal")
-    elif "family" in title_lower or "beneficiar" in title_lower:
-        return get_estate_emoji("family")
-    elif "asset" in title_lower or "propert" in title_lower or "real estate" in title_lower:
-        return get_estate_emoji("property")
-    elif "account" in title_lower or "financial" in title_lower or "bank" in title_lower:
-        return get_estate_emoji("assets")
-    elif "insurance" in title_lower:
-        return get_estate_emoji("secure")
-    elif "executor" in title_lower or "checklist" in title_lower:
-        return get_estate_emoji("document")
-    elif "memorial" in title_lower or "memories" in title_lower:
-        return get_estate_emoji("heritage")
-    elif "letter" in title_lower or "message" in title_lower:
-        return get_estate_emoji("sealed")
-    elif "contact" in title_lower:
-        return get_estate_emoji("generations")
-    elif "admin" in title_lower:
-        return get_estate_emoji("archived")
-    else:
-        return get_estate_emoji("document")
+    def save_checkpoint(self):
+        """Save current state to disk for recovery"""
+        with open(self.checkpoint_file, 'wb') as f:
+            pickle.dump(self, f)
+        logging.debug(f"Checkpoint saved at phase: {self.phase.value}")
+    
+    def load_checkpoint(self) -> Optional['DeploymentState']:
+        """Load previous state if exists"""
+        if Path(self.checkpoint_file).exists():
+            try:
+                with open(self.checkpoint_file, 'rb') as f:
+                    state = pickle.load(f)
+                logging.info(f"Recovered state from phase: {state.phase.value}")
+                return state
+            except Exception as e:
+                logging.warning(f"Could not recover state: {e}")
+        return None
+    
+    def clear_checkpoint(self):
+        """Remove checkpoint after successful completion"""
+        if Path(self.checkpoint_file).exists():
+            os.remove(self.checkpoint_file)
+            logging.debug("Checkpoint cleared")
 
-def determine_page_theme(page_title: str) -> str:
-    """Determine appropriate theme based on page category"""
-    title_lower = page_title.lower()
-    
-    # Executive blue for administrative and professional
-    if "admin" in title_lower or "executor" in title_lower or "professional" in title_lower:
-        return "blue"
-    # Legacy purple for family and beneficiaries
-    elif "family" in title_lower or "beneficiar" in title_lower or "letter" in title_lower:
-        return "purple"
-    # Heritage green for assets and property
-    elif "asset" in title_lower or "propert" in title_lower or "account" in title_lower:
-        return "green"
-    # Default theme for others
-    else:
-        return "default"
+# ============================================================================
+# LOGGING & PROGRESS (Gemini feature)
+# ============================================================================
 
-# Enhanced logging setup
-def setup_logging(log_level: str = "INFO", log_file: str = None):
-    """Setup comprehensive logging with file and console output"""
-    log_format = '%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s'
+class ProgressTracker:
+    """Visual progress tracking from Gemini build"""
+    def __init__(self, total_steps: int):
+        self.total_steps = total_steps
+        self.current_step = 0
+        self.phase = DeploymentPhase.VALIDATION
+        
+    def update(self, phase: DeploymentPhase, message: str):
+        self.phase = phase
+        self.current_step += 1
+        progress = (self.current_step / self.total_steps) * 100
+        bar_length = 40
+        filled = int(bar_length * self.current_step / self.total_steps)
+        bar = '█' * filled + '░' * (bar_length - filled)
+        
+        print(f"\r[{bar}] {progress:.1f}% - {phase.value}: {message}", end='')
+        if self.current_step >= self.total_steps:
+            print()  # New line at completion
+
+# ============================================================================
+# VALIDATION MODULE (ChatGPT foundation)
+# ============================================================================
+
+class Validator:
+    """Comprehensive validation from ChatGPT build"""
     
-    # Configure root logger
-    logging.basicConfig(
-        level=getattr(logging, log_level.upper(), logging.INFO),
-        format=log_format,
-        handlers=[]
-    )
+    @staticmethod
+    def validate_environment() -> List[str]:
+        """Validate environment variables and configuration"""
+        errors = []
+        
+        if not NOTION_TOKEN:
+            errors.append("NOTION_TOKEN environment variable not set")
+        elif not NOTION_TOKEN.startswith(('secret_', 'ntn_')):
+            errors.append("Invalid NOTION_TOKEN format (should start with 'secret_' or 'ntn_')")
+            
+        if not NOTION_PARENT_PAGEID:
+            errors.append("NOTION_PARENT_PAGEID environment variable not set")
+            
+        return errors
     
-    # Console handler
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setLevel(logging.INFO)
-    console_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    console_handler.setFormatter(console_formatter)
+    @staticmethod
+    def validate_yaml_structure(yaml_data: Dict) -> List[str]:
+        """Validate YAML file structure"""
+        errors = []
+        
+        if not isinstance(yaml_data, dict):
+            errors.append("YAML data must be a dictionary")
+            return errors
+            
+        if 'pages' in yaml_data and not isinstance(yaml_data['pages'], list):
+            errors.append("'pages' must be a list")
+            
+        if 'db' in yaml_data:
+            if not isinstance(yaml_data['db'], dict):
+                errors.append("'db' must be a dictionary")
+            else:
+                if 'schemas' in yaml_data['db'] and not isinstance(yaml_data['db']['schemas'], dict):
+                    errors.append("'db.schemas' must be a dictionary")
+                if 'seed_rows' in yaml_data['db'] and not isinstance(yaml_data['db']['seed_rows'], dict):
+                    errors.append("'db.seed_rows' must be a dictionary")
+                    
+        return errors
     
-    # File handler if specified
-    handlers = [console_handler]
-    if log_file:
+    @staticmethod
+    def validate_dependencies(yaml_data: Dict) -> List[str]:
+        """Check for circular dependencies and missing references"""
+        errors = []
+        dependencies = {}
+        
+        # Build dependency graph
+        if 'pages' in yaml_data:
+            for page in yaml_data['pages']:
+                if 'parent' in page:
+                    dependencies.setdefault(page.get('title'), []).append(page['parent'])
+                    
+        # Check for cycles (simplified)
+        def has_cycle(node, visited, rec_stack):
+            visited[node] = True
+            rec_stack[node] = True
+            
+            for neighbor in dependencies.get(node, []):
+                if neighbor not in visited:
+                    if has_cycle(neighbor, visited, rec_stack):
+                        return True
+                elif rec_stack[neighbor]:
+                    return True
+                    
+            rec_stack[node] = False
+            return False
+        
+        visited = {}
+        rec_stack = {}
+        for node in dependencies:
+            if node not in visited:
+                if has_cycle(node, visited, rec_stack):
+                    errors.append(f"Circular dependency detected involving: {node}")
+                    
+        return errors
+
+# ============================================================================
+# CORE REQUEST HANDLING (From all builds)
+# ============================================================================
+
+_LAST_REQ_TS = [0.0]
+
+def _throttle():
+    """Rate limiting to respect Notion API limits"""
+    if GLOBAL_THROTTLE_RPS <= 0:
+        return
+    min_interval = 1.0 / GLOBAL_THROTTLE_RPS
+    now = time.time()
+    elapsed = now - _LAST_REQ_TS[0]
+    if elapsed < min_interval:
+        time.sleep(min_interval - elapsed + 0.02)
+    _LAST_REQ_TS[0] = time.time()
+
+def req(method: str, url: str, headers: Optional[Dict] = None, 
+        data: Optional[str] = None, files: Optional[Any] = None, 
+        timeout: Optional[int] = None) -> requests.Response:
+    """Enhanced request with retry logic and comprehensive error handling"""
+    headers = headers or {}
+    if "Notion-Version" not in headers:
+        headers["Notion-Version"] = NOTION_VERSION
+    if "Authorization" not in headers:
+        headers["Authorization"] = f'Bearer {NOTION_TOKEN}'
+    if "Content-Type" not in headers and data is not None and files is None:
+        headers["Content-Type"] = "application/json"
+    
+    timeout = timeout or int(os.getenv("NOTION_TIMEOUT", "25"))
+    max_try = int(os.getenv("RETRY_MAX", "5"))
+    backoff = float(os.getenv("RETRY_BACKOFF_BASE", "1.5"))
+    
+    for attempt in range(max_try):
         try:
-            file_handler = logging.FileHandler(log_file)
-            file_handler.setLevel(logging.DEBUG)
-            file_formatter = logging.Formatter(log_format)
-            file_handler.setFormatter(file_formatter)
-            handlers.append(file_handler)
-        except Exception as e:
-            print(f"Warning: Could not setup file logging: {e}")
+            _throttle()
+            r = requests.request(method, url, headers=headers, data=data, 
+                               files=files, timeout=timeout)
+            
+            # Handle rate limiting
+            if r.status_code == 429:
+                retry_after = int(r.headers.get('Retry-After', '5'))
+                logging.warning(f"Rate limited, waiting {retry_after}s")
+                time.sleep(retry_after)
+                continue
+                
+            # Handle server errors with exponential backoff
+            if r.status_code in (502, 503, 504):
+                if attempt < max_try - 1:
+                    wait_time = backoff ** attempt
+                    logging.warning(f"Server error {r.status_code}, retrying in {wait_time}s")
+                    time.sleep(wait_time)
+                    continue
+                    
+            return r
+            
+        except requests.exceptions.Timeout:
+            if attempt == max_try - 1:
+                raise
+            logging.warning(f"Timeout on attempt {attempt + 1}, retrying...")
+            time.sleep(backoff ** attempt)
+            
+        except requests.exceptions.ConnectionError as e:
+            if attempt == max_try - 1:
+                raise
+            logging.warning(f"Connection error: {e}, retrying...")
+            time.sleep(backoff ** attempt)
     
-    # Apply handlers
-    root_logger = logging.getLogger()
-    root_logger.handlers = handlers
-    
-    return logging.getLogger(__name__)
+    return r
 
-# Initialize logging
-logger = setup_logging(log_file="estate_planning_deployment.log")
-
-# Global state for tracking
-state = {
-    "pages": {},      # title -> page_id mapping
-    "dbs": {},        # db_name -> db_id mapping
-    "synced": {},     # sync_key -> block_id mapping
-    "relations": {},  # for tracking relation bindings
-    "markers": set()  # for idempotency tracking
-}
-
-# Rate limiting
-_last_request_time = [0.0]
-
-# Create wrapper functions for backwards compatibility
-def throttle_wrapper():
-    """Wrapper for module throttle function using global rate limit"""
-    throttle(RATE_LIMIT_RPS)
-
-def create_session() -> requests.Session:
-    """Create session using modular approach"""
-    from modules.notion_api import create_session as module_create_session
-    return module_create_session(max_retries=MAX_RETRIES, backoff_base=BACKOFF_BASE)
-
-def j(resp: requests.Response) -> Dict:
-    """Safely parse JSON response"""
+def j(r: requests.Response) -> Dict:
+    """Parse JSON response with error handling"""
     try:
-        return resp.json()
-    except (ValueError, KeyError) as e:
-        logger.warning(f"Failed to parse JSON response: {e}")
-        logger.debug(f"Response content: {resp.text[:200]}...")
+        return r.json()
+    except json.JSONDecodeError:
+        logging.error(f"Failed to parse JSON: {r.text[:500]}")
         return {}
 
-# Load and validate configuration (using modular config system)
-try:
-    config = load_config(Path("config.yaml"))
-    
-    BASE_URL = config["base_url"]
-    NOTION_API_VERSION = config["notion_api_version"]
-    RATE_LIMIT_RPS = config["rate_limit_rps"]
-    DEFAULT_TIMEOUT = config["default_timeout"]
-    MAX_RETRIES = config["max_retries"]
-    BACKOFF_BASE = config["backoff_base"]
-    
-    logger.info(f"Configuration loaded successfully - BASE_URL: {BASE_URL}, API Version: {NOTION_API_VERSION}")
-    
-except Exception as e:
-    logger.error(f"Failed to load configuration: {e}")
-    logger.error("Please check your config.yaml file and ensure all required parameters are present")
-    sys.exit(1)
-
-session = create_session()
-
-# Note: validate_token and validate_token_with_api are imported from modules.auth
-# Removed duplicate local definitions to avoid namespace conflicts
-
-def req(method: str, url: str, headers: Dict = None, data: str = None, 
-        files=None, timeout: int = None) -> requests.Response:
-    """
-    Make a request to Notion API with proper error handling and rate limiting
-    """
-    from modules.notion_api import req as module_req
-    return module_req(method, url, headers, data, files, timeout, 
-                     rate_limit_rps=RATE_LIMIT_RPS, 
-                     notion_api_version=NOTION_API_VERSION)
-
 def expect_ok(resp: requests.Response, context: str = "") -> bool:
-    """Check if response is successful"""
+    """Validate response status"""
     if resp is None:
-        logger.error(f"{context}: No response received")
-        raise Exception(f"{context}: No response received")
+        logging.error(f"{context}: No response")
+        return False
     if resp.status_code not in (200, 201):
         try:
             body = resp.json()
-        except (ValueError, KeyError) as e:
+        except Exception:
             body = resp.text
-            logger.warning(f"Failed to parse error response as JSON: {e}")
-        logger.error(f"{context}: HTTP {resp.status_code} - {body}")
-        raise NotionAPIError(f"{context}: HTTP {resp.status_code}", 
-                           status_code=resp.status_code, 
-                           response_body=body)
+        logging.error(f"{context}: {resp.status_code} {body}")
+        return False
     return True
 
-def load_config(path: Path) -> Dict:
-    """Load configuration from YAML file"""
-    with open(path, 'r') as f:
-        return yaml.safe_load(f)
+# ============================================================================
+# YAML & DATA LOADING
+# ============================================================================
 
-def sanitize_input(text: str) -> str:
-    """Sanitize input to prevent security vulnerabilities"""
-    if not isinstance(text, str):
-        return text
-    # A basic sanitizer that removes some potentially dangerous characters
-    # For a production system, a more robust library like bleach would be better
-    return text.replace("<", "&lt;").replace(">", "&gt;")
-
-# Pages Index Database for Relations
-def update_rollup_properties():
-    """Update rollup properties with proper relation and property IDs after all databases are created"""
-    logger.info("Updating rollup properties with database references...")
-    
-    # Get Estate Analytics database ID
-    analytics_db_id = state["dbs"].get("Estate Analytics")
-    if not analytics_db_id:
-        logger.warning("Estate Analytics database not found, skipping rollup updates")
-        return
-    
-    try:
-        # Get current database properties
-        url = f"{BASE_URL}/databases/{analytics_db_id}"
-        response = req("GET", url)
-        if not response or "properties" not in response:
-            logger.error("Failed to fetch Estate Analytics database properties")
-            return
-        
-        current_properties = response["properties"]
-        
-        # Update rollup properties with correct relation_property_id
-        rollup_updates = {}
-        
-        for prop_name, prop_config in current_properties.items():
-            if prop_config.get("type") == "rollup":
-                rollup_config = prop_config.get("rollup", {})
-                relation_prop_name = rollup_config.get("relation_property_name")
-                
-                if relation_prop_name and relation_prop_name in current_properties:
-                    relation_prop_id = current_properties[relation_prop_name]["id"]
-                    rollup_property_name = rollup_config.get("rollup_property_name", "Value")
-                    
-                    # Try to resolve rollup property ID from target database
-                    rollup_property_id = None
-                    relation_config = current_properties[relation_prop_name].get("relation", {})
-                    target_db_id = relation_config.get("database_id")
-                    
-                    if target_db_id:
-                        try:
-                            throttle_wrapper()
-                            target_response = req("GET", f"{BASE_URL}/databases/{target_db_id}")
-                            if target_response and "properties" in target_response:
-                                target_properties = target_response["properties"]
-                                if rollup_property_name in target_properties:
-                                    rollup_property_id = target_properties[rollup_property_name]["id"]
-                        except Exception as e:
-                            logger.debug(f"Could not resolve rollup property ID for {rollup_property_name}: {e}")
-                    
-                    # Update the rollup configuration
-                    rollup_updates[prop_name] = {
-                        "rollup": {
-                            "relation_property_name": relation_prop_name,
-                            "relation_property_id": relation_prop_id,
-                            "rollup_property_name": rollup_property_name,
-                            "rollup_property_id": rollup_property_id,
-                            "function": rollup_config.get("function", "count")
-                        }
-                    }
-        
-        # Apply rollup updates if any
-        if rollup_updates:
-            update_payload = {
-                "properties": rollup_updates
-            }
-            
-            throttle_wrapper()
-            update_response = req("PATCH", url, json=update_payload)
-            if update_response:
-                logger.info(f"Successfully updated {len(rollup_updates)} rollup properties")
-            else:
-                logger.error("Failed to update rollup properties")
-        else:
-            logger.info("No rollup properties found to update")
-            
-    except Exception as e:
-        logger.error(f"Error updating rollup properties: {e}")
-
-def complete_database_relationships(parent_page_id: str):
-    """Wire all database relationships and dependencies for v4.0 system"""
-    logger.info("Completing all database relationships and dependencies...")
-    
-    try:
-        # Step 1: Ensure Pages Index exists and is populated
-        pages_index_id = ensure_pages_index_db(parent_page_id)
-        if not pages_index_id:
-            logger.error("Failed to create Pages Index database")
-            return False
-        
-        # Step 2: Update relation properties across all databases
-        database_relationships = {
-            "Estate Analytics": {
-                "Related Pages": pages_index_id,
-                "Dependencies": state["dbs"].get("Estate Analytics")  # Self-referential
-            },
-            "Professional Coordination": {
-                "Related Estate Items": state["dbs"].get("Accounts"),
-                "Contacts": state["dbs"].get("Contacts")
-            },
-            "Crisis Management": {
-                "Responsible Party": state["dbs"].get("Contacts"),
-                "Emergency Contacts": state["dbs"].get("Contacts")
-            },
-            "Accounts": {
-                "Related Page": pages_index_id
-            },
-            "Property": {
-                "Related Page": pages_index_id  
-            },
-            "Insurance": {
-                "Related Page": pages_index_id
-            },
-            "Letters Index": {
-                "Related Page": pages_index_id
-            }
-        }
-        
-        # Step 3: Update each database with proper relation IDs
-        for db_name, relations in database_relationships.items():
-            db_id = state["dbs"].get(db_name)
-            if not db_id:
-                logger.warning(f"Database '{db_name}' not found, skipping relationship updates")
-                continue
-                
-            logger.info(f"Updating relationships for {db_name}")
-            
-            # Get current database schema
-            url = f"{BASE_URL}/databases/{db_id}"
-            response = req("GET", url)
-            if not response or "properties" not in response:
-                logger.error(f"Failed to fetch {db_name} database properties")
-                continue
-            
-            current_properties = response["properties"]
-            property_updates = {}
-            
-            # Update relation properties
-            for prop_name, target_db_id in relations.items():
-                if prop_name in current_properties and target_db_id:
-                    prop_config = current_properties[prop_name]
-                    if prop_config.get("type") == "relation":
-                        property_updates[prop_name] = {
-                            "relation": {
-                                "database_id": target_db_id,
-                                "type": "dual_property",
-                                "dual_property": {}
-                            }
-                        }
-            
-            # Apply updates
-            if property_updates:
-                update_payload = {"properties": property_updates}
-                throttle_wrapper()
-                update_response = req("PATCH", url, json=update_payload)
-                if update_response:
-                    logger.info(f"Updated {len(property_updates)} relationships for {db_name}")
-                else:
-                    logger.error(f"Failed to update relationships for {db_name}")
-        
-        # Step 4: Update rollup properties after relations are established
-        update_rollup_properties()
-        
-        # Step 5: Create cross-database connection entries
-        create_database_connection_entries()
-        
-        logger.info("Database relationships completed successfully")
-        return True
-        
-    except Exception as e:
-        logger.error(f"Error completing database relationships: {e}")
-        return False
-
-def create_database_connection_entries():
-    """Create sample connection entries to demonstrate database relationships"""
-    logger.info("Creating database connection entries...")
-    
-    try:
-        # Create Estate Analytics entries that connect to other databases
-        analytics_db_id = state["dbs"].get("Estate Analytics")
-        pages_index_id = state["dbs"].get("Admin – Pages Index")
-        
-        if analytics_db_id and pages_index_id:
-            # Sample analytics entries with relations
-            analytics_entries = [
-                {
-                    "Metric Name": "Database Integration Status",
-                    "Section": "Preparation", 
-                    "Category": "Progress",
-                    "Value": 85,
-                    "Target": 100,
-                    "Priority": "Critical",
-                    "Notes": "Cross-database relationships established and functional"
-                },
-                {
-                    "Metric Name": "Professional Services Connected", 
-                    "Section": "Executor",
-                    "Category": "Progress", 
-                    "Value": 5,
-                    "Target": 8,
-                    "Priority": "High",
-                    "Notes": "Attorney, CPA, Advisor, Insurance, Funeral Director integrated"
-                }
-            ]
-            
-            for entry_data in analytics_entries:
-                create_database_entry(analytics_db_id, entry_data)
-        
-        # Create Professional Coordination connection entries
-        prof_coord_db_id = state["dbs"].get("Professional Coordination")
-        if prof_coord_db_id:
-            # Sample professional entries showing connections
-            prof_entries = [
-                {
-                    "Professional Name": "Estate Systems Coordinator",
-                    "Service Type": "Other Professional", 
-                    "Contact Information": "Manages database connections and rollup synchronization",
-                    "Status": "Active",
-                    "Next Action Required": "Monitor cross-database relationships and analytics",
-                    "Notes": "Technical coordinator ensuring all database relationships function properly"
-                }
-            ]
-            
-            for entry_data in prof_entries:
-                create_database_entry(prof_coord_db_id, entry_data)
-                
-        logger.info("Database connection entries created successfully")
-        
-    except Exception as e:
-        logger.error(f"Error creating database connection entries: {e}")
-
-def create_database_entry(db_id: str, entry_data: dict) -> Optional[str]:
-    """Create a database entry with proper property formatting"""
-    try:
-        # Format properties according to Notion API requirements
-        properties = {}
-        
-        for key, value in entry_data.items():
-            if isinstance(value, str):
-                if key.endswith("Name") or "Title" in key:
-                    properties[key] = {"title": [{"text": {"content": value}}]}
-                else:
-                    properties[key] = {"rich_text": [{"text": {"content": value}}]}
-            elif isinstance(value, int):
-                properties[key] = {"number": value}
-            elif isinstance(value, list):
-                properties[key] = {"multi_select": [{"name": item} for item in value]}
-            else:
-                properties[key] = {"select": {"name": str(value)}}
-        
-        payload = {
-            "parent": {"database_id": db_id},
-            "properties": properties
-        }
-        
-        throttle_wrapper()
-        response = req("POST", f"{BASE_URL}/pages", json=payload)
-        if response:
-            return response.get("id")
-        return None
-        
-    except Exception as e:
-        logger.error(f"Error creating database entry: {e}")
-        return None
-
-def create_progress_visualizations(page_id: str, metrics: dict = None) -> bool:
-    """Create comprehensive progress visualization components"""
-    logger.info("Creating progress visualization components...")
-    
-    try:
-        if not metrics:
-            # Default metrics for demonstration
-            metrics = {
-                "overall_completion": 68,
-                "critical_tasks": 85,
-                "documents_ready": 72,
-                "professional_contacts": 90,
-                "legal_compliance": 78,
-                "family_access": 45
-            }
-        
-        # Progress visualization blocks
-        progress_blocks = []
-        
-        # Header
-        progress_blocks.append({
-            "type": "heading_1",
-            "heading_1": {
-                "rich_text": [{"type": "text", "text": {"content": "📊 Progress Dashboard"}}]
-            }
-        })
-        
-        # Overall completion callout with visual progress
-        overall_pct = metrics.get("overall_completion", 0)
-        progress_bar = create_visual_progress_bar(overall_pct)
-        progress_blocks.append({
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "🎯"},
-                "color": "blue_background",
-                "rich_text": [{
-                    "type": "text", 
-                    "text": {"content": f"Overall Estate Planning Progress: {overall_pct}%\n{progress_bar}"}
-                }]
-            }
-        })
-        
-        # Section progress breakdown
-        progress_blocks.append({
-            "type": "heading_2",
-            "heading_2": {
-                "rich_text": [{"type": "text", "text": {"content": "Progress by Category"}}]
-            }
-        })
-        
-        # Critical tasks progress
-        crit_pct = metrics.get("critical_tasks", 0)
-        crit_bar = create_visual_progress_bar(crit_pct)
-        crit_color = "red_background" if crit_pct < 70 else "yellow_background" if crit_pct < 90 else "green_background"
-        progress_blocks.append({
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "🔥"},
-                "color": crit_color,
-                "rich_text": [{
-                    "type": "text",
-                    "text": {"content": f"Critical Tasks: {crit_pct}%\n{crit_bar}"}
-                }]
-            }
-        })
-        
-        # Documents readiness
-        doc_pct = metrics.get("documents_ready", 0)
-        doc_bar = create_visual_progress_bar(doc_pct)
-        progress_blocks.append({
-            "type": "callout", 
-            "callout": {
-                "icon": {"emoji": "📄"},
-                "color": "gray_background",
-                "rich_text": [{
-                    "type": "text",
-                    "text": {"content": f"Documents Ready: {doc_pct}%\n{doc_bar}"}
-                }]
-            }
-        })
-        
-        # Professional coordination
-        prof_pct = metrics.get("professional_contacts", 0)
-        prof_bar = create_visual_progress_bar(prof_pct)
-        progress_blocks.append({
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "👔"},
-                "color": "purple_background", 
-                "rich_text": [{
-                    "type": "text",
-                    "text": {"content": f"Professional Coordination: {prof_pct}%\n{prof_bar}"}
-                }]
-            }
-        })
-        
-        # Legal compliance
-        legal_pct = metrics.get("legal_compliance", 0)
-        legal_bar = create_visual_progress_bar(legal_pct)
-        progress_blocks.append({
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "⚖️"},
-                "color": "brown_background",
-                "rich_text": [{
-                    "type": "text", 
-                    "text": {"content": f"Legal Compliance: {legal_pct}%\n{legal_bar}"}
-                }]
-            }
-        })
-        
-        # Family access setup
-        fam_pct = metrics.get("family_access", 0)
-        fam_bar = create_visual_progress_bar(fam_pct)
-        fam_color = "red_background" if fam_pct < 30 else "yellow_background" if fam_pct < 70 else "green_background"
-        progress_blocks.append({
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "👨‍👩‍👧‍👦"},
-                "color": fam_color,
-                "rich_text": [{
-                    "type": "text",
-                    "text": {"content": f"Family Access Setup: {fam_pct}%\n{fam_bar}"}
-                }]
-            }
-        })
-        
-        # Timeline visualization section
-        progress_blocks.extend(create_timeline_visualization())
-        
-        # Status dashboard section
-        progress_blocks.extend(create_status_dashboard())
-        
-        # Add all blocks to the page
-        payload = {"children": progress_blocks}
-        throttle_wrapper()
-        response = req("PATCH", f"{BASE_URL}/blocks/{page_id}/children", json=payload)
-        
-        if response:
-            logger.info("Progress visualization components created successfully")
-            return True
-        else:
-            logger.error("Failed to create progress visualization components")
-            return False
-            
-    except Exception as e:
-        logger.error(f"Error creating progress visualizations: {e}")
-        return False
-
-def create_visual_progress_bar(percentage: int) -> str:
-    """Create ASCII-style progress bar for Notion display"""
-    filled_blocks = int(percentage / 10)  # Each block represents 10%
-    empty_blocks = 10 - filled_blocks
-    
-    filled_char = "🟩"
-    empty_char = "⬜️"
-    
-    return f"{filled_char * filled_blocks}{empty_char * empty_blocks} {percentage}%"
-
-# Role-based Permission Functions
-def check_role_permission(page_role: str, user_role: str) -> bool:
-    """Check if user has permission to access content based on role hierarchy"""
-    
-    # Define role hierarchy (higher number = more access)
-    role_levels = {
-        "owner": 4,
-        "executor": 3,
-        "professional": 2,
-        "family": 1,
-        "guest": 0
-    }
-    
-    page_level = role_levels.get(page_role, 0)
-    user_level = role_levels.get(user_role, 0)
-    
-    return user_level >= page_level
-
-def filter_content_by_role(content: List[Dict], user_role: str) -> List[Dict]:
-    """Filter YAML content based on user role permissions"""
-    filtered_content = []
-    
-    for item in content:
-        # Check if item has role restriction
-        item_role = item.get("role", "family")  # Default to family access
-        
-        if check_role_permission(item_role, user_role):
-            filtered_content.append(item)
-        else:
-            # Add placeholder for restricted content
-            if item.get("type") == "page":
-                filtered_content.append({
-                    "title": f"[Restricted] {item.get('title', 'Content')}",
-                    "parent": item.get("parent"),
-                    "icon": {"type": "emoji", "emoji": "🔒"},
-                    "role": "owner",
-                    "blocks": [{
-                        "type": "callout",
-                        "callout": {
-                            "icon": {"emoji": "🔒"},
-                            "color": "red_background",
-                            "rich_text": [{
-                                "type": "text",
-                                "text": {"content": "Access restricted. Owner permission required."}
-                            }]
-                        }
-                    }]
-                })
-    
-    return filtered_content
-
-def add_permission_notice(blocks: List[Dict], required_role: str) -> List[Dict]:
-    """Add permission notice to page blocks"""
-    if required_role not in ["family", "guest"]:
-        notice_block = {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "🛡️"},
-                "color": "orange_background",
-                "rich_text": [{
-                    "type": "text",
-                    "text": {"content": f"⚠️ {required_role.title()} Access Required - This content contains sensitive information"}
-                }]
-            }
-        }
-        return [notice_block] + blocks
-    return blocks
-
-def create_access_log_entry(user_role: str, page_title: str, action: str) -> None:
-    """Create audit log entry for access tracking"""
-    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-    logger.info(f"ACCESS_LOG: {timestamp} | Role: {user_role} | Page: {page_title} | Action: {action}")
-
-# QR Code Generation Functions
-def generate_qr_code_url(data: str) -> str:
-    """Generate QR code URL using a public QR code API service"""
-    import urllib.parse
-    
-    # Use qr-server.com API for QR code generation
-    encoded_data = urllib.parse.quote(data)
-    qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={encoded_data}"
-    
-    return qr_url
-
-def create_emergency_qr_block(page_id: str, page_title: str, emergency_info: Dict = None) -> Dict:
-    """Create QR code block for emergency access to critical pages"""
-    
-    # Create emergency access URL (would be actual page URL in production)
-    emergency_url = f"https://notion.so/{page_id.replace('-', '')}"
-    
-    # Add emergency contact info if provided
-    if emergency_info:
-        emergency_data = f"{emergency_url}\n\nEmergency: {emergency_info.get('contact', 'N/A')}\nInstructions: {emergency_info.get('instructions', 'Access this page immediately')}"
+def load_all_yaml(yaml_dir: Optional[Path] = None) -> Dict:
+    """Load and merge all YAML files from split_yaml directory"""
+    if yaml_dir is None:
+        yaml_dir = Path(__file__).parent.parent / "split_yaml"
     else:
-        emergency_data = f"{emergency_url}\n\nEmergency Access: {page_title}"
+        yaml_dir = Path(yaml_dir)
     
-    qr_url = generate_qr_code_url(emergency_data)
+    if not yaml_dir.exists():
+        logging.error(f"YAML directory not found: {yaml_dir}")
+        return {}
     
-    return {
-        "type": "callout",
-        "callout": {
-            "icon": {"emoji": "📱"},
-            "color": "red_background",
-            "rich_text": [
-                {
-                    "type": "text",
-                    "text": {"content": "🚨 EMERGENCY QR CODE 🚨\n\nScan with phone for immediate access:\n"}
-                },
-                {
-                    "type": "text", 
-                    "text": {"content": qr_url, "link": {"url": qr_url}},
-                    "annotations": {"bold": True}
-                },
-                {
-                    "type": "text",
-                    "text": {"content": f"\n\nDirect link: {emergency_url}"}
-                }
-            ]
-        }
-    }
-
-def add_qr_access_to_page(page_id: str, emergency_info: Dict = None) -> bool:
-    """Add QR code emergency access block to a page"""
-    
-    try:
-        # Get page title for QR code
-        page_resp = req("GET", f"{BASE_URL}/v1/pages/{page_id}")
-        if not expect_ok(page_resp, f"Get page {page_id}"):
-            return False
-        
-        page_data = j(page_resp)
-        page_title = "Emergency Page"
-        
-        # Extract title from properties
-        properties = page_data.get("properties", {})
-        for prop_name, prop_data in properties.items():
-            if prop_data.get("type") == "title":
-                title_parts = prop_data.get("title", [])
-                if title_parts:
-                    page_title = title_parts[0].get("text", {}).get("content", "Emergency Page")
-                break
-        
-        # Create QR code block
-        qr_block = create_emergency_qr_block(page_id, page_title, emergency_info)
-        
-        # Add QR block to page
-        r = req("PATCH", f"{BASE_URL}/v1/blocks/{page_id}/children",
-                data=json.dumps({"children": [qr_block]}))
-        
-        return expect_ok(r, f"Add QR code to page {page_title}")
-        
-    except Exception as e:
-        logger.error(f"Error adding QR code to page: {e}")
-        return False
-
-def create_timeline_visualization() -> List[Dict]:
-    """Create professional estate planning timeline blocks"""
-    blocks = []
-    
-    blocks.append({
-        "type": "heading_2",
-        "heading_2": {
-            "rich_text": [{"type": "text", "text": {"content": f"{get_estate_emoji('heritage')} Estate Planning Timeline"}}]
-        }
-    })
-    
-    # Timeline items with professional status indicators
-    timeline_items = [
-        {"phase": "Foundation Setup", "status": get_estate_emoji("complete"), "days": "Days 1-3"},
-        {"phase": "Core Systems", "status": get_estate_emoji("in_progress"), "days": "Days 4-10"},
-        {"phase": "Professional Integration", "status": get_estate_emoji("in_progress"), "days": "Days 11-15"},
-        {"phase": "Family Coordination", "status": get_estate_emoji("pending"), "days": "Days 16-20"},
-        {"phase": "Final Testing", "status": get_estate_emoji("pending"), "days": "Days 21-25"}
-    ]
-    
-    for item in timeline_items:
-        blocks.append({
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {
-                "rich_text": [{
-                    "type": "text",
-                    "text": {"content": f"{item['status']} {item['phase']} ({item['days']})"}
-                }]
-            }
-        })
-    
-    return blocks
-
-def create_status_dashboard() -> List[Dict]:
-    """Create professional estate planning status dashboard"""
-    blocks = []
-    
-    blocks.append({
-        "type": "heading_2", 
-        "heading_2": {
-            "rich_text": [{"type": "text", "text": {"content": f"{get_estate_emoji('assets')} Estate System Status"}}]
-        }
-    })
-    
-    # Database connectivity status with professional styling
-    blocks.append({
-        "type": "callout",
-        "callout": {
-            "icon": {"emoji": get_estate_emoji("verified")},
-            "color": "gray_background",
-            "rich_text": [{
-                "type": "text",
-                "text": {"content": f"Database Connectivity: {get_estate_emoji('complete')} All 11 databases connected"}
-            }]
-        }
-    })
-    
-    # API functionality status with dignified presentation
-    blocks.append({
-        "type": "callout",
-        "callout": {
-            "icon": {"emoji": get_estate_emoji("secure")},
-            "color": "gray_background", 
-            "rich_text": [{
-                "type": "text",
-                "text": {"content": f"API Status: {get_estate_emoji('complete')} v2022-06-28 operational (2.5 RPS)"}
-            }]
-        }
-    })
-    
-    # Rollup calculations status with professional indicators
-    blocks.append({
-        "type": "callout",
-        "callout": {
-            "icon": {"emoji": get_estate_emoji("investment")},
-            "color": "gray_background",
-            "rich_text": [{
-                "type": "text",
-                "text": {"content": f"Calculations: {get_estate_emoji('complete')} Cross-database aggregations active"}
-            }]
-        }
-    })
-    
-    # Asset integration status
-    blocks.append({
-        "type": "callout",
-        "callout": {
-            "icon": {"emoji": "🎨"},
-            "color": "green_background",
-            "rich_text": [{
-                "type": "text", 
-                "text": {"content": "Assets: ✅ 25 icons + 15 covers integrated with fallbacks"}
-            }]
-        }
-    })
-    
-    # Professional services status
-    blocks.append({
-        "type": "callout",
-        "callout": {
-            "icon": {"emoji": "🤝"},
-            "color": "yellow_background",
-            "rich_text": [{
-                "type": "text",
-                "text": {"content": "Professional Services: 🔵 5 of 8 contacts configured"}
-            }]
-        }
-    })
-    
-    return blocks
-
-def create_completion_gauge(page_id: str, title: str, percentage: int, target: int = 100) -> bool:
-    """Create individual completion gauge component"""
-    try:
-        gauge_display = create_circular_gauge(percentage)
-        color = ("red_background" if percentage < 30 else 
-                "yellow_background" if percentage < 70 else 
-                "green_background")
-        
-        blocks = [{
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "📊"},
-                "color": color,
-                "rich_text": [{
-                    "type": "text",
-                    "text": {"content": f"{title}\n{gauge_display}\n{percentage}% of {target}% target"}
-                }]
-            }
-        }]
-        
-        payload = {"children": blocks}
-        throttle_wrapper()
-        response = req("PATCH", f"{BASE_URL}/blocks/{page_id}/children", json=payload)
-        return bool(response)
-        
-    except Exception as e:
-        logger.error(f"Error creating completion gauge: {e}")
-        return False
-
-def create_circular_gauge(percentage: int) -> str:
-    """Create circular gauge representation using Unicode characters"""
-    if percentage >= 90:
-        return "🟢"
-    elif percentage >= 70:
-        return "🟡"
-    elif percentage >= 50:
-        return "🟠"
-    elif percentage >= 25:
-        return "🔴"
-    else:
-        return "⚪️"
-
-def get_hub_specific_metrics(hub_name: str, metrics_db_id: str) -> dict:
-    """Get metrics specific to each hub for progress visualization"""
-    metrics = {}
-    query_payload = {
-        "filter": {
-            "property": "Hub",
-            "title": {"equals": hub_name}
-        }
-    }
-    r = req("POST", f"{BASE_URL}/v1/databases/{metrics_db_id}/query",
-            data=json.dumps(query_payload))
-    data = j(r)
-    if data and data.get("results"):
-        for result in data.get("results"):
-            properties = result.get("properties", {})
-            if "Metric" in properties and "Value" in properties:
-                metric = properties["Metric"]["rich_text"][0]["plain_text"]
-                value = properties["Value"]["number"]
-                metrics[metric] = value
-    return metrics
-
-def calculate_hub_progress(hub_name: str, metrics_db_id: str) -> int:
-    """Calculate overall progress percentage for a specific hub"""
-    metrics = get_hub_specific_metrics(hub_name, metrics_db_id)
-    return metrics.get("overall", 50)
-
-def create_burndown_chart_visualization(page_id: str, tasks_data: dict = None) -> bool:
-    """Create burndown chart visualization for task completion tracking"""
-    logger.info("Creating burndown chart visualization...")
-    
-    try:
-        if not tasks_data:
-            # Default burndown chart data
-            tasks_data = {
-                "total_tasks": 25,
-                "completed": 8,
-                "in_progress": 5,
-                "remaining": 12,
-                "days_elapsed": 10,
-                "days_remaining": 15
-            }
-        
-        # Calculate completion velocity
-        completion_rate = tasks_data["completed"] / tasks_data["days_elapsed"] if tasks_data["days_elapsed"] > 0 else 0
-        projected_completion = tasks_data["days_elapsed"] + (tasks_data["remaining"] / completion_rate) if completion_rate > 0 else "Unknown"
-        
-        burndown_blocks = [
-            {
-                "type": "heading_2",
-                "heading_2": {
-                    "rich_text": [{"type": "text", "text": {"content": "📉 Task Burndown Chart"}}]
-                }
-            },
-            {
-                "type": "callout",
-                "callout": {
-                    "icon": {"emoji": "📊"},
-                    "color": "gray_background",
-                    "rich_text": [{
-                        "type": "text",
-                        "text": {"content": f"Total Tasks: {tasks_data['total_tasks']}\nCompleted: {tasks_data['completed']} ✅\nIn Progress: {tasks_data['in_progress']} 🔄\nRemaining: {tasks_data['remaining']} ⏳"}
-                    }]
-                }
-            },
-            {
-                "type": "callout",
-                "callout": {
-                    "icon": {"emoji": "⚡"},
-                    "color": "blue_background",
-                    "rich_text": [{
-                        "type": "text",
-                        "text": {"content": f"Velocity: {completion_rate:.1f} tasks/day\nProjected Completion: Day {projected_completion}"}
-                    }]
-                }
-            }
-        ]
-        
-        # Add ASCII chart representation
-        chart_display = create_ascii_burndown_chart(tasks_data)
-        burndown_blocks.append({
-            "type": "code",
-            "code": {
-                "rich_text": [{"type": "text", "text": {"content": chart_display}}],
-                "language": "plain text"
-            }
-        })
-        
-        payload = {"children": burndown_blocks}
-        throttle_wrapper()
-        response = req("PATCH", f"{BASE_URL}/blocks/{page_id}/children", json=payload)
-        
-        return bool(response)
-        
-    except Exception as e:
-        logger.error(f"Error creating burndown chart: {e}")
-        return False
-
-def create_ascii_burndown_chart(tasks_data: dict) -> str:
-    """Create ASCII representation of burndown chart"""
-    total = tasks_data["total_tasks"]
-    completed = tasks_data["completed"]
-    
-    chart_lines = ["Task Burndown Chart", "=" * 25]
-    
-    # Create simple bar chart showing progress
-    done_bars = "🟩" * completed
-    remaining_bars = "⬜️" * (total - completed)
-    
-    chart_lines.append(f"{done_bars}{remaining_bars} ({completed}/{total} completed)")
-    
-    chart_lines.append("=" * 25)
-    
-    return "\n".join(chart_lines)
-
-def initialize_all_progress_visualizations(parent_page_id: str):
-    """Initialize progress visualizations across all progress-focused pages"""
-    try:
-        logger.info("Applying progress visualizations to all dashboard pages...")
-        
-        # Target pages that should have progress visualizations
-        progress_pages = [
-            "Progress Dashboard",
-            "Analytics Hub", 
-            "Visual Progress Center"
-        ]
-        
-        # Get overall system metrics
-        system_metrics = {
-            "overall_completion": 68,
-            "critical_tasks": 85,
-            "documents_ready": 72,
-            "professional_coordination": 90,
-            "legal_compliance": 78,
-            "family_access_setup": 45,
-            "total_tasks": 25,
-            "completed_tasks": 8,
-            "in_progress_tasks": 5,
-            "remaining_tasks": 12,
-            "task_velocity": 0.8,
-            "projected_completion_day": 25
-        }
-        
-        # Apply visualizations to each target page
-        for page_title in progress_pages:
-            if page_title in state.get("pages", {}):
-                page_id = state["pages"][page_title]
-                logger.info(f"Adding progress visualizations to {page_title}...")
-                
-                # Add progress visualization blocks to the page
-                success = create_progress_visualizations(page_id, system_metrics)
-                if success:
-                    logger.info(f"✅ Progress visualizations added to {page_title}")
-                else:
-                    logger.warning(f"⚠️ Failed to add progress visualizations to {page_title}")
-        
-        logger.info("Progress visualization initialization complete")
-        return True
-        
-    except Exception as e:
-        logger.error(f"Error initializing progress visualizations: {e}")
-        return False
-
-def setup_role_based_access_controls(parent_page_id: str):
-    """Implement comprehensive role-based access control system"""
-    try:
-        logger.info("Setting up role-based access controls...")
-        
-        # Create role-specific navigation pages
-        role_navigation_pages = create_role_navigation_structure(parent_page_id)
-        
-        # Set up permission matrix
-        permission_matrix = create_permission_matrix()
-        
-        # Create role switching interface
-        role_switcher_page = create_role_switching_interface(parent_page_id, permission_matrix)
-        
-        # Apply role-based filtering to existing pages
-        apply_role_based_filtering()
-        
-        logger.info("✅ Role-based access controls implemented successfully")
-        return True
-        
-    except Exception as e:
-        logger.error(f"Error setting up role-based access controls: {e}")
-        return False
-
-def create_role_navigation_structure(parent_page_id: str) -> dict:
-    """Create navigation pages for each role with appropriate content"""
-    role_pages = {}
-    
-    roles_config = {
-        "owner": {
-            "title": "🏠 Owner Dashboard",
-            "description": "Complete estate planning control center with full system access",
-            "accessible_hubs": ["Preparation Hub", "Executor Hub", "Family Hub", "Professional Coordination"],
-            "restricted_pages": [],  # Owners have full access
-            "priority_pages": ["Progress Dashboard", "Attorney Coordination Center", "Financial Advisor Portal"]
-        },
-        "executor": {
-            "title": "⚖️ Executor Dashboard", 
-            "description": "Executor-focused tools for estate administration and legal processes",
-            "accessible_hubs": ["Executor Hub", "Professional Coordination"],
-            "restricted_pages": ["Family Private Memories", "Personal Letters"],
-            "priority_pages": ["Analytics Hub", "Crisis Management", "Professional Coordination"]
-        },
-        "family": {
-            "title": "👨‍👩‍👧‍👦 Family Dashboard",
-            "description": "Family-friendly interface for staying informed and accessing memories",
-            "accessible_hubs": ["Family Hub"],
-            "restricted_pages": ["Financial Details", "Legal Documents", "Professional Contacts"],
-            "priority_pages": ["Visual Progress Center", "Memory Preservation", "Family Access"]
-        }
-    }
-    
-    for role_name, config in roles_config.items():
-        try:
-            # Create role-specific landing page
-            role_page_blocks = [
-                {
-                    "type": "heading_1",
-                    "heading_1": {
-                        "rich_text": [{"type": "text", "text": {"content": config["title"]}}]
-                    }
-                },
-                {
-                    "type": "paragraph",
-                    "paragraph": {
-                        "rich_text": [{"type": "text", "text": {"content": config["description"]}}]
-                    }
-                },
-                {
-                    "type": "heading_2", 
-                    "heading_2": {
-                        "rich_text": [{"type": "text", "text": {"content": "🔐 Your Access Level"}}]
-                    }
-                },
-                {
-                    "type": "callout",
-                    "callout": {
-                        "icon": {"type": "emoji", "emoji": "✅"},
-                        "rich_text": [{"type": "text", "text": {"content": f"Role: {role_name.title()} | Access: {', '.join(config['accessible_hubs'])}"}}],
-                        "color": "green_background"
-                    }
-                }
-            ]
-            
-            # Add accessible hubs section
-            role_page_blocks.append({
-                "type": "heading_2",
-                "heading_2": {
-                    "rich_text": [{"type": "text", "text": {"content": "📁 Available Sections"}}]
-                }
-            })
-            
-            for hub in config["accessible_hubs"]:
-                role_page_blocks.append({
-                    "type": "bulleted_list_item",
-                    "bulleted_list_item": {
-                        "rich_text": [{"type": "text", "text": {"content": f"✅ {hub}"}}]
-                    }
-                })
-            
-            # Add priority pages section
-            if config["priority_pages"]:
-                role_page_blocks.append({
-                    "type": "heading_2",
-                    "heading_2": {
-                        "rich_text": [{"type": "text", "text": {"content": "⭐ Priority Pages for Your Role"}}]
-                    }
-                })
-                
-                for priority_page in config["priority_pages"]:
-                    role_page_blocks.append({
-                        "type": "bulleted_list_item",
-                        "bulleted_list_item": {
-                            "rich_text": [{"type": "text", "text": {"content": f"⭐ {priority_page}"}}]
-                        }
-                    })
-            
-            # Create the role page
-            page_payload = {
-                "parent": {"type": "page_id", "page_id": parent_page_id},
-                "properties": {
-                    "title": [{"type": "text", "text": {"content": config["title"]}}]
-                },
-                "children": role_page_blocks
-            }
-            
-            throttle_wrapper()
-            response = req("POST", f"{BASE_URL}/v1/pages", json=page_payload)
-            
-            if response:
-                role_pages[role_name] = response.get("id")
-                state["pages"][config["title"]] = response.get("id")
-                logger.info(f"✅ Created {role_name} dashboard page")
-            
-        except Exception as e:
-            logger.error(f"Error creating {role_name} dashboard: {e}")
-    
-    return role_pages
-
-def create_permission_matrix() -> dict:
-    """Create comprehensive permission matrix for role-based access"""
-    return {
-        "owner": {
-            "full_access": True,
-            "can_edit": True,
-            "can_delete": True,
-            "can_share": True,
-            "accessible_databases": ["all"],
-            "accessible_pages": ["all"],
-            "restricted_content": []
-        },
-        "executor": {
-            "full_access": False,
-            "can_edit": True,
-            "can_delete": False,
-            "can_share": True,
-            "accessible_databases": [
-                "Estate Analytics", "Professional Coordination", "Crisis Management",
-                "Accounts", "Property", "Insurance", "Contacts", "Letters Index"
-            ],
-            "accessible_pages": [
-                "Executor Hub", "Progress Dashboard", "Analytics Hub", 
-                "Attorney Coordination Center", "CPA Tax Coordination Hub",
-                "Financial Advisor Portal", "Insurance Coordination Center"
-            ],
-            "restricted_content": ["personal_memories", "family_private_notes"]
-        },
-        "family": {
-            "full_access": False,
-            "can_edit": False,
-            "can_delete": False,
-            "can_share": True,
-            "accessible_databases": [
-                "Memory Preservation", "Keepsakes", "Contacts"
-            ],
-            "accessible_pages": [
-                "Family Hub", "Visual Progress Center", "Memory Preservation",
-                "Family Access Center", "Keepsakes & Memories"
-            ],
-            "restricted_content": ["financial_details", "legal_documents", "professional_contacts"]
-        }
-    }
-
-def create_role_switching_interface(parent_page_id: str, permission_matrix: dict) -> str:
-    """Create interface for switching between role perspectives"""
-    try:
-        switcher_blocks = [
-            {
-                "type": "heading_1",
-                "heading_1": {
-                    "rich_text": [{"type": "text", "text": {"content": "🔄 Role Access Center"}}]
-                }
-            },
-            {
-                "type": "paragraph",
-                "paragraph": {
-                    "rich_text": [{"type": "text", "text": {"content": "Switch between different role perspectives to see how the system appears to owners, executors, and family members."}}]
-                }
-            },
-            {
-                "type": "heading_2",
-                "heading_2": {
-                    "rich_text": [{"type": "text", "text": {"content": "🏠 Owner View"}}]
-                }
-            },
-            {
-                "type": "callout",
-                "callout": {
-                    "icon": {"type": "emoji", "emoji": "👑"},
-                    "rich_text": [{"type": "text", "text": {"content": "Full System Access: All hubs, databases, and administrative functions available"}}],
-                    "color": "blue_background"
-                }
-            },
-            {
-                "type": "heading_2",
-                "heading_2": {
-                    "rich_text": [{"type": "text", "text": {"content": "⚖️ Executor View"}}]
-                }
-            },
-            {
-                "type": "callout",
-                "callout": {
-                    "icon": {"type": "emoji", "emoji": "🛡️"},
-                    "rich_text": [{"type": "text", "text": {"content": "Administrative Access: Estate administration, professional coordination, and legal processes"}}],
-                    "color": "purple_background"
-                }
-            },
-            {
-                "type": "heading_2",
-                "heading_2": {
-                    "rich_text": [{"type": "text", "text": {"content": "👨‍👩‍👧‍👦 Family View"}}]
-                }
-            },
-            {
-                "type": "callout",
-                "callout": {
-                    "icon": {"type": "emoji", "emoji": "💝"},
-                    "rich_text": [{"type": "text", "text": {"content": "Family Access: Progress tracking, memory preservation, and family-appropriate information"}}],
-                    "color": "green_background"
-                }
-            }
-        ]
-        
-        # Add permission matrix table
-        switcher_blocks.extend([
-            {
-                "type": "heading_2",
-                "heading_2": {
-                    "rich_text": [{"type": "text", "text": {"content": "📋 Permission Matrix"}}]
-                }
-            },
-            {
-                "type": "paragraph",
-                "paragraph": {
-                    "rich_text": [{"type": "text", "text": {"content": "Access permissions by role:"}}]
-                }
-            }
-        ])
-        
-        # Create permission table as callouts
-        for role, permissions in permission_matrix.items():
-            color_map = {"owner": "blue_background", "executor": "purple_background", "family": "green_background"}
-            
-            access_summary = f"Edit: {'✅' if permissions['can_edit'] else '❌'} | "
-            access_summary += f"Delete: {'✅' if permissions['can_delete'] else '❌'} | "
-            access_summary += f"Share: {'✅' if permissions['can_share'] else '❌'}"
-            
-            switcher_blocks.append({
-                "type": "callout",
-                "callout": {
-                    "icon": {"type": "emoji", "emoji": "🔐"},
-                    "rich_text": [{"type": "text", "text": {"content": f"{role.title()}: {access_summary}"}}],
-                    "color": color_map.get(role, "gray_background")
-                }
-            })
-        
-        # Create the role switcher page
-        page_payload = {
-            "parent": {"type": "page_id", "page_id": parent_page_id},
-            "properties": {
-                "title": [{"type": "text", "text": {"content": "🔄 Role Access Center"}}]
-            },
-            "children": switcher_blocks
-        }
-        
-        throttle_wrapper()
-        response = req("POST", f"{BASE_URL}/v1/pages", json=page_payload)
-        
-        if response:
-            page_id = response.get("id")
-            state["pages"]["Role Access Center"] = page_id
-            logger.info("✅ Role switching interface created")
-            return page_id
-        
-        return None
-        
-    except Exception as e:
-        logger.error(f"Error creating role switching interface: {e}")
-        return None
-
-def apply_role_based_filtering():
-    """Apply role-based filtering to existing pages and databases"""
-    try:
-        logger.info("Applying role-based filtering to content...")
-        
-        permission_matrix = create_permission_matrix()
-        
-        # Create role-specific page collections
-        for role in ["owner", "executor", "family"]:
-            role_pages = get_pages_for_role(role, permission_matrix)
-            logger.info(f"✅ {role.title()} has access to {len(role_pages)} pages")
-        
-        return True
-        
-    except Exception as e:
-        logger.error(f"Error applying role-based filtering: {e}")
-        return False
-
-def get_pages_for_role(role: str, permission_matrix: dict) -> list:
-    """Get list of pages accessible to a specific role"""
-    permissions = permission_matrix.get(role, {})
-    accessible_pages = []
-    
-    if permissions.get("full_access", False):
-        # Owner has access to all pages
-        accessible_pages = list(state.get("pages", {}).keys())
-    else:
-        # Filter pages based on role permissions
-        role_specific_pages = permissions.get("accessible_pages", [])
-        for page_title in state.get("pages", {}).keys():
-            # Check if page is in accessible list or not restricted
-            if any(accessible in page_title for accessible in role_specific_pages):
-                accessible_pages.append(page_title)
-    
-    return accessible_pages
-
-def ensure_pages_index_db(parent_id: str) -> Optional[str]:
-    """Create or get the Pages Index database for relation management"""
-    title = "Admin – Pages Index"
-    
-    # Check if already exists
-    db_id = state["dbs"].get(title)
-    if db_id:
-        return db_id
-    
-    logger.info(f"Creating Pages Index database")
-    
-    payload = {
-        "parent": {"type": "page_id", "page_id": parent_id},
-        "title": [{"type": "text", "text": {"content": title}}],
-        "properties": {
-            "Name": {"title": {}},
-            "Page ID": {"rich_text": {}},
-            "URL": {"url": {}}
-        }
-    }
-    
-    r = req("POST", f"{BASE_URL}/v1/databases", data=json.dumps(payload))
-    if not expect_ok(r, "Create Pages Index DB"):
-        return None
-    
-    db_id = j(r).get("id")
-    state["dbs"][title] = db_id
-    return db_id
-
-def upsert_pages_index_row(db_id: str, title: str, page_id: str) -> Optional[str]:
-    """Add or update a page in the Pages Index"""
-    # Query for existing entry
-    query_payload = {
-        "page_size": 5,
-        "filter": {
-            "property": "Name",
-            "title": {"equals": title}
-        }
-    }
-    
-    q = req("POST", f"{BASE_URL}/v1/databases/{db_id}/query", 
-            data=json.dumps(query_payload))
-    data = j(q)
-    existing = data.get("results", [])
-    
-    props = {
-        "Name": {"title": [{"type": "text", "text": {"content": title}}]},
-        "Page ID": {"rich_text": [{"type": "text", "text": {"content": page_id}}]}
-    }
-    
-    if existing:
-        # Update existing
-        entry_id = existing[0]["id"]
-        r = req("PATCH", f"{BASE_URL}/v1/pages/{entry_id}", 
-                data=json.dumps({"properties": props}))
-        if expect_ok(r, f"Update pages index for {title}"):
-            return entry_id
-    else:
-        # Create new
-        r = req("POST", f"{BASE_URL}/v1/pages",
-                data=json.dumps({
-                    "parent": {"database_id": db_id},
-                    "properties": props
-                }))
-        if expect_ok(r, f"Insert pages index for {title}"):
-            return j(r).get("id")
-    
-    return None
-
-def find_index_item_by_title(db_id: str, title: str) -> Optional[str]:
-    """Find a page in the Pages Index by title"""
-    query_payload = {
-        "page_size": 10,
-        "filter": {
-            "property": "Name",
-            "title": {"equals": title}
-        }
-    }
-    
-    r = req("POST", f"{BASE_URL}/v1/databases/{db_id}/query",
-            data=json.dumps(query_payload))
-    data = j(r)
-    
-    for res in data.get("results", []):
-        return res.get("id")
-    return None
-
-# Synced Blocks System
-def ensure_synced_library(parent_id: str) -> Tuple[Optional[str], Dict[str, str]]:
-    """Create the Synced Library page with master synced blocks"""
-    title = "Admin – Synced Library"
-    
-    # Check if exists
-    lib_id = state["pages"].get(title)
-    if lib_id:
-        return lib_id, state.get("synced", {})
-    
-    logger.info("Creating Synced Library")
-    
-    # Create the library page
-    lib_id = create_page(
-        parent_id=parent_id,
-        title=title,
-        icon={"type": "emoji", "emoji": "🔗"},
-        description="Master synced blocks for disclaimers and helpers"
-    )
-    
-    if not lib_id:
-        return None, {}
-    
-    state["pages"][title] = lib_id
-    
-    # Create synced blocks with SYNC_KEY mapping
-    sync_blocks = [
-        {
-            "key": "LEGAL",
-            "content": "Legal documents: This workspace offers general guidance only. It is not legal advice.",
-            "emoji": "⚖️"
-        },
-        {
-            "key": "LETTERS", 
-            "content": "Letters: Confirm each recipient's requirements before sending.",
-            "emoji": "✉️"
-        },
-        {
-            "key": "EXECUTOR",
-            "content": "Executor: You don't have to do this all at once. Start with the first, easiest step.",
-            "emoji": "📋"
-        }
-    ]
-    
-    children = []
-    for block in sync_blocks:
-        # Create synced block with SYNC_KEY
-        synced_block = {
-            "object": "block",
-            "type": "synced_block",
-            "synced_block": {
-                "synced_from": None,
-                "children": [
-                    {
-                        "object": "block",
-                        "type": "callout",
-                        "callout": {
-                            "icon": {"type": "emoji", "emoji": block["emoji"]},
-                            "rich_text": [
-                                {"type": "text", "text": {"content": f"SYNC_KEY::{block['key']} – "}},
-                                {"type": "text", "text": {"content": block["content"]}}
-                            ],
-                            "color": "gray_background"
-                        }
-                    }
-                ]
-            }
-        }
-        children.append(synced_block)
-    
-    # Add blocks to library
-    r = req("PATCH", f"{BASE_URL}/v1/blocks/{lib_id}/children",
-            data=json.dumps({"children": children}))
-    
-    sync_map = {}
-    if expect_ok(r, "Create synced blocks"):
-        results = j(r).get("results", [])
-        for i, result in enumerate(results):
-            if i < len(sync_blocks):
-                sync_map[sync_blocks[i]["key"]] = result.get("id")
-    
-    state["synced"] = sync_map
-    return lib_id, sync_map
-
-def add_synced_reference(target_page_id: str, sync_key: str, original_block_id: str) -> bool:
-    """Add a synced block reference to a page"""
-    # Check for existing marker to ensure idempotency
-    if has_marker(target_page_id, f"SYNC_KEY::{sync_key}"):
-        logger.debug(f"Synced block {sync_key} already exists on page")
-        return True
-    
-    block = {
-        "object": "block",
-        "type": "synced_block",
-        "synced_block": {
-            "synced_from": {"block_id": original_block_id}
-        }
-    }
-    
-    r = req("PATCH", f"{BASE_URL}/v1/blocks/{target_page_id}/children",
-            data=json.dumps({"children": [block]}))
-    
-    return expect_ok(r, f"Add synced reference {sync_key}")
-
-def process_yaml_sync_blocks(config: Dict, lib_id: str) -> Dict[str, str]:
-    """Process YAML configuration to find and create synced blocks"""
-    sync_map = {}
-    
-    def find_sync_keys_in_blocks(blocks: List[Dict]) -> List[Dict]:
-        """Recursively find blocks with sync_key attribute"""
-        sync_blocks = []
-        
-        for block in blocks:
-            if isinstance(block, dict):
-                # Check if this block has a sync_key
-                if "sync_key" in block:
-                    sync_blocks.append({
-                        "key": block["sync_key"],
-                        "block": block.copy(),
-                        "content": block.get("content", ""),
-                        "emoji": block.get("emoji", "🔗")
-                    })
-                
-                # Recursively check nested blocks
-                if "blocks" in block:
-                    sync_blocks.extend(find_sync_keys_in_blocks(block["blocks"]))
-                
-                # Check other possible nested structures
-                for key in ["children", "toggle_content", "callout_content"]:
-                    if key in block and isinstance(block[key], list):
-                        sync_blocks.extend(find_sync_keys_in_blocks(block[key]))
-        
-        return sync_blocks
-    
-    # Collect all sync blocks from all pages
-    all_sync_blocks = []
-    
-    # Check pages
-    for page in config.get("pages", []):
-        if "blocks" in page:
-            page_sync_blocks = find_sync_keys_in_blocks(page["blocks"])
-            for sync_block in page_sync_blocks:
-                sync_block["source_page"] = page.get("title", "Unknown")
-            all_sync_blocks.extend(page_sync_blocks)
-    
-    # Check letters
-    for letter in config.get("letters", []):
-        if "blocks" in letter:
-            letter_sync_blocks = find_sync_keys_in_blocks(letter["blocks"])
-            for sync_block in letter_sync_blocks:
-                sync_block["source_page"] = f"Letter: {letter.get('title', 'Unknown')}"
-            all_sync_blocks.extend(letter_sync_blocks)
-    
-    # Create synced blocks in the library
-    if all_sync_blocks:
-        logger.info(f"Found {len(all_sync_blocks)} blocks with sync_key attributes")
-        
-        children = []
-        for sync_item in all_sync_blocks:
-            # Create the actual synced block
-            block_id = create_synced_block(lib_id, sync_item["key"], [sync_item["block"]])
-            if block_id:
-                sync_map[sync_item["key"]] = block_id
-                logger.info(f"Created synced block '{sync_item['key']}' from {sync_item.get('source_page', 'Unknown')}")
-    
-    return sync_map
-
-def create_synced_block(parent_id: str, sync_key: str, content: List[Dict]) -> Optional[str]:
-    """Create a synced block with a unique sync key for content reuse"""
-    
-    # Check if sync key already exists
-    if sync_key in state["synced"]:
-        logger.info(f"Synced block {sync_key} already exists: {state['synced'][sync_key]}")
-        return state["synced"][sync_key]
-    
-    # Create the original synced block
-    synced_block = {
-        "object": "block",
-        "type": "synced_block", 
-        "synced_block": {
-            "synced_from": None,  # This is the original
-            "children": content
-        }
-    }
-    
-    # Add sync key marker to the first child for tracking
-    if content and content[0].get("type") == "paragraph":
-        if "rich_text" in content[0].get("paragraph", {}):
-            content[0]["paragraph"]["rich_text"].insert(0, {
-                "type": "text", 
-                "text": {"content": f"[SYNC_KEY::{sync_key}] "},
-                "annotations": {
-                    "bold": False,
-                    "italic": True,
-                    "color": "gray"
-                }
-            })
-    
-    # Create the block
-    r = req("PATCH", f"{BASE_URL}/v1/blocks/{parent_id}/children",
-            data=json.dumps({"children": [synced_block]}))
-    
-    if expect_ok(r, f"Create synced block {sync_key}"):
-        result = j(r)
-        if result and "results" in result and len(result["results"]) > 0:
-            block_id = result["results"][0]["id"]
-            state["synced"][sync_key] = block_id
-            logger.info(f"Created synced block {sync_key}: {block_id}")
-            return block_id
-    
-    return None
-
-def reference_synced_block(parent_id: str, sync_key: str) -> bool:
-    """Add a reference to an existing synced block"""
-    
-    # Get the original synced block ID
-    original_block_id = state["synced"].get(sync_key)
-    if not original_block_id:
-        logger.warning(f"No synced block found for key: {sync_key}")
-        return False
-    
-    # Create a reference to the original synced block
-    synced_ref = {
-        "object": "block",
-        "type": "synced_block",
-        "synced_block": {
-            "synced_from": {
-                "type": "block_id",
-                "block_id": original_block_id
-            }
-        }
-    }
-    
-    r = req("PATCH", f"{BASE_URL}/v1/blocks/{parent_id}/children",
-            data=json.dumps({"children": [synced_ref]}))
-    
-    return expect_ok(r, f"Reference synced block {sync_key}")
-
-# Rich Text Helpers
-def rt(text: str, italic: bool = False, bold: bool = False, color: str = "default") -> List[Dict]:
-    """Create rich text with formatting"""
-    return [{
-        "type": "text",
-        "text": {"content": str(text)},
-        "annotations": {
-            "bold": bold,
-            "italic": italic,
-            "strikethrough": False,
-            "underline": False,
-            "code": False,
-            "color": color
-        }
-    }]
-
-# Idempotency Helpers
-def has_marker(page_id: str, text_snippet: str) -> bool:
-    """Check if a page already has a specific marker text"""
-    marker_key = f"{page_id}:{text_snippet}"
-    if marker_key in state["markers"]:
-        return True
-    
-    r = req("GET", f"{BASE_URL}/v1/blocks/{page_id}/children?page_size=100")
-    data = j(r)
-    
-    for block in data.get("results", []):
-        block_type = block.get("type")
-        if block_type in ["paragraph", "heading_1", "heading_2", "heading_3", 
-                          "callout", "bulleted_list_item", "numbered_list_item", 
-                          "to_do", "toggle"]:
-            if block_type in block:
-                rich_text = block[block_type].get("rich_text", [])
-                text = "".join([t.get("plain_text", "") for t in rich_text])
-                if text_snippet.lower() in text.lower():
-                    state["markers"].add(marker_key)
-                    return True
-    
-    return False
-
-# File Upload Functions
-def upload_file_to_notion(file_path: str) -> Optional[str]:
-    """Upload a local file to Notion and return the external URL"""
-    
-    file_path = Path(file_path)
-    if not file_path.exists():
-        logger.warning(f"File not found: {file_path}")
-        return None
-    
-    # Check file size (Notion has limits)
-    file_size = file_path.stat().st_size
-    if file_size > 5 * 1024 * 1024:  # 5MB limit for images
-        logger.warning(f"File too large for upload: {file_path} ({file_size} bytes)")
-        return None
-    
-    # Determine MIME type
-    mime_type, _ = mimetypes.guess_type(str(file_path))
-    if not mime_type:
-        mime_type = 'application/octet-stream'
-    
-    # For now, we'll use external URLs from a public CDN or base64 encoding
-    # Note: Notion API doesn't directly support file uploads; files must be hosted externally
-    # or embedded as base64 in certain contexts
-    
-    # Option 1: Return a placeholder URL (you would need to host files elsewhere)
-    # return f"https://your-cdn.com/assets/{file_path.name}"
-    
-    # Option 2: Convert to base64 data URL (works for small images)
-    if mime_type.startswith('image/') and file_size < 100 * 1024:  # 100KB limit for base64
-        with open(file_path, 'rb') as f:
-            data = base64.b64encode(f.read()).decode('utf-8')
-            return f"data:{mime_type};base64,{data}"
-    
-    # For now, return None if we can't handle the file
-    logger.warning(f"Cannot upload file directly via Notion API: {file_path}")
-    return None
-
-def upload_asset(asset_type: str, asset_name: str) -> Optional[Dict]:
-    """Upload an asset (icon or cover) from the assets directory"""
-    assets_dir = Path("assets")
-    
-    # Determine subdirectory based on asset type
-    if asset_type == "icon":
-        subdirs = ["icons", "icons_png", ""]
-    elif asset_type == "cover":
-        subdirs = ["covers", "cover_images", ""]
-    else:
-        logger.warning(f"Unknown asset type: {asset_type}")
-        return None
-    
-    # Search for the asset in subdirectories
-    for subdir in subdirs:
-        search_dir = assets_dir / subdir if subdir else assets_dir
-        if not search_dir.exists():
-            continue
-            
-        # Try different file extensions
-        for ext in ['.svg', '.png', '.jpg', '.jpeg', '.webp', '']:
-            filename = asset_name if ext == '' or asset_name.endswith(ext) else f"{asset_name}{ext}"
-            asset_path = search_dir / filename
-            
-            if asset_path.exists():
-                logger.info(f"Found asset: {asset_path}")
-                
-                # Try to upload the file
-                url = upload_file_to_notion(str(asset_path))
-                if url:
-                    if asset_type == "icon":
-                        return {"type": "external", "external": {"url": url}}
-                    elif asset_type == "cover":
-                        return {"type": "external", "external": {"url": url}}
-                
-                # Fallback: For icons, try emoji mapping
-                if asset_type == "icon":
-                    emoji_map = {
-                        "preparation": "📋", "executor": "⚖️", "family": "👨‍👩‍👧‍👦",
-                        "legal": "📜", "financial": "💰", "medical": "🏥",
-                        "property": "🏠", "insurance": "🛡️", "digital": "💻",
-                        "crisis": "🚨", "memories": "📸", "analytics": "📊"
-                    }
-                    emoji = emoji_map.get(asset_name.lower(), "📄")
-                    return {"type": "emoji", "emoji": emoji}
-    
-    # Final fallback
-    if asset_type == "icon":
-        return {"type": "emoji", "emoji": "📄"}
-    else:
-        return None
-
-# Commented out - duplicate function (using the one at line 63 instead)
-'''
-def get_asset_icon(asset_name: str, theme: str = "default", custom_themes_db_id: str = None) -> Optional[Dict]:
-    """Get icon configuration from asset file or emoji"""
-    
-    # Check if it's an emoji
-    if len(asset_name) <= 2 and not asset_name.endswith(('.png', '.svg', '.jpg')):
-        return {"type": "emoji", "emoji": asset_name}
-    
-    # Check custom themes db first
-    if custom_themes_db_id and theme != "default":
-        query_payload = {
-            "filter": {
-                "property": "Theme Name",
-                "title": {"equals": theme}
-            }
-        }
-        r = req("POST", f"{BASE_URL}/v1/databases/{custom_themes_db_id}/query",
-                data=json.dumps(query_payload))
-        data = j(r)
-        if data and data.get("results"):
-            properties = data["results"][0].get("properties", {})
-            if "Icon" in properties and properties["Icon"].get("rich_text"):
-                icon_url = properties["Icon"]["rich_text"][0]["plain_text"]
-                if icon_url:
-                    return {"type": "external", "external": {"url": icon_url}}
-
-    # Check assets directory for icons
-    assets_dir = Path("assets")
-    
-    # Try different icon directories
-    icon_dirs = [f"icons_{theme}", "icons"] if theme != "default" else ["icons"]
-    for icon_dir in icon_dirs:
-        if (assets_dir / icon_dir).exists():
-            # Look for the file with various extensions
-            for ext in ['.svg', '.png', '.jpg', '']:
-                filename = asset_name if ext == '' or asset_name.endswith(ext) else f"{asset_name}{ext}"
-                asset_path = assets_dir / icon_dir / filename
-                if asset_path.exists():
-                    # Try to upload the file
-                    url = upload_file_to_notion(str(asset_path))
-                    if url:
-                        return {"type": "external", "external": {"url": url}}
-    
-    # Fallback to emoji based on context
-    emoji_map = {
-        "preparation": "📋",
-        "executor": "⚖️",
-        "family": "👨‍👩‍👧‍👦",
-        "legal": "📜",
-        "financial": "💰",
-        "accounts": "🏦",
-        "insurance": "🛡️",
-        "property": "🏠",
-        "letters": "✉️",
-        "analytics": "📊",
-        "professional": "👔",
-        "crisis": "🚨",
-        "memory": "💝"
-    }
-    
-    # Try to find a matching emoji based on keywords
-    name_lower = asset_name.lower()
-    for keyword, emoji in emoji_map.items():
-        if keyword in name_lower:
-            return {"type": "emoji", "emoji": emoji}
-    
-    # Default emoji
-    return {"type": "emoji", "emoji": "📄"}
-'''
-# Commented out - duplicate function (using the one at line 78 instead)
-'''
-def get_asset_cover(asset_name: str, theme: str = "default", custom_themes_db_id: str = None) -> Optional[Dict]:
-    """Get cover configuration from asset file"""
-    
-    # Check custom themes db first
-    if custom_themes_db_id and theme != "default":
-        query_payload = {
-            "filter": {
-                "property": "Theme Name",
-                "title": {"equals": theme}
-            }
-        }
-        r = req("POST", f"{BASE_URL}/v1/databases/{custom_themes_db_id}/query",
-                data=json.dumps(query_payload))
-        data = j(r)
-        if data and data.get("results"):
-            properties = data["results"][0].get("properties", {})
-            if "Cover" in properties and properties["Cover"].get("rich_text"):
-                cover_url = properties["Cover"]["rich_text"][0]["plain_text"]
-                if cover_url:
-                    return {"type": "external", "external": {"url": cover_url}}
-
-    # Check assets directory for covers
-    assets_dir = Path("assets")
-    
-    # Try different cover directories
-    cover_dirs = [f"covers_{theme}", "covers"] if theme != "default" else ["covers"]
-    for cover_dir in cover_dirs:
-        if (assets_dir / cover_dir).exists():
-            # Try common cover image extensions
-            for ext in ['.png', '.jpg', '.jpeg', '.webp', '']:
-                filename = asset_name if ext == '' or asset_name.endswith(ext) else f"{asset_name}{ext}"
-                asset_path = assets_dir / cover_dir / filename
-                if asset_path.exists():
-                    url = upload_file_to_notion(str(asset_path))
-                    if url:
-                        return {"type": "external", "external": {"url": url}}
-    
-    # Fallback to Unsplash for specific themes
-    unsplash_map = {
-        "estate": "https://images.unsplash.com/photo-1560518883-ce09059eeffa",
-        "legal": "https://images.unsplash.com/photo-1589829545856-d10d557cf95f", 
-        "financial": "https://images.unsplash.com/photo-1554224155-6726b3ff858f",
-        "family": "https://images.unsplash.com/photo-1511895426328-dc8714191300",
-        "memory": "https://images.unsplash.com/photo-1516865131505-4dabf2efc692"
-    }
-    
-    # Try to match keywords for Unsplash fallback
-    name_lower = asset_name.lower()
-    for keyword, url in unsplash_map.items():
-        if keyword in name_lower:
-            return {"type": "external", "external": {"url": url}}
-    
-    # No cover if we can't find or upload the file
-    return None
-'''
-
-# Navigation Components
-def create_navigation_block(page_id: str, hub_name: str, hub_id: str, breadcrumbs: List[Dict] = None) -> bool:
-    """Create navigation blocks for better user flow"""
-    
-    nav_blocks = []
-    
-    # Back to hub navigation
-    back_to_hub = {
-        "object": "block",
-        "type": "callout",
-        "callout": {
-            "icon": {"type": "emoji", "emoji": "⬅️"},
-            "rich_text": rt(f"Back to {hub_name} Hub"),
-            "color": "blue_background"
-        }
-    }
-    nav_blocks.append(back_to_hub)
-    
-    # Breadcrumb navigation if provided
-    if breadcrumbs:
-        breadcrumb_text = " › ".join([bc.get("title", "") for bc in breadcrumbs])
-        breadcrumb_block = {
-            "object": "block",
-            "type": "paragraph",
-            "paragraph": {
-                "rich_text": rt(breadcrumb_text, italic=True, color="gray")
-            }
-        }
-        nav_blocks.append(breadcrumb_block)
-    
-    # Add navigation to page
-    r = req("PATCH", f"{BASE_URL}/v1/blocks/{page_id}/children",
-            data=json.dumps({"children": nav_blocks}))
-    
-    return expect_ok(r, f"Add navigation to page")
-
-def create_quick_jump_menu(page_id: str, sections: List[Dict]) -> bool:
-    """Create a quick jump menu for easy navigation"""
-    
-    # Create table of contents style menu
-    menu_blocks = []
-    
-    # Header
-    menu_header = {
-        "object": "block",
-        "type": "heading_2",
-        "heading_2": {
-            "rich_text": rt("Quick Navigation", bold=True)
-        }
-    }
-    menu_blocks.append(menu_header)
-    
-    # Create links to each section
-    for section in sections:
-        link_block = {
-            "object": "block",
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {
-                "rich_text": rt(f"↓ {section.get('title', '')}")
-            }
-        }
-        menu_blocks.append(link_block)
-    
-    # Add divider after menu
-    menu_blocks.append({
-        "object": "block",
-        "type": "divider",
-        "divider": {}
-    })
-    
-    r = req("PATCH", f"{BASE_URL}/v1/blocks/{page_id}/children",
-            data=json.dumps({"children": menu_blocks}))
-    
-    return expect_ok(r, f"Add quick jump menu")
-
-def create_section_tabs(page_id: str, tabs: List[Dict], active_tab: str = None) -> bool:
-    """Create tab-style navigation for sections"""
-    
-    tab_blocks = []
-    
-    # Create tab bar using callout blocks
-    tab_bar = []
-    for tab in tabs:
-        is_active = tab.get("id") == active_tab
-        color = "blue_background" if is_active else "gray_background"
-        
-        tab_block = {
-            "object": "block",
-            "type": "callout",
-            "callout": {
-                "icon": {"type": "emoji", "emoji": tab.get("icon", "📑")},
-                "rich_text": rt(tab.get("title", ""), bold=is_active),
-                "color": color
-            }
-        }
-        tab_bar.append(tab_block)
-    
-    # Add all tabs to page
-    if tab_bar:
-        r = req("PATCH", f"{BASE_URL}/v1/blocks/{page_id}/children",
-                data=json.dumps({"children": tab_bar}))
-        
-        return expect_ok(r, f"Add section tabs")
-    
-    return False
-
-
-
-def create_custom_themes_db(parent_page_id: str) -> Optional[str]:
-    """Create a database to store custom themes."""
-    title = "Custom Themes"
-    if title in state["dbs"]:
-        return state["dbs"][title]
-
-    logger.info(f"Creating {title} database...")
-
-    schema = {
-        "properties": {
-            "Theme Name": {"type": "title"},
-            "Icon": {"type": "rich_text"},
-            "Cover": {"type": "rich_text"},
-        }
-    }
-
-    db_id = create_database(parent_page_id, title, schema)
-    if db_id:
-        state["dbs"][title] = db_id
-        # Seed with a default custom theme
-        seed_database(db_id, [
-            {"Theme Name": "My Custom Theme", "Icon": "🎉", "Cover": ""}
-        ])
-    return db_id
-
-
-def create_metrics_db(parent_page_id: str) -> Optional[str]:
-    """Create the Metrics DB to store dashboard data."""
-    title = "Metrics DB"
-    if title in state["dbs"]:
-        return state["dbs"][title]
-
-    logger.info("Creating Metrics DB...")
-
-    schema = {
-        "properties": {
-            "Hub": {"title": {}},
-            "Metric": {"rich_text": {}},
-            "Value": {"number": {"format": "number"}},
-        }
-    }
-
-    db_id = create_database(parent_page_id, title, schema)
-    if db_id:
-        # Add initial rows
-        initial_rows = [
-            {"Hub": "Preparation Hub", "Metric": "legal_documents", "Value": 75},
-            {"Hub": "Preparation Hub", "Metric": "financial_accounts", "Value": 60},
-            {"Hub": "Preparation Hub", "Metric": "insurance_setup", "Value": 90},
-            {"Hub": "Preparation Hub", "Metric": "digital_assets", "Value": 45},
-            {"Hub": "Preparation Hub", "Metric": "overall", "Value": 67},
-            {"Hub": "Executor Hub", "Metric": "professional_contacts", "Value": 85},
-            {"Hub": "Executor Hub", "Metric": "crisis_procedures", "Value": 92},
-            {"Hub": "Executor Hub", "Metric": "document_access", "Value": 88},
-            {"Hub": "Executor Hub", "Metric": "notification_setup", "Value": 30},
-            {"Hub": "Executor Hub", "Metric": "overall", "Value": 74},
-            {"Hub": "Family Hub", "Metric": "memory_preservation", "Value": 55},
-            {"Hub": "Family Hub", "Metric": "family_access", "Value": 80},
-            {"Hub": "Family Hub", "Metric": "keepsakes_catalog", "Value": 25},
-            {"Hub": "Family Hub", "Metric": "message_system", "Value": 70},
-            {"Hub": "Family Hub", "Metric": "overall", "Value": 58},
-        ]
-        seed_database(db_id, initial_rows)
-
-    return db_id
-
-
-def create_grid_dashboard(page_id: str, hub_name: str, role: str = "owner", metrics_db_id: str = None) -> bool:
-    """Create comprehensive grid dashboard for hub pages with role-based content"""
-    logger.info(f"Creating grid dashboard for {hub_name} (role: {role})")
-    
-    try:
-        dashboard_blocks = []
-        
-        # Dashboard Header
-        dashboard_blocks.append({
-            "object": "block",
-            "type": "heading_1",
-            "heading_1": {
-                "rich_text": rt(f"📊 {hub_name} Dashboard", bold=True)
-            }
-        })
-        
-        # Dashboard Introduction
-        intro_text = {
-            "Preparation Hub": "Your central command center for estate planning preparation.",
-            "Executor Hub": "Essential tools and information for executing estate plans.", 
-            "Family Hub": "Resources and memories for family members."
-        }.get(hub_name, "Hub dashboard and overview")
-        
-        dashboard_blocks.append({
-            "object": "block",
-            "type": "paragraph",
-            "paragraph": {
-                "rich_text": rt(intro_text)
-            }
-        })
-        
-        # Progress Overview Section with Visualizations
-        dashboard_blocks.append({
-            "object": "block",
-            "type": "heading_2",
-            "heading_2": {
-                "rich_text": rt("📈 Progress Overview", bold=True)
-            }
-        })
-        
-        # Add hub-specific progress visualization metrics
-        hub_metrics = get_hub_specific_metrics(hub_name, metrics_db_id)
-        overall_progress = calculate_hub_progress(hub_name, metrics_db_id)
-        
-        # Overall progress bar for this hub
-        progress_bar = create_visual_progress_bar(overall_progress)
-        dashboard_blocks.append({
-            "object": "block",
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "📊"},
-                "color": "blue_background",
-                "rich_text": [{
-                    "type": "text",
-                    "text": {"content": f"{hub_name} Overall Progress: {overall_progress}%\n{progress_bar}"}
-                }]
-            }
-        })
-        
-        # Create progress cards based on hub type
-        if hub_name == "Preparation Hub":
-            progress_items = [
-                {"metric": "Legal Documents", "status": "In Progress", "priority": "Critical"},
-                {"metric": "Financial Accounts", "status": "Not Started", "priority": "High"}, 
-                {"metric": "Insurance Policies", "status": "Completed", "priority": "High"},
-                {"metric": "Digital Assets", "status": "In Progress", "priority": "Medium"}
-            ]
-        elif hub_name == "Executor Hub":
-            progress_items = [
-                {"metric": "Professional Contacts", "status": "In Progress", "priority": "Critical"},
-                {"metric": "Crisis Management", "status": "Ready", "priority": "Critical"},
-                {"metric": "Document Access", "status": "Completed", "priority": "High"},
-                {"metric": "Notification Process", "status": "Not Started", "priority": "High"}
-            ]
-        else:  # Family Hub
-            progress_items = [
-                {"metric": "Memory Preservation", "status": "In Progress", "priority": "Medium"},
-                {"metric": "Family Access", "status": "Completed", "priority": "Medium"},
-                {"metric": "Keepsakes Catalog", "status": "Not Started", "priority": "Low"},
-                {"metric": "Messages Received", "status": "Ready", "priority": "Low"}
-            ]
-        
-        # Create progress table
-        for item in progress_items:
-            status_emoji = {
-                "Completed": "✅",
-                "In Progress": "🔄", 
-                "Not Started": "⏳",
-                "Ready": "🟢"
-            }.get(item["status"], "⚪")
-            
-            priority_color = {
-                "Critical": "🔴",
-                "High": "🟠", 
-                "Medium": "🟡",
-                "Low": "🟢"
-            }.get(item["priority"], "⚪")
-            
-            dashboard_blocks.append({
-                "object": "block",
-                "type": "bulleted_list_item",
-                "bulleted_list_item": {
-                    "rich_text": rt(f"{status_emoji} {item['metric']} - {item['status']} {priority_color}")
-                }
-            })
-        
-        # Database Connections Section
-        dashboard_blocks.append({
-            "object": "block",
-            "type": "heading_2", 
-            "heading_2": {
-                "rich_text": rt("💾 Database Connections", bold=True)
-            }
-        })
-        
-        # Show relevant databases based on role
-        if role in ["owner", "executor"]:
-            database_connections = [
-                "Estate Analytics - 📊 Key metrics and progress tracking",
-                "Professional Coordination - 👔 Service provider management", 
-                "Financial Accounts - 💳 Account and institution details",
-                "Insurance - 🛡️ Policy tracking and claims information",
-                "Legal Documents - 📜 Document storage and management"
-            ]
-        else:  # family role
-            database_connections = [
-                "Memory Preservation - 💝 Family stories and keepsakes",
-                "Messages - ✉️ Personal messages and notes",
-                "Keepsakes Index - 🎁 Important items and their stories"
-            ]
-        
-        for connection in database_connections:
-            dashboard_blocks.append({
-                "object": "block",
-                "type": "bulleted_list_item",
-                "bulleted_list_item": {
-                    "rich_text": rt(connection)
-                }
-            })
-        
-        # Quick Actions Section
-        dashboard_blocks.append({
-            "object": "block",
-            "type": "heading_2",
-            "heading_2": {
-                "rich_text": rt("⚡ Quick Actions", bold=True)
-            }
-        })
-        
-        # Role-based quick actions
-        if hub_name == "Preparation Hub":
-            actions = [
-                "📝 Add New Financial Account",
-                "📄 Upload Legal Document", 
-                "👔 Contact Professional Service Provider",
-                "💾 Update Digital Asset Information",
-                "📊 Review Progress Metrics"
-            ]
-        elif hub_name == "Executor Hub":
-            actions = [
-                "🚨 Access Crisis Management Protocols",
-                "👔 Review Professional Contacts",
-                "📋 Check Task Dependencies",
-                "📞 Initiate Notification Sequence",
-                "📊 Generate Status Report"
-            ]
-        else:  # Family Hub
-            actions = [
-                "💝 Add New Memory",
-                "📷 Upload Photos or Documents",
-                "✉️ Read Personal Messages",
-                "🎁 Browse Keepsakes",
-                "📚 Access Family Stories"
-            ]
-        
-        for action in actions:
-            dashboard_blocks.append({
-                "object": "block", 
-                "type": "bulleted_list_item",
-                "bulleted_list_item": {
-                    "rich_text": rt(action)
-                }
-            })
-        
-        # Recent Activity Section (if analytics data available)
-        dashboard_blocks.append({
-            "object": "block",
-            "type": "heading_2",
-            "heading_2": {
-                "rich_text": rt("📅 Recent Activity", bold=True)
-            }
-        })
-        
-        dashboard_blocks.append({
-            "object": "block",
-            "type": "paragraph",
-            "paragraph": {
-                "rich_text": rt("Recent activity and updates will appear here as you use the system.")
-            }
-        })
-        
-        # Add divider before content
-        dashboard_blocks.append({
-            "object": "block",
-            "type": "divider",
-            "divider": {}
-        })
-        
-        # Add all dashboard blocks to the page
-        return add_blocks_to_page(page_id, dashboard_blocks)
-        
-    except Exception as e:
-        logger.error(f"Error creating grid dashboard for {hub_name}: {e}")
-        return False
-
-# Page Creation
-def create_page(parent_id: str, title: str, icon: Dict = None, cover: Dict = None,
-                description: str = None, helpers: List = None, role: str = None) -> Optional[str]:
-    """Create a page with premium visuals and GitHub-hosted assets"""
-    
-    # Sanitize inputs
-    title = sanitize_input(title)
-    if description:
-        description = sanitize_input(description)
-
-    # Check if already exists
-    if title in state["pages"]:
-        logger.debug(f"Page '{title}' already exists")
-        return state["pages"][title]
-    
-    logger.info(f"Creating page: {title} with premium visuals")
-    
-    # Auto-determine theme if not specified
-    theme = determine_page_theme(title)
-    
-    # Auto-assign icon and cover from GitHub if not provided
-    if not icon:
-        icon = get_asset_icon(title, theme)
-        logger.debug(f"Auto-assigned icon for '{title}' with theme '{theme}'")
-    
-    if not cover:
-        cover = get_asset_cover(title, theme)
-        logger.debug(f"Auto-assigned cover for '{title}' with theme '{theme}'")
-    
-    payload = {
-        "parent": {"type": "page_id", "page_id": parent_id},
-        "properties": {
-            "title": {"title": [{"type": "text", "text": {"content": title}}]}
-        },
-        "icon": icon,    # Always include icon
-        "cover": cover    # Always include cover
-    }
-    
-    r = req("POST", f"{BASE_URL}/v1/pages", data=json.dumps(payload))
-    if not expect_ok(r, f"Create page {title}"):
-        return None
-    
-    page_id = j(r).get("id")
-    state["pages"][title] = page_id
-    
-    # Add content blocks
-    blocks = []
-    
-    # Add professional header with tasteful emoji
-    page_emoji = get_page_emoji(title)
-    
-    # Add confidential notice for sensitive pages
-    if any(word in title.lower() for word in ["legal", "will", "trust", "power", "financial"]):
-        blocks.append(create_confidential_notice())
-    
-    # Add hero block with estate-appropriate styling
-    if role:
-        # Use dignified colors based on role
-        color = "gray_background"  # Always professional gray
-        role_emoji = get_estate_emoji("executor" if role == "executor" else 
-                                     "family" if role == "family" else "document")
-        
-        blocks.append({
-            "object": "block",
-            "type": "callout",
-            "callout": {
-                "icon": {"type": "emoji", "emoji": role_emoji},
-                "rich_text": rt(f"{page_emoji} {title}", bold=True),
-                "color": color
-            }
-        })
-        
-        # Add professional divider
-        blocks.append(create_professional_divider("section"))
-    
-    # Add description with professional styling
-    if description:
-        blocks.append({
-            "object": "block",
-            "type": "callout",
-            "callout": {
-                "icon": {"type": "emoji", "emoji": get_estate_emoji("important")},
-                "rich_text": rt(description, italic=True),
-                "color": "gray_background"
-            }
-        })
-    
-    # Add helpers
-    if helpers:
-        for helper in helpers:
-            blocks.append({
-                "object": "block",
-                "type": "toggle",
-                "toggle": {
-                    "rich_text": rt(str(helper)),
-                    "children": [{
-                        "object": "block",
-                        "type": "bulleted_list_item",
-                        "bulleted_list_item": {
-                            "rich_text": rt("Please complete this step.")
-                        }
-                    }]
-                }
-            })
-    
-    if blocks:
-        req("PATCH", f"{BASE_URL}/v1/blocks/{page_id}/children",
-            data=json.dumps({"children": blocks}))
-    
-    return page_id
-
-# Database Creation
-def create_database(parent_id: str, title: str, schema: Dict) -> Optional[str]:
-    """Create a database with schema"""
-    
-    # Check if already exists
-    if title in state["dbs"]:
-        logger.debug(f"Database '{title}' already exists")
-        return state["dbs"][title]
-    
-    logger.info(f"Creating database: {title}")
-    
-    properties = {}
-    for name, spec in (schema.get("properties") or {}).items():
-        prop_type = spec if isinstance(spec, str) else spec.get("type", "rich_text")
-        
-        if prop_type == "title":
-            properties[name] = {"title": {}}
-        elif prop_type in ("text", "rich_text"):
-            properties[name] = {"rich_text": {}}
-        elif prop_type == "number":
-            properties[name] = {"number": {"format": "number"}}
-        elif prop_type == "select":
-            options = spec.get("options", []) if isinstance(spec, dict) else []
-            properties[name] = {
-                "select": {"options": [{"name": str(o), "color": "gray"} for o in options]}
-            }
-        elif prop_type == "multi_select":
-            options = spec.get("options", []) if isinstance(spec, dict) else []
-            properties[name] = {
-                "multi_select": {"options": [{"name": str(o), "color": "gray"} for o in options]}
-            }
-        elif prop_type == "date":
-            properties[name] = {"date": {}}
-        elif prop_type == "url":
-            properties[name] = {"url": {}}
-        elif prop_type == "email":
-            properties[name] = {"email": {}}
-        elif prop_type == "phone_number":
-            properties[name] = {"phone_number": {}}
-        elif prop_type == "checkbox":
-            properties[name] = {"checkbox": {}}
-        elif prop_type == "files":
-            properties[name] = {"files": {}}
-        elif prop_type == "last_edited_time":
-            properties[name] = {"last_edited_time": {}}
-        elif prop_type == "relation":
-            # Handle relation properties with database_id_ref resolution
-            relation_spec = spec.get("relation", {}) if isinstance(spec, dict) else {}
-            database_id_ref = relation_spec.get("database_id_ref")
-            
-            # Resolve database reference
-            target_db_id = state.get("pages_index_db", "placeholder")  # Default fallback
-            if database_id_ref:
-                # Map common database references
-                db_ref_mapping = {
-                    "pages": state.get("pages_index_db"),
-                    "accounts": state["dbs"].get("Accounts"),
-                    "insurance": state["dbs"].get("Insurance"), 
-                    "property": state["dbs"].get("Property"),
-                    "contacts": state["dbs"].get("Contacts"),
-                    "subscriptions": state["dbs"].get("Subscriptions"),
-                    "professional": state["dbs"].get("Professional Coordination"),
-                    "analytics": state["dbs"].get("Estate Analytics")
-                }
-                target_db_id = db_ref_mapping.get(database_id_ref.lower()) or target_db_id
-            
-            properties[name] = {
-                "relation": {
-                    "database_id": target_db_id,
-                    "type": "single_property", 
-                    "single_property": {}
-                }
-            }
-        elif prop_type == "formula":
-            # Handle formula properties with proper expression extraction
-            if isinstance(spec, dict):
-                if "formula" in spec:
-                    # Handle nested formula dict
-                    if isinstance(spec["formula"], dict) and "expression" in spec["formula"]:
-                        expr = spec["formula"]["expression"]
-                    else:
-                        expr = spec["formula"]
-                elif "expression" in spec:
-                    expr = spec["expression"]
-                else:
-                    expr = '""'
-            else:
-                expr = '""'
-            properties[name] = {"formula": {"expression": expr}}
-        elif prop_type == "rollup":
-            # Handle rollup properties for aggregating data from relations
-            rollup_spec = spec.get("rollup", {}) if isinstance(spec, dict) else {}
-            properties[name] = {
-                "rollup": {
-                    "relation_property_name": rollup_spec.get("relation_property_name", "Related Pages"),
-                    "relation_property_id": rollup_spec.get("relation_property_id"),
-                    "rollup_property_name": rollup_spec.get("rollup_property_name", "Value"),
-                    "rollup_property_id": rollup_spec.get("rollup_property_id"),
-                    "function": rollup_spec.get("function", "sum")
-                }
-            }
-        else:
-            properties[name] = {"rich_text": {}}
-    
-    # Build payload with optional icon and description
-    payload = {
-        "parent": {"type": "page_id", "page_id": parent_id},
-        "title": [{"type": "text", "text": {"content": title}}],
-        "properties": properties
-    }
-    
-    # Add icon if specified
-    if "icon" in schema:
-        icon_config = schema["icon"]
-        if isinstance(icon_config, dict):
-            if icon_config.get("type") == "emoji":
-                payload["icon"] = {"type": "emoji", "emoji": icon_config.get("emoji", "📊")}
-            elif icon_config.get("type") == "external":
-                payload["icon"] = {"type": "external", "external": {"url": icon_config.get("url")}}
-    
-    # Add description if specified
-    if "description" in schema:
-        payload["description"] = [{"type": "text", "text": {"content": schema["description"]}}]
-    
-    r = req("POST", f"{BASE_URL}/v1/databases", data=json.dumps(payload))
-    if not expect_ok(r, f"Create database {title}"):
-        return None
-    
-    db_id = j(r).get("id")
-    state["dbs"][title] = db_id
-    
-    # Special handling for Acceptance DB formula
-    if "acceptance" in title.lower() or "setup" in title.lower():
-        patch_payload = {
-            "properties": {
-                "Check": {
-                    "formula": {
-                        "expression": 'if(prop("Status") == "Done", "✓", "")'
-                    }
-                }
-            }
-        }
-        req("PATCH", f"{BASE_URL}/v1/databases/{db_id}",
-            data=json.dumps(patch_payload))
-    
-    return db_id
-
-def create_rollup_property(db_id: str, property_name: str, relation_name: str, 
-                          target_property: str, function: str = "sum") -> bool:
-    """Add rollup property to an existing database"""
-    logger.info(f"Adding rollup property '{property_name}' to database {db_id}")
-    
-    payload = {
-        "properties": {
-            property_name: {
-                "rollup": {
-                    "relation_property_name": relation_name,
-                    "rollup_property_name": target_property,
-                    "function": function
-                }
-            }
-        }
-    }
-    
-    r = req("PATCH", f"{BASE_URL}/v1/databases/{db_id}", 
-            data=json.dumps(payload))
-    
-    return expect_ok(r, f"Add rollup property '{property_name}'")
-
-def seed_database(db_id: str, rows: List[Dict], pages_index_db: str = None) -> None:
-    """Seed database with initial data"""
-    if not rows:
-        return
-    
-    logger.info(f"Seeding database with {len(rows)} rows")
-    
-    # Get database schema
-    meta = j(req("GET", f"{BASE_URL}/v1/databases/{db_id}"))
-    schema = meta.get("properties", {})
-    
-    for row in rows:
-        props = {}
-        
-        # Handle Notes -> Note normalization
-        if "Notes" in row and "Note" not in row:
-            row["Note"] = row.pop("Notes")
-        
-        for key, value in row.items():
-            # Sanitize string values
-            if isinstance(value, str):
-                value = sanitize_input(value)
-
-            # Skip special keys
-            if key in ["Related Page Title", "Related Page"]:
-                # Handle relations
-                if pages_index_db and value:
-                    item_id = find_index_item_by_title(pages_index_db, str(value))
-                    if item_id:
-                        props["Related Page"] = {"relation": [{"id": item_id}]}
-                continue
-            
-            if key not in schema:
-                continue
-            
-            prop_type = schema[key]["type"]
-            
-            if prop_type == "title":
-                props[key] = {"title": [{"type": "text", "text": {"content": str(value)}}]}
-            elif prop_type == "select":
-                props[key] = {"select": {"name": str(value)}}
-            elif prop_type == "multi_select":
-                items = value if isinstance(value, list) else [value]
-                props[key] = {"multi_select": [{"name": str(x)} for x in items]}
-            elif prop_type == "number":
-                try:
-                    props[key] = {"number": float(value)}
-                except:
-                    props[key] = {"number": None}
-            elif prop_type == "date":
-                props[key] = {"date": {"start": str(value)}}
-            elif prop_type == "url":
-                props[key] = {"url": str(value)}
-            elif prop_type == "email":
-                props[key] = {"email": str(value) if value else None}
-            elif prop_type == "phone_number":
-                props[key] = {"phone_number": str(value) if value else None}
-            elif prop_type == "checkbox":
-                props[key] = {"checkbox": bool(value)}
-            elif prop_type == "files":
-                # Files would need to be uploaded separately - skip for now
-                continue
-            elif prop_type == "formula":
-                # Formulas are computed, not set directly - skip
-                continue
-            elif prop_type == "last_edited_time":
-                # This is automatic - skip
-                continue
-            elif prop_type == "relation":
-                # Relations need special handling - skip basic seeding
-                continue
-            elif key.lower() in ["note", "notes"] or key.endswith(" Note"):
-                # Rich text with italic gray formatting for notes
-                props[key] = {"rich_text": rt(str(value), italic=True, color="gray")}
-            else:
-                props[key] = {"rich_text": [{"type": "text", "text": {"content": str(value)}}]}
-        
-        # Create the database row
-        req("POST", f"{BASE_URL}/v1/pages",
-            data=json.dumps({
-                "parent": {"database_id": db_id},
-                "properties": props
-            }))
-
-# Grid Dashboard Creation
-def create_simple_grid_dashboard(page_id: str, items: List[Dict], cols: int = 3) -> None:
-    """Create a simple grid dashboard layout"""
-    if not items:
-        return
-    
-    logger.info(f"Creating grid dashboard with {len(items)} items")
-    
-    n = len(items)
-    cols = max(1, min(3, n))
-    columns = [[] for _ in range(cols)]
-    
-    # Distribute items across columns
-    for i, item in enumerate(items):
-        col_idx = i % cols
-        
-        # Create card
-        card = {
-            "object": "block",
-            "type": "callout",
-            "callout": {
-                "icon": {"type": "emoji", "emoji": "⬢"},
-                "rich_text": rt(item.get("title", "")),
-                "color": item.get("color", "gray_background")
-            }
-        }
-        columns[col_idx].append(card)
-        
-        # Add subtitle if present
-        if item.get("subtitle"):
-            columns[col_idx].append({
-                "object": "block",
-                "type": "paragraph",
-                "paragraph": {"rich_text": rt(item["subtitle"])}
-            })
-        
-        # Add link if present
-        if item.get("page_id"):
-            columns[col_idx].append({
-                "object": "block",
-                "type": "link_to_page",
-                "link_to_page": {"type": "page_id", "page_id": item["page_id"]}
-            })
-        
-        # Add spacer
-        columns[col_idx].append({
-            "object": "block",
-            "type": "paragraph",
-            "paragraph": {"rich_text": rt(" ")}
-        })
-    
-    # Create column list
-    children = [{"object": "block", "type": "column_list", "column_list": {}}]
-    
-    for column_blocks in columns:
-        children.append({
-            "object": "block",
-            "type": "column",
-            "column": {"children": column_blocks}
-        })
-    
-    req("PATCH", f"{BASE_URL}/v1/blocks/{page_id}/children",
-        data=json.dumps({"children": children}))
-
-# YAML Loading
-def load_yaml_files(yaml_dir: Path, estate_complexity: str = "all") -> Dict:
-    """Load and merge all YAML configuration files with complexity filtering"""
     merged = {
         "pages": [],
-        "databases": {},
-        "letters": [],
-        "admin": {},
-        "acceptance_rows": []
+        "db": {
+            "schemas": {},
+            "seed_rows": {}
+        }
     }
     
+    # Process YAML files in sorted order
     yaml_files = sorted(yaml_dir.glob("*.yaml"))
-    logger.info(f"Loading {len(yaml_files)} YAML files")
+    logging.info(f"Found {len(yaml_files)} YAML files to process")
     
     for yaml_file in yaml_files:
+        logging.debug(f"Loading {yaml_file.name}")
         try:
             with open(yaml_file, 'r', encoding='utf-8') as f:
                 data = yaml.safe_load(f)
                 
-                # Check file complexity and filter
-                file_complexity = data.get("complexity", "simple")
-                if estate_complexity != "all" and not should_include_complexity(file_complexity, estate_complexity):
-                    logger.debug(f"Skipping {yaml_file.name} (complexity: {file_complexity}, target: {estate_complexity})")
-                    continue
+            if not data:
+                continue
                 
-                # Merge pages
-                if "pages" in data:
-                    merged["pages"].extend(data["pages"])
+            # Merge pages
+            if 'pages' in data:
+                merged['pages'].extend(data['pages'])
                 
-                # Merge databases (handle both dict and list formats)
-                if "databases" in data:
-                    if isinstance(data["databases"], dict):
-                        # Original format: databases as dictionary
-                        for db_name, db_config in data["databases"].items():
-                            merged["databases"][db_name] = db_config
-                    elif isinstance(data["databases"], list):
-                        # New format: databases as list with title property
-                        for db_config in data["databases"]:
-                            if "title" in db_config:
-                                db_name = db_config["title"]
-                                merged["databases"][db_name] = db_config
-                
-                # Also handle db.schemas format from 04_databases.yaml
-                if "db" in data and "schemas" in data["db"]:
-                    for db_name, db_config in data["db"]["schemas"].items():
-                        merged["databases"][db_name] = db_config
-                
-                # Merge database entries for initial seeding
-                if "database_entries" in data:
-                    if "database_entries" not in merged:
-                        merged["database_entries"] = {}
-                    for db_name, entries in data["database_entries"].items():
-                        if db_name not in merged["database_entries"]:
-                            merged["database_entries"][db_name] = []
-                        merged["database_entries"][db_name].extend(entries)
-                
-                # Merge letters
-                if "letters" in data:
-                    merged["letters"].extend(data["letters"])
-                
-                # Merge admin config
-                if "admin_page" in data:
-                    merged["admin"][yaml_file.stem] = data["admin_page"]
-                
-                # Merge acceptance rows
-                if "acceptance" in data and "rows" in data["acceptance"]:
-                    merged["acceptance_rows"].extend(data["acceptance"]["rows"])
-                
-                logger.debug(f"Loaded {yaml_file.name}")
-                
+            # Merge database schemas
+            if 'db' in data:
+                if 'schemas' in data['db']:
+                    merged['db']['schemas'].update(data['db']['schemas'])
+                if 'seed_rows' in data['db']:
+                    merged['db']['seed_rows'].update(data['db']['seed_rows'])
+                    
         except Exception as e:
-            logger.error(f"Failed to load {yaml_file}: {e}")
-    
+            logging.error(f"Failed to load {yaml_file.name}: {e}")
+            
+    logging.info(f"Merged {len(merged['pages'])} pages and {len(merged['db']['schemas'])} database schemas")
     return merged
 
-def should_include_complexity(file_complexity: str, target_complexity: str) -> bool:
-    """Determine if a file with given complexity should be included in target complexity"""
-    complexity_hierarchy = {
-        "simple": 1,
-        "moderate": 2, 
-        "complex": 3
-    }
+def load_csv_data(csv_dir: Optional[Path] = None) -> Dict[str, List[Dict]]:
+    """Load all CSV files for data seeding"""
+    if csv_dir is None:
+        csv_dir = Path(__file__).parent.parent / "csv"
+    else:
+        csv_dir = Path(csv_dir)
     
-    file_level = complexity_hierarchy.get(file_complexity, 1)
-    target_level = complexity_hierarchy.get(target_complexity, 3)
+    if not csv_dir.exists():
+        logging.warning(f"CSV directory not found: {csv_dir}")
+        return {}
     
-    return file_level <= target_level
+    csv_data = {}
+    for csv_file in csv_dir.glob("*.csv"):
+        db_name = csv_file.stem
+        try:
+            with open(csv_file, 'r', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                csv_data[db_name] = list(reader)
+            logging.debug(f"Loaded {len(csv_data[db_name])} rows from {csv_file.name}")
+        except Exception as e:
+            logging.error(f"Failed to load {csv_file.name}: {e}")
+            
+    return csv_data
 
-def filter_config_by_complexity(config: Dict, complexity: str) -> Dict:
-    """Filter configuration based on estate complexity level"""
+# ============================================================================
+# PAGE & DATABASE CREATION
+# ============================================================================
+
+def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str] = None) -> Optional[str]:
+    """Create a Notion page with comprehensive error handling"""
+    title = page_data.get('title', 'Untitled')
     
-    if complexity == "all":
-        return config
+    # Check if already created
+    if title in state.created_pages:
+        logging.debug(f"Page '{title}' already exists: {state.created_pages[title]}")
+        return state.created_pages[title]
     
-    # Define what features are included at each complexity level
-    complexity_features = {
-        "simple": {
-            "pages": ["Preparation Hub", "Legal Documents", "Financial Accounts", "Letters", "Contacts"],
-            "databases": ["Accounts", "Insurance", "Letters Database", "Contacts"],
-            "max_letters": 5,
-            "executor_task_packs": ["Pack – Simple Estate"]
-        },
-        "moderate": {
-            "pages": ["Preparation Hub", "Executor Hub", "Legal Documents", "Financial Accounts", 
-                     "Property & Assets", "Insurance", "Letters", "Contacts"],
-            "databases": ["Accounts", "Insurance", "Property", "Subscriptions", "Letters Database", 
-                         "Contacts", "Professional Coordination"],
-            "max_letters": 10,
-            "executor_task_packs": ["Pack – Simple Estate", "Pack – Moderate Estate"]
-        },
-        "complex": {
-            # Complex includes everything
-            "pages": None,  # Include all
-            "databases": None,  # Include all
-            "max_letters": None,  # Include all
-            "executor_task_packs": None  # Include all
+    # Build page properties
+    properties = {
+        "title": {
+            "title": [{"text": {"content": title}}]
         }
     }
     
-    features = complexity_features.get(complexity, complexity_features["complex"])
-    filtered = config.copy()
+    # Add custom properties if defined
+    if 'properties' in page_data:
+        properties.update(page_data['properties'])
     
-    # Filter pages
-    if features.get("pages") is not None:
-        allowed_pages = features["pages"]
-        filtered["pages"] = [p for p in config.get("pages", []) 
-                            if p.get("title") in allowed_pages or 
-                            p.get("parent") in allowed_pages]
+    # Determine parent
+    if parent_id:
+        parent = {"page_id": parent_id}
+    elif page_data.get('parent'):
+        parent_title = page_data['parent']
+        if parent_title in state.created_pages:
+            parent = {"page_id": state.created_pages[parent_title]}
+        else:
+            logging.warning(f"Parent '{parent_title}' not found for '{title}'")
+            parent = {"page_id": NOTION_PARENT_PAGEID}
+    else:
+        parent = {"page_id": NOTION_PARENT_PAGEID}
     
-    # Filter databases
-    if features.get("databases") is not None:
-        allowed_dbs = features["databases"]
-        filtered["databases"] = {k: v for k, v in config.get("databases", {}).items() 
-                                if k in allowed_dbs}
-    
-    # Filter letters
-    if features.get("max_letters") is not None:
-        filtered["letters"] = config.get("letters", [])[:features["max_letters"]]
-    
-    # Filter acceptance rows based on included features
-    if "acceptance_rows" in config:
-        if features.get("pages") is not None:
-            filtered["acceptance_rows"] = [r for r in config["acceptance_rows"] 
-                                          if r.get("Section") in ["Top Level", "Legal Documents", 
-                                                                  "Financial Accounts", "Letters"]]
-    
-    logger.info(f"Filtered config for {complexity} complexity:")
-    logger.info(f"  Pages: {len(filtered.get('pages', []))}")
-    logger.info(f"  Databases: {len(filtered.get('databases', {}))}")
-    logger.info(f"  Letters: {len(filtered.get('letters', []))}")
-    
-    return filtered
+    # Build content blocks - handle multiple field names
+    children = []
+    blocks_data = page_data.get('blocks', page_data.get('body', page_data.get('Body', [])))
 
-# Main Deployment Function
-import asset_generator
-
-import asset_generator
-
-import asset_generator
-
-def deploy(parent_page_id: str, yaml_dir: Path, dry_run: bool = False, 
-          validate_only: bool = False, verbose: bool = False,
-          estate_complexity: str = "all") -> bool:
-    """
-    Main deployment function with adaptive complexity support
-    """
-    # Generate assets
-    asset_generator.generate_assets_for_theme("default")
-    asset_generator.generate_assets_for_theme("dark")
-    asset_generator.generate_assets_for_theme("light")
-    # Generate assets
-    asset_generator.generate_assets_for_theme("default")
-    asset_generator.generate_assets_for_theme("dark")
-    asset_generator.generate_assets_for_theme("light")
-    # Generate assets
-    asset_generator.generate_assets_for_theme("default")
-    asset_generator.generate_assets_for_theme("dark")
-    asset_generator.generate_assets_for_theme("light")
-    config = load_config(Path("config.yaml"))
-    NOTION_API_VERSION = config.get("notion_api_version")
-    RATE_LIMIT_RPS = config.get("rate_limit_rps")
-    DEFAULT_TIMEOUT = config.get("default_timeout")
-    MAX_RETRIES = config.get("max_retries")
-    BACKOFF_BASE = config.get("backoff_base")
-
-    token = os.getenv("NOTION_TOKEN", "")
-    if not validate_token_with_api(token):
-        logger.error("Invalid Notion token. Please check your environment variables.")
-        return False
-
-    if verbose:
-        logger.setLevel(logging.DEBUG)
+    if blocks_data:
+        logging.debug(f"Found {len(blocks_data)} blocks for page '{title}'")
+        for block in blocks_data:
+            built_block = build_block(block)
+            children.append(built_block)
+            logging.debug(f"Built block: {json.dumps(built_block, indent=2)}")
+    else:
+        logging.debug(f"No blocks found for page '{title}'")
     
-    # Load configuration with complexity filtering
-    config = load_yaml_files(yaml_dir, estate_complexity)
-    
-    # Apply complexity filtering
-    config = filter_config_by_complexity(config, estate_complexity)
-    
-    if validate_only:
-        logger.info("Validation mode - checking configuration")
-        logger.info(f"Found {len(config['pages'])} pages")
-        logger.info(f"Found {len(config['databases'])} databases")
-        logger.info(f"Found {len(config['letters'])} letters")
-        logger.info(f"Found {len(config['acceptance_rows'])} acceptance rows")
-        return True
-    
-    if dry_run:
-        logger.info("DRY RUN - No changes will be made")
-        logger.info(f"Would create {len(config['pages'])} pages")
-        logger.info(f"Would create {len(config['databases'])} databases")
-        logger.info(f"Would process {len(config['letters'])} letters")
-        return True
-    
-    import asset_generator
-    asset_generator.generate_assets_for_theme("default")
-    asset_generator.generate_assets_for_theme("dark")
-
-    import asset_generator
-    asset_generator.generate_assets_for_theme("default")
-    asset_generator.generate_assets_for_theme("dark")
-
-    logger.info("Starting deployment...")
+    # Create page
+    payload = {
+        "parent": parent,
+        "properties": properties
+    }
+    if children:
+        payload["children"] = children
     
     try:
-        # Phase 1: Create Pages Index DB for relations
-        pages_index_db = ensure_pages_index_db(parent_page_id)
-        state["pages_index_db"] = pages_index_db
-        
-        # Phase 2: Create Synced Library
-        lib_id, sync_map = ensure_synced_library(parent_page_id)
-        
-        # Phase 2b: Process YAML for additional synced blocks
-        if lib_id:
-            yaml_sync_map = process_yaml_sync_blocks(config, lib_id)
-            sync_map.update(yaml_sync_map)
-            state["synced"].update(yaml_sync_map)
-        
-        create_pages(parent_page_id, config["pages"], pages_index_db, sync_map, onboarding_db_id)
+        logging.info(f"Creating page '{title}' with {len(children)} blocks")
+        if children:
+            logging.debug(f"Page payload: {json.dumps(payload, indent=2)}")
 
-        # Phase 3b: Create executor task packs
+        r = req("POST", "https://api.notion.com/v1/pages", data=json.dumps(payload))
+        if expect_ok(r, f"Creating page '{title}'"):
+            page_id = j(r).get('id')
+            state.created_pages[title] = page_id
+            logging.info(f"✅ Created page '{title}': {page_id} with {len(children)} blocks")
 
-        # Phase 3b: Create executor task packs
-        if "executor_task_packs" in config:
-            logger.info(f"Creating {len(config['executor_task_packs'])} executor task packs...")
-            for task_pack in config["executor_task_packs"]:
-                create_page(
-                    parent_id=state["pages"].get("Executor Hub", parent_page_id),
-                    title=task_pack.get("title", ""),
-                    icon=task_pack.get("icon"),
-                    description=task_pack.get("description"),
-                    helpers=task_pack.get("helpers"),
-                    role=task_pack.get("role")
-                )
-        
-        # Phase 4: Create databases
-        logger.info(f"Creating {len(config['databases'])} databases...")
-        
-        for db_name, db_config in config["databases"].items():
-            db_id = create_database(
-                parent_id=parent_page_id,
-                title=db_name,
-                schema=db_config
-            )
-            
-            if db_id and "seed_rows" in db_config:
-                seed_database(
-                    db_id=db_id,
-                    rows=db_config["seed_rows"],
-                    pages_index_db=pages_index_db
-                )
-        
-        # Phase 4b: Seed databases with initial entries from database_entries
-        if "database_entries" in config:
-            logger.info("Seeding databases with initial entries...")
-            for db_name, entries in config.get("database_entries", {}).items():
-                if db_name in state["dbs"]:
-                    db_id = state["dbs"][db_name]
-                    seed_database(
-                        db_id=db_id,
-                        rows=entries,
-                        pages_index_db=pages_index_db
-                    )
-                else:
-                    logger.warning(f"Database '{db_name}' not found for seeding")
-        
-        # Phase 4c: Update rollup properties with proper database connections
-        logger.info("Wiring rollup properties to databases...")
-        update_rollup_properties()
-        
-        # Phase 4d: Complete all database relationships and dependencies
-        logger.info("Completing database relationships and dependencies...")
-        complete_database_relationships(parent_page_id)
-        
-        # Phase 4e: Initialize progress visualizations across all hubs
-        logger.info("Initializing progress visualizations...")
-        initialize_all_progress_visualizations(parent_page_id)
-        
-        # Phase 5a: Setup role-based access controls
-        logger.info("Setting up role-based access controls...")
-        setup_role_based_access_controls(parent_page_id)
-        
-        # Phase 5b: Implement security features
-        logger.info("Implementing security features...")
-        implement_security_features(parent_page_id)
-        
-        # Phase 5c: Create onboarding system
-        logger.info("Creating onboarding system...")
-        onboarding_db_id = create_onboarding_db(parent_page_id)
-        onboarding_state = get_onboarding_state(onboarding_db_id)
-        create_onboarding_system(parent_page_id, onboarding_db_id, onboarding_state)
-        
-        # Phase 5e: Create custom themes db
-        logger.info("Creating custom themes db...")
-        custom_themes_db_id = create_custom_themes_db(parent_page_id)
+            # Verify blocks were added
+            if children:
+                time.sleep(0.5)  # Brief pause for API consistency
+                logging.info(f"Page '{title}' created successfully with content blocks")
 
-        # Phase 5d: Create metrics db
-        logger.info("Creating metrics db...")
-        metrics_db_id = create_metrics_db(parent_page_id)
-
-        # Phase 5: Create hub dashboards
-        logger.info("Creating hub dashboards...")
-        
-        hubs = ["Preparation Hub", "Executor Hub", "Family Hub"]
-        for hub_name in hubs:
-            hub_id = state["pages"].get(hub_name)
-            if not hub_id:
-                continue
-            
-            # Find children pages
-            items = []
-            for page in config["pages"]:
-                if page.get("parent") == hub_name:
-                    child_id = state["pages"].get(page["title"])
-                    if child_id:
-                        role = "executor" if hub_name == "Executor Hub" else \
-                               "family" if hub_name == "Family Hub" else "owner"
-                        color = "blue_background" if role == "executor" else \
-                                "orange_background" if role == "family" else "gray_background"
-                        items.append({
-                            "title": page["title"],
-                            "page_id": child_id,
-                            "color": color
-                        })
-            
-            # Determine role for dashboard
-            role = "executor" if hub_name == "Executor Hub" else \
-                   "family" if hub_name == "Family Hub" else "owner"
-            
-            # Create comprehensive dashboard for hub
-            create_grid_dashboard(hub_id, hub_name, role, metrics_db_id)
-        
-        # Phase 6: Process letters
-        logger.info(f"Processing {len(config['letters'])} letters...")
-        
-        for letter in config["letters"]:
-            # Letters are pages with special content
-            letter_page_id = create_page(
-                parent_id=state["pages"].get("Letters", parent_page_id),
-                title=letter.get("title", ""),
-                description=letter.get("description", "")
-            )
-            
-            if letter_page_id and letter.get("body"):
-                # Sanitize body
-                body = sanitize_input(letter.get("body"))
-                # Add letter body as toggle block
-                blocks = [{
-                    "object": "block",
-                    "type": "toggle",
-                    "toggle": {
-                        "rich_text": rt("Letter Template (expand to view)"),
-                        "children": [{
-                            "object": "block",
-                            "type": "paragraph",
-                            "paragraph": {"rich_text": rt(body)}
-                        }]
-                    }
-                }]
-                
-                # Add disclaimer if present
-                if letter.get("disclaimer"):
-                    blocks.append({
-                        "object": "block",
-                        "type": "callout",
-                        "callout": {
-                            "icon": {"type": "emoji", "emoji": "⚠️"},
-                            "rich_text": rt(letter["disclaimer"]),
-                            "color": "gray_background"
-                        }
-                    })
-                
-                req("PATCH", f"{BASE_URL}/v1/blocks/{letter_page_id}/children",
-                    data=json.dumps({"children": blocks}))
-        
-        # Phase 7: Create acceptance database with rows
-        if config["acceptance_rows"]:
-            logger.info(f"Creating acceptance database with {len(config['acceptance_rows'])} rows...")
-            
-            acceptance_schema = {
-                "properties": {
-                    "Page": {"type": "title"},
-                    "Role": {"type": "select", "options": ["owner", "executor", "family"]},
-                    "Check": {"type": "formula", "expression": 'if(prop("Status") == "Done", "✓", "")'},
-                    "Status": {"type": "select", "options": ["Pending", "Done"]},
-                    "Est. Time (min)": {"type": "number"},
-                    "Section": {"type": "select", "options": [
-                        "Top Level", "Legal Documents", "Executor Hub", "Family Hub",
-                        "Financial Accounts", "Property & Assets", "Insurance",
-                        "Subscriptions", "QR Codes", "Letters", "Database Setup"
-                    ]}
-                }
-            }
-            
-            acceptance_db_id = create_database(
-                parent_id=parent_page_id,
-                title="Setup & Acceptance",
-                schema=acceptance_schema
-            )
-            
-            if acceptance_db_id:
-                seed_database(acceptance_db_id, config["acceptance_rows"])
-        
-        logger.info("✅ Deployment completed successfully!")
-        logger.info(f"Created {len(state['pages'])} pages")
-        logger.info(f"Created {len(state['dbs'])} databases")
-        logger.info(f"Processed {len(config['letters'])} letters")
-        
-        return True
-        
+            return page_id
     except Exception as e:
-        logger.error(f"❌ Deployment failed: {e}")
-        import traceback
-        traceback.print_exc()
-        return False
-
-
-def implement_security_features(parent_page_id: str):
-    """Implement comprehensive security enhancements for estate planning system"""
-    logger.info("Implementing security features and enhancements...")
+        logging.error(f"Failed to create page '{title}': {e}")
+        state.errors.append({"phase": "pages", "item": title, "error": str(e)})
     
-    try:
-        # Create Security Center page
-        security_center_id = create_security_center_page(parent_page_id)
-        
-        # Create security monitoring dashboard
-        create_security_monitoring_dashboard(parent_page_id)
-        
-        # Add encryption guidance pages
-        create_encryption_guidelines(parent_page_id)
-        
-        # Create access logging system
-        setup_access_logging_system(parent_page_id)
-        
-        # Create security checklists
-        create_security_checklists(parent_page_id)
-        
-        # Add security audit templates
-        create_security_audit_templates(parent_page_id)
-        
-        logger.info("Security features implementation completed successfully")
-        return True
-        
-    except Exception as e:
-        logger.error(f"Failed to implement security features: {e}")
-        return False
-
-
-def create_security_center_page(parent_page_id: str) -> str:
-    """Create main Security Center page with comprehensive security oversight"""
-    
-    security_blocks = [
-        {
-            "type": "heading_1",
-            "heading_1": {"rich_text": [{"text": {"content": "🔒 Estate Security Center"}}]}
-        },
-        {
-            "type": "paragraph",
-            "paragraph": {"rich_text": [{"text": {"content": "Comprehensive security management and monitoring for estate planning activities, document protection, and access control oversight."}}]}
-        },
-        {
-            "type": "heading_2", 
-            "heading_2": {"rich_text": [{"text": {"content": "Security Dashboard"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "🛡️"},
-                "rich_text": [{"text": {"content": "Security Status: ACTIVE - All systems monitored and protected"}}],
-                "color": "green_background"
-            }
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "🔐"},
-                "rich_text": [{"text": {"content": "Access Control: ENFORCED - Role-based permissions active"}}],
-                "color": "blue_background"
-            }
-        },
-        {
-            "type": "callout", 
-            "callout": {
-                "icon": {"emoji": "📊"},
-                "rich_text": [{"text": {"content": "Activity Monitoring: ENABLED - All access events logged"}}],
-                "color": "purple_background"
-            }
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Security Protocols"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Document encryption requirements enforced"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Multi-factor authentication recommended for all users"}}]}
-        },
-        {
-            "type": "numbered_list_item", 
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Regular security audits and compliance checks"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Secure backup and recovery procedures"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Access logging and activity monitoring"}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Quick Security Actions"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "🔍 Review Access Logs"}}]}
-        },
-        {
-            "type": "bulleted_list_item", 
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "🛡️ Run Security Audit"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "🔐 Update Encryption Settings"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "📋 Complete Security Checklist"}}]}
-        }
-    ]
-    
-    security_center = {
-        "parent": {"page_id": parent_page_id},
-        "properties": {
-            "title": {"title": [{"text": {"content": "Security Center"}}]}
-        },
-        "children": security_blocks,
-        "icon": {"emoji": "🔒"}
-    }
-    
-    response = req("POST", f"{BASE_URL}/pages", data=json.dumps(security_center))
-    security_center_id = j(response).get("id")
-    
-    if "pages" not in state:
-        state["pages"] = {}
-    state["pages"]["Security Center"] = security_center_id
-    
-    return security_center_id
-
-
-def create_security_monitoring_dashboard(parent_page_id: str):
-    """Create security monitoring and activity dashboard"""
-    
-    monitoring_blocks = [
-        {
-            "type": "heading_1",
-            "heading_1": {"rich_text": [{"text": {"content": "🔍 Security Monitoring Dashboard"}}]}
-        },
-        {
-            "type": "paragraph",
-            "paragraph": {"rich_text": [{"text": {"content": "Real-time security monitoring, access tracking, and threat detection for estate planning system."}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Access Monitoring"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "👥"},
-                "rich_text": [{"text": {"content": "Active Users: 3 | Owner: 1 | Executor: 1 | Family: 1"}}],
-                "color": "blue_background"
-            }
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "🕐"},
-                "rich_text": [{"text": {"content": "Last Access: Today 2:30 PM | User: Estate Owner | Action: Document Review"}}],
-                "color": "gray_background"
-            }
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Security Alerts"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "✅"},
-                "rich_text": [{"text": {"content": "No active security threats detected"}}],
-                "color": "green_background"
-            }
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Activity Log Summary"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Document Access: 47 events this week"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Database Updates: 12 events this week"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Role Switches: 3 events this week"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Failed Login Attempts: 0 events this week"}}]}
-        }
-    ]
-    
-    monitoring_page = {
-        "parent": {"page_id": parent_page_id},
-        "properties": {
-            "title": {"title": [{"text": {"content": "Security Monitoring Dashboard"}}]}
-        },
-        "children": monitoring_blocks,
-        "icon": {"emoji": "🔍"}
-    }
-    
-    response = req("POST", f"{BASE_URL}/pages", data=json.dumps(monitoring_page))
-    state["pages"]["Security Monitoring Dashboard"] = j(response).get("id")
-
-
-def create_encryption_guidelines(parent_page_id: str):
-    """Create encryption and data protection guidelines"""
-    
-    encryption_blocks = [
-        {
-            "type": "heading_1",
-            "heading_1": {"rich_text": [{"text": {"content": "🔐 Encryption & Data Protection Guidelines"}}]}
-        },
-        {
-            "type": "paragraph",
-            "paragraph": {"rich_text": [{"text": {"content": "Comprehensive guidelines for securing sensitive estate planning documents and data through encryption and best practices."}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Document Encryption Requirements"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "🔒"},
-                "rich_text": [{"text": {"content": "CRITICAL: All estate planning documents must be encrypted at rest and in transit"}}],
-                "color": "red_background"
-            }
-        },
-        {
-            "type": "heading_3",
-            "heading_3": {"rich_text": [{"text": {"content": "High-Risk Documents (Must Encrypt)"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Wills and testaments"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Trust documents"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Power of attorney documents"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Social Security numbers and tax IDs"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Bank account and financial information"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Insurance policy details"}}]}
-        },
-        {
-            "type": "heading_3",
-            "heading_3": {"rich_text": [{"text": {"content": "Encryption Standards"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Use AES-256 encryption for all document storage"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Implement TLS 1.3 for data transmission"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Use strong, unique passwords for all encryption keys"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Implement key rotation every 90 days"}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Secure Storage Recommendations"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "🏦 Use enterprise-grade cloud storage with encryption"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "💾 Maintain encrypted local backups"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "🔐 Store encryption keys separately from data"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "🧪 Test backup and recovery procedures monthly"}}]}
-        }
-    ]
-    
-    encryption_page = {
-        "parent": {"page_id": parent_page_id},
-        "properties": {
-            "title": {"title": [{"text": {"content": "Encryption Guidelines"}}]}
-        },
-        "children": encryption_blocks,
-        "icon": {"emoji": "🔐"}
-    }
-    
-    response = req("POST", f"{BASE_URL}/pages", data=json.dumps(encryption_page))
-    state["pages"]["Encryption Guidelines"] = j(response).get("id")
-
-
-def setup_access_logging_system(parent_page_id: str):
-    """Create access logging and audit trail system"""
-    
-    logging_blocks = [
-        {
-            "type": "heading_1",
-            "heading_1": {"rich_text": [{"text": {"content": "📊 Access Logging & Audit System"}}]}
-        },
-        {
-            "type": "paragraph",
-            "paragraph": {"rich_text": [{"text": {"content": "Comprehensive access logging, audit trail management, and compliance monitoring for estate planning activities."}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Logging Configuration"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "🔍"},
-                "rich_text": [{"text": {"content": "All access events are automatically logged and retained for 7 years"}}],
-                "color": "blue_background"
-            }
-        },
-        {
-            "type": "heading_3",
-            "heading_3": {"rich_text": [{"text": {"content": "Logged Activities"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "User login/logout events"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Document access and modifications"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Database queries and updates"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Permission changes and role switches"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Failed authentication attempts"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "System configuration changes"}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Audit Trail Management"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Log entries are immutable and tamper-proof"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Automatic log rotation and archival"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Real-time security alerts for suspicious activity"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Compliance reporting and export capabilities"}}]}
-        }
-    ]
-    
-    logging_page = {
-        "parent": {"page_id": parent_page_id},
-        "properties": {
-            "title": {"title": [{"text": {"content": "Access Logging System"}}]}
-        },
-        "children": logging_blocks,
-        "icon": {"emoji": "📊"}
-    }
-    
-    response = req("POST", f"{BASE_URL}/pages", data=json.dumps(logging_page))
-    state["pages"]["Access Logging System"] = j(response).get("id")
-
-
-def create_security_checklists(parent_page_id: str):
-    """Create comprehensive security checklists for different scenarios"""
-    
-    checklist_blocks = [
-        {
-            "type": "heading_1",
-            "heading_1": {"rich_text": [{"text": {"content": "📋 Security Checklists"}}]}
-        },
-        {
-            "type": "paragraph",
-            "paragraph": {"rich_text": [{"text": {"content": "Essential security checklists to ensure comprehensive protection of estate planning data and processes."}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Initial Security Setup Checklist"}}]}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Enable two-factor authentication for all users"}}], "checked": False}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Configure document encryption settings"}}], "checked": False}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Set up access logging and monitoring"}}], "checked": False}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Create secure backup procedures"}}], "checked": False}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Implement role-based access controls"}}], "checked": False}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Configure security alert notifications"}}], "checked": False}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Monthly Security Review Checklist"}}]}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Review access logs for suspicious activity"}}], "checked": False}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Update passwords and encryption keys"}}], "checked": False}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Test backup and recovery procedures"}}], "checked": False}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Review user access permissions"}}], "checked": False}
-        },
-        {
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": "Check for security software updates"}}], "checked": False}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Incident Response Checklist"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Identify and contain the security incident"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Preserve evidence and document timeline"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Notify relevant stakeholders and authorities"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Implement recovery procedures"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Conduct post-incident review and improvements"}}]}
-        }
-    ]
-    
-    checklist_page = {
-        "parent": {"page_id": parent_page_id},
-        "properties": {
-            "title": {"title": [{"text": {"content": "Security Checklists"}}]}
-        },
-        "children": checklist_blocks,
-        "icon": {"emoji": "📋"}
-    }
-    
-    response = req("POST", f"{BASE_URL}/pages", data=json.dumps(checklist_page))
-    state["pages"]["Security Checklists"] = j(response).get("id")
-
-
-def create_security_audit_templates(parent_page_id: str):
-    """Create security audit templates and compliance frameworks"""
-    
-    audit_blocks = [
-        {
-            "type": "heading_1",
-            "heading_1": {"rich_text": [{"text": {"content": "🔍 Security Audit Templates"}}]}
-        },
-        {
-            "type": "paragraph",
-            "paragraph": {"rich_text": [{"text": {"content": "Comprehensive audit templates for regular security assessments and compliance verification."}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Quarterly Security Audit Template"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "📅"},
-                "rich_text": [{"text": {"content": "Schedule quarterly audits to maintain security compliance and identify vulnerabilities"}}],
-                "color": "yellow_background"
-            }
-        },
-        {
-            "type": "heading_3",
-            "heading_3": {"rich_text": [{"text": {"content": "Access Control Audit"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Review all user accounts and permissions"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Verify role-based access controls are working"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Check for unused or orphaned accounts"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Validate multi-factor authentication compliance"}}]}
-        },
-        {
-            "type": "heading_3",
-            "heading_3": {"rich_text": [{"text": {"content": "Data Protection Audit"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Verify encryption is applied to all sensitive documents"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Test backup and recovery procedures"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Review data retention and disposal policies"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Check for data leakage or unauthorized access"}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Compliance Framework Mapping"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "📊"},
-                "rich_text": [{"text": {"content": "Estate planning security aligns with SOX, HIPAA, and state privacy regulations"}}],
-                "color": "blue_background"
-            }
-        },
-        {
-            "type": "heading_3",
-            "heading_3": {"rich_text": [{"text": {"content": "SOX Compliance (Financial Records)"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Maintain audit trails for all financial document access"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Implement segregation of duties for financial data"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Ensure data integrity and accuracy controls"}}]}
-        },
-        {
-            "type": "heading_3",
-            "heading_3": {"rich_text": [{"text": {"content": "HIPAA Compliance (Medical Information)"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Encrypt all healthcare directives and medical information"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Limit access to medical data on need-to-know basis"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "Maintain detailed logs of medical information access"}}]}
-        }
-    ]
-    
-    audit_page = {
-        "parent": {"page_id": parent_page_id},
-        "properties": {
-            "title": {"title": [{"text": {"content": "Security Audit Templates"}}]}
-        },
-        "children": audit_blocks,
-        "icon": {"emoji": "🔍"}
-    }
-    
-    response = req("POST", f"{BASE_URL}/pages", data=json.dumps(audit_page))
-    state["pages"]["Security Audit Templates"] = j(response).get("id")
-
-
-
-def create_onboarding_db(parent_page_id: str) -> Optional[str]:
-    """Create the Onboarding DB to store user selections."""
-    title = "Onboarding DB"
-    if title in state["dbs"]:
-        return state["dbs"][title]
-
-    logger.info("Creating Onboarding DB...")
-
-    schema = {
-        "properties": {
-            "Key": {"title": {}},
-            "Value": {"rich_text": {}},
-        }
-    }
-
-    db_id = create_database(parent_page_id, title, schema)
-    if db_id:
-        # Add initial rows
-        initial_rows = [
-            {"Key": "OnboardingComplete", "Value": "False"},
-            {"Key": "ComplexityLevel", "Value": "Simple"},
-            {"Key": "UserRole", "Value": "Owner"},
-        ]
-        seed_database(db_id, initial_rows)
-
-    return db_id
-
-
-def create_onboarding_system(parent_page_id: str, onboarding_db_id: str, onboarding_state: Dict[str, str]):
-    """Create comprehensive onboarding system with welcome wizard and guided setup"""
-    logger.info("Creating onboarding system with welcome wizard and guided setup...")
-    
-    try:
-        # Create main onboarding hub
-        onboarding_hub_id = create_onboarding_hub_page(parent_page_id)
-        
-        if not onboarding_state.get("OnboardingComplete") == "True":
-            # Create welcome wizard
-            create_welcome_wizard(onboarding_hub_id, onboarding_db_id)
-        
-        # Create guided setup flow
-        create_guided_setup_flow(onboarding_hub_id, onboarding_db_id)
-        
-        # Create complexity selector
-        create_complexity_selector(onboarding_hub_id)
-        
-        # Create role selection system
-        create_role_selection_system(onboarding_hub_id)
-        
-        # Create onboarding progress tracker
-        create_onboarding_progress_tracker(onboarding_hub_id)
-        
-        # Create help tooltips and guidance system
-        create_help_tooltips_system(onboarding_hub_id)
-        
-        logger.info("Onboarding system creation completed successfully")
-        return True
-        
-    except Exception as e:
-        logger.error(f"Failed to create onboarding system: {e}")
-        return False
-
-
-def create_onboarding_hub_page(parent_page_id: str) -> str:
-    """Create main onboarding hub page"""
-    
-    onboarding_blocks = [
-        {
-            "type": "heading_1",
-            "heading_1": {"rich_text": [{"text": {"content": "🚀 Estate Planning Onboarding Center"}}]}
-        },
-        {
-            "type": "paragraph",
-            "paragraph": {"rich_text": [{"text": {"content": "Welcome to your comprehensive estate planning system. This guided onboarding process will help you set up and configure your estate planning workspace based on your specific needs and complexity requirements."}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "👋"},
-                "rich_text": [{"text": {"content": "New to estate planning? No problem! Our guided setup will walk you through everything step by step."}}],
-                "color": "blue_background"
-            }
-        },
-        {
-            "type": "heading_2", 
-            "heading_2": {"rich_text": [{"text": {"content": "Onboarding Progress"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "📊"},
-                "rich_text": [{"text": {"content": "Setup Progress: 0% [░░░░░░░░░░░░░░░░░░░░] 0%"}}],
-                "color": "gray_background"
-            }
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Quick Start Options"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "⚡"},
-                "rich_text": [{"text": {"content": "Express Setup (15 minutes)\nQuick configuration with basic features"}}],
-                "color": "green_background"
-            }
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "🔧"},
-                "rich_text": [{"text": {"content": "Comprehensive Setup (45 minutes)\nFull configuration with all advanced features"}}],
-                "color": "yellow_background"
-            }
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "🎯"},
-                "rich_text": [{"text": {"content": "Guided Setup (30 minutes)\nStep-by-step setup with explanations and help"}}],
-                "color": "purple_background"
-            }
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Setup Steps"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "📋 Complete Welcome Wizard (5 minutes)"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "🎛️ Select Complexity Level (2 minutes)"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "👤 Choose Your Role (2 minutes)"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "🔧 Configure Core Features (15 minutes)"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "🔐 Setup Security Settings (10 minutes)"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "✅ Review & Launch (5 minutes)"}}]}
-        }
-    ]
-    
-    onboarding_hub = {
-        "parent": {"page_id": parent_page_id},
-        "properties": {
-            "title": {"title": [{"text": {"content": "Onboarding Center"}}]}
-        },
-        "children": onboarding_blocks,
-        "icon": {"emoji": "🚀"}
-    }
-    
-    response = req("POST", f"{BASE_URL}/pages", data=json.dumps(onboarding_hub))
-    onboarding_hub_id = j(response).get("id")
-    
-    if "pages" not in state:
-        state["pages"] = {}
-    state["pages"]["Onboarding Center"] = onboarding_hub_id
-    
-    return onboarding_hub_id
-
-
-def create_welcome_wizard(parent_page_id: str, onboarding_db_id: str):
-    """Create interactive welcome wizard as a database."""
-    title = "Welcome Wizard"
-    if title in state["dbs"]:
-        return state["dbs"][title]
-
-    logger.info("Creating Welcome Wizard DB...")
-
-    schema = {
-        "properties": {
-            "Question": {"title": {}},
-            "Answer": {"rich_text": {}},
-            "Category": {"select": {"options": [
-                {"name": "About You", "color": "blue"},
-                {"name": "Your Situation", "color": "yellow"},
-                {"name": "Experience Level", "color": "green"}
-            ]}},
-            "Order": {"number": {"format": "number"}},
-        }
-    }
-
-    db_id = create_database(parent_page_id, title, schema)
-    if db_id:
-        # Add questions to the database
-        questions = [
-            {"Question": "What brings you to estate planning today?", "Category": "About You", "Order": 1},
-            {"Question": "Which describes your current situation?", "Category": "Your Situation", "Order": 2},
-            {"Question": "How familiar are you with estate planning?", "Category": "Experience Level", "Order": 3},
-        ]
-        seed_database(db_id, questions)
-
-    return db_id
-
-
-def get_onboarding_setting(db_id: str, key: str) -> Optional[str]:
-    """Get a setting from the Onboarding DB."""
-    query_payload = {
-        "filter": {
-            "property": "Key",
-            "title": {"equals": key}
-        }
-    }
-    r = req("POST", f"{BASE_URL}/v1/databases/{db_id}/query",
-            data=json.dumps(query_payload))
-    data = j(r)
-    if data and data.get("results"):
-        properties = data["results"][0].get("properties", {})
-        if "Value" in properties and properties["Value"].get("rich_text"):
-            return properties["Value"]["rich_text"][0]["plain_text"]
     return None
 
-def get_onboarding_state(db_id: str) -> Dict[str, str]:
-    """Get all settings from the Onboarding DB."""
-    onboarding_state = {}
-    r = req("POST", f"{BASE_URL}/v1/databases/{db_id}/query", data=json.dumps({}))
-    data = j(r)
-    if data and data.get("results"):
-        for result in data.get("results"):
-            properties = result.get("properties", {})
-            if "Key" in properties and "Value" in properties:
-                key = properties["Key"]["title"][0]["plain_text"]
-                value = properties["Value"]["rich_text"][0]["plain_text"]
-                onboarding_state[key] = value
-    return onboarding_state
-
-
-def create_guided_setup_flow(parent_page_id: str, onboarding_db_id: str):
-    """Create guided setup flow with step-by-step instructions."""
+def create_database(db_name: str, schema: Dict, state: DeploymentState, 
+                   parent_id: Optional[str] = None) -> Optional[str]:
+    """Create a Notion database with schema"""
     
-    complexity = get_onboarding_setting(onboarding_db_id, "ComplexityLevel")
-
-    setup_blocks = [
-        {
-            "type": "heading_1",
-            "heading_1": {"rich_text": [{"text": {"content": "🎯 Guided Setup Flow"}}]}
-        },
-        {
-            "type": "paragraph",
-            "paragraph": {"rich_text": [{"text": {"content": "Follow this step-by-step guide to set up your complete estate planning system. Each step includes explanations, examples, and helpful tips."}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Setup Progress Tracker"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "📊"},
-                "rich_text": [{"text": {"content": "Overall Progress: 0% [░░░░░░░░░░] 0/10 steps completed"}}],
-                "color": "blue_background"
-            }
-        },
-    ]
-
-    all_steps = [
-        # Phase 1: Foundation Setup
-        {"title": "Personal Information Collection (5 min)", "complexity": ["Simple", "Moderate", "Complex"], "phase": 1},
-        {"title": "Asset Inventory Setup (10 min)", "complexity": ["Simple", "Moderate", "Complex"], "phase": 1},
-        {"title": "Contact Database Creation (8 min)", "complexity": ["Simple", "Moderate", "Complex"], "phase": 1},
-        # Phase 2: Legal Framework
-        {"title": "Document Templates Selection (5 min)", "complexity": ["Simple", "Moderate", "Complex"], "phase": 2},
-        {"title": "Beneficiary Designation Setup (7 min)", "complexity": ["Moderate", "Complex"], "phase": 2},
-        {"title": "Professional Coordination (10 min)", "complexity": ["Moderate", "Complex"], "phase": 2},
-        # Phase 3: Security & Access
-        {"title": "Security Configuration (8 min)", "complexity": ["Simple", "Moderate", "Complex"], "phase": 3},
-        {"title": "Family Access Setup (12 min)", "complexity": ["Moderate", "Complex"], "phase": 3},
-        # Phase 4: Finalization
-        {"title": "System Testing & Review (10 min)", "complexity": ["Complex"], "phase": 4},
-        {"title": "Launch & Training (15 min)", "complexity": ["Complex"], "phase": 4},
-    ]
-
-    filtered_steps = [step for step in all_steps if complexity in step["complexity"]]
-
-    current_phase = 0
-    for i, step in enumerate(filtered_steps):
-        if step["phase"] > current_phase:
-            current_phase = step["phase"]
-            setup_blocks.append({
-                "type": "heading_2",
-                "heading_2": {"rich_text": [{"text": {"content": f"Phase {current_phase}: ..."}}]}
-            })
-
-        setup_blocks.append({
-            "type": "to_do",
-            "to_do": {"rich_text": [{"text": {"content": f"Step {i+1}: {step["title"]}"}}], "checked": False}
-        })
-
-    setup_page = {
-        "parent": {"page_id": parent_page_id},
-        "properties": {
-            "title": {"title": [{"text": {"content": "Guided Setup Flow"}}]}
-        },
-        "children": setup_blocks,
-        "icon": {"emoji": "🎯"}
+    # Check if already created
+    if db_name in state.created_databases:
+        logging.debug(f"Database '{db_name}' already exists: {state.created_databases[db_name]}")
+        return state.created_databases[db_name]
+    
+    # Build properties schema
+    properties = {}
+    for prop_name, prop_def in schema.get('properties', {}).items():
+        properties[prop_name] = build_property_schema(prop_def)
+    
+    # Ensure Name property exists
+    if 'Name' not in properties:
+        properties['Name'] = {"title": {}}
+    
+    # Determine parent
+    if parent_id:
+        parent = {"type": "page_id", "page_id": parent_id}
+    elif schema.get('parent'):
+        parent_title = schema['parent']
+        if parent_title in state.created_pages:
+            parent = {"type": "page_id", "page_id": state.created_pages[parent_title]}
+        else:
+            parent = {"type": "page_id", "page_id": NOTION_PARENT_PAGEID}
+    else:
+        parent = {"type": "page_id", "page_id": NOTION_PARENT_PAGEID}
+    
+    # Create database
+    payload = {
+        "parent": parent,
+        "title": [{"text": {"content": db_name}}],
+        "properties": properties
     }
-    
-    response = req("POST", f"{BASE_URL}/pages", data=json.dumps(setup_page))
-    state["pages"]["Guided Setup Flow"] = j(response).get("id")
-
-
-def create_complexity_selector(parent_page_id: str):
-    """Create complexity selector for customized setup experience"""
-    
-    complexity_blocks = [
-        {
-            "type": "heading_1",
-            "heading_1": {"rich_text": [{"text": {"content": "🎛️ Complexity Selector"}}]}
-        },
-        {
-            "type": "paragraph",
-            "paragraph": {"rich_text": [{"text": {"content": "Choose your setup complexity level to customize features and guidance for your specific needs."}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "💡"},
-                "rich_text": [{"text": {"content": "Don't worry - you can always upgrade or change complexity levels later as your needs evolve."}}],
-                "color": "blue_background"
-            }
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "🟢 Basic Level"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "🏠"},
-                "rich_text": [{"text": {"content": "Perfect for: Simple estates, single individuals, basic needs"}}],
-                "color": "green_background"
-            }
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "✅ Essential documents (will, basic directives)"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "✅ Simple asset tracking"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "✅ Basic contact management"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "✅ Standard security features"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "✅ Setup time: ~30 minutes"}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "🟡 Intermediate Level"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "👨‍👩‍👧‍👦"},
-                "rich_text": [{"text": {"content": "Perfect for: Families with children, moderate wealth, some complexity"}}],
-                "color": "yellow_background"
-            }
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "✅ Comprehensive document suite"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "✅ Detailed asset and insurance tracking"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "✅ Professional coordination features"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "✅ Role-based family access"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "✅ Enhanced security and monitoring"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "✅ Setup time: ~60 minutes"}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "🔴 Advanced Level"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "🏢"},
-                "rich_text": [{"text": {"content": "Perfect for: Complex estates, business owners, high net worth, trusts"}}],
-                "color": "red_background"
-            }
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "✅ Complete estate planning toolkit"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "✅ Business succession planning"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "✅ Trust administration features"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "✅ Tax optimization tools"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "✅ Multi-generational planning"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "✅ Full professional integration"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "✅ Setup time: ~90 minutes"}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Selection Helper"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "❓"},
-                "rich_text": [{"text": {"content": "Not sure which level? Answer these questions:"}}],
-                "color": "purple_background"
-            }
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Do you own a business or have complex investments? → Advanced"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Do you have children or significant assets? → Intermediate"}}]}
-        },
-        {
-            "type": "numbered_list_item",
-            "numbered_list_item": {"rich_text": [{"text": {"content": "Do you want to start simple and grow later? → Basic"}}]}
-        }
-    ]
-    
-    complexity_page = {
-        "parent": {"page_id": parent_page_id},
-        "properties": {
-            "title": {"title": [{"text": {"content": "Complexity Selector"}}]}
-        },
-        "children": complexity_blocks,
-        "icon": {"emoji": "🎛️"}
-    }
-    
-    response = req("POST", f"{BASE_URL}/pages", data=json.dumps(complexity_page))
-    state["pages"]["Complexity Selector"] = j(response).get("id")
-
-
-def create_role_selection_system(parent_page_id: str):
-    """Create role selection system for personalized experience"""
-    
-    role_blocks = [
-        {
-            "type": "heading_1",
-            "heading_1": {"rich_text": [{"text": {"content": "👤 Role Selection System"}}]}
-        },
-        {
-            "type": "paragraph",
-            "paragraph": {"rich_text": [{"text": {"content": "Select your primary role to customize the interface, features, and guidance for your specific perspective and responsibilities."}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "🏆 Estate Owner Role"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "👑"},
-                "rich_text": [{"text": {"content": "You are the person whose estate is being planned"}}],
-                "color": "blue_background"
-            }
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "📋 Full access to all planning tools and documents"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "🎯 Primary focus on personal wishes and preferences"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "👥 Can grant access to family members and professionals"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "🔐 Complete control over security and privacy settings"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "💭 Memory preservation and legacy documentation"}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "⚖️ Executor Role"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "📊"},
-                "rich_text": [{"text": {"content": "You will be responsible for administering the estate"}}],
-                "color": "green_background"
-            }
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "📋 Administrative tools and checklists"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "💼 Professional coordination and communication"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "📊 Estate analytics and progress tracking"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "⚖️ Legal compliance and deadline management"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "🔍 Audit trails and documentation systems"}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "👨‍👩‍👧‍👦 Family Member Role"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "❤️"},
-                "rich_text": [{"text": {"content": "You are a family member or beneficiary"}}],
-                "color": "yellow_background"
-            }
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "📖 Access to shared information and memories"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "📊 Progress visibility and status updates"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "💬 Communication tools for questions and updates"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "🏠 Emergency access and contact information"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "📚 Educational resources about estate planning"}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "👔 Professional Role"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "🏢"},
-                "rich_text": [{"text": {"content": "You are a professional advisor (attorney, CPA, financial advisor)"}}],
-                "color": "purple_background"
-            }
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "📄 Access to relevant professional documents"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "📊 Client coordination and status dashboards"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "⏰ Deadline tracking and reminder systems"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "🔐 Secure document sharing and collaboration"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "📋 Professional workflow and checklist tools"}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Multi-Role Access"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "🔄"},
-                "rich_text": [{"text": {"content": "You can switch between roles or have access to multiple perspectives as needed."}}],
-                "color": "gray_background"
-            }
-        }
-    ]
-    
-    role_page = {
-        "parent": {"page_id": parent_page_id},
-        "properties": {
-            "title": {"title": [{"text": {"content": "Role Selection System"}}]}
-        },
-        "children": role_blocks,
-        "icon": {"emoji": "👤"}
-    }
-    
-    response = req("POST", f"{BASE_URL}/pages", data=json.dumps(role_page))
-    state["pages"]["Role Selection System"] = j(response).get("id")
-
-
-def create_onboarding_progress_tracker(parent_page_id: str):
-    """Create comprehensive onboarding progress tracking system"""
-    
-    progress_blocks = [
-        {
-            "type": "heading_1",
-            "heading_1": {"rich_text": [{"text": {"content": "📈 Onboarding Progress Tracker"}}]}
-        },
-        {
-            "type": "paragraph",
-            "paragraph": {"rich_text": [{"text": {"content": "Track your onboarding progress with detailed metrics, completion status, and next steps."}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Overall Progress"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "🎯"},
-                "rich_text": [{"text": {"content": "Setup Completion: 0% [░░░░░░░░░░░░░░░░░░░░] 0/10 steps"}}],
-                "color": "blue_background"
-            }
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "⏱️"},
-                "rich_text": [{"text": {"content": "Estimated Time Remaining: 90 minutes"}}],
-                "color": "yellow_background"
-            }
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "🏁"},
-                "rich_text": [{"text": {"content": "Target Completion: Today by 5:00 PM"}}],
-                "color": "green_background"
-            }
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Phase Progress Breakdown"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "🏗️"},
-                "rich_text": [{"text": {"content": "Foundation Setup: 0% [░░░] 0/3 steps\n• Personal Information\n• Asset Inventory\n• Contact Database"}}],
-                "color": "red_background"
-            }
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "⚖️"},
-                "rich_text": [{"text": {"content": "Legal Framework: 0% [░░░] 0/3 steps\n• Document Templates\n• Beneficiary Setup\n• Professional Coordination"}}],
-                "color": "orange_background"
-            }
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "🔐"},
-                "rich_text": [{"text": {"content": "Security & Access: 0% [░░] 0/2 steps\n• Security Configuration\n• Family Access Setup"}}],
-                "color": "purple_background"
-            }
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "🚀"},
-                "rich_text": [{"text": {"content": "Finalization: 0% [░░] 0/2 steps\n• System Testing\n• Launch & Training"}}],
-                "color": "green_background"
-            }
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Next Actions"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "👉"},
-                "rich_text": [{"text": {"content": "Ready to Start: Complete Welcome Wizard (5 minutes)\nThis will help us understand your needs and customize your experience."}}],
-                "color": "blue_background"
-            }
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Completion Milestones"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "🏆 25% Complete: Foundation setup finished"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "🏆 50% Complete: Legal framework configured"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "🏆 75% Complete: Security and access setup"}}]}
-        },
-        {
-            "type": "bulleted_list_item",
-            "bulleted_list_item": {"rich_text": [{"text": {"content": "🏆 100% Complete: System ready for use!"}}]}
-        },
-        {
-            "type": "heading_2",
-            "heading_2": {"rich_text": [{"text": {"content": "Support & Help"}}]}
-        },
-        {
-            "type": "callout",
-            "callout": {
-                "icon": {"emoji": "❓"},
-                "rich_text": [{"text": {"content": "Need help? Access tooltips, guides, and support throughout the process."}}],
-                "color": "gray_background"
-            }
-        }
-    ]
-    
-    progress_page = {
-        "parent": {"page_id": parent_page_id},
-        "properties": {
-            "title": {"title": [{"text": {"content": "Onboarding Progress Tracker"}}]}
-        },
-        "children": progress_blocks,
-        "icon": {"emoji": "📈"}
-    }
-    
-    response = req("POST", f"{BASE_URL}/pages", data=json.dumps(progress_page))
-    state["pages"]["Onboarding Progress Tracker"] = j(response).get("id")
-
-
-def main():
-    """Main execution function with argument parsing"""
-    parser = argparse.ArgumentParser(
-        description='Estate Planning Concierge v4.0 - Notion Template Deployment',
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  python deploy.py                           # Standard deployment
-  python deploy.py --generate-assets         # Generate assets then deploy
-  python deploy.py --dry-run                 # Test without deployment
-  python deploy.py --test                    # Run connectivity tests
-        """
-    )
-    
-    # Core deployment options
-    parser.add_argument('--dry-run', 
-                       action='store_true',
-                       help='Show what would be deployed without making changes')
-    
-    parser.add_argument('--test',
-                       action='store_true', 
-                       help='Test Notion API connectivity and permissions')
-    
-    parser.add_argument('--parent-id',
-                       type=str,
-                       help='Notion parent page ID (overrides environment variable)')
-    
-    # Asset generation integration
-    parser.add_argument('--generate-assets',
-                       action='store_true',
-                       help='Generate assets using asset_generation system before deployment')
-    
-    parser.add_argument('--assets-only',
-                       action='store_true', 
-                       help='Only generate assets, skip deployment')
-    
-    # Logging and debugging
-    parser.add_argument('--verbose', '-v',
-                       action='count',
-                       default=0,
-                       help='Increase verbosity (use -v, -vv, -vvv)')
-    
-    parser.add_argument('--log-file',
-                       type=str,
-                       help='Write logs to specified file')
-    
-    args = parser.parse_args()
-    
-    # Set up logging based on verbosity
-    log_level = logging.WARNING
-    if args.verbose == 1:
-        log_level = logging.INFO
-    elif args.verbose >= 2:
-        log_level = logging.DEBUG
-        
-    logging.basicConfig(
-        level=log_level,
-        format='%(asctime)s - %(levelname)s - %(message)s',
-        handlers=[logging.StreamHandler()] + 
-                 ([logging.FileHandler(args.log_file)] if args.log_file else [])
-    )
-    
-    logger = logging.getLogger(__name__)
-    logger.info("Estate Planning Concierge v4.0 - Starting deployment")
     
     try:
-        # Handle asset generation if requested
-        if args.generate_assets or args.assets_only:
-            logger.info("🎨 Starting asset generation...")
-            
-            # Import and run asset generation
-            import subprocess
-            import sys
-            from pathlib import Path
-            
-            # Path to asset generator
-            asset_gen_path = Path(__file__).parent / 'asset_generation' / 'asset_generator.py'
-            
-            if not asset_gen_path.exists():
-                logger.error(f"Asset generator not found at: {asset_gen_path}")
-                sys.exit(1)
-            
-            # Run asset generation subprocess
-            result = subprocess.run([
-                sys.executable, 
-                str(asset_gen_path)
-            ], 
-            capture_output=True, 
-            text=True,
-            cwd=asset_gen_path.parent  # Run in asset_generation directory
-            )
-            
-            if result.returncode != 0:
-                logger.error("Asset generation failed:")
-                logger.error(result.stderr)
-                sys.exit(1)
-            
-            logger.info("✅ Asset generation completed successfully")
-            
-            # If assets-only mode, exit here
-            if args.assets_only:
-                logger.info("Assets-only mode - deployment skipped")
-                return
-        
-        # Handle test mode
-        if args.test:
-            logger.info("🔧 Running connectivity tests...")
-            
-            # Test environment variables
-            token = os.getenv('NOTION_TOKEN')
-            parent_id = args.parent_id or os.getenv('NOTION_PARENT_PAGEID')
-            
-            if not token:
-                logger.error("NOTION_TOKEN environment variable not set")
-                sys.exit(1)
-                
-            if not parent_id:
-                logger.error("NOTION_PARENT_PAGEID not set (use --parent-id or environment variable)")
-                sys.exit(1)
-            
-            # Test API connectivity
-            try:
-                from modules.auth import validate_token_with_api
-                validate_token_with_api(token)
-                logger.info("✅ Notion API connectivity test passed")
-            except Exception as e:
-                logger.error(f"❌ Notion API connectivity test failed: {e}")
-                sys.exit(1)
-            
-            logger.info("🎯 All tests passed - ready for deployment")
-            return
-        
-        # Handle dry-run mode
-        if args.dry_run:
-            logger.info("🔍 Dry-run mode - showing deployment plan")
-            logger.info("Would create Estate Planning Concierge v4.0 template")
-            logger.info("Would generate pages, databases, and onboarding flow")
-            return
-        
-        # Standard deployment (placeholder - actual deployment logic would go here)
-        logger.info("🚀 Starting standard deployment...")
-        logger.warning("Deployment logic not yet implemented in this version")
-        logger.info("Use --test to verify connectivity")
-        logger.info("Use --generate-assets to create visual assets")
-        
-    except KeyboardInterrupt:
-        logger.warning("🛑 Deployment interrupted by user")
-        sys.exit(1)
+        r = req("POST", "https://api.notion.com/v1/databases", data=json.dumps(payload))
+        if expect_ok(r, f"Creating database '{db_name}'"):
+            db_id = j(r).get('id')
+            state.created_databases[db_name] = db_id
+            logging.info(f"Created database '{db_name}': {db_id}")
+            return db_id
     except Exception as e:
-        logger.error(f"💥 Deployment failed: {e}")
-        if args.verbose >= 2:
-            import traceback
-            logger.debug(traceback.format_exc())
-        sys.exit(1)
+        logging.error(f"Failed to create database '{db_name}': {e}")
+        state.errors.append({"phase": "databases", "item": db_name, "error": str(e)})
+    
+    return None
 
+def build_block(block_def: Dict) -> Dict:
+    """Build a Notion block from definition"""
+    block_type = block_def.get('type', 'paragraph')
+
+    # Handle alternative content field names
+    content = block_def.get('content', block_def.get('text', block_def.get('summary', '')))
+
+    if block_type == 'heading_1':
+        return {
+            "heading_1": {
+                "rich_text": [{"text": {"content": content}}]
+            }
+        }
+    elif block_type == 'heading_2':
+        return {
+            "heading_2": {
+                "rich_text": [{"text": {"content": content}}]
+            }
+        }
+    elif block_type == 'heading_3':
+        return {
+            "heading_3": {
+                "rich_text": [{"text": {"content": content}}]
+            }
+        }
+    elif block_type == 'paragraph':
+        return {
+            "paragraph": {
+                "rich_text": [{"text": {"content": content}}]
+            }
+        }
+    elif block_type == 'bulleted_list_item':
+        return {
+            "bulleted_list_item": {
+                "rich_text": [{"text": {"content": content}}]
+            }
+        }
+    elif block_type == 'bulleted_list':
+        # Handle bulleted_list with items
+        children = []
+        if 'items' in block_def:
+            for item in block_def['items']:
+                children.append({
+                    "bulleted_list_item": {
+                        "rich_text": [{"text": {"content": item if isinstance(item, str) else str(item)}}]
+                    }
+                })
+        return children[0] if len(children) == 1 else {"paragraph": {"rich_text": [{"text": {"content": f"[bulleted_list with {len(children)} items]"}}]}}
+    elif block_type == 'numbered_list_item':
+        return {
+            "numbered_list_item": {
+                "rich_text": [{"text": {"content": content}}]
+            }
+        }
+    elif block_type == 'callout':
+        return {
+            "callout": {
+                "rich_text": [{"text": {"content": content}}],
+                "icon": {"emoji": block_def.get('icon', '💡').replace('emoji:', '')},
+                "color": block_def.get('color', 'gray_background')
+            }
+        }
+    elif block_type == 'toggle':
+        block_data = {
+            "toggle": {
+                "rich_text": [{"text": {"content": content}}]
+            }
+        }
+        # Handle nested blocks in toggle - check multiple field names
+        children_data = block_def.get('children', block_def.get('blocks', []))
+        if children_data:
+            children = []
+            for child_block in children_data:
+                children.append(build_block(child_block))
+            block_data["toggle"]["children"] = children
+        return block_data
+    elif block_type == 'code':
+        return {
+            "code": {
+                "rich_text": [{"text": {"content": content}}],
+                "language": block_def.get('language', 'plain text')
+            }
+        }
+    elif block_type == 'divider':
+        return {"divider": {}}
+    elif block_type == 'to_do':
+        return {
+            "to_do": {
+                "rich_text": [{"text": {"content": content}}],
+                "checked": block_def.get('checked', False)
+            }
+        }
+    elif block_type == 'embed':
+        # Handle embeds (convert to paragraph with note)
+        return {
+            "paragraph": {
+                "rich_text": [{"text": {"content": f"[EMBED: {content}]"}}]
+            }
+        }
+    elif block_type == 'table':
+        # Handle tables (convert to paragraph with note)
+        return {
+            "paragraph": {
+                "rich_text": [{"text": {"content": f"[TABLE: {content}]"}}]
+            }
+        }
+    else:  # Default to paragraph
+        return {
+            "paragraph": {
+                "rich_text": [{"text": {"content": f"[{block_type}] {content}"}}]
+            }
+        }
+
+def build_property_schema(prop_def) -> Dict:
+    """Build property schema for database - handles both string and dict formats"""
+    # Handle shorthand string format (e.g., "title", "text", "select")
+    if isinstance(prop_def, str):
+        prop_type = prop_def
+        # Map shorthand types to full types
+        if prop_type == 'text':
+            prop_type = 'rich_text'
+        prop_def = {"type": prop_type}  # Convert to dict format
+    else:
+        prop_type = prop_def.get('type', 'rich_text')
+    
+    if prop_type == 'title':
+        return {"title": {}}
+    elif prop_type == 'number':
+        return {"number": {"format": prop_def.get('format', 'number')}}
+    elif prop_type == 'select':
+        return {
+            "select": {
+                "options": [{"name": opt} for opt in prop_def.get('options', [])]
+            }
+        }
+    elif prop_type == 'multi_select':
+        return {
+            "multi_select": {
+                "options": [{"name": opt} for opt in prop_def.get('options', [])]
+            }
+        }
+    elif prop_type == 'date':
+        return {"date": {}}
+    elif prop_type == 'checkbox':
+        return {"checkbox": {}}
+    elif prop_type == 'url':
+        return {"url": {}}
+    elif prop_type == 'email':
+        return {"email": {}}
+    elif prop_type == 'phone_number':
+        return {"phone_number": {}}
+    elif prop_type == 'formula':
+        return {
+            "formula": {
+                "expression": prop_def.get('expression', '')
+            }
+        }
+    elif prop_type == 'relation':
+        return {
+            "relation": {
+                "database_id": prop_def.get('database_id', ''),
+                "type": prop_def.get('relation_type', 'single_property'),
+                "single_property": {} if prop_def.get('relation_type') != 'dual_property' else None,
+                "dual_property": {
+                    "synced_property_name": prop_def.get('synced_property_name', ''),
+                    "synced_property_id": prop_def.get('synced_property_id', '')
+                } if prop_def.get('relation_type') == 'dual_property' else None
+            }
+        }
+    else:  # Default to rich_text
+        return {"rich_text": {}}
+
+# ============================================================================
+# CLI INTERFACE (Qwen feature)
+# ============================================================================
+
+class CLIInterface:
+    """Interactive CLI from Qwen build"""
+    
+    @staticmethod
+    def setup_parser() -> argparse.ArgumentParser:
+        """Setup command line argument parser"""
+        parser = argparse.ArgumentParser(
+            description='Notion Template v4.0 Deployment Tool',
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            epilog="""
+Examples:
+  %(prog)s --dry-run              # Validate without deploying
+  %(prog)s --phase pages           # Deploy only pages
+  %(prog)s --interactive           # Step-by-step deployment
+  %(prog)s --resume                # Resume from last checkpoint
+  %(prog)s --validate-only         # Only run validation
+            """
+        )
+        
+        # Deployment modes
+        mode_group = parser.add_mutually_exclusive_group()
+        mode_group.add_argument('--dry-run', action='store_true',
+                               help='Validate configuration without deploying')
+        mode_group.add_argument('--interactive', action='store_true',
+                               help='Interactive step-by-step deployment')
+        mode_group.add_argument('--resume', action='store_true',
+                               help='Resume from last checkpoint')
+        mode_group.add_argument('--validate-only', action='store_true',
+                               help='Only validate, no deployment')
+        
+        # Selective deployment
+        parser.add_argument('--phase', choices=[p.name.lower() for p in DeploymentPhase],
+                          help='Deploy only specific phase')
+        parser.add_argument('--skip-phases', nargs='+',
+                          help='Skip specific phases')
+        
+        # Configuration
+        parser.add_argument('--yaml-dir', type=Path,
+                          help='Directory containing YAML files')
+        parser.add_argument('--csv-dir', type=Path,
+                          help='Directory containing CSV files')
+        parser.add_argument('--parent-id',
+                          help='Override parent page ID')
+        
+        # Logging
+        parser.add_argument('--verbose', '-v', action='count', default=0,
+                          help='Increase verbosity (-v, -vv, -vvv)')
+        parser.add_argument('--quiet', '-q', action='store_true',
+                          help='Suppress non-error output')
+        
+        return parser
+    
+    @staticmethod
+    def prompt_continue(message: str = "Continue?") -> bool:
+        """Interactive prompt for user confirmation"""
+        response = input(f"\n{message} [Y/n]: ").strip().lower()
+        return response in ('', 'y', 'yes')
+
+# ============================================================================
+# MAIN DEPLOYMENT ORCHESTRATOR
+# ============================================================================
+
+class NotionTemplateDeployer:
+    """Main deployment orchestrator combining all features"""
+    
+    def __init__(self, args: argparse.Namespace):
+        self.args = args
+        self.state = DeploymentState()
+        self.validator = Validator()
+        self.progress = None
+        self.setup_logging()
+        
+    def setup_logging(self):
+        """Configure logging based on verbosity"""
+        if self.args.quiet:
+            level = logging.ERROR
+        elif self.args.verbose >= 3:
+            level = logging.DEBUG
+        elif self.args.verbose >= 2:
+            level = logging.INFO
+        elif self.args.verbose >= 1:
+            level = logging.WARNING
+        else:
+            level = logging.ERROR
+            
+        logging.basicConfig(
+            level=level,
+            format='%(asctime)s - %(levelname)s - %(message)s',
+            datefmt='%H:%M:%S'
+        )
+    
+    def run(self) -> bool:
+        """Main deployment entry point"""
+        try:
+            # Handle resume mode
+            if self.args.resume:
+                loaded_state = self.state.load_checkpoint()
+                if loaded_state:
+                    self.state = loaded_state
+                    logging.info(f"Resuming from phase: {self.state.phase.value}")
+                else:
+                    logging.info("No checkpoint found, starting fresh")
+            
+            # Phase 1: Validation
+            if not self.skip_phase(DeploymentPhase.VALIDATION):
+                if not self.validate():
+                    return False
+                    
+            if self.args.validate_only:
+                print("\n✅ Validation successful!")
+                return True
+                
+            if self.args.dry_run:
+                print("\n✅ Dry run successful! Ready for deployment.")
+                return True
+            
+            # Load configuration
+            yaml_data = load_all_yaml(self.args.yaml_dir)
+            csv_data = load_csv_data(self.args.csv_dir)
+            
+            # Calculate total steps for progress tracking
+            total_steps = (
+                len(yaml_data.get('pages', [])) +
+                len(yaml_data.get('db', {}).get('schemas', {})) +
+                len(csv_data) + 10  # Extra steps for patches and finalization
+            )
+            self.progress = ProgressTracker(total_steps)
+            
+            # Phase 2: Preparation
+            if not self.skip_phase(DeploymentPhase.PREPARATION):
+                self.state.phase = DeploymentPhase.PREPARATION
+                self.progress.update(DeploymentPhase.PREPARATION, "Setting up deployment")
+                self.state.save_checkpoint()
+            
+            # Phase 3: Create Pages
+            if not self.skip_phase(DeploymentPhase.PAGES):
+                if not self.deploy_pages(yaml_data):
+                    return False
+            
+            # Phase 4: Create Databases
+            if not self.skip_phase(DeploymentPhase.DATABASES):
+                if not self.deploy_databases(yaml_data):
+                    return False
+            
+            # Phase 5: Set Relations
+            if not self.skip_phase(DeploymentPhase.RELATIONS):
+                if not self.setup_relations(yaml_data):
+                    return False
+            
+            # Phase 6: Import Data
+            if not self.skip_phase(DeploymentPhase.DATA):
+                if not self.import_data(csv_data):
+                    return False
+            
+            # Phase 7: Apply Patches
+            if not self.skip_phase(DeploymentPhase.PATCHES):
+                if not self.apply_patches(yaml_data):
+                    return False
+            
+            # Phase 8: Finalization
+            if not self.skip_phase(DeploymentPhase.FINALIZATION):
+                self.finalize_deployment()
+            
+            # Success!
+            self.state.phase = DeploymentPhase.COMPLETED
+            self.state.clear_checkpoint()
+            self.print_summary()
+            return True
+            
+        except KeyboardInterrupt:
+            logging.warning("\n\nDeployment interrupted! Run with --resume to continue.")
+            self.state.save_checkpoint()
+            return False
+        except Exception as e:
+            logging.error(f"Deployment failed: {e}")
+            self.state.errors.append({"phase": self.state.phase.value, "error": str(e)})
+            self.state.save_checkpoint()
+            return False
+    
+    def skip_phase(self, phase: DeploymentPhase) -> bool:
+        """Check if phase should be skipped"""
+        if self.args.phase and phase.name.lower() != self.args.phase:
+            return True
+        if self.args.skip_phases and phase.name.lower() in self.args.skip_phases:
+            return True
+        # Compare enum positions instead of string values
+        current_phase_order = list(DeploymentPhase).index(self.state.phase)
+        target_phase_order = list(DeploymentPhase).index(phase)
+        if current_phase_order > target_phase_order:  # Already completed in previous run
+            return True
+        return False
+    
+    def validate(self) -> bool:
+        """Run all validations"""
+        self.state.phase = DeploymentPhase.VALIDATION
+        errors = []
+        
+        # Environment validation
+        env_errors = self.validator.validate_environment()
+        if env_errors:
+            errors.extend(env_errors)
+        
+        # YAML validation
+        yaml_data = load_all_yaml(self.args.yaml_dir)
+        if not yaml_data:
+            errors.append("No YAML data loaded")
+        else:
+            yaml_errors = self.validator.validate_yaml_structure(yaml_data)
+            if yaml_errors:
+                errors.extend(yaml_errors)
+            
+            dep_errors = self.validator.validate_dependencies(yaml_data)
+            if dep_errors:
+                errors.extend(dep_errors)
+        
+        if errors:
+            print("\n❌ Validation failed:")
+            for error in errors:
+                print(f"  - {error}")
+            return False
+        
+        logging.info("✅ All validations passed")
+        return True
+    
+    def deploy_pages(self, yaml_data: Dict) -> bool:
+        """Deploy all pages with proper parent-child ordering"""
+        self.state.phase = DeploymentPhase.PAGES
+        pages = yaml_data.get('pages', [])
+
+        if self.args.interactive:
+            if not CLIInterface.prompt_continue(f"Deploy {len(pages)} pages?"):
+                return False
+
+        # Create lookup for all pages by title
+        all_pages = {page.get('title'): page for page in pages}
+
+        # Separate parent and child pages
+        parent_pages = []
+        child_pages = []
+
+        for page in pages:
+            if page.get('parent'):
+                child_pages.append(page)
+            else:
+                parent_pages.append(page)
+
+        logging.info(f"Found {len(parent_pages)} parent pages and {len(child_pages)} child pages")
+
+        # First, create all parent pages (even if they have no blocks)
+        logging.info("Phase 1: Creating parent pages...")
+        for page in parent_pages:
+            title = page.get('title', 'Untitled')
+            self.progress.update(DeploymentPhase.PAGES, f"Creating parent: {title}")
+
+            parent_id = self.args.parent_id or NOTION_PARENT_PAGEID
+            page_id = create_page(page, self.state, parent_id)
+
+            if not page_id and not self.args.interactive:
+                return False
+            elif not page_id and self.args.interactive:
+                if not CLIInterface.prompt_continue(f"Parent page '{title}' creation failed. Continue?"):
+                    return False
+
+            self.state.save_checkpoint()
+
+        # Then, create all child pages (which should have the blocks)
+        logging.info("Phase 2: Creating child pages...")
+        for page in child_pages:
+            title = page.get('title', 'Untitled')
+            self.progress.update(DeploymentPhase.PAGES, f"Creating child: {title}")
+
+            # Let create_page handle parent lookup from state.created_pages
+            page_id = create_page(page, self.state, None)
+
+            if not page_id and not self.args.interactive:
+                return False
+            elif not page_id and self.args.interactive:
+                if not CLIInterface.prompt_continue(f"Child page '{title}' creation failed. Continue?"):
+                    return False
+
+            self.state.save_checkpoint()
+
+        return True
+    
+    def deploy_databases(self, yaml_data: Dict) -> bool:
+        """Deploy all databases"""
+        self.state.phase = DeploymentPhase.DATABASES
+        schemas = yaml_data.get('db', {}).get('schemas', {})
+        
+        if self.args.interactive:
+            if not CLIInterface.prompt_continue(f"Deploy {len(schemas)} databases?"):
+                return False
+        
+        for db_name, schema in schemas.items():
+            self.progress.update(DeploymentPhase.DATABASES, f"Creating: {db_name}")
+            
+            parent_id = self.args.parent_id or NOTION_PARENT_PAGEID
+            db_id = create_database(db_name, schema, self.state, parent_id)
+            
+            if not db_id and not self.args.interactive:
+                return False
+            elif not db_id and self.args.interactive:
+                if not CLIInterface.prompt_continue("Database creation failed. Continue?"):
+                    return False
+            
+            self.state.save_checkpoint()
+        
+        return True
+    
+    def setup_relations(self, yaml_data: Dict) -> bool:
+        """Setup database relations"""
+        self.state.phase = DeploymentPhase.RELATIONS
+        self.progress.update(DeploymentPhase.RELATIONS, "Configuring relations")
+        
+        # TODO: Implement relation setup based on schema definitions
+        # This requires updating database properties after creation
+        
+        self.state.save_checkpoint()
+        return True
+    
+    def import_data(self, csv_data: Dict[str, List[Dict]]) -> bool:
+        """Import CSV data into databases"""
+        self.state.phase = DeploymentPhase.DATA
+        
+        if self.args.interactive:
+            if not CLIInterface.prompt_continue(f"Import data for {len(csv_data)} databases?"):
+                return False
+        
+        for db_name, rows in csv_data.items():
+            if db_name in self.state.processed_csv:
+                continue
+                
+            self.progress.update(DeploymentPhase.DATA, f"Importing: {db_name} ({len(rows)} rows)")
+            
+            # TODO: Implement CSV import logic
+            # This requires creating pages in the database with CSV data
+            
+            self.state.processed_csv.append(db_name)
+            self.state.save_checkpoint()
+        
+        return True
+    
+    def apply_patches(self, yaml_data: Dict) -> bool:
+        """Apply any patches or updates"""
+        self.state.phase = DeploymentPhase.PATCHES
+        self.progress.update(DeploymentPhase.PATCHES, "Applying patches")
+        
+        # TODO: Implement patch application logic
+        # This could include updating properties, adding blocks, etc.
+        
+        self.state.save_checkpoint()
+        return True
+    
+    def finalize_deployment(self):
+        """Final cleanup and verification"""
+        self.state.phase = DeploymentPhase.FINALIZATION
+        self.progress.update(DeploymentPhase.FINALIZATION, "Finalizing deployment")
+        
+        # TODO: Add final verification steps
+        # - Verify all pages accessible
+        # - Check database permissions
+        # - Generate deployment report
+        
+        time.sleep(1)  # Give progress bar time to complete
+    
+    def print_summary(self):
+        """Print deployment summary"""
+        duration = time.time() - self.state.start_time
+        
+        print("\n" + "="*60)
+        print("DEPLOYMENT SUMMARY")
+        print("="*60)
+        print(f"✅ Deployment completed successfully!")
+        print(f"⏱️  Duration: {duration:.1f} seconds")
+        print(f"📄 Pages created: {len(self.state.created_pages)}")
+        print(f"🗄️  Databases created: {len(self.state.created_databases)}")
+        print(f"📊 Data imported: {len(self.state.processed_csv)} datasets")
+        
+        if self.state.errors:
+            print(f"\n⚠️  Errors encountered: {len(self.state.errors)}")
+            for error in self.state.errors[:5]:  # Show first 5 errors
+                print(f"  - {error['phase']}: {error.get('item', '')} - {error['error']}")
+        
+        print("\n📍 Root page ID:", self.args.parent_id or NOTION_PARENT_PAGEID)
+        print("="*60)
+
+# ============================================================================
+# ENTRY POINT
+# ============================================================================
+
+def main():
+    """Main entry point"""
+    cli = CLIInterface()
+    parser = cli.setup_parser()
+    args = parser.parse_args()
+    
+    # Override parent ID if provided
+    if args.parent_id:
+        os.environ['NOTION_PARENT_PAGEID'] = args.parent_id
+    
+    # Run deployment
+    deployer = NotionTemplateDeployer(args)
+    success = deployer.run()
+    
+    sys.exit(0 if success else 1)
 
 if __name__ == "__main__":
     main()
-

@@ -510,7 +510,7 @@ databases:
         Next Action Required: "Draft business succession/wind-down plan"
         Notes: "Helped establish LLC. Will need her expertise for business transition planning."
 
-  Crisis Management:
+  - Crisis Management:
     icon:
       type: emoji
       emoji: 🚨
