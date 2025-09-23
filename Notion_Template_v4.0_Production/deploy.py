@@ -30,6 +30,7 @@ import requests
 from dotenv import load_dotenv
 from urllib.parse import quote
 from datetime import datetime
+import re
 
 # ============================================================================
 # CONFIGURATION & CONSTANTS
@@ -44,6 +45,229 @@ NOTION_PARENT_PAGEID = os.getenv("NOTION_PARENT_PAGEID")
 
 GLOBAL_THROTTLE_RPS = float(os.getenv("THROTTLE_RPS", "2.5"))
 ENABLE_SEARCH_FALLBACK = os.getenv("ENABLE_SEARCH_FALLBACK", "1") in ("1", "true", "True", "yes", "YES")
+
+# ============================================================================
+# VARIABLE SUBSTITUTION SYSTEM
+# ============================================================================
+
+def process_variable_substitution(content: str) -> str:
+    """
+    Process variable substitution for ${VARIABLE} patterns in content
+    Supports format: ${VARIABLE} or ${VARIABLE:-default_value}
+
+    Args:
+        content: String content that may contain ${VARIABLE} patterns
+
+    Returns:
+        String with variables substituted from environment
+    """
+    if not isinstance(content, str):
+        return content
+
+    # Pattern matches ${VARIABLE} or ${VARIABLE:-default}
+    pattern = r'\$\{([A-Z_][A-Z0-9_]*?)(?::-(.*?))?\}'
+
+    def substitute_var(match):
+        var_name = match.group(1)
+        default_value = match.group(2) if match.group(2) is not None else ''
+
+        # Get value from environment, fall back to default
+        return os.getenv(var_name, default_value)
+
+    return re.sub(pattern, substitute_var, content)
+
+
+def process_content_substitution(data: Any) -> Any:
+    """
+    Recursively process variable substitution in nested data structures
+
+    Args:
+        data: Dict, List, or primitive containing content to process
+
+    Returns:
+        Data structure with variables substituted
+    """
+    if isinstance(data, dict):
+        return {key: process_content_substitution(value) for key, value in data.items()}
+    elif isinstance(data, list):
+        return [process_content_substitution(item) for item in data]
+    elif isinstance(data, str):
+        return process_variable_substitution(data)
+    else:
+        return data
+
+# FORMULA PLACEHOLDER SYSTEM
+# ============================================================================
+
+def process_formula_placeholder(content: str) -> str:
+    """
+    Process formula placeholder patterns {{formula:expression}} in content
+    These are typically used for dynamic values that would be calculated
+
+    Args:
+        content: String content that may contain {{formula:}} patterns
+
+    Returns:
+        String with formula placeholders replaced with placeholder text
+    """
+    if not isinstance(content, str):
+        return content
+
+    # Pattern matches {{formula:expression}}
+    pattern = r'\{\{formula:(.*?)\}\}'
+
+    def substitute_formula(match):
+        formula_expr = match.group(1)
+        # For now, replace with a placeholder that indicates formula was here
+        # In production, this could be connected to an actual formula evaluator
+        return f"[Formula: {formula_expr}]"
+
+    return re.sub(pattern, substitute_formula, content)
+
+
+def process_formula_substitution(data: Any) -> Any:
+    """
+    Recursively process formula placeholder substitution in nested data structures
+
+    Args:
+        data: Dict, List, or primitive containing content to process
+
+    Returns:
+        Data structure with formula placeholders processed
+    """
+    if isinstance(data, dict):
+        return {key: process_formula_substitution(value) for key, value in data.items()}
+    elif isinstance(data, list):
+        return [process_formula_substitution(item) for item in data]
+    elif isinstance(data, str):
+        return process_formula_placeholder(data)
+    else:
+        return data
+
+
+# ENHANCED SELECT OPTIONS SUPPORT
+# ============================================================================
+
+def build_enhanced_select_options(options: List[Any]) -> List[Dict]:
+    """
+    Build enhanced select options supporting both formats:
+    - Array format: ["Option1", "Option2"]
+    - Object format: [{"name": "Option1", "color": "red"}, ...]
+
+    Args:
+        options: List of options (strings or dicts)
+
+    Returns:
+        List of properly formatted option dicts for Notion API
+    """
+    if not options:
+        return []
+
+    # Valid Notion API colors (as of 2025-09-03)
+    valid_colors = {
+        'default', 'gray', 'brown', 'orange', 'yellow',
+        'green', 'blue', 'purple', 'pink', 'red'
+    }
+
+    formatted_options = []
+    for option in options:
+        if isinstance(option, str):
+            # Simple string format
+            formatted_options.append({"name": option})
+        elif isinstance(option, dict):
+            if 'name' in option:
+                # Object format with optional color
+                opt_dict = {"name": option['name']}
+                if 'color' in option and option['color'] in valid_colors:
+                    opt_dict['color'] = option['color']
+                formatted_options.append(opt_dict)
+            else:
+                # Malformed object, treat as string
+                formatted_options.append({"name": str(option)})
+        else:
+            # Convert other types to string
+            formatted_options.append({"name": str(option)})
+
+    return formatted_options
+
+
+def add_page_metadata_properties(page_data: Dict, properties: Dict) -> Dict:
+    """
+    Add page metadata fields (role, slug, complexity, disclaimer) to page properties
+
+    Args:
+        page_data: YAML page data containing metadata fields
+        properties: Existing page properties dict
+
+    Returns:
+        Updated properties dict with metadata fields
+    """
+    # Add role field as rich_text property
+    if 'role' in page_data:
+        properties['Role'] = {
+            "rich_text": [{"text": {"content": str(page_data['role'])}}]
+        }
+
+    # Add slug field as rich_text property
+    if 'slug' in page_data:
+        properties['Slug'] = {
+            "rich_text": [{"text": {"content": str(page_data['slug'])}}]
+        }
+
+    # Add complexity field as select property
+    if 'complexity' in page_data:
+        properties['Complexity'] = {
+            "select": {"name": str(page_data['complexity'])}
+        }
+
+    # Add disclaimer field as rich_text property
+    if 'disclaimer' in page_data:
+        properties['Disclaimer'] = {
+            "rich_text": [{"text": {"content": str(page_data['disclaimer'])}}]
+        }
+
+    return properties
+
+
+def create_asset_field_placeholders(page_data: Dict) -> Dict:
+    """
+    Create placeholder properties for asset fields that will be populated by image generator
+
+    Args:
+        page_data: YAML page data containing asset field references
+
+    Returns:
+        Dict of asset properties for future population
+    """
+    asset_properties = {}
+
+    # Create placeholders for asset fields if they exist in YAML
+    if 'icon_file' in page_data:
+        asset_properties['Icon File'] = {
+            "rich_text": [{"text": {"content": ""}}]  # Empty placeholder
+        }
+
+    if 'cover_file' in page_data:
+        asset_properties['Cover File'] = {
+            "rich_text": [{"text": {"content": ""}}]  # Empty placeholder
+        }
+
+    if 'icon_png' in page_data:
+        asset_properties['Icon PNG'] = {
+            "rich_text": [{"text": {"content": ""}}]  # Empty placeholder
+        }
+
+    if 'cover_png' in page_data:
+        asset_properties['Cover PNG'] = {
+            "rich_text": [{"text": {"content": ""}}]  # Empty placeholder
+        }
+
+    if 'alt_text' in page_data:
+        asset_properties['Alt Text'] = {
+            "rich_text": [{"text": {"content": str(page_data.get('alt_text', ''))}}]
+        }
+
+    return asset_properties
 
 # Deployment phases from Gemini build
 class DeploymentPhase(Enum):
@@ -300,7 +524,7 @@ def expect_ok(resp: requests.Response, context: str = "") -> bool:
 def load_all_yaml(yaml_dir: Optional[Path] = None) -> Dict:
     """Load and merge all YAML files from split_yaml directory"""
     if yaml_dir is None:
-        yaml_dir = Path(__file__).parent.parent / "split_yaml"
+        yaml_dir = Path(__file__).parent / "split_yaml"
     else:
         yaml_dir = Path(yaml_dir)
     
@@ -329,6 +553,10 @@ def load_all_yaml(yaml_dir: Optional[Path] = None) -> Dict:
             if not data:
                 continue
                 
+            # Apply formula placeholders first, then variable substitution
+            data = process_formula_substitution(data)
+            data = process_content_substitution(data)
+
             # Merge pages
             if 'pages' in data:
                 merged['pages'].extend(data['pages'])
@@ -376,23 +604,34 @@ def load_csv_data(csv_dir: Optional[Path] = None) -> Dict[str, List[Dict]]:
 
 def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str] = None) -> Optional[str]:
     """Create a Notion page with comprehensive error handling"""
+    # Process formula placeholders first, then variable substitution
+    page_data = process_formula_substitution(page_data)
+    page_data = process_content_substitution(page_data)
+
     title = page_data.get('title', 'Untitled')
-    
+
     # Check if already created
     if title in state.created_pages:
         logging.debug(f"Page '{title}' already exists: {state.created_pages[title]}")
         return state.created_pages[title]
-    
+
     # Build page properties
     properties = {
         "title": {
             "title": [{"text": {"content": title}}]
         }
     }
-    
+
     # Add custom properties if defined
     if 'properties' in page_data:
         properties.update(page_data['properties'])
+
+    # Add page metadata fields (role, slug, complexity, disclaimer)
+    properties = add_page_metadata_properties(page_data, properties)
+
+    # Add asset field placeholders for image generator integration
+    asset_properties = create_asset_field_placeholders(page_data)
+    properties.update(asset_properties)
     
     # Determine parent
     if parent_id:
@@ -414,9 +653,17 @@ def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str
     if blocks_data:
         logging.debug(f"Found {len(blocks_data)} blocks for page '{title}'")
         for block in blocks_data:
+            # Process variable substitution in block content
+            block = process_content_substitution(block)
             built_block = build_block(block)
-            children.append(built_block)
-            logging.debug(f"Built block: {json.dumps(built_block, indent=2)}")
+
+            # Handle multi-block responses (e.g., bulleted_list with items)
+            if isinstance(built_block, dict) and built_block.get('_multi_block'):
+                children.extend(built_block['_blocks'])
+                logging.debug(f"Built multi-block: {len(built_block['_blocks'])} blocks")
+            else:
+                children.append(built_block)
+                logging.debug(f"Built block: {json.dumps(built_block, indent=2)}")
     else:
         logging.debug(f"No blocks found for page '{title}'")
     
@@ -464,7 +711,10 @@ def create_database(db_name: str, schema: Dict, state: DeploymentState,
     properties = {}
     for prop_name, prop_def in schema.get('properties', {}).items():
         properties[prop_name] = build_property_schema(prop_def)
-    
+
+    # Resolve database references in relation properties
+    properties = resolve_database_references(properties, state)
+
     # Ensure Name property exists
     if 'Name' not in properties:
         properties['Name'] = {"title": {}}
@@ -501,8 +751,35 @@ def create_database(db_name: str, schema: Dict, state: DeploymentState,
     
     return None
 
+def convert_legacy_block_format(block_def: Dict) -> Dict:
+    """
+    Convert old block formats to modern Notion API format
+    Handles legacy patterns like type: H1/H2/H3 and heading field
+    """
+    block_def = block_def.copy()  # Don't mutate original
+
+    # Convert old heading format: type: H1/H2/H3 -> type: heading_1/2/3
+    if 'type' in block_def:
+        old_type = block_def['type']
+        if old_type == 'H1':
+            block_def['type'] = 'heading_1'
+        elif old_type == 'H2':
+            block_def['type'] = 'heading_2'
+        elif old_type == 'H3':
+            block_def['type'] = 'heading_3'
+
+    # Move 'heading' field to 'content' if present
+    if 'heading' in block_def and 'content' not in block_def:
+        block_def['content'] = block_def.pop('heading')
+
+    return block_def
+
+
 def build_block(block_def: Dict) -> Dict:
     """Build a Notion block from definition"""
+    # Convert legacy formats first
+    block_def = convert_legacy_block_format(block_def)
+
     block_type = block_def.get('type', 'paragraph')
 
     # Handle alternative content field names
@@ -574,7 +851,16 @@ def build_block(block_def: Dict) -> Dict:
         if children_data:
             children = []
             for child_block in children_data:
-                children.append(build_block(child_block))
+                # Process variable substitution in nested blocks
+                child_block = process_content_substitution(child_block)
+                built_child = build_block(child_block)
+
+                # Handle multi-block responses in toggle children
+                if isinstance(built_child, dict) and built_child.get('_multi_block'):
+                    children.extend(built_child['_blocks'])
+                else:
+                    children.append(built_child)
+
             block_data["toggle"]["children"] = children
         return block_data
     elif block_type == 'code':
@@ -593,26 +879,157 @@ def build_block(block_def: Dict) -> Dict:
                 "checked": block_def.get('checked', False)
             }
         }
+    elif block_type == 'bulleted_list':
+        # Handle bulleted_list with items array - this is a special case
+        # We need to return a list of blocks, not a single block
+        items = block_def.get('items', [])
+        if not items:
+            # Fallback to single item with content
+            return {
+                "bulleted_list_item": {
+                    "rich_text": [{"text": {"content": content}}]
+                }
+            }
+        else:
+            # Mark this as a multi-block response
+            return {
+                "_multi_block": True,
+                "_blocks": [
+                    {
+                        "bulleted_list_item": {
+                            "rich_text": [{"text": {"content": item}}]
+                        }
+                    }
+                    for item in items
+                ]
+            }
+    elif block_type == 'numbered_list':
+        # Handle numbered_list with items array - similar to bulleted_list
+        items = block_def.get('items', [])
+        if not items:
+            return {
+                "numbered_list_item": {
+                    "rich_text": [{"text": {"content": content}}]
+                }
+            }
+        else:
+            return {
+                "_multi_block": True,
+                "_blocks": [
+                    {
+                        "numbered_list_item": {
+                            "rich_text": [{"text": {"content": item}}]
+                        }
+                    }
+                    for item in items
+                ]
+            }
     elif block_type == 'embed':
-        # Handle embeds (convert to paragraph with note)
-        return {
-            "paragraph": {
-                "rich_text": [{"text": {"content": f"[EMBED: {content}]"}}]
+        # Handle embed blocks with proper Notion API format
+        url = block_def.get('url', content if isinstance(content, str) and content.startswith('http') else '')
+        if url:
+            return {
+                "embed": {
+                    "url": url
+                }
             }
-        }
+        else:
+            # Fallback if no valid URL
+            return {
+                "paragraph": {
+                    "rich_text": [{"text": {"content": f"[EMBED: No valid URL provided]"}}]
+                }
+            }
     elif block_type == 'table':
-        # Handle tables (convert to paragraph with note)
-        return {
-            "paragraph": {
-                "rich_text": [{"text": {"content": f"[TABLE: {content}]"}}]
+        # Handle table blocks with proper Notion API format
+        # Tables in Notion API require table_width and has_column_header
+        rows = block_def.get('rows', [])
+        if rows and isinstance(rows, list):
+            # Calculate table width from first row
+            table_width = len(rows[0].get('cells', [])) if rows else 3
+
+            # Build table rows
+            table_rows = []
+            for row in rows:
+                cells = row.get('cells', []) if isinstance(row, dict) else row if isinstance(row, list) else []
+                # Convert cells to rich text format
+                formatted_cells = []
+                for cell in cells:
+                    cell_content = str(cell) if cell else ""
+                    formatted_cells.append([{"text": {"content": cell_content}}])
+
+                # Pad row if needed
+                while len(formatted_cells) < table_width:
+                    formatted_cells.append([{"text": {"content": ""}}])
+
+                table_rows.append({"cells": formatted_cells[:table_width]})
+
+            return {
+                "table": {
+                    "table_width": table_width,
+                    "has_column_header": block_def.get('has_header', True),
+                    "has_row_header": block_def.get('has_row_header', False),
+                    "children": table_rows if table_rows else [
+                        {"cells": [[{"text": {"content": ""}}] for _ in range(table_width)]}
+                    ]
+                }
             }
-        }
+        else:
+            # Fallback for invalid table structure
+            return {
+                "paragraph": {
+                    "rich_text": [{"text": {"content": f"[TABLE: Invalid structure]"}}]
+                }
+            }
     else:  # Default to paragraph
         return {
             "paragraph": {
                 "rich_text": [{"text": {"content": f"[{block_type}] {content}"}}]
             }
         }
+
+def resolve_database_references(properties: Dict, state: Any) -> Dict:
+    """Resolve database_id_ref markers to actual database IDs"""
+    resolved_properties = {}
+
+    for prop_name, prop_schema in properties.items():
+        resolved_properties[prop_name] = prop_schema
+
+        # Check if this is a relation property with a reference
+        if (isinstance(prop_schema, dict) and
+            prop_schema.get('relation', {}).get('database_id', '').startswith('ref:')):
+
+            ref_key = prop_schema['relation']['database_id'][4:]  # Remove 'ref:' prefix
+            resolved_id = None
+
+            if ref_key == 'pages':
+                # 'pages' refers to the main page-type database
+                # This is typically created as the first database
+                page_databases = [db_id for db_name, db_id in state.created_databases.items()
+                                if 'page' in db_name.lower() or db_name == 'Main Pages']
+                if page_databases:
+                    resolved_id = page_databases[0]
+                elif state.created_databases:
+                    # Fallback: use first created database
+                    resolved_id = list(state.created_databases.values())[0]
+            else:
+                # Try to find exact match in created databases
+                resolved_id = state.created_databases.get(ref_key)
+                if not resolved_id:
+                    # Try case-insensitive match
+                    for db_name, db_id in state.created_databases.items():
+                        if db_name.lower() == ref_key.lower():
+                            resolved_id = db_id
+                            break
+
+            if resolved_id:
+                resolved_properties[prop_name]['relation']['database_id'] = resolved_id
+                logging.info(f"Resolved database reference '{ref_key}' to {resolved_id}")
+            else:
+                logging.warning(f"Could not resolve database reference '{ref_key}' - using placeholder")
+                # Keep the reference as is - this may be resolved later
+
+    return resolved_properties
 
 def build_property_schema(prop_def) -> Dict:
     """Build property schema for database - handles both string and dict formats"""
@@ -633,13 +1050,13 @@ def build_property_schema(prop_def) -> Dict:
     elif prop_type == 'select':
         return {
             "select": {
-                "options": [{"name": opt} for opt in prop_def.get('options', [])]
+                "options": build_enhanced_select_options(prop_def.get('options', []))
             }
         }
     elif prop_type == 'multi_select':
         return {
             "multi_select": {
-                "options": [{"name": opt} for opt in prop_def.get('options', [])]
+                "options": build_enhanced_select_options(prop_def.get('options', []))
             }
         }
     elif prop_type == 'date':
@@ -653,23 +1070,63 @@ def build_property_schema(prop_def) -> Dict:
     elif prop_type == 'phone_number':
         return {"phone_number": {}}
     elif prop_type == 'formula':
+        # Handle multiple formula expression patterns from YAML
+        expression = ''
+
+        # Pattern 1: { type: formula, formula: "expression" }
+        if isinstance(prop_def.get('formula'), str):
+            expression = prop_def.get('formula', '')
+
+        # Pattern 2: { type: formula, formula: { expression: "expression" } }
+        elif isinstance(prop_def.get('formula'), dict):
+            expression = prop_def.get('formula', {}).get('expression', '')
+
+        # Pattern 3: { type: formula, expression: "expression" } (legacy)
+        elif 'expression' in prop_def:
+            expression = prop_def.get('expression', '')
+
         return {
             "formula": {
-                "expression": prop_def.get('expression', '')
+                "expression": expression
             }
         }
     elif prop_type == 'relation':
-        return {
-            "relation": {
-                "database_id": prop_def.get('database_id', ''),
-                "type": prop_def.get('relation_type', 'single_property'),
-                "single_property": {} if prop_def.get('relation_type') != 'dual_property' else None,
-                "dual_property": {
-                    "synced_property_name": prop_def.get('synced_property_name', ''),
-                    "synced_property_id": prop_def.get('synced_property_id', '')
-                } if prop_def.get('relation_type') == 'dual_property' else None
+        # Handle database_id_ref pattern from YAML
+        database_id = prop_def.get('database_id', '')
+
+        # If database_id_ref is provided, mark for later resolution
+        if not database_id and 'database_id_ref' in prop_def:
+            database_ref = prop_def.get('database_id_ref')
+            # Use a marker that will be resolved during database creation
+            database_id = f"ref:{database_ref}"
+
+        # Build relation property according to Sept 2025 API format
+        relation_config = {"database_id": database_id}
+
+        # Handle dual_property relations if specified
+        if prop_def.get('relation_type') == 'dual_property':
+            relation_config["dual_property"] = {
+                "synced_property_name": prop_def.get('synced_property_name', ''),
+                "synced_property_id": prop_def.get('synced_property_id', '')
             }
+
+        return {"relation": relation_config}
+    elif prop_type == 'rollup':
+        # Handle rollup properties
+        rollup_config = {
+            "relation_property_name": prop_def.get('relation_property_name', ''),
+            "relation_property_id": prop_def.get('relation_property_id', ''),
+            "rollup_property_name": prop_def.get('rollup_property_name', ''),
+            "rollup_property_id": prop_def.get('rollup_property_id', ''),
+            "function": prop_def.get('function', 'count')  # count, count_values, sum, average, median, min, max, etc.
         }
+        return {"rollup": rollup_config}
+    elif prop_type == 'people':
+        # Handle people property type
+        return {"people": {}}
+    elif prop_type == 'last_edited_time':
+        # Handle last_edited_time property type
+        return {"last_edited_time": {}}
     else:  # Default to rich_text
         return {"rich_text": {}}
 
