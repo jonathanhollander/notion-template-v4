@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estate Planning v4.0 - Enhanced Generation Dashboard</title>
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        /* Enhanced visibility styles */
+        .visibility-panel {
+            background: linear-gradient(135deg, #F8F7F5 0%, #F0EDE8 100%);
+            border: 2px solid #8B7355;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Live prompt display */
+        .prompt-display {
+            background: #FFFFFF;
+            border: 1px solid #D4C8B8;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Monaco', monospace;
+            font-size: 13px;
+            min-height: 100px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .prompt-display.active {
+            border-color: #4CAF50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.2);
+        }
+        
+        /* Cost tracker widget */
+        .cost-tracker {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: 2px solid #8B7355;
+            border-radius: 12px;
+            padding: 15px;
+            min-width: 200px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+        }
+        
+        .cost-display {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2C1810;
+            margin: 10px 0;
+        }
+        
+        .cost-progress {
+            height: 8px;
+            background: #E0E0E0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .cost-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50 0%, #FFC107 50%, #FF5252 100%);
+            transition: width 0.3s ease;
+        }
+        
+        /* Model decisions panel */
+        .model-decisions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .model-card {
+            background: white;
+            border: 1px solid #D4C8B8;
+            border-radius: 8px;
+            padding: 15px;
+            position: relative;
+        }
+        
+        .model-card.selected {
+            border-color: #4CAF50;
+            background: #F0FFF0;
+        }
+        
+        .model-name {
+            font-weight: bold;
+            color: #6B5444;
+            margin-bottom: 10px;
+        }
+        
+        .confidence-score {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #8B7355;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        /* Control buttons */
+        .control-panel {
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+            background: #F5F5F5;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .control-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .control-button.pause {
+            background: #FFC107;
+            color: #000;
+        }
+        
+        .control-button.resume {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .control-button.abort {
+            background: #FF5252;
+            color: white;
+        }
+        
+        .control-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Pipeline visualization */
+        .pipeline-visual {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .pipeline-stage {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            position: relative;
+        }
+        
+        .pipeline-stage.active {
+            background: #E8F5E9;
+            border-radius: 8px;
+        }
+        
+        .pipeline-stage.completed {
+            color: #4CAF50;
+        }
+        
+        .pipeline-stage::after {
+            content: '→';
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: #8B7355;
+        }
+        
+        .pipeline-stage:last-child::after {
+            display: none;
+        }
+        
+        /* Approval modal */
+        .approval-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .approval-modal.show {
+            display: flex;
+        }
+        
+        .approval-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .prompt-editor {
+            width: 100%;
+            min-height: 150px;
+            padding: 10px;
+            border: 1px solid #D4C8B8;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 13px;
+        }
+        
+        /* Real-time log stream */
+        .log-stream {
+            background: #1E1E1E;
+            color: #00FF00;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            padding: 15px;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+        
+        .log-entry {
+            margin: 2px 0;
+            opacity: 0;
+            animation: fadeIn 0.3s forwards;
+        }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+        
+        /* Decision explanation panel */
+        .decision-explanation {
+            background: #FFF9E6;
+            border-left: 4px solid #FFC107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .explanation-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #6B5444;
+        }
+        
+        .explanation-item {
+            margin: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .explanation-item::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+        }
+        
+        /* Dry-run toggle */
+        .dry-run-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: #F0F0F0;
+            border-radius: 8px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: #CCC;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .toggle-switch.active {
+            background: #4CAF50;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: left 0.3s;
+        }
+        
+        .toggle-switch.active .toggle-slider {
+            left: 33px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Cost Tracker Widget (Fixed Position) -->
+    <div class="cost-tracker">
+        <h3>💰 Cost Tracker</h3>
+        <div class="cost-display">$<span id="current-cost">0.00</span></div>
+        <div class="cost-progress">
+            <div class="cost-progress-bar" id="cost-progress" style="width: 0%"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666;">
+            <span>Budget: $<span id="budget-limit">0.50</span></span>
+            <span><span id="cost-percentage">0</span>%</span>
+        </div>
+        <div style="margin-top: 10px; font-size: 12px;">
+            <div>Per Image: $<span id="per-image-cost">0.00</span></div>
+            <div>Images Left: <span id="images-remaining">0</span></div>
+        </div>
+    </div>
+
+    <div class="header">
+        <h1>🏛️ Estate Planning v4.0 - Enhanced Generation Dashboard</h1>
+        <p>Full Transparency & Real-Time Visibility</p>
+    </div>
+    
+    <main class="dashboard-container">
+        <!-- Dry-Run Mode Toggle -->
+        <div class="visibility-panel">
+            <div class="dry-run-toggle">
+                <label style="font-weight: bold;">Mode:</label>
+                <div class="toggle-switch" id="mode-toggle" onclick="toggleMode()">
+                    <div class="toggle-slider"></div>
+                </div>
+                <span id="mode-label">Production Mode</span>
+                <span style="margin-left: 20px; color: #666;">
+                    (Dry-run: test without API costs)
+                </span>
+            </div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <button class="control-button pause" onclick="pauseGeneration()" id="pause-btn">
+                ⏸️ PAUSE
+            </button>
+            <button class="control-button resume" onclick="resumeGeneration()" id="resume-btn" style="display: none;">
+                ▶️ RESUME
+            </button>
+            <button class="control-button abort" onclick="abortGeneration()">
+                🛑 ABORT ALL
+            </button>
+            <button class="control-button" onclick="skipCurrent()">
+                ⏭️ SKIP CURRENT
+            </button>
+            <select id="speed-control" onchange="updateSpeed()" style="padding: 10px; border-radius: 6px;">
+                <option value="slow">🐢 Slow</option>
+                <option value="normal" selected>⚡ Normal</option>
+                <option value="fast">🚀 Fast</option>
+            </select>
+        </div>
+
+        <!-- Pipeline Visualization -->
+        <div class="visibility-panel">
+            <h2>📊 Generation Pipeline</h2>
+            <div class="pipeline-visual">
+                <div class="pipeline-stage" id="stage-discovery">
+                    <div>📁</div>
+                    <div>YAML Discovery</div>
+                </div>
+                <div class="pipeline-stage" id="stage-prompt">
+                    <div>✍️</div>
+                    <div>Prompt Generation</div>
+                </div>
+                <div class="pipeline-stage" id="stage-model">
+                    <div>🤖</div>
+                    <div>Model Selection</div>
+                </div>
+                <div class="pipeline-stage" id="stage-image">
+                    <div>🎨</div>
+                    <div>Image Creation</div>
+                </div>
+                <div class="pipeline-stage" id="stage-save">
+                    <div>💾</div>
+                    <div>Save & Validate</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Prompt Display -->
+        <div class="visibility-panel">
+            <h2>📝 Current Prompt Generation</h2>
+            <div class="prompt-display active" id="current-prompt">
+                <div style="color: #666;">Waiting for generation to start...</div>
+            </div>
+            <div style="margin-top: 10px; display: flex; justify-content: space-between;">
+                <span>Asset: <strong id="current-asset">-</strong></span>
+                <span>Model: <strong id="current-model">-</strong></span>
+                <span>Time: <strong id="elapsed-time">0s</strong></span>
+            </div>
+        </div>
+
+        <!-- Model Decisions Panel -->
+        <div class="visibility-panel">
+            <h2>🤖 Model Competition Results</h2>
+            <div class="model-decisions">
+                <div class="model-card" id="claude-card">
+                    <div class="model-name">Claude 3.5 Sonnet</div>
+                    <div class="confidence-score" id="claude-score">-</div>
+                    <div class="prompt-display" id="claude-prompt" style="min-height: 80px;">
+                        Waiting...
+                    </div>
+                </div>
+                <div class="model-card" id="gpt4-card">
+                    <div class="model-name">GPT-4</div>
+                    <div class="confidence-score" id="gpt4-score">-</div>
+                    <div class="prompt-display" id="gpt4-prompt" style="min-height: 80px;">
+                        Waiting...
+                    </div>
+                </div>
+                <div class="model-card" id="gemini-card">
+                    <div class="model-name">Gemini Pro</div>
+                    <div class="confidence-score" id="gemini-score">-</div>
+                    <div class="prompt-display" id="gemini-prompt" style="min-height: 80px;">
+                        Waiting...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Decision Explanation -->
+        <div class="decision-explanation" id="decision-explanation" style="display: none;">
+            <div class="explanation-title">🎯 Why This Prompt Was Selected</div>
+            <div id="explanation-details">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+
+        <!-- Real-time Log Stream -->
+        <div class="visibility-panel">
+            <h2>📜 Live Activity Log</h2>
+            <div class="log-stream" id="log-stream">
+                <!-- Log entries will be added here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Approval Modal -->
+    <div class="approval-modal" id="approval-modal">
+        <div class="approval-content">
+            <h2>✅ Approval Required</h2>
+            <p>Review and approve the following prompts before generation:</p>
+            <div id="approval-prompts">
+                <!-- Prompts to approve will be shown here -->
+            </div>
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <button class="control-button resume" onclick="approvePrompts()">
+                    ✅ Approve All
+                </button>
+                <button class="control-button" onclick="editPrompts()">
+                    ✏️ Edit Prompts
+                </button>
+                <button class="control-button abort" onclick="rejectPrompts()">
+                    ❌ Reject All
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // WebSocket connection
+        let socket = null;
+        let generationPaused = false;
+        let isDryRun = false;
+        let currentCost = 0;
+        let budgetLimit = 0.50;
+        let startTime = Date.now();
+        
+        // Initialize WebSocket
+        function initWebSocket() {
+            socket = io();
+            
+            socket.on('connect', function() {
+                console.log('Connected to real-time updates');
+                addLogEntry('✅ Connected to generation server', 'success');
+            });
+            
+            // Listen for prompt generation events
+            socket.on('prompt_generating', function(data) {
+                updateCurrentPrompt(data);
+            });
+            
+            socket.on('prompt_created', function(data) {
+                displayPromptResult(data);
+            });
+            
+            socket.on('model_decision', function(data) {
+                showDecisionExplanation(data);
+            });
+            
+            socket.on('cost_update', function(data) {
+                updateCostTracker(data);
+            });
+            
+            socket.on('pipeline_stage', function(data) {
+                updatePipelineStage(data.stage);
+            });
+            
+            socket.on('approval_needed', function(data) {
+                showApprovalModal(data.prompts);
+            });
+            
+            socket.on('generation_error', function(data) {
+                addLogEntry(`❌ Error: ${data.error}`, 'error');
+            });
+            
+            socket.on('log_message', function(data) {
+                addLogEntry(data.message, data.level);
+            });
+        }
+        
+        // Update current prompt display
+        function updateCurrentPrompt(data) {
+            document.getElementById('current-prompt').innerHTML = 
+                `<strong>Generating:</strong> ${data.asset_name}<br>
+                 <strong>Model:</strong> ${data.model}<br>
+                 <strong>Prompt:</strong><br>${data.prompt_preview}`;
+            document.getElementById('current-asset').textContent = data.asset_name;
+            document.getElementById('current-model').textContent = data.model;
+            updateElapsedTime();
+        }
+        
+        // Display prompt competition results
+        function displayPromptResult(data) {
+            const modelId = data.model.toLowerCase().replace(' ', '-');
+            const card = document.getElementById(`${modelId}-card`);
+            const promptDiv = document.getElementById(`${modelId}-prompt`);
+            const scoreDiv = document.getElementById(`${modelId}-score`);
+            
+            if (card && promptDiv && scoreDiv) {
+                promptDiv.textContent = data.prompt;
+                scoreDiv.textContent = `${data.confidence}%`;
+                
+                if (data.selected) {
+                    card.classList.add('selected');
+                }
+            }
+        }
+        
+        // Show decision explanation
+        function showDecisionExplanation(data) {
+            const explanationDiv = document.getElementById('decision-explanation');
+            const detailsDiv = document.getElementById('explanation-details');
+            
+            explanationDiv.style.display = 'block';
+            detailsDiv.innerHTML = data.reasons.map(reason => 
+                `<div class="explanation-item">${reason}</div>`
+            ).join('');
+        }
+        
+        // Update cost tracker
+        function updateCostTracker(data) {
+            currentCost = data.total_cost;
+            document.getElementById('current-cost').textContent = currentCost.toFixed(2);
+            document.getElementById('per-image-cost').textContent = data.per_image_cost.toFixed(3);
+            document.getElementById('images-remaining').textContent = data.images_remaining;
+            
+            const percentage = (currentCost / budgetLimit) * 100;
+            document.getElementById('cost-percentage').textContent = percentage.toFixed(0);
+            document.getElementById('cost-progress').style.width = `${Math.min(percentage, 100)}%`;
+            
+            if (percentage > 80) {
+                document.querySelector('.cost-tracker').style.borderColor = '#FF5252';
+            }
+        }
+        
+        // Update pipeline visualization
+        function updatePipelineStage(stage) {
+            document.querySelectorAll('.pipeline-stage').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            const stageElement = document.getElementById(`stage-${stage}`);
+            if (stageElement) {
+                stageElement.classList.add('active');
+                
+                // Mark previous stages as completed
+                let foundCurrent = false;
+                document.querySelectorAll('.pipeline-stage').forEach(el => {
+                    if (el === stageElement) {
+                        foundCurrent = true;
+                    } else if (!foundCurrent) {
+                        el.classList.add('completed');
+                    }
+                });
+            }
+        }
+        
+        // Add log entry
+        function addLogEntry(message, level = 'info') {
+            const logStream = document.getElementById('log-stream');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.style.color = level === 'error' ? '#FF5252' : 
+                              level === 'success' ? '#4CAF50' : '#00FF00';
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logStream.appendChild(entry);
+            logStream.scrollTop = logStream.scrollHeight;
+        }
+        
+        // Control functions
+        function pauseGeneration() {
+            generationPaused = true;
+            document.getElementById('pause-btn').style.display = 'none';
+            document.getElementById('resume-btn').style.display = 'inline-block';
+            socket.emit('pause_generation');
+            addLogEntry('⏸️ Generation paused', 'info');
+        }
+        
+        function resumeGeneration() {
+            generationPaused = false;
+            document.getElementById('pause-btn').style.display = 'inline-block';
+            document.getElementById('resume-btn').style.display = 'none';
+            socket.emit('resume_generation');
+            addLogEntry('▶️ Generation resumed', 'info');
+        }
+        
+        function abortGeneration() {
+            if (confirm('Are you sure you want to abort all generation?')) {
+                socket.emit('abort_generation');
+                addLogEntry('🛑 Generation aborted', 'error');
+            }
+        }
+        
+        function skipCurrent() {
+            socket.emit('skip_current');
+            addLogEntry('⏭️ Skipped current item', 'info');
+        }
+        
+        function updateSpeed() {
+            const speed = document.getElementById('speed-control').value;
+            socket.emit('update_speed', {speed: speed});
+            addLogEntry(`⚡ Speed changed to ${speed}`, 'info');
+        }
+        
+        // Mode toggle
+        function toggleMode() {
+            isDryRun = !isDryRun;
+            const toggle = document.getElementById('mode-toggle');
+            const label = document.getElementById('mode-label');
+            
+            if (isDryRun) {
+                toggle.classList.add('active');
+                label.textContent = 'Dry-Run Mode';
+                addLogEntry('🔄 Switched to Dry-Run mode (no API costs)', 'success');
+            } else {
+                toggle.classList.remove('active');
+                label.textContent = 'Production Mode';
+                addLogEntry('🔄 Switched to Production mode (real generation)', 'info');
+            }
+            
+            socket.emit('set_mode', {dry_run: isDryRun});
+        }
+        
+        // Approval modal functions
+        function showApprovalModal(prompts) {
+            const modal = document.getElementById('approval-modal');
+            const promptsDiv = document.getElementById('approval-prompts');
+            
+            promptsDiv.innerHTML = prompts.map((prompt, index) => `
+                <div style="margin: 10px 0; padding: 10px; background: #F5F5F5; border-radius: 4px;">
+                    <strong>${prompt.asset_name}</strong>
+                    <textarea class="prompt-editor" id="prompt-${index}">${prompt.prompt}</textarea>
+                </div>
+            `).join('');
+            
+            modal.classList.add('show');
+        }
+        
+        function approvePrompts() {
+            const prompts = [];
+            document.querySelectorAll('.prompt-editor').forEach((textarea, index) => {
+                prompts.push(textarea.value);
+            });
+            
+            socket.emit('approve_prompts', {prompts: prompts});
+            document.getElementById('approval-modal').classList.remove('show');
+            addLogEntry('✅ Prompts approved', 'success');
+        }
+        
+        function editPrompts() {
+            alert('Edit mode - modify prompts in the text areas then click Approve');
+        }
+        
+        function rejectPrompts() {
+            socket.emit('reject_prompts');
+            document.getElementById('approval-modal').classList.remove('show');
+            addLogEntry('❌ Prompts rejected', 'error');
+        }
+        
+        // Update elapsed time
+        function updateElapsedTime() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            document.getElementById('elapsed-time').textContent = `${elapsed}s`;
+        }
+        
+        // Initialize on page load
+        window.onload = function() {
+            initWebSocket();
+            setInterval(updateElapsedTime, 1000);
+        };
+    </script>
+</body>
+</html>

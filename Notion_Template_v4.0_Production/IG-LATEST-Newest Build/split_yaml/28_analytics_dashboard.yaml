@@ -1,0 +1,691 @@
+# Analytics Dashboard
+complexity: complex
+
+pages:
+- title: Executive Analytics Dashboard
+  parent: Preparation Hub
+  icon: emoji:📊
+  description: High-level analytics and key performance indicators
+  role: owner
+  blocks:
+    - type: heading_1
+      content: 📊 Executive Analytics Dashboard
+    - type: paragraph
+      content: Comprehensive analytics system providing deep insights into estate planning progress, task completion patterns, and system performance metrics.
+    
+    - type: heading_2
+      content: Key Performance Indicators (KPIs)
+    - type: callout
+      icon: emoji:🎯
+      content: "Overall Completion Rate: 68% (↑12% from last month)"
+      color: green_background
+    - type: callout
+      icon: emoji:⚡
+      content: "Average Task Completion Time: 3.2 days (↓0.8 days improvement)"
+      color: blue_background
+    - type: callout
+      icon: emoji:🔄
+      content: "System Utilization: 87% (↑15% from baseline)"
+      color: yellow_background
+    - type: callout
+      icon: emoji:👥
+      content: "Family Engagement Score: 92% (↑8% this quarter)"
+      color: purple_background
+    
+    - type: heading_2
+      content: Completion Metrics by Category
+    - type: toggle
+      content: Legal Documentation Progress
+      blocks:
+        - type: bulleted_list_item
+          content: "Will & Testament: 95% complete (4 of 4 major sections)"
+        - type: bulleted_list_item
+          content: "Power of Attorney: 100% complete (All forms executed)"
+        - type: bulleted_list_item
+          content: "Healthcare Directives: 88% complete (Medical preferences pending)"
+        - type: bulleted_list_item
+          content: "Trust Documents: 78% complete (Funding in progress)"
+        - type: paragraph
+          content: "📊 Legal completion average: 90.3% (Target: 95%)"
+    
+    - type: toggle
+      content: Financial Planning Metrics
+      blocks:
+        - type: bulleted_list_item
+          content: "Asset Inventory: 92% complete (Real estate valuations pending)"
+        - type: bulleted_list_item
+          content: "Beneficiary Designations: 85% complete (3 accounts remaining)"
+        - type: bulleted_list_item
+          content: "Tax Planning: 76% complete (Year-of-death projections needed)"
+        - type: bulleted_list_item
+          content: "Insurance Reviews: 94% complete (Final policy updates in progress)"
+        - type: paragraph
+          content: "💰 Financial completion average: 86.8% (Target: 90%)"
+    
+    - type: toggle
+      content: Professional Coordination Status
+      blocks:
+        - type: bulleted_list_item
+          content: "Attorney Coordination: 98% complete (Final review scheduled)"
+        - type: bulleted_list_item
+          content: "Financial Advisor Sync: 91% complete (Portfolio rebalancing active)"
+        - type: bulleted_list_item
+          content: "CPA Collaboration: 83% complete (Tax projections in progress)"
+        - type: bulleted_list_item
+          content: "Insurance Agent Updates: 89% complete (Policy reviews ongoing)"
+        - type: paragraph
+          content: "👔 Professional coordination average: 90.3% (Excellent)"
+    
+    - type: heading_2
+      content: Performance Trends (90-Day View)
+    - type: callout
+      icon: emoji:📈
+      content: "Task Completion Velocity: 0.8 → 1.2 → 1.4 tasks/day (↑75% improvement)"
+      color: green_background
+    - type: callout
+      icon: emoji:⏱️
+      content: "Average Resolution Time: 4.2 → 3.8 → 3.2 days (↓24% faster)"
+      color: green_background
+    - type: callout
+      icon: emoji:🎯
+      content: "Quality Score: 87% → 91% → 94% (Consistent improvement)"
+      color: green_background
+    - type: callout
+      icon: emoji:⚠️
+      content: "Bottleneck Incidents: 12 → 8 → 3 (↓75% reduction)"
+      color: yellow_background
+    
+    - type: heading_2
+      content: Resource Utilization Analysis
+    - type: paragraph
+      content: "System resource usage and efficiency metrics:"
+    - type: bulleted_list_item
+      content: "🖥️ System Uptime: 99.8% (Target: 99.5%)"
+    - type: bulleted_list_item
+      content: "📊 Database Performance: Average response time 0.3s"
+    - type: bulleted_list_item
+      content: "🔄 Sync Operations: 2,847 successful, 3 retries"
+    - type: bulleted_list_item
+      content: "📱 Mobile Access: 34% of total usage"
+    - type: bulleted_list_item
+      content: "🌐 Multi-language Usage: 18% non-English sessions"
+
+- title: Task Velocity Tracker
+  parent: Preparation Hub
+  icon: emoji:⚡
+  description: Productivity analytics and task completion patterns
+  role: owner
+  blocks:
+    - type: heading_1
+      content: ⚡ Task Velocity Tracker
+    - type: paragraph
+      content: Advanced productivity analytics tracking task completion patterns, velocity trends, and efficiency optimization opportunities.
+    
+    - type: heading_2
+      content: Current Velocity Metrics
+    - type: callout
+      icon: emoji:🏃
+      content: "Current Velocity: 1.4 tasks/day (7-day average)"
+      color: green_background
+    - type: callout
+      icon: emoji:📊
+      content: "Peak Velocity: 2.1 tasks/day (Best performance day)"
+      color: blue_background
+    - type: callout
+      icon: emoji:📉
+      content: "Lowest Velocity: 0.6 tasks/day (Identified bottleneck day)"
+      color: yellow_background
+    - type: callout
+      icon: emoji:🎯
+      content: "Target Velocity: 1.5 tasks/day (Goal for next sprint)"
+      color: purple_background
+    
+    - type: heading_2
+      content: Velocity Breakdown by Task Type
+    - type: toggle
+      content: High-Complexity Tasks (8+ hours)
+      blocks:
+        - type: paragraph
+          content: "Average completion time: 2.3 days"
+        - type: bulleted_list_item
+          content: "Legal document preparation: 2.8 days average"
+        - type: bulleted_list_item
+          content: "Professional coordination: 1.9 days average"
+        - type: bulleted_list_item
+          content: "Asset valuation: 3.1 days average"
+        - type: paragraph
+          content: "📊 Velocity impact: -0.4 tasks/day when active"
+    
+    - type: toggle
+      content: Medium-Complexity Tasks (2-8 hours)
+      blocks:
+        - type: paragraph
+          content: "Average completion time: 1.2 days"
+        - type: bulleted_list_item
+          content: "Database updates: 0.8 days average"
+        - type: bulleted_list_item
+          content: "Family communication: 1.4 days average"
+        - type: bulleted_list_item
+          content: "Document reviews: 1.1 days average"
+        - type: paragraph
+          content: "📊 Velocity impact: Neutral (maintains baseline)"
+    
+    - type: toggle
+      content: Low-Complexity Tasks (<2 hours)
+      blocks:
+        - type: paragraph
+          content: "Average completion time: 0.4 days"
+        - type: bulleted_list_item
+          content: "Status updates: 0.2 days average"
+        - type: bulleted_list_item
+          content: "Quick communications: 0.3 days average"
+        - type: bulleted_list_item
+          content: "Simple data entry: 0.5 days average"
+        - type: paragraph
+          content: "📊 Velocity impact: +0.6 tasks/day boost"
+    
+    - type: heading_2
+      content: Velocity Optimization Recommendations
+    - type: numbered_list_item
+      content: "Batch similar low-complexity tasks for maximum velocity boost"
+    - type: numbered_list_item
+      content: "Schedule high-complexity tasks during peak focus periods"
+    - type: numbered_list_item
+      content: "Implement 2-hour time blocks for medium-complexity tasks"
+    - type: numbered_list_item
+      content: "Use Friday afternoons for low-complexity task clearing"
+    - type: numbered_list_item
+      content: "Reserve Monday mornings for high-complexity task initiation"
+    
+    - type: heading_2
+      content: Weekly Velocity Pattern Analysis
+    - type: paragraph
+      content: "Productivity patterns by day of week:"
+    - type: callout
+      icon: emoji:🌅
+      content: "Monday: 1.6 tasks/day (High-complexity task start day)"
+      color: blue_background
+    - type: callout
+      icon: emoji:🔥
+      content: "Tuesday-Wednesday: 1.8 tasks/day (Peak productivity window)"
+      color: green_background
+    - type: callout
+      icon: emoji:⚡
+      content: "Thursday: 1.4 tasks/day (Review and coordination day)"
+      color: yellow_background
+    - type: callout
+      icon: emoji:🎯
+      content: "Friday: 1.1 tasks/day (Administrative and planning focus)"
+      color: purple_background
+
+- title: Bottleneck Detection Center
+  parent: Executor Hub
+  icon: emoji:🚨
+  description: Identify and resolve process bottlenecks and delays
+  role: executor
+  blocks:
+    - type: heading_1
+      content: 🚨 Bottleneck Detection Center
+    - type: paragraph
+      content: Advanced analytics system for identifying, analyzing, and resolving process bottlenecks that slow estate planning progress.
+    
+    - type: heading_2
+      content: Current Bottleneck Alerts
+    - type: callout
+      icon: emoji:🔴
+      content: "CRITICAL: Attorney document review - 8 days overdue"
+      color: red_background
+    - type: callout
+      icon: emoji:🟡
+      content: "WARNING: Asset valuation pending - 3 days delayed"
+      color: yellow_background
+    - type: callout
+      icon: emoji:🟢
+      content: "RESOLVED: Family meeting scheduling - completed today"
+      color: green_background
+    
+    - type: heading_2
+      content: Bottleneck Categories and Frequency
+    - type: toggle
+      content: External Dependencies (45% of bottlenecks)
+      blocks:
+        - type: paragraph
+          content: "Delays caused by external parties and requirements:"
+        - type: bulleted_list_item
+          content: "Professional response times: 28% of all delays"
+        - type: bulleted_list_item
+          content: "Government processing: 12% of all delays"
+        - type: bulleted_list_item
+          content: "Third-party valuations: 5% of all delays"
+        - type: paragraph
+          content: "💡 Mitigation: Build buffer time, maintain backup contacts"
+    
+    - type: toggle
+      content: Resource Constraints (25% of bottlenecks)
+      blocks:
+        - type: paragraph
+          content: "Limitations in available resources or capacity:"
+        - type: bulleted_list_item
+          content: "Time availability: 15% of all delays"
+        - type: bulleted_list_item
+          content: "Information gathering: 7% of all delays"
+        - type: bulleted_list_item
+          content: "Decision complexity: 3% of all delays"
+        - type: paragraph
+          content: "💡 Mitigation: Prioritize tasks, simplify decisions, delegate"
+    
+    - type: toggle
+      content: Process Issues (20% of bottlenecks)
+      blocks:
+        - type: paragraph
+          content: "Internal process inefficiencies and workflow problems:"
+        - type: bulleted_list_item
+          content: "Workflow confusion: 12% of all delays"
+        - type: bulleted_list_item
+          content: "Missing prerequisites: 5% of all delays"
+        - type: bulleted_list_item
+          content: "Communication gaps: 3% of all delays"
+        - type: paragraph
+          content: "💡 Mitigation: Improve documentation, clarify workflows"
+    
+    - type: toggle
+      content: Technical Issues (10% of bottlenecks)
+      blocks:
+        - type: paragraph
+          content: "System and technical problems causing delays:"
+        - type: bulleted_list_item
+          content: "System performance: 6% of all delays"
+        - type: bulleted_list_item
+          content: "Integration problems: 3% of all delays"
+        - type: bulleted_list_item
+          content: "Access issues: 1% of all delays"
+        - type: paragraph
+          content: "💡 Mitigation: System optimization, backup procedures"
+    
+    - type: heading_2
+      content: Bottleneck Resolution Strategies
+    - type: numbered_list_item
+      content: "Early Warning System: Identify potential bottlenecks 5-7 days in advance"
+    - type: numbered_list_item
+      content: "Escalation Procedures: Automatic alerts when delays exceed thresholds"
+    - type: numbered_list_item
+      content: "Alternative Pathways: Backup plans for common bottleneck scenarios"
+    - type: numbered_list_item
+      content: "Resource Reallocation: Shift resources to resolve critical bottlenecks"
+    - type: numbered_list_item
+      content: "Process Optimization: Continuous improvement based on bottleneck data"
+    
+    - type: heading_2
+      content: Bottleneck Prevention Metrics
+    - type: callout
+      icon: emoji:🎯
+      content: "Prevention Success Rate: 73% (bottlenecks avoided through early detection)"
+      color: green_background
+    - type: callout
+      icon: emoji:⚡
+      content: "Average Resolution Time: 2.1 days (↓40% from baseline)"
+      color: blue_background
+    - type: callout
+      icon: emoji:📊
+      content: "Recurrence Rate: 8% (bottlenecks that repeat within 30 days)"
+      color: yellow_background
+
+- title: Trend Analysis Hub
+  parent: Executor Hub
+  icon: emoji:📈
+  description: Pattern analysis and predictive insights
+  role: executor
+  blocks:
+    - type: heading_1
+      content: 📈 Trend Analysis Hub
+    - type: paragraph
+      content: Advanced pattern recognition and predictive analytics for estate planning trends, seasonal patterns, and future planning insights.
+    
+    - type: heading_2
+      content: Completion Trend Analysis
+    - type: callout
+      icon: emoji:📊
+      content: "90-Day Trend: ↗️ Consistent upward trajectory (+2.3% weekly improvement)"
+      color: green_background
+    - type: callout
+      icon: emoji:🎯
+      content: "Projected Completion: December 15, 2024 (85% confidence interval)"
+      color: blue_background
+    - type: callout
+      icon: emoji:⚡
+      content: "Acceleration Factor: 1.4x faster than initial projections"
+      color: green_background
+    
+    - type: heading_2
+      content: Seasonal Patterns and Insights
+    - type: toggle
+      content: Quarterly Performance Patterns
+      blocks:
+        - type: paragraph
+          content: "Historical performance patterns by quarter:"
+        - type: bulleted_list_item
+          content: "Q1 (Jan-Mar): 23% higher activity (New Year motivation effect)"
+        - type: bulleted_list_item
+          content: "Q2 (Apr-Jun): 18% above baseline (Spring planning surge)"
+        - type: bulleted_list_item
+          content: "Q3 (Jul-Sep): 12% below baseline (Summer vacation slowdown)"
+        - type: bulleted_list_item
+          content: "Q4 (Oct-Dec): 31% above baseline (Year-end urgency)"
+        - type: paragraph
+          content: "📊 Planning insight: Schedule major tasks for Q1 and Q4"
+    
+    - type: toggle
+      content: Monthly Activity Cycles
+      blocks:
+        - type: paragraph
+          content: "Within-month patterns and optimal timing:"
+        - type: bulleted_list_item
+          content: "Week 1: High energy, complex task initiation (1.6x baseline)"
+        - type: bulleted_list_item
+          content: "Week 2-3: Sustained productivity, execution focus (1.2x baseline)"
+        - type: bulleted_list_item
+          content: "Week 4: Planning and preparation for next month (0.9x baseline)"
+        - type: paragraph
+          content: "📊 Optimization: Start major initiatives in Week 1"
+    
+    - type: toggle
+      content: Professional Response Time Trends
+      blocks:
+        - type: paragraph
+          content: "Response time patterns from professional partners:"
+        - type: bulleted_list_item
+          content: "Attorneys: 3.2 days average (↓0.8 days over 6 months)"
+        - type: bulleted_list_item
+          content: "Financial Advisors: 1.8 days average (↓0.3 days improvement)"
+        - type: bulleted_list_item
+          content: "CPAs: 4.1 days average during tax season, 2.3 days off-season"
+        - type: bulleted_list_item
+          content: "Insurance Agents: 1.2 days average (consistently fast)"
+        - type: paragraph
+          content: "📊 Insight: Avoid CPA requests March-April"
+    
+    - type: heading_2
+      content: Predictive Analytics Insights
+    - type: callout
+      icon: emoji:🔮
+      content: "Risk Prediction: 15% probability of Q4 deadline pressure based on current velocity"
+      color: yellow_background
+    - type: callout
+      icon: emoji:🎯
+      content: "Optimization Opportunity: 23% time savings possible with task resequencing"
+      color: blue_background
+    - type: callout
+      icon: emoji:⚡
+      content: "Resource Forecast: Additional 8 hours needed for legal review phase"
+      color: purple_background
+    
+    - type: heading_2
+      content: Family Engagement Trends
+    - type: paragraph
+      content: "Family participation and engagement patterns:"
+    - type: bulleted_list_item
+      content: "📱 Digital engagement: ↗️ 34% increase over 6 months"
+    - type: bulleted_list_item
+      content: "💬 Communication frequency: ↗️ 28% more active discussions"
+    - type: bulleted_list_item
+      content: "📚 Learning engagement: ↗️ 45% increase in help section usage"
+    - type: bulleted_list_item
+      content: "🎯 Task completion: ↗️ 19% faster family-assigned task completion"
+    
+    - type: heading_2
+      content: Technology Adoption Trends
+    - type: callout
+      icon: emoji:📱
+      content: "Mobile Usage: 34% → 47% → 52% (Growing mobile preference)"
+      color: green_background
+    - type: callout
+      icon: emoji:🌐
+      content: "Multi-language Feature: 12% → 18% → 23% (International adoption)"
+      color: blue_background
+    - type: callout
+      icon: emoji:⚡
+      content: "Advanced Features: 67% → 78% → 85% (Power user growth)"
+      color: purple_background
+
+- title: Export & Reporting Center
+  parent: Executor Hub
+  icon: emoji:📊
+  description: Data export capabilities and comprehensive reporting
+  role: executor
+  blocks:
+    - type: heading_1
+      content: 📊 Export & Reporting Center
+    - type: paragraph
+      content: Comprehensive data export and reporting capabilities for analytics, compliance, and professional coordination.
+    
+    - type: heading_2
+      content: Available Export Formats
+    - type: callout
+      icon: emoji:📊
+      content: "Excel (.xlsx): Full analytics data with formulas and charts"
+      color: green_background
+    - type: callout
+      icon: emoji:📄
+      content: "PDF Report: Professional summary reports for stakeholders"
+      color: blue_background
+    - type: callout
+      icon: emoji:💾
+      content: "CSV Data: Raw data for custom analysis and integration"
+      color: yellow_background
+    - type: callout
+      icon: emoji:📊
+      content: "JSON API: Real-time data feeds for external systems"
+      color: purple_background
+    
+    - type: heading_2
+      content: Standard Reports Available
+    - type: toggle
+      content: Executive Summary Report
+      blocks:
+        - type: paragraph
+          content: "High-level overview for estate planning stakeholders:"
+        - type: bulleted_list_item
+          content: "Overall completion status and key milestones"
+        - type: bulleted_list_item
+          content: "Critical path analysis and timeline projections"
+        - type: bulleted_list_item
+          content: "Professional coordination status updates"
+        - type: bulleted_list_item
+          content: "Risk assessment and mitigation strategies"
+        - type: paragraph
+          content: "📊 Export options: PDF (8-page summary), Excel (detailed data)"
+    
+    - type: toggle
+      content: Professional Coordination Report
+      blocks:
+        - type: paragraph
+          content: "Detailed report for professional service providers:"
+        - type: bulleted_list_item
+          content: "Task assignments and completion status by professional"
+        - type: bulleted_list_item
+          content: "Response time analytics and performance metrics"
+        - type: bulleted_list_item
+          content: "Outstanding action items and upcoming deadlines"
+        - type: bulleted_list_item
+          content: "Communication history and coordination notes"
+        - type: paragraph
+          content: "📊 Export options: PDF (detailed), Excel (data analysis)"
+    
+    - type: toggle
+      content: Family Progress Report
+      blocks:
+        - type: paragraph
+          content: "User-friendly report for family member updates:"
+        - type: bulleted_list_item
+          content: "Visual progress indicators and completion percentages"
+        - type: bulleted_list_item
+          content: "Milestone achievements and upcoming activities"
+        - type: bulleted_list_item
+          content: "Family member task assignments and contributions"
+        - type: bulleted_list_item
+          content: "Simplified timeline and next steps guidance"
+        - type: paragraph
+          content: "📊 Export options: PDF (visual), simplified Excel"
+    
+    - type: toggle
+      content: Compliance and Audit Report
+      blocks:
+        - type: paragraph
+          content: "Comprehensive documentation for legal and regulatory compliance:"
+        - type: bulleted_list_item
+          content: "Complete task audit trail with timestamps"
+        - type: bulleted_list_item
+          content: "Document completion verification and signatures"
+        - type: bulleted_list_item
+          content: "Professional certifications and review confirmations"
+        - type: bulleted_list_item
+          content: "Compliance checklist status across all requirements"
+        - type: paragraph
+          content: "📊 Export options: PDF (certified), Excel (detailed audit trail)"
+    
+    - type: heading_2
+      content: Custom Report Builder
+    - type: paragraph
+      content: "Create custom reports tailored to specific needs:"
+    - type: bulleted_list_item
+      content: "🎯 Date Range Selection: Custom time periods for analysis"
+    - type: bulleted_list_item
+      content: "📊 Metric Selection: Choose specific KPIs and data points"
+    - type: bulleted_list_item
+      content: "👥 Role-Based Views: Customize data visibility by user role"
+    - type: bulleted_list_item
+      content: "🎨 Format Options: Multiple export formats and styling options"
+    - type: bulleted_list_item
+      content: "🔄 Scheduled Reports: Automatic report generation and distribution"
+    
+    - type: heading_2
+      content: Data Export Capabilities
+    - type: callout
+      icon: emoji:💾
+      content: "Real-time Exports: Current data with live updates"
+      color: green_background
+    - type: callout
+      icon: emoji:📈
+      content: "Historical Data: Up to 2 years of analytics history"
+      color: blue_background
+    - type: callout
+      icon: emoji:🔍
+      content: "Filtered Views: Export specific data subsets and categories"
+      color: yellow_background
+    - type: callout
+      icon: emoji:🔒
+      content: "Secure Delivery: Encrypted exports with access controls"
+      color: red_background
+    
+    - type: heading_2
+      content: Export Usage Statistics
+    - type: paragraph
+      content: "Analytics on report usage and preferences:"
+    - type: bulleted_list_item
+      content: "📊 Most Requested: Executive Summary (45% of all exports)"
+    - type: bulleted_list_item
+      content: "📱 Format Preference: PDF reports (67%), Excel data (28%), CSV (5%)"
+    - type: bulleted_list_item
+      content: "⏰ Peak Usage: Monday mornings and Friday afternoons"
+    - type: bulleted_list_item
+      content: "🔄 Recurring Reports: 32% of users schedule automatic reports"
+
+- title: Analytics Command Center
+  parent: Family Hub
+  icon: emoji:🎯
+  description: Simplified analytics overview for family members
+  role: family
+  blocks:
+    - type: heading_1
+      content: 🎯 Family Analytics Overview
+    - type: paragraph
+      content: Simplified analytics dashboard designed for family members to understand estate planning progress and their role in the process.
+    
+    - type: heading_2
+      content: How We're Doing Overall
+    - type: callout
+      icon: emoji:🎉
+      content: "Great Progress! We're 68% complete with your estate planning"
+      color: green_background
+    - type: callout
+      icon: emoji:📅
+      content: "On Track: Projected completion by December 15, 2024"
+      color: blue_background
+    - type: callout
+      icon: emoji:⚡
+      content: "Getting Faster: We're completing tasks 40% faster than when we started"
+      color: yellow_background
+    
+    - type: heading_2
+      content: What's Been Accomplished
+    - type: bulleted_list_item
+      content: "✅ Legal Foundation: Will, power of attorney, and healthcare directives drafted"
+    - type: bulleted_list_item
+      content: "✅ Professional Team: Attorney, financial advisor, and CPA all coordinating"
+    - type: bulleted_list_item
+      content: "✅ Asset Organization: 92% of assets documented and valued"
+    - type: bulleted_list_item
+      content: "✅ Family Setup: Communication systems and access controls established"
+    
+    - type: heading_2
+      content: What We're Working on Now
+    - type: callout
+      icon: emoji:⚖️
+      content: "Legal Review: Attorney reviewing final documents (in progress)"
+      color: yellow_background
+    - type: callout
+      icon: emoji:💰
+      content: "Financial Planning: Finalizing investment and tax strategies"
+      color: blue_background
+    - type: callout
+      icon: emoji:🏠
+      content: "Asset Valuation: Professional appraisal of real estate (scheduled)"
+      color: gray_background
+    
+    - type: heading_2
+      content: How Family Members Are Helping
+    - type: paragraph
+      content: "Family participation makes our estate planning stronger:"
+    - type: bulleted_list_item
+      content: "📚 Learning Engagement: Family members are actively using help resources (+45%)"
+    - type: bulleted_list_item
+      content: "💬 Communication: More frequent family discussions about planning (+28%)"
+    - type: bulleted_list_item
+      content: "📱 Technology Use: Increased mobile access and engagement (+34%)"
+    - type: bulleted_list_item
+      content: "🎯 Task Completion: Family-assigned tasks completed 19% faster"
+    
+    - type: heading_2
+      content: Simple Progress Tracker
+    - type: callout
+      icon: emoji:📊
+      content: "Legal Documents: ████████████████░░░░ 80% Complete"
+      color: green_background
+    - type: callout
+      icon: emoji:💰
+      content: "Financial Planning: ████████████░░░░░░░░ 65% Complete"
+      color: yellow_background
+    - type: callout
+      icon: emoji:👥
+      content: "Family Coordination: ██████████████░░░░░░ 70% Complete"
+      color: blue_background
+    - type: callout
+      icon: emoji:🏠
+      content: "Asset Management: ███████████████░░░░░ 75% Complete"
+      color: purple_background
+    
+    - type: heading_2
+      content: What You Can Expect Next
+    - type: numbered_list_item
+      content: "Final legal document review and execution (next 2 weeks)"
+    - type: numbered_list_item
+      content: "Asset valuation completion and documentation (next 3 weeks)"
+    - type: numbered_list_item
+      content: "Family access testing and training (next 4 weeks)"
+    - type: numbered_list_item
+      content: "Complete system activation and final review (next 5 weeks)"
+    
+    - type: heading_2
+      content: Questions or Concerns?
+    - type: paragraph
+      content: "If you have questions about our progress or want to understand any part of the process better, please don't hesitate to ask. Regular family communication is key to successful estate planning."

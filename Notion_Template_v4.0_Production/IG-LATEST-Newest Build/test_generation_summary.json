@@ -1,0 +1,48 @@
+{
+  "timestamp": "2025-09-04T11:52:30.016895",
+  "total_pages": 3,
+  "total_prompts_generated": 9,
+  "models_used": [
+    "claude",
+    "gpt4",
+    "gemini"
+  ],
+  "structured_output_format": "SYSTEM/TEMPERATURE/ROLE/PROMPT",
+  "logs_directory": "logs/llm_generations",
+  "master_prompt_size": 3752,
+  "pages_processed": [
+    {
+      "title": "Executor Command Center",
+      "category": "executor",
+      "asset_type": "hero_image",
+      "variants_generated": 3,
+      "variant_models": [
+        "claude",
+        "gpt4",
+        "gemini"
+      ]
+    },
+    {
+      "title": "Family Legacy Letters",
+      "category": "family",
+      "asset_type": "section_cover",
+      "variants_generated": 3,
+      "variant_models": [
+        "claude",
+        "gpt4",
+        "gemini"
+      ]
+    },
+    {
+      "title": "Digital Asset Vault",
+      "category": "digital",
+      "asset_type": "icon",
+      "variants_generated": 3,
+      "variant_models": [
+        "claude",
+        "gpt4",
+        "gemini"
+      ]
+    }
+  ]
+}

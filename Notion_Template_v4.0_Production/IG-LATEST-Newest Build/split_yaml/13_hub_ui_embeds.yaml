@@ -1,0 +1,22 @@
+# 13_hub_ui_embeds.yaml
+complexity: moderate
+# Adds guided embed instructions and progress snapshots to Hubs (idempotent via markers).
+pages:
+  - title: "Preparation Hub"
+    body:
+      - type: callout
+        icon: "emoji:📊"
+        color: gray_background
+        text: "HUB_MARKER::PREP • Embed 'Setup & Acceptance – Active' view below for live progress. (Create the Saved View first in the DB.)"
+  - title: "Executor Hub"
+    body:
+      - type: callout
+        icon: "emoji:📊"
+        color: gray_background
+        text: "HUB_MARKER::EXEC • Embed 'Executor Tasks – Active' and 'Insurance Claims – Open' views below."
+  - title: "Family Hub"
+    body:
+      - type: callout
+        icon: "emoji:📊"
+        color: gray_background
+        text: "HUB_MARKER::FAM • Embed 'Letters – Outbox' view here for at-a-glance communication status."

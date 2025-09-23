@@ -1,0 +1,333 @@
+# Enhanced Professional Integration
+complexity: complex
+
+pages:
+- title: Attorney Coordination Center
+  parent: Professional Coordination
+  icon: emoji:⚖️
+  description: Comprehensive legal coordination workspace
+  role: owner
+  blocks:
+    - type: heading_1
+      content: Attorney Coordination Center
+    - type: paragraph
+      content: Central hub for managing all legal aspects of estate planning and administration.
+    
+    - type: heading_2
+      content: Legal Checklist Progress
+    - type: bulleted_list_item
+      content: "☐ Initial Consultation Scheduled"
+    - type: bulleted_list_item
+      content: "☐ Will and Testament Drafted"
+    - type: bulleted_list_item
+      content: "☐ Power of Attorney Created"
+    - type: bulleted_list_item
+      content: "☐ Healthcare Directives Completed"
+    - type: bulleted_list_item
+      content: "☐ Trust Documents Prepared"
+    - type: bulleted_list_item
+      content: "☐ Beneficiary Designations Updated"
+    - type: bulleted_list_item
+      content: "☐ Final Review and Signatures"
+    
+    - type: heading_2
+      content: Document Status Tracker
+    - type: callout
+      icon: emoji:📄
+      content: "Will Status: IN DRAFT - Review scheduled for next week"
+      color: yellow_background
+    - type: callout
+      icon: emoji:🔐
+      content: "Power of Attorney: COMPLETED - Executed and notarized"
+      color: green_background
+    - type: callout
+      icon: emoji:🏥
+      content: "Healthcare Directives: IN REVIEW - Medical preferences being finalized"
+      color: blue_background
+    
+    - type: heading_2
+      content: Attorney Contact & Communication Log
+    - type: paragraph
+      content: "Primary Attorney: [Name] | Firm: [Firm Name] | Phone: [Number] | Email: [Email]"
+    - type: paragraph
+      content: "Last Contact: [Date] | Next Appointment: [Date] | Status: [Status]"
+
+- title: CPA Tax Coordination Hub
+  parent: Professional Coordination
+  icon: emoji:💰
+  description: Tax planning and preparation coordination
+  role: owner
+  blocks:
+    - type: heading_1
+      content: CPA Tax Coordination Hub
+    - type: paragraph
+      content: Comprehensive tax planning and year-of-death return preparation.
+    
+    - type: heading_2
+      content: Tax Planning Checklist
+    - type: bulleted_list_item
+      content: "☐ Current Year Tax Return Filed"
+    - type: bulleted_list_item
+      content: "☐ Estimated Tax Payments Current"
+    - type: bulleted_list_item
+      content: "☐ Year-of-Death Return Prepared"
+    - type: bulleted_list_item
+      content: "☐ Estate Tax Return Filed (if applicable)"
+    - type: bulleted_list_item
+      content: "☐ Final Tax Clearance Obtained"
+    - type: bulleted_list_item
+      content: "☐ Tax Records Organized for Heirs"
+    
+    - type: heading_2
+      content: Key Tax Documents
+    - type: bulleted_list_item
+      content: "📊 Previous 3 Years Tax Returns"
+    - type: bulleted_list_item
+      content: "💳 Current Year Financial Statements"
+    - type: bulleted_list_item
+      content: "🏦 Bank and Investment Account Statements"
+    - type: bulleted_list_item
+      content: "🏠 Real Estate Records and Valuations"
+    - type: bulleted_list_item
+      content: "💼 Business Records (if applicable)"
+    - type: bulleted_list_item
+      content: "🎁 Gift Tax Records"
+    
+    - type: heading_2
+      content: Tax Implications Tracker
+    - type: callout
+      icon: emoji:⚠️
+      content: "Estate Tax Threshold: $12.92M (2023) - Monitor changes"
+      color: yellow_background
+    - type: callout
+      icon: emoji:📈
+      content: "Capital Gains: Step-up basis applies at death"
+      color: blue_background
+
+- title: Financial Advisor Portal
+  parent: Professional Coordination
+  icon: emoji:📊
+  description: Investment and financial planning coordination
+  role: owner
+  blocks:
+    - type: heading_1
+      content: Financial Advisor Portal
+    - type: paragraph
+      content: Central coordination point for investment management and financial planning.
+    
+    - type: heading_2
+      content: Portfolio Review Checklist
+    - type: bulleted_list_item
+      content: "☐ Asset Allocation Review Completed"
+    - type: bulleted_list_item
+      content: "☐ Beneficiary Designations Verified"
+    - type: bulleted_list_item
+      content: "☐ Estate Planning Integration Review"
+    - type: bulleted_list_item
+      content: "☐ Tax-Loss Harvesting Opportunities Assessed"
+    - type: bulleted_list_item
+      content: "☐ Distribution Strategy Planned"
+    - type: bulleted_list_item
+      content: "☐ Successor Trustee Instructions Prepared"
+    
+    - type: heading_2
+      content: Account Summary Dashboard
+    - type: callout
+      icon: emoji:💼
+      content: "Total Portfolio Value: $[Amount] as of [Date]"
+      color: blue_background
+    - type: callout
+      icon: emoji:📈
+      content: "YTD Performance: [Percentage] vs Benchmark: [Percentage]"
+      color: green_background
+    - type: callout
+      icon: emoji:⚖️
+      content: "Asset Allocation: [Stocks]% Stocks | [Bonds]% Bonds | [Other]% Other"
+      color: gray_background
+    
+    - type: heading_2
+      content: Action Items & Next Steps
+    - type: numbered_list_item
+      content: "Review and update investment policy statement"
+    - type: numbered_list_item
+      content: "Coordinate with attorney on trust funding"
+    - type: numbered_list_item
+      content: "Schedule beneficiary education meetings"
+    - type: numbered_list_item
+      content: "Prepare portfolio transition instructions"
+
+- title: Insurance Coordination Center
+  parent: Professional Coordination
+  icon: emoji:🛡️
+  description: Comprehensive insurance management and claims coordination
+  role: owner
+  blocks:
+    - type: heading_1
+      content: Insurance Coordination Center
+    - type: paragraph
+      content: Centralized management of all insurance policies and claims processes.
+    
+    - type: heading_2
+      content: Policy Management Checklist
+    - type: bulleted_list_item
+      content: "☐ Life Insurance Beneficiaries Updated"
+    - type: bulleted_list_item
+      content: "☐ Health Insurance Coverage Current"
+    - type: bulleted_list_item
+      content: "☐ Property Insurance Adequate"
+    - type: bulleted_list_item
+      content: "☐ Auto Insurance Current"
+    - type: bulleted_list_item
+      content: "☐ Disability Insurance Active"
+    - type: bulleted_list_item
+      content: "☐ Umbrella Policy in Place"
+    - type: bulleted_list_item
+      content: "☐ Claims Procedures Documented"
+    
+    - type: heading_2
+      content: Claims Process Guide
+    - type: numbered_list_item
+      content: "Contact insurance company immediately after incident"
+    - type: numbered_list_item
+      content: "Provide policy number and death certificate"
+    - type: numbered_list_item
+      content: "Complete claim forms accurately and promptly"
+    - type: numbered_list_item
+      content: "Submit required documentation"
+    - type: numbered_list_item
+      content: "Follow up on claim status regularly"
+    - type: numbered_list_item
+      content: "Coordinate with other professionals as needed"
+    
+    - type: heading_2
+      content: Emergency Claim Contacts
+    - type: callout
+      icon: emoji:📞
+      content: "Life Insurance Claim Line: [Number] | Reference: Policy #[Number]"
+      color: red_background
+    - type: callout
+      icon: emoji:🏠
+      content: "Property Insurance: [Number] | Agent: [Name] | Policy: [Number]"
+      color: blue_background
+
+- title: Funeral Coordination Hub
+  parent: Professional Coordination
+  icon: emoji:🕊️
+  description: Funeral and memorial service coordination
+  role: executor
+  blocks:
+    - type: heading_1
+      content: Funeral Coordination Hub
+    - type: paragraph
+      content: Comprehensive funeral and memorial service planning and coordination.
+    
+    - type: heading_2
+      content: Immediate Action Checklist (First 24-48 Hours)
+    - type: bulleted_list_item
+      content: "☐ Contact funeral home/director"
+    - type: bulleted_list_item
+      content: "☐ Obtain death certificates (order 10-15 copies)"
+    - type: bulleted_list_item
+      content: "☐ Notify immediate family and close friends"
+    - type: bulleted_list_item
+      content: "☐ Contact clergy or spiritual leader"
+    - type: bulleted_list_item
+      content: "☐ Make arrangements for care of dependents/pets"
+    - type: bulleted_list_item
+      content: "☐ Secure property and valuable items"
+    
+    - type: heading_2
+      content: Service Planning Details
+    - type: callout
+      icon: emoji:⛪
+      content: "Service Type: [Funeral/Memorial/Celebration] | Location: [Venue]"
+      color: blue_background
+    - type: callout
+      icon: emoji:🌸
+      content: "Flowers: [Preferences] | Donations: [Preferred Charity]"
+      color: green_background
+    - type: callout
+      icon: emoji:🎵
+      content: "Music: [Preferences] | Readings: [Preferences]"
+      color: yellow_background
+    
+    - type: heading_2
+      content: Professional Contacts
+    - type: paragraph
+      content: "Funeral Director: [Name] | Phone: [Number] | Email: [Email]"
+    - type: paragraph
+      content: "Clergy/Officiant: [Name] | Phone: [Number] | Organization: [Name]"
+    - type: paragraph
+      content: "Cemetery/Crematorium: [Name] | Phone: [Number] | Address: [Address]"
+    
+    - type: heading_2
+      content: Memorial Service Coordination
+    - type: numbered_list_item
+      content: "Create guest list and send notifications"
+    - type: numbered_list_item
+      content: "Arrange venue and catering if needed"
+    - type: numbered_list_item
+      content: "Prepare eulogy and select speakers"
+    - type: numbered_list_item
+      content: "Coordinate music and multimedia presentations"
+    - type: numbered_list_item
+      content: "Arrange transportation for family"
+    - type: numbered_list_item
+      content: "Plan reception or gathering details"
+
+database_entries:
+  Professional Coordination:
+    - Professional Name: "Estate Planning Attorney"
+      Service Type: "Attorney"
+      Contact Information: "Complete contact details including office hours and emergency contact"
+      Phone: "+1-555-0123"
+      Email: "attorney@lawfirm.com"
+      Firm/Company: "Estate Law Partners LLC"
+      Status: "Active"
+      Last Contact Date: ""
+      Next Action Required: "Schedule quarterly review of estate documents"
+      Notes: "Primary legal counsel specializing in estate planning, wills, and trusts. Has complete knowledge of estate structure and family dynamics."
+      
+    - Professional Name: "Certified Public Accountant"
+      Service Type: "CPA/Tax Professional"
+      Contact Information: "Tax preparation and estate tax specialist"
+      Phone: "+1-555-0456"
+      Email: "cpa@taxfirm.com"
+      Firm/Company: "Professional Tax Services"
+      Status: "Active"
+      Last Contact Date: ""
+      Next Action Required: "Prepare year-of-death tax return and final filings"
+      Notes: "Experienced with estate tax returns and final tax obligations. Maintains all prior year tax records and understands complex tax implications."
+      
+    - Professional Name: "Financial Advisor"
+      Service Type: "Financial Advisor"
+      Contact Information: "Investment management and estate planning coordination"
+      Phone: "+1-555-0789"
+      Email: "advisor@wealth.com"
+      Firm/Company: "Wealth Management Group"
+      Status: "Active"
+      Last Contact Date: ""
+      Next Action Required: "Review portfolio allocation and distribution strategy"
+      Notes: "Manages investment portfolio worth $X.X million. Has successor advisor arrangements and detailed investment policy statement."
+      
+    - Professional Name: "Insurance Agent"
+      Service Type: "Insurance Agent"
+      Contact Information: "Multi-line insurance agent handling life, property, and health coverage"
+      Phone: "+1-555-0101"
+      Email: "agent@insurance.com"
+      Firm/Company: "Comprehensive Insurance Agency"
+      Status: "Active"
+      Last Contact Date: ""
+      Next Action Required: "Process life insurance claims and update property coverage"
+      Notes: "Handles all insurance policies including $XXX,000 life insurance policy. Has complete beneficiary information and claims procedures."
+      
+    - Professional Name: "Funeral Director"
+      Service Type: "Funeral Director"
+      Contact Information: "Licensed funeral director with pre-need arrangements"
+      Phone: "+1-555-0202"
+      Email: "director@funeral.com"
+      Firm/Company: "Dignity Memorial Services"
+      Status: "Active"
+      Last Contact Date: ""
+      Next Action Required: "Execute pre-planned funeral arrangements"
+      Notes: "Pre-need arrangements completed with detailed service preferences. Understands family wishes and religious requirements."

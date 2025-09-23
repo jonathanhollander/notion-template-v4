@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Prompt Editor - Estate Planning Concierge v4.0</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <style>
+        .editor-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .prompt-editor {
+            width: 100%;
+            min-height: 500px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            padding: 20px;
+            border: 2px solid #8B7355;
+            border-radius: 8px;
+            background-color: #FAFAFA;
+            color: #2C1810;
+            resize: vertical;
+        }
+        
+        .prompt-editor:focus {
+            outline: none;
+            border-color: #6B5444;
+            box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
+        }
+        
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #8B7355;
+        }
+        
+        .editor-stats {
+            display: flex;
+            gap: 30px;
+            color: #6B5444;
+            font-size: 14px;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2C1810;
+        }
+        
+        .editor-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        /* Tabs styling */
+        .prompt-tabs {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #8B7355;
+            padding-bottom: 0;
+        }
+        
+        .tab-button {
+            padding: 12px 24px;
+            background: #F5F5F5;
+            border: 2px solid #8B7355;
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #6B5444;
+            transition: all 0.3s ease;
+            position: relative;
+            bottom: -2px;
+        }
+        
+        .tab-button:hover {
+            background: #EFEFEF;
+        }
+        
+        .tab-button.active {
+            background: white;
+            color: #2C1810;
+            border-bottom: 2px solid white;
+        }
+        
+        .tab-button.tab-default.active {
+            background: linear-gradient(to bottom, white 90%, #F0F0F0 100%);
+        }
+        
+        .tab-button.tab-icons.active {
+            background: linear-gradient(to bottom, white 90%, #E6F3FF 100%);
+        }
+        
+        .tab-button.tab-covers.active {
+            background: linear-gradient(to bottom, white 90%, #FFF9E6 100%);
+        }
+        
+        .prompt-type-indicator {
+            margin-bottom: 10px;
+            padding: 8px 15px;
+            background: #F9F7F5;
+            border-left: 4px solid #8B7355;
+            font-size: 13px;
+            color: #6B5444;
+        }
+        
+        .prompt-type-indicator strong {
+            color: #2C1810;
+        }
+        
+        .btn-save {
+            background: linear-gradient(135deg, #8B7355 0%, #6B5444 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-save:hover {
+            background: linear-gradient(135deg, #6B5444 0%, #5B4434 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(107, 84, 68, 0.3);
+        }
+        
+        .btn-save:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #6B5444;
+            border: 2px solid #8B7355;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: #FAFAFA;
+            border-color: #6B5444;
+        }
+        
+        .save-status {
+            padding: 10px 20px;
+            border-radius: 6px;
+            margin-top: 15px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .save-status.success {
+            background: #E8F5E9;
+            color: #2E7D32;
+            border: 1px solid #4CAF50;
+        }
+        
+        .save-status.error {
+            background: #FFEBEE;
+            color: #C62828;
+            border: 1px solid #F44336;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .help-text {
+            background: #FFF8E1;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #F57C00;
+            margin-bottom: 20px;
+            color: #5D4037;
+        }
+        
+        .help-text h3 {
+            margin-top: 0;
+            color: #3E2723;
+        }
+        
+        .help-text ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .help-text li {
+            margin: 5px 0;
+        }
+        
+        /* Navigation styles */
+        .navigation {
+            background: white;
+            border-bottom: 1px solid #dee2e6;
+            padding: 15px 0;
+            margin-bottom: 30px;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 30px;
+            padding: 0 20px;
+        }
+
+        .nav-link {
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #8B7355;
+            background-color: #f8f9fa;
+        }
+
+        .nav-link.active {
+            color: #8B7355;
+            background-color: #f0ede8;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏛️ Master Prompt Editor</h1>
+        <p class="subtitle">Estate Planning Concierge v4.0 - AI Generation Control</p>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="navigation">
+        <div class="nav-container">
+            <a href="/" class="nav-link">📊 Dashboard</a>
+            <a href="/edit-master-prompt" class="nav-link active">✏️ Edit Prompts</a>
+            <a href="/emotional-config" class="nav-link">🧠 Emotional Config</a>
+        </div>
+    </nav>
+
+    <div class="editor-container">
+        <h1 class="dashboard-title">
+            ✏️ Master Prompt Editor
+        </h1>
+        
+        <div class="editor-header">
+            <h2>Estate Planning Concierge v4.0 - Image Generation Master Prompts</h2>
+            <div class="editor-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Characters</span>
+                    <span class="stat-value" id="char-count">{{ char_count|default(0) }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Last Modified</span>
+                    <span class="stat-value">{{ last_modified|default('Never') }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Lines</span>
+                    <span class="stat-value" id="line-count">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs for different prompt types -->
+        <div class="prompt-tabs">
+            <button class="tab-button tab-default {% if prompt_type == 'default' %}active{% endif %}" 
+                    onclick="switchPromptType('default')" title="Default prompt for general assets">
+                📄 Default Prompt
+            </button>
+            <button class="tab-button tab-icons {% if prompt_type == 'icons' %}active{% endif %}" 
+                    onclick="switchPromptType('icons')" title="Prompt for generating simple, flat UI icons">
+                🎨 Icon Prompt
+            </button>
+            <button class="tab-button tab-covers {% if prompt_type == 'covers' %}active{% endif %}" 
+                    onclick="switchPromptType('covers')" title="Prompt for generating luxury cover images">
+                🖼️ Cover Prompt
+            </button>
+        </div>
+
+        <!-- Indicator showing which file is being edited -->
+        <div class="prompt-type-indicator">
+            <strong>Currently Editing:</strong> {{ prompt_file }} 
+            {% if prompt_type == 'icons' %}
+            - Used for generating simple, flat UI icons
+            {% elif prompt_type == 'covers' %}
+            - Used for generating luxury cover images
+            {% else %}
+            - Default prompt for general assets
+            {% endif %}
+        </div>
+        
+        <div class="help-text">
+            <h3>📝 Master Prompt Guidelines</h3>
+            <ul>
+                <li>Each prompt type controls specific asset generation behavior</li>
+                <li>Icon Prompt: Controls generation of simple, flat UI icons</li>
+                <li>Cover Prompt: Controls generation of luxury cover images</li>
+                <li>Default Prompt: Used for all other asset types</li>
+                <li>Focus on luxury branding, emotional sensitivity, and visual hierarchy</li>
+                <li>Backup is automatically created when you save changes</li>
+                <li>Character limit: 10,000 (currently using <span id="char-count-inline">{{ char_count }}</span>)</li>
+            </ul>
+        </div>
+
+        <div class="editor-header">
+            <h2>Edit Master Prompt</h2>
+            <div class="editor-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Characters</span>
+                    <span class="stat-value" id="char-count">{{ char_count }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Last Modified</span>
+                    <span class="stat-value">{{ last_modified }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Lines</span>
+                    <span class="stat-value" id="line-count">0</span>
+                </div>
+            </div>
+        </div>
+
+        <textarea id="master-prompt" class="prompt-editor" placeholder="Enter your master prompt here..." data-prompt-type="{{ prompt_type }}">{{ current_prompt }}</textarea>
+
+        <div class="editor-actions">
+            <button class="btn-save" onclick="saveMasterPrompt()">
+                💾 Save Changes
+            </button>
+            <button class="btn-secondary" onclick="revertChanges()">
+                ↩️ Revert Changes
+            </button>
+            <button class="btn-secondary" onclick="startGeneration()">
+                🚀 Start Test Generation (15 Images)
+            </button>
+        </div>
+
+        <div id="save-status" class="save-status"></div>
+    </div>
+
+    <script>
+        // Store original content for revert (per prompt type)
+        let originalContent = {{ current_prompt | tojson }};
+        let currentPromptType = '{{ prompt_type }}';
+        let hasChanges = false;
+        let unsavedPrompts = {};  // Track unsaved changes per prompt type
+        
+        // Function to switch between prompt types
+        async function switchPromptType(newType) {
+            // Check if current prompt has unsaved changes
+            if (hasChanges) {
+                unsavedPrompts[currentPromptType] = document.getElementById('master-prompt').value;
+                if (!confirm(`You have unsaved changes in the ${currentPromptType} prompt. Switch anyway?`)) {
+                    return;
+                }
+            }
+            
+            // If we have unsaved content for this type, use it
+            if (unsavedPrompts[newType]) {
+                // Switch to the new tab with unsaved content
+                window.location.href = `/edit-master-prompt?type=${newType}`;
+                return;
+            }
+            
+            // Otherwise, load fresh from server
+            window.location.href = `/edit-master-prompt?type=${newType}`;
+        }
+
+        // Update character and line counts
+        function updateCounts() {
+            const textarea = document.getElementById('master-prompt');
+            const content = textarea.value;
+            
+            // Update character count
+            const charCount = content.length;
+            document.getElementById('char-count').textContent = charCount.toLocaleString();
+            document.getElementById('char-count-inline').textContent = charCount.toLocaleString();
+            
+            // Update line count
+            const lineCount = content.split('\n').length;
+            document.getElementById('line-count').textContent = lineCount.toLocaleString();
+            
+            // Check if content has changed
+            hasChanges = content !== originalContent;
+            
+            // Update save button state
+            const saveBtn = document.querySelector('.btn-save');
+            if (hasChanges) {
+                saveBtn.textContent = '💾 Save Changes *';
+            } else {
+                saveBtn.textContent = '💾 Save Changes';
+            }
+        }
+
+        // Initialize counts on load
+        updateCounts();
+
+        // Update counts on input
+        document.getElementById('master-prompt').addEventListener('input', updateCounts);
+
+        // Save master prompt
+        async function saveMasterPrompt() {
+            const content = document.getElementById('master-prompt').value;
+            const promptType = document.getElementById('master-prompt').dataset.promptType || 'default';
+            const saveBtn = document.querySelector('.btn-save');
+            const statusDiv = document.getElementById('save-status');
+            
+            // Disable button during save
+            saveBtn.disabled = true;
+            saveBtn.textContent = '⏳ Saving...';
+            
+            try {
+                // Get CSRF token first
+                const csrfResponse = await fetch('/api/get-csrf-token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                });
+                
+                const csrfData = await csrfResponse.json();
+                
+                if (!csrfData.success) {
+                    throw new Error('Failed to get CSRF token');
+                }
+                
+                // Save the master prompt with prompt type
+                const response = await fetch('/api/save-master-prompt', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-TOKEN': '{{ api_token }}' || 'estate-planning-review-2024',
+                        'X-Session-ID': csrfData.session_id,
+                        'X-CSRF-Token': csrfData.csrf_token
+                    },
+                    body: JSON.stringify({ 
+                        content: content,
+                        prompt_type: promptType
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Update original content
+                    originalContent = content;
+                    hasChanges = false;
+                    delete unsavedPrompts[currentPromptType];  // Clear unsaved changes
+                    updateCounts();
+                    
+                    statusDiv.className = 'save-status success';
+                    statusDiv.textContent = '✅ ' + data.message;
+                    statusDiv.style.display = 'block';
+                } else {
+                    throw new Error(data.error || 'Failed to save');
+                }
+                
+            } catch (error) {
+                statusDiv.className = 'save-status error';
+                statusDiv.textContent = '❌ Error: ' + error.message;
+                statusDiv.style.display = 'block';
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.textContent = hasChanges ? '💾 Save Changes *' : '💾 Save Changes';
+                
+                // Hide status after 5 seconds
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Revert changes
+        function revertChanges() {
+            if (hasChanges && !confirm('Are you sure you want to revert all changes?')) {
+                return;
+            }
+            
+            document.getElementById('master-prompt').value = originalContent;
+            updateCounts();
+            
+            const statusDiv = document.getElementById('save-status');
+            statusDiv.className = 'save-status success';
+            statusDiv.textContent = '↩️ Changes reverted';
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // Start generation
+        async function startGeneration() {
+            if (hasChanges) {
+                if (!confirm('You have unsaved changes. Save before starting generation?')) {
+                    return;
+                }
+                await saveMasterPrompt();
+            }
+            
+            try {
+                // Get CSRF token
+                const csrfResponse = await fetch('/api/get-csrf-token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                });
+                
+                const csrfData = await csrfResponse.json();
+                
+                // Start generation
+                const response = await fetch('/api/start-generation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-TOKEN': '{{ api_token }}' || 'estate-planning-review-2024',
+                        'X-Session-ID': csrfData.session_id,
+                        'X-CSRF-Token': csrfData.csrf_token
+                    },
+                    body: JSON.stringify({
+                        mode: 'sample',
+                        test_pages: 3
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Redirect to main dashboard to see status
+                    window.location.href = '/?generation_started=true';
+                } else {
+                    throw new Error(data.error || 'Failed to start generation');
+                }
+                
+            } catch (error) {
+                const statusDiv = document.getElementById('save-status');
+                statusDiv.className = 'save-status error';
+                statusDiv.textContent = '❌ Failed to start generation: ' + error.message;
+                statusDiv.style.display = 'block';
+            }
+        }
+
+        // Warn before leaving with unsaved changes
+        window.addEventListener('beforeunload', function(e) {
+            if (hasChanges) {
+                e.preventDefault();
+                e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+S or Cmd+S to save
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                saveMasterPrompt();
+            }
+        });
+    </script>
+</body>
+</html>

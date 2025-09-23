@@ -1,0 +1,254 @@
+[
+  {
+    "page_title": "Executor Command Center",
+    "page_category": "executor",
+    "asset_type": "hero_image",
+    "variants": [
+      {
+        "model": "claude",
+        "structured_prompt": {
+          "system_message": "You are a compassionate estate planning visual designer specializing in creating emotionally resonant imagery that honors family legacies and provides comfort during life transitions.",
+          "temperature": 0.6,
+          "role": "empathetic legacy visual consultant",
+          "prompt": "Create a warm, inviting hero_image for \"Executor Command Center\" featuring soft golden hour lighting through mahogany-framed windows, illuminating a leather-bound family album open to vintage photographs spanning three generations. Include a sterling silver frame with a recent family portrait, fresh white orchids in a crystal vase symbolizing renewal, and handwritten notes on ivory stationery with a Mont Blanc fountain pen nearby. The scene should evoke feelings of continuity, love, and dignified planning while maintaining an ultra-luxury aesthetic with rich textures of velvet, silk, and aged leather. Style: photorealistic, warm color palette with amber and honey tones, emotional depth, premium materials, 8K quality.",
+          "raw_response": "\nSYSTEM: You are a compassionate estate planning visual designer specializing in creating emotionally resonant imagery that honors family legacies and provides comfort during life transitions.\n\nTEMPERATURE: 0.6\n\nROLE: empathetic legacy visual consultant\n\nPROMPT: Create a warm, inviting hero_image for \"Executor Command Center\" featuring soft golden hour lighting through mahogany-framed windows, illuminating a leather-bound family album open to vintage photographs spanning three generations. Include a sterling silver frame with a recent family portrait, fresh white orchids in a crystal vase symbolizing renewal, and handwritten notes on ivory stationery with a Mont Blanc fountain pen nearby. The scene should evoke feelings of continuity, love, and dignified planning while maintaining an ultra-luxury aesthetic with rich textures of velvet, silk, and aged leather. Style: photorealistic, warm color palette with amber and honey tones, emotional depth, premium materials, 8K quality.\n"
+        },
+        "style_elements": [
+          "luxury",
+          "premium",
+          "warm",
+          "mahogany",
+          "leather"
+        ],
+        "emotional_markers": [
+          "warm",
+          "family"
+        ],
+        "luxury_indicators": [],
+        "confidence": 0.8,
+        "reasoning": "Generated using master prompt with technical_precision perspective",
+        "timestamp": "2025-09-04T11:52:30.014186"
+      },
+      {
+        "model": "gpt4",
+        "structured_prompt": {
+          "system_message": "You are an exclusive luxury brand designer creating ultra-premium visual assets for distinguished estate planning clients who expect the finest in aesthetic excellence.",
+          "temperature": 0.7,
+          "role": "luxury estate brand creative director",
+          "prompt": "Design an opulent hero_image for \"Executor Command Center\" showcasing a private library setting with floor-to-ceiling mahogany bookcases, first-edition leather-bound volumes, and a massive carved oak desk with gold leaf detailing. Feature a Waterford crystal decanter set on a silver tray, architectural lighting highlighting marble columns, and a view of manicured estate grounds through tall windows. Include subtle elements like a Patek Philippe pocket watch, wax seal stamps, and embossed letterhead on the finest cotton paper. The composition should communicate exclusivity, heritage, and sophisticated wealth management. Style: ultra-luxury aesthetic, rich jewel tones, architectural grandeur, museum-quality lighting, cinematic composition.",
+          "raw_response": "\nSYSTEM: You are an exclusive luxury brand designer creating ultra-premium visual assets for distinguished estate planning clients who expect the finest in aesthetic excellence.\n\nTEMPERATURE: 0.7\n\nROLE: luxury estate brand creative director\n\nPROMPT: Design an opulent hero_image for \"Executor Command Center\" showcasing a private library setting with floor-to-ceiling mahogany bookcases, first-edition leather-bound volumes, and a massive carved oak desk with gold leaf detailing. Feature a Waterford crystal decanter set on a silver tray, architectural lighting highlighting marble columns, and a view of manicured estate grounds through tall windows. Include subtle elements like a Patek Philippe pocket watch, wax seal stamps, and embossed letterhead on the finest cotton paper. The composition should communicate exclusivity, heritage, and sophisticated wealth management. Style: ultra-luxury aesthetic, rich jewel tones, architectural grandeur, museum-quality lighting, cinematic composition.\n"
+        },
+        "style_elements": [
+          "luxury",
+          "sophisticated",
+          "mahogany",
+          "leather",
+          "gold"
+        ],
+        "emotional_markers": [
+          "heritage"
+        ],
+        "luxury_indicators": [
+          "private",
+          "estate"
+        ],
+        "confidence": 0.8,
+        "reasoning": "Generated using master prompt with technical_precision perspective",
+        "timestamp": "2025-09-04T11:52:30.014833"
+      },
+      {
+        "model": "gemini",
+        "structured_prompt": {
+          "system_message": "You are a technical visual systems architect specializing in creating precisely structured, consistent imagery for professional estate planning documentation.",
+          "temperature": 0.5,
+          "role": "technical estate visual systems designer",
+          "prompt": "Construct a technically precise hero_image for \"Executor Command Center\" with exact specifications: centered composition using rule of thirds, three-point lighting setup with key light at 45 degrees, fill light at 30% intensity, and rim lighting for depth separation. Include mahogany desk surface at 60% frame width, positioned at lower third intersection. Place primary documents in golden ratio spiral, with supporting elements following Fibonacci sequence spacing. Color palette: #4A3C28 (mahogany), #D4AF37 (gold accents), #F5F5DC (parchment), #2C3E50 (deep blue-gray). Ensure 300 DPI resolution, 16:9 aspect ratio, with depth of field f/2.8 for selective focus. Materials should show precise texture mapping: leather grain at 0.3mm detail, paper fiber visibility, metallic reflections at 85% intensity.",
+          "raw_response": "\nSYSTEM: You are a technical visual systems architect specializing in creating precisely structured, consistent imagery for professional estate planning documentation.\n\nTEMPERATURE: 0.5\n\nROLE: technical estate visual systems designer\n\nPROMPT: Construct a technically precise hero_image for \"Executor Command Center\" with exact specifications: centered composition using rule of thirds, three-point lighting setup with key light at 45 degrees, fill light at 30% intensity, and rim lighting for depth separation. Include mahogany desk surface at 60% frame width, positioned at lower third intersection. Place primary documents in golden ratio spiral, with supporting elements following Fibonacci sequence spacing. Color palette: #4A3C28 (mahogany), #D4AF37 (gold accents), #F5F5DC (parchment), #2C3E50 (deep blue-gray). Ensure 300 DPI resolution, 16:9 aspect ratio, with depth of field f/2.8 for selective focus. Materials should show precise texture mapping: leather grain at 0.3mm detail, paper fiber visibility, metallic reflections at 85% intensity.\n"
+        },
+        "style_elements": [
+          "mahogany",
+          "leather",
+          "gold"
+        ],
+        "emotional_markers": [],
+        "luxury_indicators": [],
+        "confidence": 0.8,
+        "reasoning": "Generated using master prompt with technical_precision perspective",
+        "timestamp": "2025-09-04T11:52:30.015005"
+      }
+    ],
+    "winner": null,
+    "human_selected": null,
+    "scores": null
+  },
+  {
+    "page_title": "Family Legacy Letters",
+    "page_category": "family",
+    "asset_type": "section_cover",
+    "variants": [
+      {
+        "model": "claude",
+        "structured_prompt": {
+          "system_message": "You are a compassionate estate planning visual designer specializing in creating emotionally resonant imagery that honors family legacies and provides comfort during life transitions.",
+          "temperature": 0.6,
+          "role": "empathetic legacy visual consultant",
+          "prompt": "Create a warm, inviting section_cover for \"Family Legacy Letters\" featuring soft golden hour lighting through mahogany-framed windows, illuminating a leather-bound family album open to vintage photographs spanning three generations. Include a sterling silver frame with a recent family portrait, fresh white orchids in a crystal vase symbolizing renewal, and handwritten notes on ivory stationery with a Mont Blanc fountain pen nearby. The scene should evoke feelings of continuity, love, and dignified planning while maintaining an ultra-luxury aesthetic with rich textures of velvet, silk, and aged leather. Style: photorealistic, warm color palette with amber and honey tones, emotional depth, premium materials, 8K quality.",
+          "raw_response": "\nSYSTEM: You are a compassionate estate planning visual designer specializing in creating emotionally resonant imagery that honors family legacies and provides comfort during life transitions.\n\nTEMPERATURE: 0.6\n\nROLE: empathetic legacy visual consultant\n\nPROMPT: Create a warm, inviting section_cover for \"Family Legacy Letters\" featuring soft golden hour lighting through mahogany-framed windows, illuminating a leather-bound family album open to vintage photographs spanning three generations. Include a sterling silver frame with a recent family portrait, fresh white orchids in a crystal vase symbolizing renewal, and handwritten notes on ivory stationery with a Mont Blanc fountain pen nearby. The scene should evoke feelings of continuity, love, and dignified planning while maintaining an ultra-luxury aesthetic with rich textures of velvet, silk, and aged leather. Style: photorealistic, warm color palette with amber and honey tones, emotional depth, premium materials, 8K quality.\n"
+        },
+        "style_elements": [
+          "luxury",
+          "premium",
+          "warm",
+          "mahogany",
+          "leather"
+        ],
+        "emotional_markers": [
+          "warm",
+          "family",
+          "legacy"
+        ],
+        "luxury_indicators": [],
+        "confidence": 0.8,
+        "reasoning": "Generated using master prompt with technical_precision perspective",
+        "timestamp": "2025-09-04T11:52:30.015351"
+      },
+      {
+        "model": "gpt4",
+        "structured_prompt": {
+          "system_message": "You are an exclusive luxury brand designer creating ultra-premium visual assets for distinguished estate planning clients who expect the finest in aesthetic excellence.",
+          "temperature": 0.7,
+          "role": "luxury estate brand creative director",
+          "prompt": "Design an opulent section_cover for \"Family Legacy Letters\" showcasing a private library setting with floor-to-ceiling mahogany bookcases, first-edition leather-bound volumes, and a massive carved oak desk with gold leaf detailing. Feature a Waterford crystal decanter set on a silver tray, architectural lighting highlighting marble columns, and a view of manicured estate grounds through tall windows. Include subtle elements like a Patek Philippe pocket watch, wax seal stamps, and embossed letterhead on the finest cotton paper. The composition should communicate exclusivity, heritage, and sophisticated wealth management. Style: ultra-luxury aesthetic, rich jewel tones, architectural grandeur, museum-quality lighting, cinematic composition.",
+          "raw_response": "\nSYSTEM: You are an exclusive luxury brand designer creating ultra-premium visual assets for distinguished estate planning clients who expect the finest in aesthetic excellence.\n\nTEMPERATURE: 0.7\n\nROLE: luxury estate brand creative director\n\nPROMPT: Design an opulent section_cover for \"Family Legacy Letters\" showcasing a private library setting with floor-to-ceiling mahogany bookcases, first-edition leather-bound volumes, and a massive carved oak desk with gold leaf detailing. Feature a Waterford crystal decanter set on a silver tray, architectural lighting highlighting marble columns, and a view of manicured estate grounds through tall windows. Include subtle elements like a Patek Philippe pocket watch, wax seal stamps, and embossed letterhead on the finest cotton paper. The composition should communicate exclusivity, heritage, and sophisticated wealth management. Style: ultra-luxury aesthetic, rich jewel tones, architectural grandeur, museum-quality lighting, cinematic composition.\n"
+        },
+        "style_elements": [
+          "luxury",
+          "sophisticated",
+          "mahogany",
+          "leather",
+          "gold"
+        ],
+        "emotional_markers": [
+          "family",
+          "legacy",
+          "heritage"
+        ],
+        "luxury_indicators": [
+          "private",
+          "estate"
+        ],
+        "confidence": 0.8,
+        "reasoning": "Generated using master prompt with technical_precision perspective",
+        "timestamp": "2025-09-04T11:52:30.015494"
+      },
+      {
+        "model": "gemini",
+        "structured_prompt": {
+          "system_message": "You are a technical visual systems architect specializing in creating precisely structured, consistent imagery for professional estate planning documentation.",
+          "temperature": 0.5,
+          "role": "technical estate visual systems designer",
+          "prompt": "Construct a technically precise section_cover for \"Family Legacy Letters\" with exact specifications: centered composition using rule of thirds, three-point lighting setup with key light at 45 degrees, fill light at 30% intensity, and rim lighting for depth separation. Include mahogany desk surface at 60% frame width, positioned at lower third intersection. Place primary documents in golden ratio spiral, with supporting elements following Fibonacci sequence spacing. Color palette: #4A3C28 (mahogany), #D4AF37 (gold accents), #F5F5DC (parchment), #2C3E50 (deep blue-gray). Ensure 300 DPI resolution, 16:9 aspect ratio, with depth of field f/2.8 for selective focus. Materials should show precise texture mapping: leather grain at 0.3mm detail, paper fiber visibility, metallic reflections at 85% intensity.",
+          "raw_response": "\nSYSTEM: You are a technical visual systems architect specializing in creating precisely structured, consistent imagery for professional estate planning documentation.\n\nTEMPERATURE: 0.5\n\nROLE: technical estate visual systems designer\n\nPROMPT: Construct a technically precise section_cover for \"Family Legacy Letters\" with exact specifications: centered composition using rule of thirds, three-point lighting setup with key light at 45 degrees, fill light at 30% intensity, and rim lighting for depth separation. Include mahogany desk surface at 60% frame width, positioned at lower third intersection. Place primary documents in golden ratio spiral, with supporting elements following Fibonacci sequence spacing. Color palette: #4A3C28 (mahogany), #D4AF37 (gold accents), #F5F5DC (parchment), #2C3E50 (deep blue-gray). Ensure 300 DPI resolution, 16:9 aspect ratio, with depth of field f/2.8 for selective focus. Materials should show precise texture mapping: leather grain at 0.3mm detail, paper fiber visibility, metallic reflections at 85% intensity.\n"
+        },
+        "style_elements": [
+          "mahogany",
+          "leather",
+          "gold"
+        ],
+        "emotional_markers": [
+          "family",
+          "legacy"
+        ],
+        "luxury_indicators": [],
+        "confidence": 0.8,
+        "reasoning": "Generated using master prompt with technical_precision perspective",
+        "timestamp": "2025-09-04T11:52:30.015655"
+      }
+    ],
+    "winner": null,
+    "human_selected": null,
+    "scores": null
+  },
+  {
+    "page_title": "Digital Asset Vault",
+    "page_category": "digital",
+    "asset_type": "icon",
+    "variants": [
+      {
+        "model": "claude",
+        "structured_prompt": {
+          "system_message": "You are a compassionate estate planning visual designer specializing in creating emotionally resonant imagery that honors family legacies and provides comfort during life transitions.",
+          "temperature": 0.6,
+          "role": "empathetic legacy visual consultant",
+          "prompt": "Create a warm, inviting icon for \"Digital Asset Vault\" featuring soft golden hour lighting through mahogany-framed windows, illuminating a leather-bound family album open to vintage photographs spanning three generations. Include a sterling silver frame with a recent family portrait, fresh white orchids in a crystal vase symbolizing renewal, and handwritten notes on ivory stationery with a Mont Blanc fountain pen nearby. The scene should evoke feelings of continuity, love, and dignified planning while maintaining an ultra-luxury aesthetic with rich textures of velvet, silk, and aged leather. Style: photorealistic, warm color palette with amber and honey tones, emotional depth, premium materials, 8K quality.",
+          "raw_response": "\nSYSTEM: You are a compassionate estate planning visual designer specializing in creating emotionally resonant imagery that honors family legacies and provides comfort during life transitions.\n\nTEMPERATURE: 0.6\n\nROLE: empathetic legacy visual consultant\n\nPROMPT: Create a warm, inviting icon for \"Digital Asset Vault\" featuring soft golden hour lighting through mahogany-framed windows, illuminating a leather-bound family album open to vintage photographs spanning three generations. Include a sterling silver frame with a recent family portrait, fresh white orchids in a crystal vase symbolizing renewal, and handwritten notes on ivory stationery with a Mont Blanc fountain pen nearby. The scene should evoke feelings of continuity, love, and dignified planning while maintaining an ultra-luxury aesthetic with rich textures of velvet, silk, and aged leather. Style: photorealistic, warm color palette with amber and honey tones, emotional depth, premium materials, 8K quality.\n"
+        },
+        "style_elements": [
+          "luxury",
+          "premium",
+          "warm",
+          "mahogany",
+          "leather"
+        ],
+        "emotional_markers": [
+          "warm",
+          "family"
+        ],
+        "luxury_indicators": [],
+        "confidence": 0.8,
+        "reasoning": "Generated using master prompt with technical_precision perspective",
+        "timestamp": "2025-09-04T11:52:30.015839"
+      },
+      {
+        "model": "gpt4",
+        "structured_prompt": {
+          "system_message": "You are an exclusive luxury brand designer creating ultra-premium visual assets for distinguished estate planning clients who expect the finest in aesthetic excellence.",
+          "temperature": 0.7,
+          "role": "luxury estate brand creative director",
+          "prompt": "Design an opulent icon for \"Digital Asset Vault\" showcasing a private library setting with floor-to-ceiling mahogany bookcases, first-edition leather-bound volumes, and a massive carved oak desk with gold leaf detailing. Feature a Waterford crystal decanter set on a silver tray, architectural lighting highlighting marble columns, and a view of manicured estate grounds through tall windows. Include subtle elements like a Patek Philippe pocket watch, wax seal stamps, and embossed letterhead on the finest cotton paper. The composition should communicate exclusivity, heritage, and sophisticated wealth management. Style: ultra-luxury aesthetic, rich jewel tones, architectural grandeur, museum-quality lighting, cinematic composition.",
+          "raw_response": "\nSYSTEM: You are an exclusive luxury brand designer creating ultra-premium visual assets for distinguished estate planning clients who expect the finest in aesthetic excellence.\n\nTEMPERATURE: 0.7\n\nROLE: luxury estate brand creative director\n\nPROMPT: Design an opulent icon for \"Digital Asset Vault\" showcasing a private library setting with floor-to-ceiling mahogany bookcases, first-edition leather-bound volumes, and a massive carved oak desk with gold leaf detailing. Feature a Waterford crystal decanter set on a silver tray, architectural lighting highlighting marble columns, and a view of manicured estate grounds through tall windows. Include subtle elements like a Patek Philippe pocket watch, wax seal stamps, and embossed letterhead on the finest cotton paper. The composition should communicate exclusivity, heritage, and sophisticated wealth management. Style: ultra-luxury aesthetic, rich jewel tones, architectural grandeur, museum-quality lighting, cinematic composition.\n"
+        },
+        "style_elements": [
+          "luxury",
+          "sophisticated",
+          "mahogany",
+          "leather",
+          "gold"
+        ],
+        "emotional_markers": [
+          "heritage"
+        ],
+        "luxury_indicators": [
+          "private",
+          "estate"
+        ],
+        "confidence": 0.8,
+        "reasoning": "Generated using master prompt with technical_precision perspective",
+        "timestamp": "2025-09-04T11:52:30.015975"
+      },
+      {
+        "model": "gemini",
+        "structured_prompt": {
+          "system_message": "You are a technical visual systems architect specializing in creating precisely structured, consistent imagery for professional estate planning documentation.",
+          "temperature": 0.5,
+          "role": "technical estate visual systems designer",
+          "prompt": "Construct a technically precise icon for \"Digital Asset Vault\" with exact specifications: centered composition using rule of thirds, three-point lighting setup with key light at 45 degrees, fill light at 30% intensity, and rim lighting for depth separation. Include mahogany desk surface at 60% frame width, positioned at lower third intersection. Place primary documents in golden ratio spiral, with supporting elements following Fibonacci sequence spacing. Color palette: #4A3C28 (mahogany), #D4AF37 (gold accents), #F5F5DC (parchment), #2C3E50 (deep blue-gray). Ensure 300 DPI resolution, 16:9 aspect ratio, with depth of field f/2.8 for selective focus. Materials should show precise texture mapping: leather grain at 0.3mm detail, paper fiber visibility, metallic reflections at 85% intensity.",
+          "raw_response": "\nSYSTEM: You are a technical visual systems architect specializing in creating precisely structured, consistent imagery for professional estate planning documentation.\n\nTEMPERATURE: 0.5\n\nROLE: technical estate visual systems designer\n\nPROMPT: Construct a technically precise icon for \"Digital Asset Vault\" with exact specifications: centered composition using rule of thirds, three-point lighting setup with key light at 45 degrees, fill light at 30% intensity, and rim lighting for depth separation. Include mahogany desk surface at 60% frame width, positioned at lower third intersection. Place primary documents in golden ratio spiral, with supporting elements following Fibonacci sequence spacing. Color palette: #4A3C28 (mahogany), #D4AF37 (gold accents), #F5F5DC (parchment), #2C3E50 (deep blue-gray). Ensure 300 DPI resolution, 16:9 aspect ratio, with depth of field f/2.8 for selective focus. Materials should show precise texture mapping: leather grain at 0.3mm detail, paper fiber visibility, metallic reflections at 85% intensity.\n"
+        },
+        "style_elements": [
+          "mahogany",
+          "leather",
+          "gold"
+        ],
+        "emotional_markers": [],
+        "luxury_indicators": [],
+        "confidence": 0.8,
+        "reasoning": "Generated using master prompt with technical_precision perspective",
+        "timestamp": "2025-09-04T11:52:30.016125"
+      }
+    ],
+    "winner": null,
+    "human_selected": null,
+    "scores": null
+  }
+]

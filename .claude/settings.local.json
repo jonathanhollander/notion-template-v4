@@ -106,7 +106,10 @@
       "Bash(pip3 install:*)",
       "Bash(timeout 30s python3:*)",
       "mcp__task-master-ai__update_task",
-      "mcp__task-master-ai__get_task"
+      "mcp__task-master-ai__get_task",
+      "Bash(git fetch:*)",
+      "Bash(gh pr:*)",
+      "Bash(gh issue:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,0 +1,394 @@
+let currentEvaluationIndex = 0;
+let totalEvaluations = 0;
+let sessionActive = false;
+let sessionId = null;
+let csrfToken = null;
+
+// Sanitization helper functions
+function sanitizeInput(input) {
+    if (typeof input !== 'string') return '';
+    return DOMPurify.sanitize(input, {
+        ALLOWED_TAGS: [],  // No HTML tags allowed
+        ALLOWED_ATTR: []   // No attributes allowed
+    });
+}
+
+function sanitizeHTML(html) {
+    return DOMPurify.sanitize(html, {
+        ALLOWED_TAGS: ['p', 'strong', 'em', 'br'],
+        ALLOWED_ATTR: []
+    });
+}
+
+// Loading state management
+function setLoading(element, isLoading) {
+    if (isLoading) {
+        element.classList.add('loading');
+        element.disabled = true;
+    } else {
+        element.classList.remove('loading');
+        element.disabled = false;
+    }
+}
+
+// Toast notifications
+function showToast(message, type = 'success') {
+    const toastContainer = document.querySelector('.toast-container') || createToastContainer();
+    
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = sanitizeInput(message);
+    
+    toastContainer.appendChild(toast);
+    
+    // Trigger animation
+    setTimeout(() => toast.classList.add('show'), 10);
+    
+    // Remove after 5 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 5000);
+}
+
+function createToastContainer() {
+    const container = document.createElement('div');
+    container.className = 'toast-container';
+    document.body.appendChild(container);
+    return container;
+}
+
+// CSRF Token Management
+async function getCSRFToken() {
+    try {
+        const response = await fetch('/api/get-csrf-token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-TOKEN': getAPIToken()
+            },
+            body: JSON.stringify({})
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            sessionId = result.session_id;
+            csrfToken = result.csrf_token;
+            return true;
+        } else {
+            console.error('Failed to get CSRF token:', result.error);
+            return false;
+        }
+    } catch (error) {
+        console.error('Error getting CSRF token:', error);
+        return false;
+    }
+}
+
+function getAPIToken() {
+    // Try to get from form field first, then from environment/storage
+    const tokenField = document.getElementById('api-token');
+    if (tokenField && tokenField.value) {
+        return tokenField.value;
+    }
+    return 'estate-planning-review-2024'; // Default for development
+}
+
+async function startSession() {
+    const reviewerName = sanitizeInput(document.getElementById('reviewer-name').value) || 'Anonymous';
+    const startButton = document.querySelector('button[onclick="startSession()"]');
+    
+    setLoading(startButton, true);
+    
+    // First get CSRF token
+    if (!await getCSRFToken()) {
+        showToast('Failed to get security token. Please check your API token.', 'error');
+        setLoading(startButton, false);
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/start-session', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-TOKEN': getAPIToken(),
+                'X-Session-ID': sessionId,
+                'X-CSRF-Token': csrfToken
+            },
+            body: JSON.stringify({reviewer_name: reviewerName})
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            sessionActive = true;
+            document.getElementById('session-status').textContent = `Active (${sanitizeInput(reviewerName)})`;
+            showToast('Review session started successfully!', 'success');
+        } else {
+            showToast('Failed to start session: ' + result.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error starting session:', error);
+        showToast('Error starting session: ' + error.message, 'error');
+    } finally {
+        setLoading(startButton, false);
+    }
+}
+
+async function loadEvaluations() {
+    if (!sessionActive) {
+        showToast('Please start a review session first', 'warning');
+        return;
+    }
+    
+    const loadButton = document.querySelector('button[onclick="loadEvaluations()"]');
+    setLoading(loadButton, true);
+    
+    try {
+        const response = await fetch('/api/load-evaluations', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-TOKEN': getAPIToken(),
+                'X-Session-ID': sessionId,
+                'X-CSRF-Token': csrfToken
+            },
+            body: JSON.stringify({file_path: 'quality_evaluation_results.json'})
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            totalEvaluations = result.evaluations_loaded;
+            document.getElementById('evaluations-count').textContent = totalEvaluations;
+            document.getElementById('export-btn').disabled = false;
+            
+            // Load first evaluation
+            await loadEvaluation(0);
+            
+            document.getElementById('pre-review-message').style.display = 'none';
+            document.getElementById('evaluation-display').style.display = 'block';
+            
+            showToast(`Loaded ${totalEvaluations} evaluations successfully!`, 'success');
+        } else {
+            showToast(`Failed to load evaluations: ${result.error}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error loading evaluations:', error);
+        showToast('Error loading evaluations: ' + error.message, 'error');
+    } finally {
+        setLoading(loadButton, false);
+    }
+}
+
+async function loadEvaluation(index) {
+    try {
+        const response = await fetch(`/api/get-evaluation/${index}`, {
+            headers: {
+                'X-API-TOKEN': getAPIToken()
+            }
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            const evaluation = result.evaluation;
+            
+            // Update header
+            document.getElementById('eval-title').textContent = sanitizeInput(evaluation.page_title);
+            document.getElementById('eval-category').textContent = sanitizeInput(evaluation.page_category);
+            document.getElementById('eval-type').textContent = sanitizeInput(evaluation.asset_type);
+            
+            // Update prompts container
+            const container = document.getElementById('prompts-container');
+            // Safe DOM manipulation - remove all children
+            while (container.firstChild) {
+                container.removeChild(container.firstChild);
+            }
+            
+            // Update selection dropdown
+            const select = document.getElementById('selected-prompt');
+            // Safe DOM manipulation - clear and add default option
+            while (select.firstChild) {
+                select.removeChild(select.firstChild);
+            }
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Select a prompt...';
+            select.appendChild(defaultOption);
+            
+            evaluation.prompts.forEach((prompt, idx) => {
+                // Create prompt display
+                const promptDiv = document.createElement('div');
+                promptDiv.className = 'prompt-container';
+                
+                // Create safe DOM elements instead of innerHTML
+                const promptHeader = document.createElement('div');
+                promptHeader.className = 'prompt-header';
+                
+                const modelSource = document.createElement('strong');
+                modelSource.textContent = sanitizeInput(prompt.model_source);
+                
+                const scoreBadge = document.createElement('span');
+                scoreBadge.className = 'score-badge';
+                scoreBadge.textContent = prompt.weighted_score.toFixed(2) + '/10';
+                
+                promptHeader.appendChild(modelSource);
+                promptHeader.appendChild(scoreBadge);
+                
+                const promptText = document.createElement('p');
+                promptText.textContent = sanitizeInput(prompt.text);
+                
+                const scoreDetails = document.createElement('small');
+                scoreDetails.textContent = `Overall Score: ${prompt.overall_score.toFixed(1)} | Weighted: ${prompt.weighted_score.toFixed(2)}`;
+                
+                promptDiv.appendChild(promptHeader);
+                promptDiv.appendChild(promptText);
+                promptDiv.appendChild(scoreDetails);
+                
+                if (evaluation.winner && prompt.id === evaluation.winner.id) {
+                    promptDiv.style.borderColor = '#28a745';
+                    promptDiv.style.borderWidth = '2px';
+                    const badge = document.createElement('span');
+                    badge.style.background = '#28a745';
+                    badge.style.color = 'white';
+                    badge.style.padding = '4px 8px';
+                    badge.style.borderRadius = '4px';
+                    badge.style.fontSize = '12px';
+                    badge.textContent = 'AI WINNER';
+                    promptDiv.querySelector('.prompt-header').appendChild(badge);
+                }
+                
+                container.appendChild(promptDiv);
+                
+                // Add to selection dropdown
+                const option = document.createElement('option');
+                option.value = prompt.id;
+                option.textContent = `${sanitizeInput(prompt.model_source)} (${prompt.weighted_score.toFixed(2)})`;
+                select.appendChild(option);
+            });
+            
+            currentEvaluationIndex = index;
+        } else {
+            showToast(`Error loading evaluation: ${result.error}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error loading evaluation:', error);
+        showToast('Error loading evaluation: ' + error.message, 'error');
+    }
+}
+
+async function makeDecision() {
+    const selectedPromptId = sanitizeInput(document.getElementById('selected-prompt').value);
+    const reasoning = sanitizeInput(document.getElementById('decision-reasoning').value);
+    const modifications = sanitizeInput(document.getElementById('custom-modifications').value);
+    
+    if (!selectedPromptId) {
+        showToast('Please select a prompt first', 'warning');
+        return;
+    }
+    
+    if (!reasoning.trim()) {
+        showToast('Please provide reasoning for your decision', 'warning');
+        return;
+    }
+    
+    const decisionButton = document.querySelector('button[onclick="makeDecision()"]');
+    setLoading(decisionButton, true);
+    
+    try {
+        const response = await fetch('/api/make-decision', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-TOKEN': getAPIToken(),
+                'X-Session-ID': sessionId,
+                'X-CSRF-Token': csrfToken
+            },
+            body: JSON.stringify({
+                page_title: document.getElementById('eval-title').textContent,
+                page_category: document.getElementById('eval-category').textContent,
+                asset_type: document.getElementById('eval-type').textContent,
+                selected_prompt_id: selectedPromptId,
+                selected_model: document.getElementById('selected-prompt').selectedOptions[0].textContent.split(' (')[0],
+                reasoning: reasoning,
+                custom_modifications: modifications
+            })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            // Update progress
+            document.getElementById('decisions-count').textContent = result.total_decisions;
+            const progress = (result.total_decisions / totalEvaluations) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+            document.getElementById('progress-text').textContent = progress.toFixed(1) + '% Complete';
+            
+            // Clear form
+            document.getElementById('selected-prompt').value = '';
+            document.getElementById('decision-reasoning').value = '';
+            document.getElementById('custom-modifications').value = '';
+            
+            showToast('Decision recorded successfully!', 'success');
+        } else {
+            showToast(`Error recording decision: ${result.error}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error making decision:', error);
+        showToast('Error recording decision: ' + error.message, 'error');
+    } finally {
+        setLoading(decisionButton, false);
+    }
+}
+
+async function nextEvaluation() {
+    if (currentEvaluationIndex < totalEvaluations - 1) {
+        await loadEvaluation(currentEvaluationIndex + 1);
+    } else {
+        showToast('No more evaluations to review!', 'warning');
+    }
+}
+
+async function exportDecisions() {
+    const exportButton = document.getElementById('export-btn');
+    setLoading(exportButton, true);
+    
+    try {
+        const response = await fetch('/api/export-decisions', {
+            headers: {
+                'X-API-TOKEN': getAPIToken()
+            }
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast(`Exported ${result.total_decisions} decisions to ${result.file_path}`, 'success');
+        } else {
+            showToast('Error exporting decisions', 'error');
+        }
+    } catch (error) {
+        console.error('Error exporting decisions:', error);
+        showToast('Error exporting decisions: ' + error.message, 'error');
+    } finally {
+        setLoading(exportButton, false);
+    }
+}
+
+// Auto-refresh progress every 30 seconds
+setInterval(async () => {
+    if (sessionActive) {
+        try {
+            const response = await fetch('/api/get-progress', {
+                headers: {
+                    'X-API-TOKEN': getAPIToken()
+                }
+            });
+            const progress = await response.json();
+            
+            document.getElementById('decisions-count').textContent = progress.decisions_made;
+            const percentage = progress.completion_percentage;
+            document.getElementById('progress-fill').style.width = percentage + '%';
+            document.getElementById('progress-text').textContent = percentage.toFixed(1) + '% Complete';
+        } catch (error) {
+            console.error('Error updating progress:', error);
+        }
+    }
+}, 30000);

@@ -1,0 +1,21 @@
+# 19_assets_standardize_patch.yaml
+complexity: moderate
+# Enforces a single asset base and consistent naming; adds an Admin checklist.
+
+pages:
+  - title: "Admin – Visual Assets"
+    icon: "emoji:🖼️"
+    description: "Keep icons and covers consistent across the workspace. Delete before sharing."
+    body:
+      - type: callout
+        icon: "emoji:⚠️"
+        color: gray_background
+        text: "ADMIN_ONLY • ASSET_BASE • Set ASSET_BASE_URL in your .env (e.g., https://yourname.github.io/assets/notion). Avoid Unsplash fallbacks."
+      - type: bulleted_list
+        items:
+          - "Use SVG or PNG; prefer SVG for icons"
+          - "Use clear names: hub_prep.svg, hub_executor.svg, hub_family.svg"
+          - "DB icons: db_accounts.svg, db_properties.svg, db_insurance.svg, db_letters.svg"
+          - "Covers: cover_preparation.jpg, cover_executor.jpg, cover_family.jpg"
+      - type: paragraph
+        text: "After setting ASSET_BASE_URL, re-run deploy to attach icons/covers automatically."

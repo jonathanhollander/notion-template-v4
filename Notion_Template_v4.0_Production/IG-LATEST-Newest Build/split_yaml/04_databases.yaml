@@ -1,0 +1,605 @@
+complexity: moderate
+db:
+  schemas:
+    Accounts:
+      properties:
+        Name: title
+        Institution: text
+        Type: select
+        'Account #': text
+        Notes: text
+        Related Page:
+          type: relation
+          database_id_ref: pages
+          by_title: true
+        Tags:
+          type: multi_select
+          options:
+          - Critical
+          - Tax
+          - Transfer
+          - Beneficiaries
+        Note:
+          type: rich_text
+      seed_rows:
+      - Name: Bank Accounts
+        Institution: ''
+        Type: Bank
+        'Account #': ''
+        Notes: List each account; add closure/transfer steps.
+        Related Page Title: Financial Accounts
+      - Name: Retirement Accounts
+        Institution: ''
+        Type: Retirement
+        'Account #': ''
+        Notes: Add beneficiaries; rollover instructions.
+        Related Page Title: Financial Accounts
+      - Name: Brokerage – Taxable (Individual)
+        Institution: ''
+        Type: Brokerage
+        'Account #': ''
+        Notes: DTC transfer form; cost basis statements; TOD (transfer-on-death) designation;
+          medallion signature guarantee if required.
+        Related Page Title: Financial Accounts
+      - Name: Brokerage – Taxable (Joint)
+        Institution: ''
+        Type: Brokerage
+        'Account #': ''
+        Notes: Joint tenancy details; survivorship; DTC transfer; cost basis docs;
+          beneficiary/TOD where applicable.
+        Related Page Title: Financial Accounts
+      - Name: Brokerage – Traditional IRA
+        Institution: ''
+        Type: Retirement
+        'Account #': ''
+        Notes: Custodian transfer/rollover process; beneficiary designation; RMD considerations
+          if applicable.
+        Related Page Title: Financial Accounts
+      - Name: Brokerage – Roth IRA
+        Institution: ''
+        Type: Retirement
+        'Account #': ''
+        Notes: Custodian transfer/rollover; beneficiary designation; tax treatment
+          notes.
+        Related Page Title: Financial Accounts
+      - Name: Brokerage – 529 College Savings
+        Institution: ''
+        Type: Education
+        'Account #': ''
+        Notes: Plan administrator; successor owner/beneficiary change process; distribution
+          rules.
+        Related Page Title: Financial Accounts
+      - Name: Credit Cards
+        Institution: ''
+        Type: Credit Card
+        'Account #': ''
+        Notes: Cancel cards; reconcile statements; disable autopay.
+        Related Page Title: Financial Accounts
+        
+      # Additional comprehensive financial account examples
+      - Name: Primary Checking Account
+        Institution: First National Bank
+        Type: Bank
+        'Account #': '****1234'
+        Notes: Primary household checking account. Set up direct deposit cancellation and final statement.
+        Related Page Title: Financial Accounts
+        Tags: [Critical, Transfer]
+        
+      - Name: High-Yield Savings
+        Institution: Online Savings Bank
+        Type: Bank
+        'Account #': '****5678'
+        Notes: Emergency fund savings account. Transfer to estate account or beneficiaries.
+        Related Page Title: Financial Accounts
+        Tags: [Critical, Transfer]
+        
+      - Name: Company 401(k)
+        Institution: Employer Benefits Corp
+        Type: Retirement
+        'Account #': '****9012'
+        Notes: Employer-sponsored retirement account. Contact HR for beneficiary verification and rollover options.
+        Related Page Title: Financial Accounts
+        Tags: [Critical, Beneficiaries]
+        
+      - Name: HSA Health Savings Account
+        Institution: Health Savings Solutions
+        Type: Bank
+        'Account #': '****3456'
+        Notes: Health savings account with medical expense receipts. Tax-free transfer to spouse.
+        Related Page Title: Financial Accounts
+        Tags: [Tax, Transfer]
+        
+      - Name: Cryptocurrency Holdings
+        Institution: Coinbase Pro
+        Type: Investment
+        'Account #': '****7890'
+        Notes: Digital currency holdings. Access via seed phrase in secure storage. High volatility asset.
+        Related Page Title: Digital Assets
+        Tags: [Critical, Transfer]
+        
+      - Name: Precious Metals IRA
+        Institution: Gold & Silver Trust Co
+        Type: Retirement
+        'Account #': '****2345'
+        Notes: Self-directed IRA holding precious metals. Special custodian transfer requirements.
+        Related Page Title: Financial Accounts
+        Tags: [Beneficiaries, Transfer]
+    Property:
+      properties:
+        Name: title
+        Type: select
+        Identifier: text
+        Notes: text
+      seed_rows:
+      - Name: Primary Residence
+        Type: Real Estate
+        Identifier: ''
+        Notes: Deed/mortgage details; utility handoff.
+      - Name: Vehicle
+        Type: Vehicle
+        Identifier: ''
+        Notes: Title; registration; insurance carrier.
+      - Name: Safe Deposit Box
+        Type: Asset
+        Identifier: ''
+        Notes: Location; access rules; key custody.
+        
+      # Additional comprehensive property examples
+      - Name: Vacation Home
+        Type: Real Estate
+        Identifier: '123 Lake Shore Drive, Mountain View, CO'
+        Notes: Second home property. Current market value ~$850K. HOA fees and maintenance schedule documented.
+        
+      - Name: Investment Property Rental
+        Type: Real Estate
+        Identifier: '456 Main Street, Units 1-4, Downtown City'
+        Notes: 4-unit rental property. Property management company contact info and tenant lease details included.
+        
+      - Name: Classic Car Collection
+        Type: Vehicle
+        Identifier: '1967 Mustang (VIN: 7R01C123456), 1955 Chevy (VIN: 55B123789)'
+        Notes: Classic vehicles with specialty insurance. Appraisal values and restoration documentation.
+        
+      - Name: Art and Collectibles
+        Type: Asset
+        Identifier: 'Various paintings, sculptures, and collectible items'
+        Notes: Appraised collection valued at $75K. Insurance documentation and authentication certificates.
+        
+      - Name: Business Equipment
+        Type: Asset
+        Identifier: 'Office equipment, tools, professional machinery'
+        Notes: Business assets including computer equipment, tools, and specialized machinery. Depreciation schedules.
+        
+      - Name: Intellectual Property
+        Type: Asset
+        Identifier: 'Patents, copyrights, trademarks'
+        Notes: Intellectual property portfolio including patent #12345 and registered trademarks. Licensing agreements.
+    Insurance:
+      properties:
+        Policy: title
+        Carrier: text
+        Type: select
+        'Policy #': text
+        Notes: text
+        Related Page:
+          type: relation
+          database_id_ref: pages
+          by_title: true
+        Tags:
+          type: multi_select
+          options:
+          - Life
+          - Health
+          - Property
+          - Auto
+          - Claims
+        Note:
+          type: rich_text
+      seed_rows:
+      - Name: Life Insurance
+        Type: Life
+        Carrier: ''
+        'Policy #': ''
+        Notes: Claim initiation steps; beneficiary process.
+        Related Page Title: Insurance
+      - Name: Health Insurance
+        Type: Health
+        Carrier: ''
+        'Policy #': ''
+        Notes: Coverage end date; outstanding claims.
+        Related Page Title: Insurance
+      - Name: Home Insurance
+        Type: Home
+        Carrier: ''
+        'Policy #': ''
+        Notes: Property coverage; claims contact.
+        Related Page Title: Insurance
+      - Name: Auto Insurance
+        Type: Auto
+        Carrier: ''
+        'Policy #': ''
+        Notes: Cancel/transfer policy; proof of sale for vehicle.
+        Related Page Title: Insurance
+        
+      # Additional comprehensive insurance examples
+      - Name: Term Life Insurance - Primary
+        Type: Life
+        Carrier: Life Insurance Company A
+        'Policy #': 'LIFE-123456'
+        Notes: $500,000 term life policy. Beneficiaries: Spouse (100%). Claim number: 1-800-CLAIMS.
+        Related Page Title: Insurance
+        Tags: [Life, Claims]
+        
+      - Name: Whole Life Insurance - Estate Planning
+        Type: Life
+        Carrier: Mutual Life Company
+        'Policy #': 'WL-789012'
+        Notes: $250,000 whole life with cash value $45K. Estate beneficiary. Used for estate tax liquidity.
+        Related Page Title: Insurance
+        Tags: [Life, Claims]
+        
+      - Name: Disability Insurance
+        Type: Health
+        Carrier: Disability Insurance Corp
+        'Policy #': 'DIS-345678'
+        Notes: 60% income replacement policy. Review for continuation of premiums vs cancellation.
+        Related Page Title: Insurance
+        Tags: [Health]
+        
+      - Name: Umbrella Liability Policy
+        Type: Property
+        Carrier: Comprehensive Insurance
+        'Policy #': 'UMB-901234'
+        Notes: $2M umbrella policy covering auto, home, and personal liability. Coordinate with other policies.
+        Related Page Title: Insurance
+        Tags: [Property]
+        
+      - Name: Long-Term Care Insurance
+        Type: Health
+        Carrier: Elder Care Insurance
+        'Policy #': 'LTC-567890'
+        Notes: Long-term care benefits $200/day for 5 years. Review benefit triggers and care coordination.
+        Related Page Title: Insurance
+        Tags: [Health]
+        
+      - Name: Business Insurance
+        Type: Property
+        Carrier: Commercial Insurance Group
+        'Policy #': 'BUS-123789'
+        Notes: Business property and liability coverage. Key person life insurance included.
+        Related Page Title: Insurance
+        Tags: [Property]
+    Contacts:
+      properties:
+        Name: title
+        Role: select
+        Email: text
+        Phone: text
+        Notes: text
+        Tags:
+          type: multi_select
+          options:
+          - Legal
+          - Executor
+          - Finance
+          - Family
+          - Urgent
+        Note:
+          type: rich_text
+      seed_rows:
+      - Name: Attorney
+        Role: Attorney
+        Email: ''
+        Phone: ''
+        Notes: Primary legal point of contact.
+        Tags:
+        - Legal
+      - Name: Executor
+        Role: Executor
+        Email: ''
+        Phone: ''
+        Notes: Primary executor contact.
+        Tags:
+        - Executor
+      - Name: Accountant/Tax
+        Role: Accountant/Tax
+        Email: ''
+        Phone: ''
+        Notes: Year-of-death return; filings.
+        Tags:
+        - Finance
+      - Name: Primary Family Contact
+        Role: Family
+        Email: ''
+        Phone: ''
+        Notes: Coordinator for family communications.
+        Tags:
+        - Family
+        
+      # Additional comprehensive contact examples
+      - Name: Emergency Contact - Sibling
+        Role: Family
+        Email: 'sibling@email.com'
+        Phone: '+1-555-0111'
+        Notes: Primary emergency contact and backup executor. Lives locally and has spare house keys.
+        Tags: [Family, Urgent]
+        
+      - Name: Family Doctor
+        Role: Medical
+        Email: 'doctor@medicalgroup.com'
+        Phone: '+1-555-0222'
+        Notes: Primary care physician. Has medical history and healthcare directive copies.
+        Tags: [Urgent]
+        
+      - Name: Financial Advisor
+        Role: Finance
+        Email: 'advisor@wealthmanagement.com'
+        Phone: '+1-555-0333'
+        Notes: Investment portfolio manager. Has beneficiary instructions and distribution strategy.
+        Tags: [Finance, Urgent]
+        
+      - Name: Insurance Agent - Auto/Home
+        Role: Finance
+        Email: 'agent@autoinsurance.com'
+        Phone: '+1-555-0444'
+        Notes: Handles auto and homeowners insurance. Contact for claims and policy questions.
+        Tags: [Finance]
+        
+      - Name: Employer HR Representative
+        Role: Finance
+        Email: 'hr@company.com'
+        Phone: '+1-555-0555'
+        Notes: HR contact for 401k, benefits, and final pay issues. Has beneficiary forms on file.
+        Tags: [Finance]
+        
+      - Name: Bank Relationship Manager
+        Role: Finance
+        Email: 'manager@bank.com'
+        Phone: '+1-555-0666'
+        Notes: Primary banking relationship manager. Authorized to discuss account details with executor.
+        Tags: [Finance]
+        
+      - Name: Tax Preparer/CPA
+        Role: Finance
+        Email: 'cpa@taxfirm.com'
+        Phone: '+1-555-0777'
+        Notes: Annual tax preparer. Has 7 years of tax records and knows financial situation.
+        Tags: [Finance, Legal]
+        
+      - Name: Closest Friend
+        Role: Family
+        Email: 'friend@email.com'
+        Phone: '+1-555-0888'
+        Notes: Lifelong friend who knows personal wishes and family dynamics. Emotional support for family.
+        Tags: [Family]
+    Subscriptions:
+      properties:
+        Service: title
+        Category: select
+        Account Email: text
+        Notes: text
+        Tags:
+          type: multi_select
+          options:
+          - Critical
+          - Recurring
+          - Optional
+        Note:
+          type: rich_text
+      seed_rows:
+      - Name: Utilities
+        Type: Utilities
+        Provider: ''
+        'Account #': ''
+        Notes: Electric, gas, water, internet, phone.
+        Tags:
+        - Critical
+        - Recurring
+      - Name: Digital Services
+        Type: Digital
+        Provider: ''
+        'Account #': ''
+        Notes: Streaming, storage, software subscriptions.
+        Tags:
+        - Recurring
+      - Name: Memberships
+        Type: Membership
+        Provider: ''
+        'Account #': ''
+        Notes: Gyms, clubs, associations.
+        Tags:
+        - Optional
+        
+      # Additional comprehensive subscription examples
+      - Name: Netflix Streaming
+        Type: Digital
+        Provider: Netflix
+        'Account #': 'netflix.user@email.com'
+        Notes: Family entertainment streaming service. Monthly $15.99. Cancel or transfer to family.
+        Tags: [Recurring]
+        
+      - Name: Amazon Prime
+        Type: Digital
+        Provider: Amazon
+        'Account #': 'amazon.user@email.com'
+        Notes: Prime membership with shipping and video. Annual $139. May transfer to family member.
+        Tags: [Recurring, Critical]
+        
+      - Name: Cell Phone Service
+        Type: Utilities
+        Provider: Wireless Carrier
+        'Account #': 'Account #123456789'
+        Notes: Family plan with 4 lines. Main account holder. Transfer to spouse or cancel extra lines.
+        Tags: [Critical, Recurring]
+        
+      - Name: Internet Service
+        Type: Utilities
+        Provider: ISP Company
+        'Account #': 'Service ID 987654'
+        Notes: Home internet service $79.99/month. Essential for family. Transfer account ownership.
+        Tags: [Critical, Recurring]
+        
+      - Name: Cloud Storage Service
+        Type: Digital
+        Provider: Google Drive
+        'Account #': 'gsuite.user@email.com'
+        Notes: 2TB cloud storage with family photos and documents. Critical for digital asset access.
+        Tags: [Critical, Recurring]
+        
+      - Name: Software Subscriptions
+        Type: Digital
+        Provider: Microsoft Office 365
+        'Account #': 'office.user@email.com'
+        Notes: Office suite subscription $99.99/year. Used for document management and family coordination.
+        Tags: [Recurring]
+        
+      - Name: Gym Membership
+        Type: Membership
+        Provider: Fitness Center
+        'Account #': 'Member #456789'
+        Notes: Family gym membership $89/month. Consider cancellation or transfer to family members.
+        Tags: [Optional]
+        
+      - Name: Professional Associations
+        Type: Membership
+        Provider: Industry Association
+        'Account #': 'Professional ID #123'
+        Notes: Professional organization memberships. Some may provide survivor benefits.
+        Tags: [Optional]
+    Keepsakes:
+      properties:
+        Title: title
+        Story: text
+        Where: text
+        Tags:
+          type: multi_select
+          options:
+          - Photos
+          - Stories
+          - Letters
+      seed_rows:
+      - Title: Photos
+        Story: ''
+        Where: Add location of albums/drives.
+      - Title: Stories
+        Story: Write a memory that matters — a moment, a lesson, a laugh.
+        Where: ''
+      - Title: Letters
+        Story: If you'd like, add a note for someone special.
+        Where: ''
+        
+      # Additional comprehensive keepsake examples
+      - Title: Wedding Ring and Jewelry
+        Story: Wedding ring and special jewelry pieces with their stories and significance.
+        Where: Master bedroom jewelry box and safe deposit box
+        Tags: [Stories]
+        
+      - Title: Family Heirloom Books
+        Story: Collection of first edition books and family Bibles passed down through generations.
+        Where: Home library and study
+        Tags: [Stories]
+        
+      - Title: Military Service Memorabilia
+        Story: Military medals, discharge papers, and service photos from military career.
+        Where: Home office display case
+        Tags: [Stories, Photos]
+        
+      - Title: Children's Artwork Collection
+        Story: Precious artwork and school projects created by children through their school years.
+        Where: Storage boxes in basement, some framed in home office
+        Tags: [Photos, Stories]
+        
+      - Title: Love Letters and Cards
+        Story: Collection of romantic letters and special occasion cards between spouses.
+        Where: Private box in bedroom closet
+        Tags: [Letters, Stories]
+        
+      - Title: Professional Achievement Awards
+        Story: Career awards, certificates, and recognition items from professional accomplishments.
+        Where: Home office wall and awards cabinet
+        Tags: [Stories]
+    Letters Index:
+      properties:
+        Title: title
+        Audience: select
+        Category:
+          type: multi_select
+          options:
+          - Banking
+          - Credit Cards
+          - Utilities
+          - Insurance
+          - Mortgage
+          - Employment
+          - Government
+          - Benefits
+          - Subscriptions
+          - Brokerage
+        URL: url
+        Related Page:
+          type: relation
+          database_id_ref: pages
+          by_title: true
+        Note:
+          type: rich_text
+      seed_rows:
+      - Title: Letter – Banks
+        Audience: Institution
+        Category: Banking
+        URL: ''
+        Related Page Title: Letter – Banks
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Credit Card Issuers
+        Audience: Institution
+        Category: Credit Cards
+        URL: ''
+        Related Page Title: Letter – Credit Card Issuers
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Utilities
+        Audience: Institution
+        Category: Utilities
+        URL: ''
+        Related Page Title: Letter – Utilities
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Insurance Companies
+        Audience: Institution
+        Category: Insurance
+        URL: ''
+        Related Page Title: Letter – Insurance Companies
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Mortgage/Servicer
+        Audience: Institution
+        Category: Mortgage
+        URL: ''
+        Related Page Title: Letter – Mortgage/Servicer
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Employer/HR
+        Audience: Employer
+        Category: Employment
+        URL: ''
+        Related Page Title: Letter – Employer/HR
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Social Security Administration
+        Audience: Agency
+        Category: Government
+        URL: ''
+        Related Page Title: Letter – Social Security Administration
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Pension/Benefits
+        Audience: Plan
+        Category: Benefits
+        URL: ''
+        Related Page Title: Letter – Pension/Benefits
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Subscriptions & Services
+        Audience: Provider
+        Category: Subscriptions
+        URL: ''
+        Related Page Title: Letter – Subscriptions & Services
+        Note: This entry links to the letter’s page. Review and tailor before sending.
+      - Title: Letter – Brokerage Firms
+        Audience: Institution
+        Category: Brokerage
+        URL: ''
+        Related Page Title: Letter – Brokerage Firms
+        Note: This entry links to the letter’s page. Review and tailor before sending.
