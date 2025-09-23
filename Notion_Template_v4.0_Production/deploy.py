@@ -537,7 +537,8 @@ def load_all_yaml(yaml_dir: Optional[Path] = None) -> Dict:
         "db": {
             "schemas": {},
             "seed_rows": {}
-        }
+        },
+        "standalone_databases": []
     }
     
     # Process YAML files in sorted order
@@ -567,12 +568,42 @@ def load_all_yaml(yaml_dir: Optional[Path] = None) -> Dict:
                     merged['db']['schemas'].update(data['db']['schemas'])
                 if 'seed_rows' in data['db']:
                     merged['db']['seed_rows'].update(data['db']['seed_rows'])
+
+            # Merge standalone databases
+            if 'databases' in data:
+                merged['standalone_databases'].extend(data['databases'])
                     
         except Exception as e:
             logging.error(f"Failed to load {yaml_file.name}: {e}")
             
-    logging.info(f"Merged {len(merged['pages'])} pages and {len(merged['db']['schemas'])} database schemas")
+    logging.info(f"Merged {len(merged['pages'])} pages, {len(merged['db']['schemas'])} database schemas, and {len(merged['standalone_databases'])} standalone databases")
     return merged
+
+def convert_standalone_db_to_schema(standalone_db: Dict) -> Dict:
+    """Convert standalone database format to schema format for deployment"""
+    title = standalone_db.get('title', 'Untitled Database')
+    icon = standalone_db.get('icon', {})
+    description = standalone_db.get('description', '')
+    properties = standalone_db.get('properties', {})
+    seed_rows = standalone_db.get('seed_rows', [])
+
+    # Convert to schema format expected by create_database()
+    schema = {
+        'title': title,
+        'icon': icon,
+        'description': description,
+        'properties': properties
+    }
+
+    # Add parent if specified (otherwise will use NOTION_PARENT_PAGEID)
+    if 'parent' in standalone_db:
+        schema['parent'] = standalone_db['parent']
+
+    return {
+        'schema': schema,
+        'seed_rows': seed_rows,
+        'db_name': title  # Use title as database name
+    }
 
 def load_csv_data(csv_dir: Optional[Path] = None) -> Dict[str, List[Dict]]:
     """Load all CSV files for data seeding"""
@@ -626,12 +657,12 @@ def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str
     if 'properties' in page_data:
         properties.update(page_data['properties'])
 
-    # Add page metadata fields (role, slug, complexity, disclaimer)
-    properties = add_page_metadata_properties(page_data, properties)
+    # NOTE: Metadata properties disabled for regular pages - only for database entries
+    # properties = add_page_metadata_properties(page_data, properties)
 
-    # Add asset field placeholders for image generator integration
-    asset_properties = create_asset_field_placeholders(page_data)
-    properties.update(asset_properties)
+    # NOTE: Asset field placeholders disabled for regular pages - only for database entries
+    # asset_properties = create_asset_field_placeholders(page_data)
+    # properties.update(asset_properties)
     
     # Determine parent
     if parent_id:
@@ -665,22 +696,137 @@ def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str
                 children.append(built_block)
                 logging.debug(f"Built block: {json.dumps(built_block, indent=2)}")
     else:
-        logging.debug(f"No blocks found for page '{title}'")
-    
+        logging.debug(f"No blocks found for page '{title}', adding empty paragraph")
+        # Add an empty paragraph block for pages without content
+        children = [{"type": "paragraph", "paragraph": {"rich_text": []}}]
+
+    # Handle Notion's 100-block limit per page creation
+    if len(children) > 100:
+        logging.warning(f"Page '{title}' has {len(children)} blocks, exceeding Notion's 100-block limit. Using first 100 blocks.")
+        children = children[:100]
+
     # Create page
     payload = {
         "parent": parent,
         "properties": properties
     }
+
+    # Add icon if specified
+    if 'icon' in page_data:
+        icon_value = page_data['icon']
+        if isinstance(icon_value, str):
+            if icon_value.startswith('emoji:'):
+                payload["icon"] = {"type": "emoji", "emoji": icon_value.replace('emoji:', '')}
+            elif icon_value.startswith('http'):
+                payload["icon"] = {"type": "external", "external": {"url": icon_value}}
+        elif isinstance(icon_value, dict):
+            payload["icon"] = icon_value
+
+    # Add cover if specified
+    if 'cover' in page_data:
+        cover_value = page_data['cover']
+        if isinstance(cover_value, str) and cover_value.startswith('http'):
+            payload["cover"] = {"type": "external", "external": {"url": cover_value}}
+        elif isinstance(cover_value, dict):
+            payload["cover"] = cover_value
+
     if children:
         payload["children"] = children
-    
+
+    # Check if page already exists and delete it to avoid archived conflicts
+    try:
+        parent_page_id = parent.get("page_id")
+        if parent_page_id:
+            # Get children of parent page to find existing page
+            search_r = req("GET", f"https://api.notion.com/v1/blocks/{parent_page_id}/children")
+            if expect_ok(search_r, f"Searching for existing page '{title}'"):
+                blocks = j(search_r).get('results', [])
+                existing_page_id = None
+
+                for block in blocks:
+                    if (block.get('type') == 'child_page' and
+                        block.get('child_page', {}).get('title') == title):
+                        existing_page_id = block.get('id')
+                        break
+
+                if existing_page_id:
+                    logging.info(f"Found existing page '{title}' with ID: {existing_page_id}. Deleting to avoid conflicts...")
+                    delete_r = req("DELETE", f"https://api.notion.com/v1/blocks/{existing_page_id}")
+                    if expect_ok(delete_r, f"Deleting existing page '{title}'"):
+                        logging.info(f"Successfully deleted existing page '{title}'")
+                    else:
+                        logging.warning(f"Failed to delete existing page '{title}', continuing with creation...")
+    except Exception as e:
+        logging.warning(f"Error checking for existing page '{title}': {e}, continuing with creation...")
+
     try:
         logging.info(f"Creating page '{title}' with {len(children)} blocks")
         if children:
             logging.debug(f"Page payload: {json.dumps(payload, indent=2)}")
 
         r = req("POST", "https://api.notion.com/v1/pages", data=json.dumps(payload))
+
+        # Check for archived content error BEFORE expect_ok
+        response_data = j(r) if r else {}
+        error_message = response_data.get('message', '')
+
+        if r and r.status_code == 400 and 'archived' in error_message.lower():
+            logging.warning(f"Page creation failed due to archived content. Attempting to clear existing content for '{title}'...")
+
+            # Try to get the parent page and check if a page with this title already exists
+            try:
+                # Search for existing page by title in the parent
+                parent_page_id = parent.get("page_id")
+                if parent_page_id:
+                    # Get children of parent page to find existing page
+                    search_r = req("GET", f"https://api.notion.com/v1/blocks/{parent_page_id}/children")
+                    if expect_ok(search_r, f"Searching for existing page '{title}'"):
+                        blocks = j(search_r).get('results', [])
+                        existing_page_id = None
+
+                        for block in blocks:
+                            if (block.get('type') == 'child_page' and
+                                block.get('child_page', {}).get('title') == title):
+                                existing_page_id = block.get('id')
+                                break
+
+                        if existing_page_id:
+                            logging.info(f"Found existing page '{title}' with ID: {existing_page_id}")
+
+                            # Get the existing page's children and delete archived blocks
+                            page_r = req("GET", f"https://api.notion.com/v1/blocks/{existing_page_id}/children")
+                            if expect_ok(page_r, f"Getting children of existing page '{title}'"):
+                                page_blocks = j(page_r).get('results', [])
+
+                                # Delete all existing blocks
+                                for block in page_blocks:
+                                    block_id = block.get('id')
+                                    if block_id:
+                                        delete_r = req("DELETE", f"https://api.notion.com/v1/blocks/{block_id}")
+                                        if expect_ok(delete_r, f"Deleting block {block_id}"):
+                                            logging.debug(f"Deleted block {block_id}")
+
+                                # Now add new content to the existing page
+                                if children:
+                                    add_payload = {"children": children}
+                                    add_r = req("PATCH", f"https://api.notion.com/v1/blocks/{existing_page_id}/children",
+                                               data=json.dumps(add_payload))
+                                    if expect_ok(add_r, f"Adding content to existing page '{title}'"):
+                                        state.created_pages[title] = existing_page_id
+                                        logging.info(f"✅ Updated existing page '{title}': {existing_page_id} with {len(children)} blocks")
+                                        return existing_page_id
+
+                            # If we couldn't add content, at least return the existing page ID
+                            state.created_pages[title] = existing_page_id
+                            logging.warning(f"⚠️ Found existing page '{title}' but couldn't update content: {existing_page_id}")
+                            return existing_page_id
+
+            except Exception as clear_error:
+                logging.error(f"Error while handling archived content for '{title}': {clear_error}")
+
+            return None
+
+        # Normal successful creation
         if expect_ok(r, f"Creating page '{title}'"):
             page_id = j(r).get('id')
             state.created_pages[title] = page_id
@@ -692,10 +838,68 @@ def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str
                 logging.info(f"Page '{title}' created successfully with content blocks")
 
             return page_id
+        else:
+            return None
     except Exception as e:
+        error_message = str(e)
+
+        # Handle archived content error in exceptions too
+        if 'archived' in error_message.lower():
+            logging.warning(f"Page creation failed due to archived content exception. Attempting to handle for '{title}'...")
+
+            try:
+                # Search for existing page by title in the parent
+                parent_page_id = parent.get("page_id")
+                if parent_page_id:
+                    # Get children of parent page to find existing page
+                    search_r = req("GET", f"https://api.notion.com/v1/blocks/{parent_page_id}/children")
+                    if expect_ok(search_r, f"Searching for existing page '{title}' after exception"):
+                        blocks = j(search_r).get('results', [])
+                        existing_page_id = None
+
+                        for block in blocks:
+                            if (block.get('type') == 'child_page' and
+                                block.get('child_page', {}).get('title') == title):
+                                existing_page_id = block.get('id')
+                                break
+
+                        if existing_page_id:
+                            logging.info(f"Found existing page '{title}' with ID: {existing_page_id}")
+
+                            # Get the existing page's children and delete archived blocks
+                            page_r = req("GET", f"https://api.notion.com/v1/blocks/{existing_page_id}/children")
+                            if expect_ok(page_r, f"Getting children of existing page '{title}' after exception"):
+                                page_blocks = j(page_r).get('results', [])
+
+                                # Delete all existing blocks
+                                for block in page_blocks:
+                                    block_id = block.get('id')
+                                    if block_id:
+                                        delete_r = req("DELETE", f"https://api.notion.com/v1/blocks/{block_id}")
+                                        if expect_ok(delete_r, f"Deleting block {block_id} after exception"):
+                                            logging.debug(f"Deleted block {block_id}")
+
+                                # Now add new content to the existing page
+                                if children:
+                                    add_payload = {"children": children}
+                                    add_r = req("PATCH", f"https://api.notion.com/v1/blocks/{existing_page_id}/children",
+                                               data=json.dumps(add_payload))
+                                    if expect_ok(add_r, f"Adding content to existing page '{title}' after exception"):
+                                        state.created_pages[title] = existing_page_id
+                                        logging.info(f"✅ Updated existing page '{title}' after exception: {existing_page_id} with {len(children)} blocks")
+                                        return existing_page_id
+
+                            # If we couldn't add content, at least return the existing page ID
+                            state.created_pages[title] = existing_page_id
+                            logging.warning(f"⚠️ Found existing page '{title}' but couldn't update content after exception: {existing_page_id}")
+                            return existing_page_id
+
+            except Exception as clear_error:
+                logging.error(f"Error while handling archived content exception for '{title}': {clear_error}")
+
         logging.error(f"Failed to create page '{title}': {e}")
         state.errors.append({"phase": "pages", "item": title, "error": str(e)})
-    
+
     return None
 
 def create_database(db_name: str, schema: Dict, state: DeploymentState, 
@@ -775,8 +979,12 @@ def convert_legacy_block_format(block_def: Dict) -> Dict:
     return block_def
 
 
-def build_block(block_def: Dict) -> Dict:
+def build_block(block_def) -> Dict:
     """Build a Notion block from definition"""
+    # Handle string blocks (convert to paragraph)
+    if isinstance(block_def, str):
+        block_def = {"type": "paragraph", "content": block_def}
+
     # Convert legacy formats first
     block_def = convert_legacy_block_format(block_def)
 
@@ -979,6 +1187,35 @@ def build_block(block_def: Dict) -> Dict:
             return {
                 "paragraph": {
                     "rich_text": [{"text": {"content": f"[TABLE: Invalid structure]"}}]
+                }
+            }
+    elif block_type == 'child_database':
+        # Handle child_database blocks for embedded database views
+        database_id = block_def.get('database_id')
+        title = block_def.get('title', content)
+
+        if database_id:
+            return {
+                "child_database": {
+                    "title": title
+                }
+            }
+        else:
+            # Fallback with reference lookup
+            db_ref = block_def.get('database_ref')
+            if db_ref and hasattr(state, 'created_databases'):
+                resolved_id = state.created_databases.get(db_ref)
+                if resolved_id:
+                    return {
+                        "child_database": {
+                            "title": title
+                        }
+                    }
+
+            # Fallback if no valid database reference
+            return {
+                "paragraph": {
+                    "rich_text": [{"text": {"content": f"[DATABASE: {title} - Reference not resolved]"}}]
                 }
             }
     else:  # Default to paragraph
@@ -1270,6 +1507,10 @@ class NotionTemplateDeployer:
             
             # Phase 3: Create Pages
             if not self.skip_phase(DeploymentPhase.PAGES):
+                # Clear existing content first to avoid archived conflicts
+                if not self.clear_existing_content():
+                    logging.warning("Failed to clear existing content, but continuing...")
+
                 if not self.deploy_pages(yaml_data):
                     return False
             
@@ -1358,6 +1599,43 @@ class NotionTemplateDeployer:
         logging.info("✅ All validations passed")
         return True
     
+    def clear_existing_content(self) -> bool:
+        """Clear all existing content from the target page to avoid archived conflicts"""
+        try:
+            parent_id = self.args.parent_id or NOTION_PARENT_PAGEID
+            logging.info(f"Clearing existing content from page: {parent_id}")
+
+            # Get all children of the parent page
+            r = req("GET", f"https://api.notion.com/v1/blocks/{parent_id}/children")
+            if not expect_ok(r, "Getting existing content"):
+                return False
+
+            blocks = j(r).get('results', [])
+            if not blocks:
+                logging.info("No existing content to clear")
+                return True
+
+            logging.info(f"Found {len(blocks)} existing blocks to clear")
+
+            # Delete all existing blocks
+            deleted_count = 0
+            for block in blocks:
+                block_id = block.get('id')
+                if block_id:
+                    delete_r = req("DELETE", f"https://api.notion.com/v1/blocks/{block_id}")
+                    if expect_ok(delete_r, f"Deleting block {block_id}"):
+                        deleted_count += 1
+                        logging.debug(f"Deleted block {block_id}")
+                    else:
+                        logging.warning(f"Failed to delete block {block_id}")
+
+            logging.info(f"✅ Cleared {deleted_count} existing blocks")
+            return True
+
+        except Exception as e:
+            logging.error(f"Error clearing existing content: {e}")
+            return False
+
     def deploy_pages(self, yaml_data: Dict) -> bool:
         """Deploy all pages with proper parent-child ordering"""
         self.state.phase = DeploymentPhase.PAGES
@@ -1419,28 +1697,50 @@ class NotionTemplateDeployer:
         return True
     
     def deploy_databases(self, yaml_data: Dict) -> bool:
-        """Deploy all databases"""
+        """Deploy all databases from both db.schemas and standalone databases formats"""
         self.state.phase = DeploymentPhase.DATABASES
+
+        # Get databases from db.schemas format
         schemas = yaml_data.get('db', {}).get('schemas', {})
-        
+
+        # Get standalone databases and convert them to schema format
+        standalone_databases = yaml_data.get('standalone_databases', [])
+        converted_standalone = {}
+
+        for standalone_db in standalone_databases:
+            converted = convert_standalone_db_to_schema(standalone_db)
+            db_name = converted['db_name']
+            converted_standalone[db_name] = converted['schema']
+
+            # Add seed rows to merged data for later processing
+            if converted['seed_rows']:
+                if 'db' not in yaml_data:
+                    yaml_data['db'] = {}
+                if 'seed_rows' not in yaml_data['db']:
+                    yaml_data['db']['seed_rows'] = {}
+                yaml_data['db']['seed_rows'][db_name] = converted['seed_rows']
+
+        # Combine both types of databases
+        all_databases = {**schemas, **converted_standalone}
+
         if self.args.interactive:
-            if not CLIInterface.prompt_continue(f"Deploy {len(schemas)} databases?"):
+            if not CLIInterface.prompt_continue(f"Deploy {len(all_databases)} databases ({len(schemas)} from schemas + {len(converted_standalone)} standalone)?"):
                 return False
-        
-        for db_name, schema in schemas.items():
+
+        for db_name, schema in all_databases.items():
             self.progress.update(DeploymentPhase.DATABASES, f"Creating: {db_name}")
-            
+
             parent_id = self.args.parent_id or NOTION_PARENT_PAGEID
             db_id = create_database(db_name, schema, self.state, parent_id)
-            
+
             if not db_id and not self.args.interactive:
                 return False
             elif not db_id and self.args.interactive:
                 if not CLIInterface.prompt_continue("Database creation failed. Continue?"):
                     return False
-            
+
             self.state.save_checkpoint()
-        
+
         return True
     
     def setup_relations(self, yaml_data: Dict) -> bool:
