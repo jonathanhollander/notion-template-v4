@@ -562,6 +562,10 @@ def load_all_yaml(yaml_dir: Optional[Path] = None) -> Dict:
             # Merge pages
             if 'pages' in data:
                 merged['pages'].extend(data['pages'])
+
+            # Merge letters into pages
+            if 'letters' in data:
+                merged['pages'].extend(data['letters'])
                 
             # Merge database schemas
             if 'db' in data:
@@ -1199,6 +1203,9 @@ def build_block(block_def) -> Dict:
     elif block_type == 'divider':
         return {"divider": {}}
     elif block_type == 'to_do':
+        # Handle pre-formatted to_do blocks
+        if 'to_do' in block_def:
+            return block_def
         return {
             "to_do": {
                 "rich_text": [{"text": {"content": content}}],
