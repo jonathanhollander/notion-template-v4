@@ -699,6 +699,146 @@ databases:
             - name: Milestones
               color: red
 
+  # Phase 2.1 Enhancement: Advanced contextual guidance database
+  - title: "Enhanced Estate Analytics with Contextual Guidance"
+    icon:
+      type: emoji
+      emoji: 🎯
+    description: "Advanced estate analytics with smart contextual help and workflow guidance"
+    properties:
+      Task_Name:
+        type: title
+        title: {}
+
+      Section:
+        type: select
+        select:
+          options:
+            - name: "📊 Financial Planning"
+              color: "blue"
+            - name: "📋 Legal Documentation"
+              color: "green"
+            - name: "🏠 Property Management"
+              color: "yellow"
+            - name: "👥 Family Coordination"
+              color: "purple"
+            - name: "💼 Professional Services"
+              color: "orange"
+            - name: "📱 Digital Assets"
+              color: "red"
+            - name: "📝 Administrative Tasks"
+              color: "gray"
+
+      Status:
+        type: select
+        select:
+          options:
+            - name: "Not Started"
+              color: "red"
+            - name: "In Progress"
+              color: "yellow"
+            - name: "Review Needed"
+              color: "orange"
+            - name: "Complete"
+              color: "green"
+            - name: "Deferred"
+              color: "gray"
+
+      Priority_Level:
+        type: select
+        select:
+          options:
+            - name: "Critical"
+              color: "red"
+            - name: "High"
+              color: "orange"
+            - name: "Medium"
+              color: "yellow"
+            - name: "Low"
+              color: "green"
+
+      Estimated_Hours:
+        type: number
+        number:
+          format: "number"
+
+      Completion_Percentage:
+        type: number
+        number:
+          format: "percent"
+
+      Target_Date:
+        type: date
+        date: {}
+
+      # Phase 2.1: Smart Contextual Help Formulas
+      Smart_Help_Guidance:
+        type: formula
+        formula:
+          expression: "if(prop(\"Status\") == \"Not Started\", \"🚀 GET STARTED: \" + if(prop(\"Section\") == \"📊 Financial Planning\", \"Begin by gathering all financial statements and account information\", if(prop(\"Section\") == \"📋 Legal Documentation\", \"Start with will preparation - contact attorney for consultation\", if(prop(\"Section\") == \"🏠 Property Management\", \"Create comprehensive property inventory with valuations\", if(prop(\"Section\") == \"👥 Family Coordination\", \"Schedule family meeting to discuss roles and expectations\", if(prop(\"Section\") == \"💼 Professional Services\", \"Research and interview estate planning professionals\", if(prop(\"Section\") == \"📱 Digital Assets\", \"Compile list of all digital accounts and access methods\", \"Review task requirements and create action plan\")))))), if(prop(\"Status\") == \"In Progress\", \"⚡ KEEP GOING: \" + if(prop(\"Completion_Percentage\") >= 75, \"You're almost done! Focus on final details and quality check\", if(prop(\"Completion_Percentage\") >= 50, \"Good progress! Continue with current approach and maintain momentum\", if(prop(\"Completion_Percentage\") >= 25, \"Building momentum! Consider if you need additional resources or help\", \"Just getting started! Break this into smaller, manageable steps\"))), if(prop(\"Status\") == \"Review Needed\", \"👀 REVIEW TIME: \" + if(prop(\"Priority_Level\") == \"Critical\", \"Critical item needs immediate review - don't delay\", \"Schedule review session and gather all relevant materials\"), if(prop(\"Status\") == \"Complete\", \"✅ COMPLETED: \" + if(prop(\"Priority_Level\") == \"Critical\", \"Critical task done! This is a major milestone for your estate plan\", \"Task completed successfully! Consider next steps and dependencies\"), \"📝 DEFERRED: Review if this task is still needed or can be eliminated\"))))"
+
+      Next_Action_Guidance:
+        type: formula
+        formula:
+          expression: "if(prop(\"Status\") == \"Not Started\", \"📋 FIRST STEP: \" + if(prop(\"Priority_Level\") == \"Critical\", \"HIGH PRIORITY - Schedule this within 48 hours\", if(prop(\"Priority_Level\") == \"High\", \"Important task - plan for this week\", if(prop(\"Priority_Level\") == \"Medium\", \"Standard task - include in next planning session\", \"Lower priority - add to future task list\"))), if(prop(\"Status\") == \"In Progress\", \"🎯 NEXT ACTION: \" + if(empty(prop(\"Target_Date\")), \"Set a target completion date to maintain momentum\", if(dateBetween(prop(\"Target_Date\"), now(), \"days\") < 3, \"Target date approaching - focus your efforts here\", \"Continue current progress and check in regularly\")), if(prop(\"Status\") == \"Review Needed\", \"🔍 REVIEW ACTION: \" + if(prop(\"Section\") == \"📋 Legal Documentation\", \"Have attorney review all documents before finalizing\", if(prop(\"Section\") == \"📊 Financial Planning\", \"Verify all numbers and get professional validation\", \"Schedule thorough review with relevant experts\")), if(prop(\"Status\") == \"Complete\", \"🔄 FOLLOW-UP: \" + if(prop(\"Section\") == \"📋 Legal Documentation\", \"Ensure documents are properly stored and copies distributed\", if(prop(\"Section\") == \"📊 Financial Planning\", \"Update beneficiaries and notify financial institutions\", \"Document completion and update related systems\")), \"📌 DEFERRED: Periodically review if circumstances change\"))))"
+
+      Time_Priority_Alert:
+        type: formula
+        formula:
+          expression: "if(empty(prop(\"Target_Date\")), \"⏰ NO DEADLINE: Consider setting target date for better planning\", if(dateBetween(prop(\"Target_Date\"), now(), \"days\") < 0, \"🚨 OVERDUE: \" + format(abs(dateBetween(prop(\"Target_Date\"), now(), \"days\"))) + \" days past deadline - immediate attention needed!\", if(dateBetween(prop(\"Target_Date\"), now(), \"days\") <= 3, \"⚠️ DUE SOON: \" + format(dateBetween(prop(\"Target_Date\"), now(), \"days\")) + \" days remaining - prioritize this task\", if(dateBetween(prop(\"Target_Date\"), now(), \"days\") <= 7, \"📅 THIS WEEK: \" + format(dateBetween(prop(\"Target_Date\"), now(), \"days\")) + \" days remaining - plan completion\", if(dateBetween(prop(\"Target_Date\"), now(), \"days\") <= 14, \"📋 UPCOMING: \" + format(dateBetween(prop(\"Target_Date\"), now(), \"days\")) + \" days remaining - good planning horizon\", \"✅ GOOD TIMELINE: \" + format(dateBetween(prop(\"Target_Date\"), now(), \"days\")) + \" days remaining - maintain current pace\")))))"
+
+      Workflow_Coordination:
+        type: formula
+        formula:
+          expression: "if(prop(\"Section\") == \"📊 Financial Planning\", \"💰 COORDINATION: \" + if(prop(\"Status\") == \"Not Started\", \"Connect with financial advisor and gather all account statements\", if(prop(\"Status\") == \"In Progress\", \"Regular check-ins with financial professionals and beneficiary updates\", \"Ensure all financial institutions have updated beneficiary information\")), if(prop(\"Section\") == \"📋 Legal Documentation\", \"⚖️ COORDINATION: \" + if(prop(\"Status\") == \"Not Started\", \"Schedule consultation with estate planning attorney\", if(prop(\"Status\") == \"In Progress\", \"Regular attorney meetings and document review sessions\", \"Finalize all documents and ensure proper execution and storage\")), if(prop(\"Section\") == \"👥 Family Coordination\", \"👨‍👩‍👧‍👦 COORDINATION: \" + if(prop(\"Status\") == \"Not Started\", \"Plan family meeting to discuss roles and responsibilities\", if(prop(\"Status\") == \"In Progress\", \"Regular family updates and role clarification meetings\", \"Ensure all family members understand their roles and have access\")), \"🔄 COORDINATION: \" + if(prop(\"Status\") == \"Complete\", \"Monitor for changes and maintain current systems\", \"Coordinate with relevant professionals and family members as needed\"))))"
+
+      Resource_Recommendations:
+        type: formula
+        formula:
+          expression: "if(prop(\"Section\") == \"📊 Financial Planning\", \"📚 RESOURCES: \" + if(prop(\"Priority_Level\") == \"Critical\", \"Essential: Fee-only financial planner, estate tax attorney, CPA with estate experience\", \"Helpful: Financial advisor, tax professional, estate planning software\"), if(prop(\"Section\") == \"📋 Legal Documentation\", \"📚 RESOURCES: \" + if(prop(\"Priority_Level\") == \"Critical\", \"Essential: Estate planning attorney, notary services, document storage system\", \"Helpful: Online legal resources, document templates, legal review services\"), if(prop(\"Section\") == \"🏠 Property Management\", \"📚 RESOURCES: \" + if(prop(\"Priority_Level\") == \"Critical\", \"Essential: Real estate appraiser, property attorney, title company\", \"Helpful: Property management company, real estate agent, maintenance contacts\"), if(prop(\"Section\") == \"👥 Family Coordination\", \"📚 RESOURCES: \" + if(prop(\"Priority_Level\") == \"Critical\", \"Essential: Family meeting facilitator, communication platform, role documentation\", \"Helpful: Family counselor, mediation services, coordination tools\"), if(prop(\"Section\") == \"💼 Professional Services\", \"📚 RESOURCES: \" + if(prop(\"Priority_Level\") == \"Critical\", \"Essential: Vetted professional network, service agreements, performance metrics\", \"Helpful: Professional referral services, review platforms, coordination tools\"), \"📚 RESOURCES: Research relevant professionals and tools for your specific situation\")))))"
+
+      Progress_Insights:
+        type: formula
+        formula:
+          expression: "if(prop(\"Status\") == \"Complete\", \"🎉 ACHIEVEMENT: \" + prop(\"Section\") + \" task completed successfully! \", \"\") + if(prop(\"Completion_Percentage\") >= 80, \"🔥 EXCELLENT PROGRESS: You're in the final stretch - maintain focus and attention to detail\", if(prop(\"Completion_Percentage\") >= 60, \"📈 STRONG MOMENTUM: Good progress being made - consider what support you need for final push\", if(prop(\"Completion_Percentage\") >= 40, \"⚡ BUILDING STEAM: You're making solid progress - stay consistent with your efforts\", if(prop(\"Completion_Percentage\") >= 20, \"🌱 EARLY PROGRESS: Good start! Break down remaining work into manageable chunks\", if(prop(\"Status\") != \"Not Started\", \"🚀 GETTING STARTED: Every expert was once a beginner - you're on the right path\", \"💡 READY TO BEGIN: Take the first small step - momentum builds from action\"))))))"
+
+      Smart_Recommendations:
+        type: formula
+        formula:
+          expression: "\"💡 SMART TIP: \" + if(prop(\"Estimated_Hours\") > 10 and prop(\"Status\") == \"Not Started\", \"Large task ahead - consider breaking this into smaller milestones\", if(prop(\"Priority_Level\") == \"Critical\" and prop(\"Status\") == \"In Progress\" and prop(\"Completion_Percentage\") < 50, \"Critical task needs acceleration - consider adding resources or help\", if(empty(prop(\"Target_Date\")) and prop(\"Status\") == \"In Progress\", \"Set a target completion date to maintain accountability and momentum\", if(prop(\"Status\") == \"Review Needed\" and dateBetween(prop(\"Target_Date\"), now(), \"days\") < 7, \"Review needed urgently - don't let this become a bottleneck\", if(prop(\"Section\") == \"📋 Legal Documentation\" and prop(\"Status\") == \"Complete\", \"Legal docs complete - ensure copies are stored securely and accessible\", if(prop(\"Section\") == \"👥 Family Coordination\" and prop(\"Completion_Percentage\") < 30, \"Family coordination is crucial - invest time in clear communication early\", \"Stay focused and maintain steady progress - you're doing great!\"))))))"
+
+    seed_rows:
+      - Task_Name: "Create Comprehensive Will Document"
+        Section: "📋 Legal Documentation"
+        Status: "In Progress"
+        Priority_Level: "Critical"
+        Estimated_Hours: 15
+        Completion_Percentage: 0.65
+      - Task_Name: "Establish Family Trust Structure"
+        Section: "📋 Legal Documentation"
+        Status: "Review Needed"
+        Priority_Level: "Critical"
+        Estimated_Hours: 25
+        Completion_Percentage: 0.80
+      - Task_Name: "Financial Account Beneficiary Updates"
+        Section: "📊 Financial Planning"
+        Status: "In Progress"
+        Priority_Level: "High"
+        Estimated_Hours: 8
+        Completion_Percentage: 0.45
+      - Task_Name: "Family Roles and Responsibilities Meeting"
+        Section: "👥 Family Coordination"
+        Status: "Not Started"
+        Priority_Level: "High"
+        Estimated_Hours: 6
+        Completion_Percentage: 0
+      - Task_Name: "Digital Asset Inventory and Access"
+        Section: "📱 Digital Assets"
+        Status: "In Progress"
+        Priority_Level: "Medium"
+        Estimated_Hours: 12
+        Completion_Percentage: 0.30
+
 # Initial database entries for Estate Analytics
 database_entries:
   Estate Analytics:

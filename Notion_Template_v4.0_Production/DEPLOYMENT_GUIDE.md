@@ -147,6 +147,43 @@ tail -100 logs/deployment.log | grep -E "WARNING|ERROR"
 
 ## Troubleshooting
 
+### Debugging with Unified Color-Coded Logging
+
+All deployment operations are automatically logged to **ONE file**: `logs/debug.log` with color-coded prefixes for easy identification:
+
+- **🟢 API** = Notion API calls/responses
+- **🟤 LLM** = AI/LLM calls (Replicate, OpenAI, etc.)
+- **🔵 ASSET** = Asset processing (icons, covers, page creation)
+- **🔴 ERROR** = Errors, failures, warnings
+- **🟣 TRACE** = Request tracing, correlation IDs
+- **🟠 YAML** = Configuration file processing
+- **⚫ INFO** = General information
+
+#### Viewing Debug Logs
+
+```bash
+# View the complete color-coded log
+cat logs/debug.log
+
+# Monitor deployment in real-time
+tail -f logs/debug.log
+
+# Filter for specific types (e.g., only API calls)
+grep "🟢 API" logs/debug.log
+
+# Search for errors
+grep "🔴 ERROR" logs/debug.log
+```
+
+#### Troubleshooting Assets Not Appearing on Pages
+
+When pages are created with titles but no content/assets appear:
+
+1. **Check API responses**: `grep "🟢 API" logs/debug.log` - Look for Notion API responses to see what was actually created
+2. **Check asset processing**: `grep "🔵 ASSET" logs/debug.log` - See what assets were processed and if they were uploaded
+3. **Check for errors**: `grep "🔴 ERROR" logs/debug.log` - Look for failures in API calls or asset processing
+4. **Check YAML parsing**: `grep "🟠 YAML" logs/debug.log` - Verify configuration files were parsed correctly
+
 ### Common Issues and Solutions
 
 #### 1. Authentication Error

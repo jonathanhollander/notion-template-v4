@@ -85,7 +85,12 @@
       "Bash(PORT=4501 python3 review_dashboard.py)",
       "mcp__github__list_issues",
       "mcp__roo-cline-memory__check_memory_bank_status",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "mcp__task-master__initialize_project",
+      "Bash(./validate_complete_implementation.sh:*)",
+      "Bash(dos2unix:*)",
+      "Bash(./temp_validate.sh:*)",
+      "Read(///**)"
     ],
     "deny": [],
     "ask": []

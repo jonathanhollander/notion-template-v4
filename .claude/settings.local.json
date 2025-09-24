@@ -141,7 +141,8 @@
       "Bash(./content_discovery.sh)",
       "Bash(./catalog_all_discovered_systems.sh)",
       "Bash(./refined_systems_catalog.sh:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Read(///**)"
     ],
     "deny": [],
     "ask": []

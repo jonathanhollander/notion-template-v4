@@ -1754,23 +1754,61 @@ class NotionTemplateDeployer:
         self.setup_logging()
         
     def setup_logging(self):
-        """Configure logging based on verbosity"""
-        if self.args.quiet:
-            level = logging.ERROR
-        elif self.args.verbose >= 3:
-            level = logging.DEBUG
-        elif self.args.verbose >= 2:
-            level = logging.INFO
-        elif self.args.verbose >= 1:
-            level = logging.WARNING
-        else:
-            level = logging.ERROR
-            
+        """Configure unified color-coded logging"""
+        # Always use DEBUG level for comprehensive logging
+        level = logging.DEBUG
+
+        # Create logs directory
+        os.makedirs('logs', exist_ok=True)
+
+        # Clear previous log
+        log_file = 'logs/debug.log'
+        if os.path.exists(log_file):
+            os.remove(log_file)
+
+        # Set up unified logging - everything to ONE file with color prefixes
+        class ColorFormatter(logging.Formatter):
+            def format(self, record):
+                msg = record.getMessage().lower()
+                timestamp = self.formatTime(record, '%Y-%m-%d %H:%M:%S.%f')[:-3]
+
+                # Color code based on message content
+                if any(x in msg for x in ['api_request', 'api_response', 'post /v1/', 'patch /v1/', 'get /v1/', 'status_code', 'notion api']):
+                    prefix = "🟢 API"
+                elif any(x in msg for x in ['replicate', 'openai', 'anthropic', 'gpt', 'claude', 'llm', 'ai_call', 'model_request', 'generation']):
+                    prefix = "🟤 LLM"
+                elif any(x in msg for x in ['asset', 'icon', 'cover', 'image', 'processing', 'block creation', 'page creation']):
+                    prefix = "🔵 ASSET"
+                elif any(x in msg for x in ['error', 'failed', 'exception', 'warning', 'critical']):
+                    prefix = "🔴 ERROR"
+                elif any(x in msg for x in ['correlation_id', 'request_id', 'tracing', 'elapsed_seconds']):
+                    prefix = "🟣 TRACE"
+                elif any(x in msg for x in ['yaml', 'section', 'parsing', 'configuration']):
+                    prefix = "🟠 YAML"
+                else:
+                    prefix = "⚫ INFO"
+
+                return f"{prefix} {timestamp} - {record.levelname} - {record.filename}:{record.lineno} - {record.getMessage()}"
+
+        # Configure logging
         logging.basicConfig(
             level=level,
-            format='%(asctime)s - %(levelname)s - %(message)s',
-            datefmt='%H:%M:%S'
+            format='%(message)s',
+            handlers=[
+                logging.FileHandler(log_file, mode='w', encoding='utf-8'),
+                logging.StreamHandler()
+            ]
         )
+
+        # Apply color formatter to file handler only
+        for handler in logging.root.handlers:
+            if isinstance(handler, logging.FileHandler):
+                handler.setFormatter(ColorFormatter())
+
+        # Log initialization
+        logging.info("🚀 Unified debug logging initialized")
+        logging.info(f"📝 All output in: {log_file}")
+        logging.info("🟢=API | 🟤=LLM | 🔵=Assets | 🔴=Errors | ⚫=Info | 🟣=Trace | 🟠=YAML")
     
     def run(self) -> bool:
         """Main deployment entry point"""

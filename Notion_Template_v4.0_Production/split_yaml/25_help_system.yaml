@@ -343,3 +343,372 @@ pages:
       content: "Keep detailed records of all professional consultations"
     - type: numbered_list_item
       content: "Review and update professional contact information annually"
+
+# Interactive Content Systems - Phase 1.3: Advanced Progressive Disclosure
+- title: Advanced Estate Planning Guidance
+  parent: Help Center
+  icon: emoji:🎯
+  description: Sophisticated guidance system with progressive disclosure and contextual help
+  role: owner
+  blocks:
+    - type: heading_1
+      content: 🎯 Advanced Estate Planning Guidance
+    - type: paragraph
+      content: Comprehensive guidance system that adapts to your progress and provides contextual help at every step.
+
+    - type: heading_2
+      content: Interactive Planning Modules
+
+    # Progressive Disclosure Module 1: Estate Size Assessment
+    - type: toggle
+      content: "💰 Estate Size Assessment & Tax Planning"
+      blocks:
+        - type: paragraph
+          content: "Determine your estate's size and tax implications through progressive questions."
+
+        - type: toggle
+          content: "Step 1: Basic Asset Calculation"
+          blocks:
+            - type: paragraph
+              content: "Start with these fundamental calculations:"
+            - type: to_do
+              to_do:
+                rich_text:
+                  - type: text
+                    text:
+                      content: "List all bank accounts and current balances"
+                checked: false
+            - type: to_do
+              to_do:
+                rich_text:
+                  - type: text
+                    text:
+                      content: "Value investment and retirement accounts"
+                checked: false
+            - type: to_do
+              to_do:
+                rich_text:
+                  - type: text
+                    text:
+                      content: "Estimate real estate fair market value"
+                checked: false
+
+            # Nested progressive disclosure
+            - type: toggle
+              content: "💡 Need Help Valuing Assets?"
+              blocks:
+                - type: paragraph
+                  content: "Professional valuation resources:"
+                - type: bulleted_list_item
+                  content: "Real Estate: Use Zillow/Redfin estimates or hire appraiser"
+                - type: bulleted_list_item
+                  content: "Business Interests: Require professional business valuation"
+                - type: bulleted_list_item
+                  content: "Collectibles: Certified appraisal for items over $3,000"
+                - type: bulleted_list_item
+                  content: "Investments: Use current market value from statements"
+
+        - type: toggle
+          content: "Step 2: Debt Assessment"
+          blocks:
+            - type: to_do
+              to_do:
+                rich_text:
+                  - type: text
+                    text:
+                      content: "Calculate total mortgage balances"
+                checked: false
+            - type: to_do
+              to_do:
+                rich_text:
+                  - type: text
+                    text:
+                      content: "List credit card and consumer debt"
+                checked: false
+            - type: to_do
+              to_do:
+                rich_text:
+                  - type: text
+                    text:
+                      content: "Include business debts and obligations"
+                checked: false
+
+        - type: toggle
+          content: "Step 3: Net Estate Calculation"
+          blocks:
+            - type: paragraph
+              content: "Your net estate determines tax implications:"
+            - type: callout
+              icon: emoji:✅
+              content: "Estate under $12.92 million (2023): No federal estate tax"
+              color: green_background
+            - type: callout
+              icon: emoji:⚠️
+              content: "Estate $12.92M - $50M: Moderate tax planning needed"
+              color: yellow_background
+            - type: callout
+              icon: emoji:🚨
+              content: "Estate over $50M: Advanced tax strategies essential"
+              color: red_background
+
+            # Advanced nested disclosure
+            - type: toggle
+              content: "🔍 Advanced Tax Strategies (High Net Worth)"
+              blocks:
+                - type: paragraph
+                  content: "For estates over $12.92 million, consider:"
+                - type: bulleted_list_item
+                  content: "Grantor Retained Annuity Trusts (GRATs)"
+                - type: bulleted_list_item
+                  content: "Charitable Lead Annuity Trusts (CLATs)"
+                - type: bulleted_list_item
+                  content: "Intentionally Defective Grantor Trusts (IDGTs)"
+                - type: bulleted_list_item
+                  content: "Annual gifting strategies"
+
+                - type: toggle
+                  content: "⚖️ When to Hire Estate Tax Attorney"
+                  blocks:
+                    - type: paragraph
+                      content: "Immediate consultation needed if:"
+                    - type: bulleted_list_item
+                      content: "Net worth exceeds $10 million"
+                    - type: bulleted_list_item
+                      content: "Complex business ownership structures"
+                    - type: bulleted_list_item
+                      content: "Significant charitable giving goals"
+                    - type: bulleted_list_item
+                      content: "Multi-generational wealth transfer plans"
+
+    # Progressive Disclosure Module 2: Family Situation Analysis
+    - type: toggle
+      content: "👨‍👩‍👧‍👦 Family Situation Analysis"
+      blocks:
+        - type: paragraph
+          content: "Tailor your estate plan to your unique family circumstances."
+
+        - type: toggle
+          content: "Traditional Nuclear Family"
+          blocks:
+            - type: paragraph
+              content: "Straightforward planning considerations:"
+            - type: bulleted_list_item
+              content: "Simple will with spouse as primary beneficiary"
+            - type: bulleted_list_item
+              content: "Guardian nominations for minor children"
+            - type: bulleted_list_item
+              content: "Basic trust considerations for minors"
+            - type: bulleted_list_item
+              content: "Joint ownership strategies"
+
+            - type: toggle
+              content: "🔍 Minor Children Considerations"
+              blocks:
+                - type: paragraph
+                  content: "Special provisions for families with minors:"
+                - type: toggle
+                  content: "Guardian Selection Process"
+                  blocks:
+                    - type: bulleted_list_item
+                      content: "Interview potential guardians thoroughly"
+                    - type: bulleted_list_item
+                      content: "Consider geographic location preferences"
+                    - type: bulleted_list_item
+                      content: "Discuss parenting philosophy alignment"
+                    - type: bulleted_list_item
+                      content: "Plan for financial support of guardians"
+
+                - type: toggle
+                  content: "Trust Setup for Minors"
+                  blocks:
+                    - type: bulleted_list_item
+                      content: "Age-based distribution schedules (e.g., 25, 30, 35)"
+                    - type: bulleted_list_item
+                      content: "Educational spending provisions"
+                    - type: bulleted_list_item
+                      content: "Health and maintenance standards"
+                    - type: bulleted_list_item
+                      content: "Trustee selection and succession"
+
+        - type: toggle
+          content: "Blended Family Situations"
+          blocks:
+            - type: paragraph
+              content: "Complex family structures require careful planning:"
+            - type: callout
+              icon: emoji:⚠️
+              content: "Blended families have unique challenges - professional guidance strongly recommended"
+              color: yellow_background
+
+            - type: toggle
+              content: "Current Spouse vs Children from Previous Marriage"
+              blocks:
+                - type: paragraph
+                  content: "Balance competing interests:"
+                - type: bulleted_list_item
+                  content: "QTIP trust for spouse with remainder to children"
+                - type: bulleted_list_item
+                  content: "Life insurance for children's inheritance"
+                - type: bulleted_list_item
+                  content: "Separate property identification"
+                - type: bulleted_list_item
+                  content: "Prenuptial agreement considerations"
+
+            - type: toggle
+              content: "Step-Children and Adoption"
+              blocks:
+                - type: bulleted_list_item
+                  content: "Formal adoption creates full inheritance rights"
+                - type: bulleted_list_item
+                  content: "Step-children have NO automatic inheritance rights"
+                - type: bulleted_list_item
+                  content: "Explicit naming required in will and trusts"
+                - type: bulleted_list_item
+                  content: "Consider equal vs proportionate treatment"
+
+        - type: toggle
+          content: "Single Parent Households"
+          blocks:
+            - type: paragraph
+              content: "Single parents need comprehensive backup plans:"
+            - type: bulleted_list_item
+              content: "Multiple guardian options and detailed preferences"
+            - type: bulleted_list_item
+              content: "Robust trustee selection for financial management"
+            - type: bulleted_list_item
+              content: "Detailed child-rearing instructions"
+            - type: bulleted_list_item
+              content: "Strong healthcare directive provisions"
+
+        - type: toggle
+          content: "Adult Children with Special Needs"
+          blocks:
+            - type: callout
+              icon: emoji:🩺
+              content: "Special needs planning requires specialized legal expertise"
+              color: blue_background
+
+            - type: toggle
+              content: "Special Needs Trust Considerations"
+              blocks:
+                - type: paragraph
+                  content: "Protect government benefits while providing support:"
+                - type: bulleted_list_item
+                  content: "First-party vs third-party special needs trusts"
+                - type: bulleted_list_item
+                  content: "ABLE account coordination"
+                - type: bulleted_list_item
+                  content: "Medicaid planning implications"
+                - type: bulleted_list_item
+                  content: "Future care coordination"
+
+    # Progressive Disclosure Module 3: Advanced Document Strategy
+    - type: toggle
+      content: "📚 Advanced Document Strategy"
+      blocks:
+        - type: paragraph
+          content: "Beyond basic documents - sophisticated estate planning tools."
+
+        - type: toggle
+          content: "Revocable Trust Decision Tree"
+          blocks:
+            - type: paragraph
+              content: "Do you need a revocable living trust? Work through these questions:"
+
+            - type: toggle
+              content: "✅ Strong Candidates for Revocable Trust"
+              blocks:
+                - type: bulleted_list_item
+                  content: "Net worth over $300,000"
+                - type: bulleted_list_item
+                  content: "Real estate in multiple states"
+                - type: bulleted_list_item
+                  content: "Privacy concerns about probate"
+                - type: bulleted_list_item
+                  content: "Desire for incapacity management"
+                - type: bulleted_list_item
+                  content: "Complex family situations requiring ongoing management"
+
+            - type: toggle
+              content: "❌ Poor Candidates for Revocable Trust"
+              blocks:
+                - type: bulleted_list_item
+                  content: "Simple estates under $100,000"
+                - type: bulleted_list_item
+                  content: "All assets have beneficiary designations"
+                - type: bulleted_list_item
+                  content: "Cost concerns override benefits"
+                - type: bulleted_list_item
+                  content: "Unwillingness to transfer asset ownership"
+
+            - type: toggle
+              content: "🤔 Borderline Cases - Need Professional Analysis"
+              blocks:
+                - type: bulleted_list_item
+                  content: "Net worth $100,000 - $300,000"
+                - type: bulleted_list_item
+                  content: "Primarily retirement accounts and life insurance"
+                - type: bulleted_list_item
+                  content: "Young families with growing assets"
+                - type: bulleted_list_item
+                  content: "Business owners with fluctuating values"
+
+        - type: toggle
+          content: "Advanced Trust Strategies"
+          blocks:
+            - type: paragraph
+              content: "Sophisticated trust planning for specific goals:"
+
+            - type: toggle
+              content: "Asset Protection Trusts"
+              blocks:
+                - type: paragraph
+                  content: "Consider for high-risk professions:"
+                - type: bulleted_list_item
+                  content: "Domestic Asset Protection Trusts (DAPTs)"
+                - type: bulleted_list_item
+                  content: "Offshore trust considerations"
+                - type: bulleted_list_item
+                  content: "Professional liability protection"
+                - type: bulleted_list_item
+                  content: "Fraudulent transfer timing rules"
+
+            - type: toggle
+              content: "Generation-Skipping Strategies"
+              blocks:
+                - type: paragraph
+                  content: "Multi-generational wealth transfer:"
+                - type: bulleted_list_item
+                  content: "Dynasty trust structures"
+                - type: bulleted_list_item
+                  content: "GST tax exemption optimization"
+                - type: bulleted_list_item
+                  content: "Rule against perpetuities considerations"
+                - type: bulleted_list_item
+                  content: "Distribution standards for multiple generations"
+
+    - type: heading_2
+      content: Contextual Help Triggers
+    - type: paragraph
+      content: "Smart guidance appears based on your specific circumstances and progress."
+
+    - type: callout
+      icon: emoji:💡
+      content: "SMART TIP: This help system adapts to your entries. Complete basic information first to unlock personalized guidance."
+      color: blue_background
+
+    - type: toggle
+      content: "How Contextual Help Works"
+      blocks:
+        - type: paragraph
+          content: "The system provides targeted advice based on:"
+        - type: bulleted_list_item
+          content: "Estate size and complexity level"
+        - type: bulleted_list_item
+          content: "Family composition and special circumstances"
+        - type: bulleted_list_item
+          content: "Geographic location and state law variations"
+        - type: bulleted_list_item
+          content: "Professional team composition and gaps"
+        - type: bulleted_list_item
+          content: "Document completion status and next steps"

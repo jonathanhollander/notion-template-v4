@@ -262,3 +262,216 @@ pages:
   description: Links to all sections your executor will need.
   slug: qr-executor-full
   cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+
+# Interactive Content Systems - Phase 1.1
+- title: Estate Planning Guide - Interactive
+  parent: Preparation Hub
+  icon: emoji:📚
+  description: Interactive step-by-step guide for comprehensive estate planning
+  role: owner
+  blocks:
+    - type: heading_1
+      content: 📚 Estate Planning Guide - Interactive
+    - type: paragraph
+      content: Complete your estate planning journey with this interactive, step-by-step guide. Click each section to expand detailed instructions and checklists.
+
+    - type: heading_2
+      content: Getting Started
+
+    # Toggle System 1: Basic Estate Setup
+    - type: toggle
+      content: "🏠 Step 1: Basic Estate Setup"
+      blocks:
+        - type: paragraph
+          content: Start with these fundamental estate planning steps to build a solid foundation.
+        - type: bulleted_list_item
+          content: "✅ Create or update your will"
+        - type: bulleted_list_item
+          content: "✅ Designate beneficiaries on all accounts"
+        - type: bulleted_list_item
+          content: "✅ Choose an executor you trust"
+        - type: bulleted_list_item
+          content: "✅ Consider a healthcare power of attorney"
+
+        # Nested Toggle for Advanced Options
+        - type: toggle
+          content: "💡 Advanced Will Options"
+          blocks:
+            - type: paragraph
+              content: Consider these advanced will provisions for comprehensive protection
+            - type: bulleted_list_item
+              content: "Contingent beneficiaries for unexpected situations"
+            - type: bulleted_list_item
+              content: "Guardian nominations for minor children"
+            - type: bulleted_list_item
+              content: "Specific bequests for meaningful items"
+            - type: bulleted_list_item
+              content: "Pet care provisions and funding"
+
+    # Toggle System 2: Financial Organization
+    - type: toggle
+      content: "💰 Step 2: Financial Account Organization"
+      blocks:
+        - type: paragraph
+          content: Organize your financial accounts systematically for easy management and transfer.
+
+        # Nested Banking Toggle
+        - type: toggle
+          content: "🏦 Banking Accounts"
+          blocks:
+            - type: bulleted_list_item
+              content: "Primary checking account with direct deposit"
+            - type: bulleted_list_item
+              content: "High-yield savings account for emergency fund"
+            - type: bulleted_list_item
+              content: "Certificate of deposits (CDs) for long-term savings"
+            - type: bulleted_list_item
+              content: "Safe deposit box inventory and access"
+
+        # Nested Investment Toggle
+        - type: toggle
+          content: "📈 Investment Accounts"
+          blocks:
+            - type: bulleted_list_item
+              content: "401(k) or employer-sponsored retirement plans"
+            - type: bulleted_list_item
+              content: "IRA accounts (Traditional and Roth)"
+            - type: bulleted_list_item
+              content: "Taxable brokerage accounts for additional investments"
+            - type: bulleted_list_item
+              content: "529 education savings accounts"
+            - type: bulleted_list_item
+              content: "HSA health savings accounts"
+
+    # Toggle System 3: Document Checklist
+    - type: toggle
+      content: "📋 Step 3: Important Documents Checklist"
+      blocks:
+        - type: paragraph
+          content: Essential documents to locate, organize, and secure properly.
+
+        # Interactive Checklist with to_do blocks
+        - type: to_do
+          to_do:
+            rich_text:
+              - type: text
+                text:
+                  content: "Birth certificate and Social Security card"
+            checked: false
+        - type: to_do
+          to_do:
+            rich_text:
+              - type: text
+                text:
+                  content: "Marriage certificate / divorce decree"
+            checked: false
+        - type: to_do
+          to_do:
+            rich_text:
+              - type: text
+                text:
+                  content: "Property deeds and mortgage documents"
+            checked: false
+        - type: to_do
+          to_do:
+            rich_text:
+              - type: text
+                text:
+                  content: "Vehicle titles and registrations"
+            checked: false
+        - type: to_do
+          to_do:
+            rich_text:
+              - type: text
+                text:
+                  content: "Insurance policies (life, health, disability)"
+            checked: false
+        - type: to_do
+          to_do:
+            rich_text:
+              - type: text
+                text:
+                  content: "Tax returns (last 7 years)"
+            checked: false
+
+    # Toggle System 4: Professional Team
+    - type: toggle
+      content: "👥 Step 4: Assemble Your Professional Team"
+      blocks:
+        - type: paragraph
+          content: Build a team of trusted professionals to guide your estate planning.
+
+        - type: toggle
+          content: "⚖️ Estate Planning Attorney"
+          blocks:
+            - type: paragraph
+              content: "Essential for creating legally valid documents:"
+            - type: bulleted_list_item
+              content: "Research attorneys specializing in estate planning"
+            - type: bulleted_list_item
+              content: "Check state bar associations for credentials"
+            - type: bulleted_list_item
+              content: "Schedule initial consultation"
+            - type: bulleted_list_item
+              content: "Prepare questions about fees and process"
+
+        - type: toggle
+          content: "💼 Financial Advisor"
+          blocks:
+            - type: paragraph
+              content: "Helps optimize your financial legacy:"
+            - type: bulleted_list_item
+              content: "Review investment strategies for beneficiaries"
+            - type: bulleted_list_item
+              content: "Plan for tax-efficient transfers"
+            - type: bulleted_list_item
+              content: "Coordinate with insurance planning"
+            - type: bulleted_list_item
+              content: "Consider charitable giving strategies"
+
+        - type: toggle
+          content: "📊 Tax Professional"
+          blocks:
+            - type: paragraph
+              content: "Critical for minimizing tax burden:"
+            - type: bulleted_list_item
+              content: "Estate tax planning and exemptions"
+            - type: bulleted_list_item
+              content: "Gift tax strategies"
+            - type: bulleted_list_item
+              content: "Income tax implications for beneficiaries"
+            - type: bulleted_list_item
+              content: "Trust taxation considerations"
+
+    # Toggle System 5: Digital Legacy
+    - type: toggle
+      content: "💻 Step 5: Digital Asset Management"
+      blocks:
+        - type: paragraph
+          content: "Secure and organize your digital presence for future access."
+
+        - type: toggle
+          content: "🔑 Password Management"
+          blocks:
+            - type: bulleted_list_item
+              content: "Use a password manager with emergency access feature"
+            - type: bulleted_list_item
+              content: "Document master password securely"
+            - type: bulleted_list_item
+              content: "Set up legacy contact for password manager"
+            - type: bulleted_list_item
+              content: "Enable two-factor authentication recovery options"
+
+        - type: toggle
+          content: "🌐 Online Accounts"
+          blocks:
+            - type: bulleted_list_item
+              content: "Email accounts - set up inactive account manager"
+            - type: bulleted_list_item
+              content: "Social media - configure memorialization settings"
+            - type: bulleted_list_item
+              content: "Cloud storage - grant emergency access"
+            - type: bulleted_list_item
+              content: "Cryptocurrency wallets - secure key storage"
+            - type: bulleted_list_item
+              content: "Domain names - set auto-renewal or transfer"

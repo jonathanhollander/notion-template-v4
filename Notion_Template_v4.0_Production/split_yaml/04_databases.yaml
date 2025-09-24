@@ -21,6 +21,75 @@ db:
           - Beneficiaries
         Note:
           type: rich_text
+
+        # Phase 3 Enhancement: Cross-Database Rollup Formulas
+        Account_Value:
+          type: number
+          number:
+            format: "dollar"
+
+        Status:
+          type: select
+          select:
+            options:
+              - name: "Not Started"
+                color: "gray"
+              - name: "In Progress"
+                color: "yellow"
+              - name: "Completed"
+                color: "green"
+              - name: "On Hold"
+                color: "orange"
+              - name: "Needs Review"
+                color: "red"
+
+        Completion_Date:
+          type: date
+          date: {}
+
+        Risk_Level:
+          type: select
+          select:
+            options:
+              - name: "Low Risk"
+                color: "green"
+              - name: "Medium Risk"
+                color: "yellow"
+              - name: "High Risk"
+                color: "orange"
+              - name: "Critical Risk"
+                color: "red"
+
+        # Cross-Database Rollup Formulas
+        Cross_Database_Priority:
+          type: formula
+          formula:
+            expression: "if(contains(prop(\"Tags\"), \"Critical\"), \"🚨 CRITICAL: \" + if(prop(\"Status\") == \"Not Started\", \"Start immediately - estate processing blocked\", if(prop(\"Status\") == \"In Progress\", \"Continue urgent work - high dependency\", if(prop(\"Status\") == \"Completed\", \"✅ Critical task complete\", \"⚠️ Critical task needs attention\"))), if(contains(prop(\"Tags\"), \"Tax\"), \"📊 TAX IMPACT: \" + if(prop(\"Account_Value\") > 100000, \"High value - professional review required\", \"Standard processing acceptable\"), if(contains(prop(\"Tags\"), \"Transfer\"), \"📋 TRANSFER: \" + if(prop(\"Status\") == \"Completed\", \"✅ Transfer complete\", \"Pending transfer - coordinate timing\"), \"📝 ROUTINE: Standard estate processing\")))"
+
+        Real_Time_Progress_Tracker:
+          type: formula
+          formula:
+            expression: "if(prop(\"Status\") == \"Not Started\", \"⚪ 0% - \" + if(prop(\"Risk_Level\") == \"Critical Risk\", \"URGENT START REQUIRED\", \"Ready to begin\"), if(prop(\"Status\") == \"In Progress\", \"🟡 50% - \" + if(dateBetween(now(), prop(\"Created\"), \"days\") > 30, \"⏰ OVERDUE: Review needed\", \"Active work in progress\"), if(prop(\"Status\") == \"Completed\", \"🟢 100% - \" + if(empty(prop(\"Completion_Date\")), \"Please set completion date\", \"Completed \" + formatDate(prop(\"Completion_Date\"), \"MMM DD\")), if(prop(\"Status\") == \"On Hold\", \"🟠 PAUSED - \" + if(prop(\"Risk_Level\") == \"Critical Risk\", \"CRITICAL: Cannot remain on hold\", \"Temporary hold acceptable\"), \"🔴 REVIEW - Action needed\"))))"
+
+        Estate_Value_Impact:
+          type: formula
+          formula:
+            expression: "if(prop(\"Account_Value\") > 1000000, \"💎 HIGH VALUE: $\" + format(prop(\"Account_Value\")) + \" - Estate tax implications likely\", if(prop(\"Account_Value\") > 100000, \"💰 SIGNIFICANT: $\" + format(prop(\"Account_Value\")) + \" - Professional oversight recommended\", if(prop(\"Account_Value\") > 10000, \"💵 MODERATE: $\" + format(prop(\"Account_Value\")) + \" - Standard processing\", if(empty(prop(\"Account_Value\")), \"❓ VALUE UNKNOWN - Assessment needed\", \"💴 MINIMAL: Under $10K - Simple processing\"))))"
+
+        Risk_Assessment_Calculator:
+          type: formula
+          formula:
+            expression: "if(prop(\"Risk_Level\") == \"Critical Risk\", \"🚨 CRITICAL RISK: \" + if(prop(\"Status\") == \"Not Started\", \"Immediate action required - estate processing blocked\", if(dateBetween(now(), prop(\"Created\"), \"days\") > 7, \"OVERDUE: \" + format(dateBetween(now(), prop(\"Created\"), \"days\")) + \" days without progress\", \"Under urgent review\")), if(prop(\"Risk_Level\") == \"High Risk\", \"⚠️ HIGH RISK: \" + if(prop(\"Status\") == \"Completed\", \"✅ Risk mitigated successfully\", \"Priority attention needed\"), if(prop(\"Risk_Level\") == \"Medium Risk\", \"⚡ MEDIUM RISK: \" + if(prop(\"Status\") == \"In Progress\", \"Active risk management\", \"Monitor and address\"), \"✅ LOW RISK: Routine processing acceptable\")))"
+
+        Aggregation_Status:
+          type: formula
+          formula:
+            expression: "\"📊 ACCOUNT SUMMARY: \" + prop(\"Type\") + \" | Status: \" + prop(\"Status\") + if(empty(prop(\"Account_Value\")), \" | Value: TBD\", \" | Value: $\" + format(prop(\"Account_Value\"))) + \" | Risk: \" + prop(\"Risk_Level\") + if(contains(prop(\"Tags\"), \"Critical\"), \" | 🚨 CRITICAL PRIORITY\", if(contains(prop(\"Tags\"), \"Tax\"), \" | 📊 TAX IMPLICATIONS\", if(contains(prop(\"Tags\"), \"Transfer\"), \" | 📋 TRANSFER REQUIRED\", \" | 📝 Standard Processing\")))"
+
+        Timeline_Coordination:
+          type: formula
+          formula:
+            expression: "if(prop(\"Status\") == \"Completed\", \"✅ DONE: \" + if(empty(prop(\"Completion_Date\")), \"Recently completed\", \"Completed \" + formatDate(prop(\"Completion_Date\"), \"MMM DD, YYYY\")), if(prop(\"Status\") == \"In Progress\", \"⚡ ACTIVE: \" + if(dateBetween(now(), prop(\"Created\"), \"days\") > 14, \"⏰ Running long (\" + format(dateBetween(now(), prop(\"Created\"), \"days\")) + \" days) - review needed\", \"In progress (\" + format(dateBetween(now(), prop(\"Created\"), \"days\")) + \" days)\"), if(prop(\"Status\") == \"Not Started\", \"⚪ PENDING: \" + if(prop(\"Risk_Level\") == \"Critical Risk\", \"🚨 URGENT - Must start immediately\", if(prop(\"Risk_Level\") == \"High Risk\", \"⚠️ HIGH PRIORITY - Start this week\", \"Standard queue\")), \"🔶 NEEDS ACTION: \" + prop(\"Status\") + \" - Review and update status\")))"
       seed_rows:
       - Name: Bank Accounts
         Institution: ''
@@ -195,6 +264,72 @@ db:
           - Claims
         Note:
           type: rich_text
+
+        # Phase 3 Enhancement: Insurance-Specific Cross-Database Formulas
+        Policy_Value:
+          type: number
+          number:
+            format: "dollar"
+
+        Claim_Status:
+          type: select
+          select:
+            options:
+              - name: "Not Filed"
+                color: "gray"
+              - name: "Filed"
+                color: "yellow"
+              - name: "Under Review"
+                color: "orange"
+              - name: "Approved"
+                color: "green"
+              - name: "Denied"
+                color: "red"
+              - name: "Paid"
+                color: "blue"
+
+        Beneficiary_Status:
+          type: select
+          select:
+            options:
+              - name: "Verified"
+                color: "green"
+              - name: "Needs Update"
+                color: "yellow"
+              - name: "Missing"
+                color: "red"
+              - name: "Under Review"
+                color: "orange"
+
+        Claim_Deadline:
+          type: date
+          date: {}
+
+        # Insurance Cross-Database Rollup Formulas
+        Insurance_Priority_Matrix:
+          type: formula
+          formula:
+            expression: "if(contains(prop(\"Tags\"), \"Life\"), \"💰 LIFE INSURANCE: \" + if(prop(\"Claim_Status\") == \"Not Filed\", \"🚨 URGENT - File claim immediately\", if(prop(\"Claim_Status\") == \"Paid\", \"✅ Claim paid - estate funds received\", \"📋 Claim in progress\")), if(contains(prop(\"Tags\"), \"Claims\"), \"📄 ACTIVE CLAIM: \" + if(empty(prop(\"Claim_Deadline\")), \"⏰ Set claim deadline\", if(dateBetween(prop(\"Claim_Deadline\"), now(), \"days\") < 30, \"🚨 DEADLINE APPROACHING: \" + format(dateBetween(prop(\"Claim_Deadline\"), now(), \"days\")) + \" days remaining\", \"📅 On track - \" + format(dateBetween(prop(\"Claim_Deadline\"), now(), \"days\")) + \" days until deadline\")), if(contains(prop(\"Tags\"), \"Property\"), \"🏠 PROPERTY: \" + if(prop(\"Claim_Status\") == \"Not Filed\", \"Review for potential claims\", \"Policy under review\"), \"📋 GENERAL: Standard processing\")))"
+
+        Estate_Liquidity_Impact:
+          type: formula
+          formula:
+            expression: "if(and(contains(prop(\"Tags\"), \"Life\"), prop(\"Policy_Value\") > 100000), \"💎 HIGH IMPACT: $\" + format(prop(\"Policy_Value\")) + \" - \" + if(prop(\"Claim_Status\") == \"Paid\", \"✅ Estate liquidity enhanced\", if(prop(\"Claim_Status\") == \"Not Filed\", \"🚨 Critical estate funds pending - file claim immediately\", \"💰 Significant estate funds processing\")), if(and(contains(prop(\"Tags\"), \"Life\"), prop(\"Policy_Value\") > 25000), \"💰 MODERATE IMPACT: $\" + format(prop(\"Policy_Value\")) + \" - \" + if(prop(\"Claim_Status\") == \"Paid\", \"✅ Funds received\", \"Important estate funds pending\"), if(empty(prop(\"Policy_Value\")), \"❓ VALUE UNKNOWN - Assess policy value for estate planning\", \"💵 MINIMAL IMPACT: Small policy value\")))"
+
+        Beneficiary_Coordination:
+          type: formula
+          formula:
+            expression: "if(prop(\"Beneficiary_Status\") == \"Missing\", \"🚨 CRITICAL: No beneficiary information - \" + if(contains(prop(\"Tags\"), \"Life\"), \"Life insurance requires immediate beneficiary verification\", \"Update beneficiary information ASAP\"), if(prop(\"Beneficiary_Status\") == \"Needs Update\", \"⚠️ UPDATE NEEDED: \" + if(contains(prop(\"Tags\"), \"Life\"), \"Life insurance beneficiary may be outdated\", \"Beneficiary information needs review\"), if(prop(\"Beneficiary_Status\") == \"Verified\", \"✅ CONFIRMED: \" + if(contains(prop(\"Tags\"), \"Life\"), \"Life insurance beneficiary current\", \"Beneficiary information up to date\"), \"🔍 UNDER REVIEW: Beneficiary verification in progress\")))"
+
+        Claim_Management_Guide:
+          type: formula
+          formula:
+            expression: "if(prop(\"Claim_Status\") == \"Not Filed\", \"🎯 ACTION: \" + if(contains(prop(\"Tags\"), \"Life\"), \"Contact \" + prop(\"Carrier\") + \" to file life insurance claim\", if(contains(prop(\"Tags\"), \"Property\"), \"Assess property damage and file claim if needed\", \"Review policy for potential claims\")), if(prop(\"Claim_Status\") == \"Filed\", \"📋 TRACKING: Claim filed with \" + prop(\"Carrier\") + \" - \" + if(empty(prop(\"Claim_Deadline\")), \"Request processing timeline\", \"Deadline: \" + formatDate(prop(\"Claim_Deadline\"), \"MMM DD\")), if(prop(\"Claim_Status\") == \"Paid\", \"✅ COMPLETE: Claim paid by \" + prop(\"Carrier\") + if(prop(\"Policy_Value\") > 0, \" - Amount: $\" + format(prop(\"Policy_Value\")), \"\"), \"📞 FOLLOW UP: Contact \" + prop(\"Carrier\") + \" for claim status update\")))"
+
+        Cross_Policy_Summary:
+          type: formula
+          formula:
+            expression: "\"🏢 \" + prop(\"Carrier\") + \" | \" + prop(\"Type\") + \" Policy\" + if(empty(prop(\"Policy_Value\")), \" | Value: TBD\", \" | Value: $\" + format(prop(\"Policy_Value\"))) + \" | Claim: \" + prop(\"Claim_Status\") + \" | Beneficiary: \" + prop(\"Beneficiary_Status\") + if(contains(prop(\"Tags\"), \"Life\"), \" | 💰 ESTATE CRITICAL\", if(contains(prop(\"Tags\"), \"Claims\"), \" | 📄 ACTIVE PROCESSING\", \" | 📋 Standard Review\"))"
       seed_rows:
       - Name: Life Insurance
         Type: Life

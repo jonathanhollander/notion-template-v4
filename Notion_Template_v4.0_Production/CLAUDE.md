@@ -1,4 +1,4 @@
-# CLAUDE.md
+FP# CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -115,7 +115,8 @@ pip3 install flask flask-cors flask-socketio flask-limiter
 
 Required environment variables (create `.env` from `.env.example`):
 ```bash
-# Required for Notion deployment
+# Required for Notion deployment - 
+VARIABLES FOR THIS ARE STORED IN .env file 
 NOTION_TOKEN=your_notion_integration_token
 NOTION_PARENT_PAGEID=your_parent_page_id
 
@@ -176,10 +177,34 @@ Edit prompt templates in:
 - `asset_generation/emotional_elements.py` - Emotional enhancement layers
 
 ### Debugging Deployment Issues
-1. Check logs in `logs/deployment.log`
-2. Use `--verbose --verbose` for detailed output
-3. Use `--dry-run` to test without API calls
-4. Validate with `python validate_deployment_ready.py`
+
+**Unified Color-Coded Logging**: All logs go to ONE file: `logs/debug.log`
+
+**Color Codes**:
+- **🟢 API** = Notion API calls/responses
+- **🟤 LLM** = AI/LLM calls (Replicate, OpenAI, etc.)
+- **🔵 ASSET** = Asset processing (icons, covers, page creation)
+- **🔴 ERROR** = Errors, failures, warnings
+- **🟣 TRACE** = Request tracing, correlation IDs
+- **🟠 YAML** = Configuration file processing
+- **⚫ INFO** = General information
+
+**Debugging Commands**:
+```bash
+# View all logs
+cat logs/debug.log
+
+# Monitor in real-time
+tail -f logs/debug.log
+
+# Check API calls only
+grep "🟢 API" logs/debug.log
+
+# Check for errors
+grep "🔴 ERROR" logs/debug.log
+```
+
+**Legacy**: Some logs may still appear in `logs/deployment.log`
 
 ## Important Notes
 
@@ -188,3 +213,4 @@ Edit prompt templates in:
 - Notion API version should be updated from `2022-06-28` to latest
 - Rate limiting is set to 2.5 requests/second by default
 - The system maintains idempotency through marker strings in content
+- the notion deploy page is in the env.
