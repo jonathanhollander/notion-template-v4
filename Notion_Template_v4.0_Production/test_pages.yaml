@@ -1,0 +1,12 @@
+pages:
+- title: Test Parent Page
+  icon: emoji:🧪
+  blocks:
+    - type: paragraph
+      content: "This is the parent page."
+- title: Test Child Page
+  parent: Test Parent Page
+  icon: emoji:🔬
+  blocks:
+    - type: paragraph
+      content: "This is the child page."

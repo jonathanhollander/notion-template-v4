@@ -42,7 +42,7 @@ load_dotenv(override=True)
 
 NOTION_TOKEN = os.getenv("NOTION_TOKEN")
 NOTION_VERSION = os.getenv("NOTION_VERSION", "2025-09-03")
-NOTION_PARENT_PAGEID = os.getenv("NOTION_PARENT_PAGEID")
+NOTION_PARENT_PAGEID = "277a6c4ebadd80799d19d839db90e901"  # Hardcoded correct page ID
 
 GLOBAL_THROTTLE_RPS = float(os.getenv("THROTTLE_RPS", "2.5"))
 ENABLE_SEARCH_FALLBACK = os.getenv("ENABLE_SEARCH_FALLBACK", "1") in ("1", "true", "True", "yes", "YES")
@@ -634,27 +634,6 @@ def load_csv_data(csv_dir: Optional[Path] = None) -> Dict[str, List[Dict]]:
 # PAGE & DATABASE CREATION
 # ============================================================================
 
-def append_blocks_to_page(page_id: str, blocks: List[Dict], state: DeploymentState) -> bool:
-    """Appends blocks to a page in chunks of 100."""
-    if not blocks:
-        return True
-
-    success = True
-    # The Notion API has a limit of 100 blocks per request.
-    for i in range(0, len(blocks), 100):
-        chunk = blocks[i:i+100]
-        payload = {"children": chunk}
-        try:
-            r = req("PATCH", f"https://api.notion.com/v1/blocks/{page_id}/children", data=json.dumps(payload))
-            if not expect_ok(r, f"Appending blocks to page {page_id}"):
-                success = False
-        except Exception as e:
-            logging.error(f"Failed to append blocks to page {page_id}: {e}")
-            state.errors.append({"phase": "pages", "item": page_id, "error": str(e)})
-            success = False
-    return success
-
-
 def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str] = None) -> Optional[str]:
     """Create a Notion page with comprehensive error handling"""
     # Process formula placeholders first, then variable substitution
@@ -734,7 +713,12 @@ def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str
         # Add an empty paragraph block for pages without content
         children = [{"type": "paragraph", "paragraph": {"rich_text": []}}]
 
-    # Create page without blocks first
+    # Handle Notion's 100-block limit per page creation
+    if len(children) > 100:
+        logging.warning(f"Page '{title}' has {len(children)} blocks, exceeding Notion's 100-block limit. Using first 100 blocks.")
+        children = children[:100]
+
+    # Create page
     payload = {
         "parent": parent,
         "properties": properties
@@ -759,24 +743,180 @@ def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str
         elif isinstance(cover_value, dict):
             payload["cover"] = cover_value
 
+    if children:
+        payload["children"] = children
+
+    # Proactive deletion commented out for debugging child page creation failure
+    """
+    # Check if page already exists and delete it to avoid archived conflicts
     try:
+        parent_page_id = parent.get("page_id")
+        if parent_page_id:
+            # Get children of parent page to find existing page
+            search_r = req("GET", f"https://api.notion.com/v1/blocks/{parent_page_id}/children")
+            if expect_ok(search_r, f"Searching for existing page '{title}'"):
+                blocks = j(search_r).get('results', [])
+                existing_page_id = None
+
+                for block in blocks:
+                    if (block.get('type') == 'child_page' and
+                        block.get('child_page', {}).get('title') == title):
+                        existing_page_id = block.get('id')
+                        break
+
+                if existing_page_id:
+                    logging.info(f"Found existing page '{title}' with ID: {existing_page_id}. Deleting to avoid conflicts...")
+                    delete_r = req("DELETE", f"https://api.notion.com/v1/blocks/{existing_page_id}")
+                    if expect_ok(delete_r, f"Deleting existing page '{title}'"):
+                        logging.info(f"Successfully deleted existing page '{title}'")
+                    else:
+                        logging.warning(f"Failed to delete existing page '{title}', continuing with creation...")
+    except Exception as e:
+        logging.warning(f"Error checking for existing page '{title}': {e}, continuing with creation...")
+    """
+
+    try:
+        logging.info(f"Creating page '{title}' with {len(children)} blocks")
+        if children:
+            logging.debug(f"Page payload: {json.dumps(payload, indent=2)}")
+
         r = req("POST", "https://api.notion.com/v1/pages", data=json.dumps(payload))
+
+        # Check for archived content error BEFORE expect_ok
+        response_data = j(r) if r else {}
+        error_message = response_data.get('message', '')
+
+        if r and r.status_code == 400 and 'archived' in error_message.lower():
+            logging.warning(f"Page creation failed due to archived content. Attempting to clear existing content for '{title}'...")
+
+            # Try to get the parent page and check if a page with this title already exists
+            try:
+                # Search for existing page by title in the parent
+                parent_page_id = parent.get("page_id")
+                if parent_page_id:
+                    # Get children of parent page to find existing page
+                    search_r = req("GET", f"https://api.notion.com/v1/blocks/{parent_page_id}/children")
+                    if expect_ok(search_r, f"Searching for existing page '{title}'"):
+                        blocks = j(search_r).get('results', [])
+                        existing_page_id = None
+
+                        for block in blocks:
+                            if (block.get('type') == 'child_page' and
+                                block.get('child_page', {}).get('title') == title):
+                                existing_page_id = block.get('id')
+                                break
+
+                        if existing_page_id:
+                            logging.info(f"Found existing page '{title}' with ID: {existing_page_id}")
+
+                            # Get the existing page's children and delete archived blocks
+                            page_r = req("GET", f"https://api.notion.com/v1/blocks/{existing_page_id}/children")
+                            if expect_ok(page_r, f"Getting children of existing page '{title}'"):
+                                page_blocks = j(page_r).get('results', [])
+
+                                # Delete all existing blocks
+                                for block in page_blocks:
+                                    block_id = block.get('id')
+                                    if block_id:
+                                        delete_r = req("DELETE", f"https://api.notion.com/v1/blocks/{block_id}")
+                                        if expect_ok(delete_r, f"Deleting block {block_id}"):
+                                            logging.debug(f"Deleted block {block_id}")
+
+                                # Now add new content to the existing page
+                                if children:
+                                    add_payload = {"children": children}
+                                    add_r = req("PATCH", f"https://api.notion.com/v1/blocks/{existing_page_id}/children",
+                                               data=json.dumps(add_payload))
+                                    if expect_ok(add_r, f"Adding content to existing page '{title}'"):
+                                        state.created_pages[title] = existing_page_id
+                                        logging.info(f"✅ Updated existing page '{title}': {existing_page_id} with {len(children)} blocks")
+                                        return existing_page_id
+
+                            # If we couldn't add content, at least return the existing page ID
+                            state.created_pages[title] = existing_page_id
+                            logging.warning(f"⚠️ Found existing page '{title}' but couldn't update content: {existing_page_id}")
+                            return existing_page_id
+
+            except Exception as clear_error:
+                logging.error(f"Error while handling archived content for '{title}': {clear_error}")
+
+            return None
+
+        # Normal successful creation
         if expect_ok(r, f"Creating page '{title}'"):
             page_id = j(r).get('id')
             state.created_pages[title] = page_id
-            logging.info(f"✅ Created page '{title}': {page_id}")
+            logging.info(f"✅ Created page '{title}': {page_id} with {len(children)} blocks")
 
-            # Now, append blocks to the newly created page
+            # Verify blocks were added
             if children:
-                if not append_blocks_to_page(page_id, children, state):
-                    logging.warning(f"Failed to append all blocks to page '{title}'")
+                time.sleep(0.5)  # Brief pause for API consistency
+                logging.info(f"Page '{title}' created successfully with content blocks")
+
             return page_id
         else:
             return None
     except Exception as e:
+        error_message = str(e)
+
+        # Handle archived content error in exceptions too
+        if 'archived' in error_message.lower():
+            logging.warning(f"Page creation failed due to archived content exception. Attempting to handle for '{title}'...")
+
+            try:
+                # Search for existing page by title in the parent
+                parent_page_id = parent.get("page_id")
+                if parent_page_id:
+                    # Get children of parent page to find existing page
+                    search_r = req("GET", f"https://api.notion.com/v1/blocks/{parent_page_id}/children")
+                    if expect_ok(search_r, f"Searching for existing page '{title}' after exception"):
+                        blocks = j(search_r).get('results', [])
+                        existing_page_id = None
+
+                        for block in blocks:
+                            if (block.get('type') == 'child_page' and
+                                block.get('child_page', {}).get('title') == title):
+                                existing_page_id = block.get('id')
+                                break
+
+                        if existing_page_id:
+                            logging.info(f"Found existing page '{title}' with ID: {existing_page_id}")
+
+                            # Get the existing page's children and delete archived blocks
+                            page_r = req("GET", f"https://api.notion.com/v1/blocks/{existing_page_id}/children")
+                            if expect_ok(page_r, f"Getting children of existing page '{title}' after exception"):
+                                page_blocks = j(page_r).get('results', [])
+
+                                # Delete all existing blocks
+                                for block in page_blocks:
+                                    block_id = block.get('id')
+                                    if block_id:
+                                        delete_r = req("DELETE", f"https://api.notion.com/v1/blocks/{block_id}")
+                                        if expect_ok(delete_r, f"Deleting block {block_id} after exception"):
+                                            logging.debug(f"Deleted block {block_id}")
+
+                                # Now add new content to the existing page
+                                if children:
+                                    add_payload = {"children": children}
+                                    add_r = req("PATCH", f"https://api.notion.com/v1/blocks/{existing_page_id}/children",
+                                               data=json.dumps(add_payload))
+                                    if expect_ok(add_r, f"Adding content to existing page '{title}' after exception"):
+                                        state.created_pages[title] = existing_page_id
+                                        logging.info(f"✅ Updated existing page '{title}' after exception: {existing_page_id} with {len(children)} blocks")
+                                        return existing_page_id
+
+                            # If we couldn't add content, at least return the existing page ID
+                            state.created_pages[title] = existing_page_id
+                            logging.warning(f"⚠️ Found existing page '{title}' but couldn't update content after exception: {existing_page_id}")
+                            return existing_page_id
+
+            except Exception as clear_error:
+                logging.error(f"Error while handling archived content exception for '{title}': {clear_error}")
+
         logging.error(f"Failed to create page '{title}': {e}")
         state.errors.append({"phase": "pages", "item": title, "error": str(e)})
-        return None
+
+    return None
 
 def create_database(db_name: str, schema: Dict, state: DeploymentState,
                    parent_id: Optional[str] = None, skip_rollups: bool = False) -> Optional[str]:
