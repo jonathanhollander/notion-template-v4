@@ -462,6 +462,7 @@ def req(method: str, url: str, headers: Optional[Dict] = None,
     for attempt in range(max_try):
         try:
             _throttle()
+            logging.info(f"Request: {method} {url}")
             r = requests.request(method, url, headers=headers, data=data, 
                                files=files, timeout=timeout)
             
@@ -636,6 +637,9 @@ def load_csv_data(csv_dir: Optional[Path] = None) -> Dict[str, List[Dict]]:
 
 def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str] = None) -> Optional[str]:
     """Create a Notion page with comprehensive error handling"""
+    logging.info(f"[START] Creating page: {page_data.get('title')}")
+    logging.debug(f"Page data: {json.dumps(page_data, indent=2)}")
+
     # Process formula placeholders first, then variable substitution
     page_data = process_formula_substitution(page_data)
     page_data = process_content_substitution(page_data)
@@ -724,6 +728,19 @@ def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str
         "properties": properties
     }
 
+    # Construct asset URLs from file paths
+    ASSET_BASE_URL = os.getenv("ASSET_BASE_URL", "").rstrip('/')
+    if ASSET_BASE_URL:
+        if 'icon_file' in page_data:
+            icon_url = f"{ASSET_BASE_URL}/{page_data['icon_file'].lstrip('/')}"
+            payload['icon'] = {"type": "external", "external": {"url": icon_url}}
+            logging.info(f"Constructed icon URL for '{title}': {icon_url}")
+
+        if 'cover_file' in page_data:
+            cover_url = f"{ASSET_BASE_URL}/{page_data['cover_file'].lstrip('/')}"
+            payload['cover'] = {"type": "external", "external": {"url": cover_url}}
+            logging.info(f"Constructed cover URL for '{title}': {cover_url}")
+
     # Add icon if specified
     if 'icon' in page_data:
         icon_value = page_data['icon']
@@ -778,7 +795,7 @@ def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str
     try:
         logging.info(f"Creating page '{title}' with {len(children)} blocks")
         if children:
-            logging.debug(f"Page payload: {json.dumps(payload, indent=2)}")
+            logging.debug(f"Full page payload for '{title}': {json.dumps(payload, indent=2)}")
 
         r = req("POST", "https://api.notion.com/v1/pages", data=json.dumps(payload))
 
@@ -2020,7 +2037,7 @@ class NotionTemplateDeployer:
             if not page_id and not self.args.interactive:
                 return False
             elif not page_id and self.args.interactive:
-                if not CLIInterface.prompt_continue(f"Parent page '{title}' creation failed. Continue?"):
+                if not CLIInterface.prompt_continue(f"Child page '{title}' creation failed. Continue?"):
                     return False
 
             self.state.save_checkpoint()
@@ -2037,7 +2054,7 @@ class NotionTemplateDeployer:
             if not page_id and not self.args.interactive:
                 return False
             elif not page_id and self.args.interactive:
-                if not CLIInterface.prompt_continue(f"Child page '{title}' creation failed. Continue?"):
+                if not CLIInterface.prompt_continue(f"Parent page '{title}' creation failed. Continue?"):
                     return False
 
             self.state.save_checkpoint()
