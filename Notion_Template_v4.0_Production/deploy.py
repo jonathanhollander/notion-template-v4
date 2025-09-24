@@ -2066,13 +2066,33 @@ class NotionTemplateDeployer:
         return True
     
     def setup_relations(self, yaml_data: Dict) -> bool:
-        """Setup database relations"""
+        """Setup database relations and rollup properties
+
+        This function now handles:
+        1. Establishing relations between databases (if needed)
+        2. Adding rollup properties that depend on those relations
+        """
         self.state.phase = DeploymentPhase.RELATIONS
         self.progress.update(DeploymentPhase.RELATIONS, "Configuring relations")
-        
-        # TODO: Implement relation setup based on schema definitions
-        # This requires updating database properties after creation
-        
+
+        # Note: Relations are already created during database creation
+        # The relation properties were included in the first pass
+        # Now we need to add the rollup properties that depend on them
+
+        logging.info("Adding rollup properties to databases...")
+        self.progress.update(DeploymentPhase.RELATIONS, "Adding rollup properties")
+
+        # SECOND PASS: Add rollup properties now that all databases and relations exist
+        rollup_success = add_rollup_properties(self.state)
+
+        if not rollup_success:
+            logging.warning("Some rollup properties could not be added")
+            if self.args.interactive:
+                if not CLIInterface.prompt_continue("Some rollup properties failed. Continue?"):
+                    return False
+        else:
+            logging.info("All rollup properties successfully added")
+
         self.state.save_checkpoint()
         return True
     
