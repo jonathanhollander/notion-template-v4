@@ -992,6 +992,87 @@ def create_database(db_name: str, schema: Dict, state: DeploymentState,
     
     return None
 
+def add_rollup_properties(state: DeploymentState) -> bool:
+    """Add rollup properties to databases after all relations are established
+
+    This is the second pass of database creation that adds rollup properties
+    which depend on relations being already established.
+    """
+    if not hasattr(state, 'pending_rollups') or not state.pending_rollups:
+        logging.debug("No pending rollup properties to add")
+        return True
+
+    success = True
+    logging.info(f"Adding rollup properties to {len(state.pending_rollups)} databases")
+
+    for db_name, rollup_definitions in state.pending_rollups.items():
+        if db_name not in state.created_databases:
+            logging.error(f"Cannot add rollups to '{db_name}': database not found")
+            continue
+
+        db_id = state.created_databases[db_name]
+        logging.info(f"Adding {len(rollup_definitions)} rollup properties to database '{db_name}'")
+
+        # Build the properties update payload
+        properties = {}
+        for prop_name, prop_def in rollup_definitions.items():
+            # Ensure the rollup configuration is complete
+            rollup_config = prop_def.get('rollup', {})
+
+            # Validate required fields
+            if not rollup_config.get('relation_property_name'):
+                logging.error(f"Rollup '{prop_name}' missing relation_property_name")
+                continue
+
+            if not rollup_config.get('rollup_property_name'):
+                logging.error(f"Rollup '{prop_name}' missing rollup_property_name")
+                continue
+
+            # Build the rollup property configuration
+            properties[prop_name] = {
+                "rollup": {
+                    "relation_property_name": rollup_config.get('relation_property_name'),
+                    "rollup_property_name": rollup_config.get('rollup_property_name'),
+                    "function": rollup_config.get('function', 'count')
+                }
+            }
+
+            logging.debug(f"Prepared rollup '{prop_name}': {rollup_config.get('relation_property_name')} -> {rollup_config.get('rollup_property_name')} ({rollup_config.get('function', 'count')})")
+
+        if not properties:
+            logging.warning(f"No valid rollup properties to add to '{db_name}'")
+            continue
+
+        # Update the database with rollup properties
+        payload = {
+            "properties": properties
+        }
+
+        try:
+            # Use PATCH to update the database
+            r = req("PATCH", f"https://api.notion.com/v1/databases/{db_id}",
+                   data=json.dumps(payload))
+
+            if expect_ok(r, f"Adding rollup properties to '{db_name}'"):
+                logging.info(f"Successfully added {len(properties)} rollup properties to '{db_name}'")
+
+                # Log each added rollup for confirmation
+                for prop_name in properties.keys():
+                    logging.debug(f"  ✓ Added rollup: {prop_name}")
+            else:
+                success = False
+                logging.error(f"Failed to add rollup properties to '{db_name}'")
+
+        except Exception as e:
+            logging.error(f"Error adding rollup properties to '{db_name}': {e}")
+            state.errors.append({"phase": "rollups", "item": db_name, "error": str(e)})
+            success = False
+
+    # Clear pending rollups after processing
+    state.pending_rollups.clear()
+
+    return success
+
 def convert_legacy_block_format(block_def: Dict) -> Dict:
     """
     Convert old block formats to modern Notion API format
@@ -1926,7 +2007,12 @@ class NotionTemplateDeployer:
         return True
     
     def deploy_databases(self, yaml_data: Dict) -> bool:
-        """Deploy all databases from both db.schemas and standalone databases formats"""
+        """Deploy all databases from both db.schemas and standalone databases formats
+
+        Uses a two-pass system:
+        1. First pass: Create databases without rollup properties
+        2. Second pass: Add rollup properties after all relations are established
+        """
         self.state.phase = DeploymentPhase.DATABASES
 
         # Get databases from db.schemas format
@@ -1956,11 +2042,14 @@ class NotionTemplateDeployer:
             if not CLIInterface.prompt_continue(f"Deploy {len(all_databases)} databases ({len(schemas)} from schemas + {len(converted_standalone)} standalone)?"):
                 return False
 
+        # FIRST PASS: Create databases without rollup properties
+        logging.info("Phase 1: Creating databases without rollup properties...")
         for db_name, schema in all_databases.items():
-            self.progress.update(DeploymentPhase.DATABASES, f"Creating: {db_name}")
+            self.progress.update(DeploymentPhase.DATABASES, f"Creating: {db_name} (without rollups)")
 
             parent_id = self.args.parent_id or NOTION_PARENT_PAGEID
-            db_id = create_database(db_name, schema, self.state, parent_id)
+            # Pass skip_rollups=True for first pass
+            db_id = create_database(db_name, schema, self.state, parent_id, skip_rollups=True)
 
             if not db_id and not self.args.interactive:
                 return False
@@ -1969,6 +2058,10 @@ class NotionTemplateDeployer:
                     return False
 
             self.state.save_checkpoint()
+
+        # Note: The second pass (adding rollups) will happen after relations are set up
+        # This will be called from setup_relations() function
+        logging.info("Databases created. Rollup properties will be added after relations are established.")
 
         return True
     
