@@ -297,13 +297,13 @@ class DeploymentState:
     errors: List[Dict[str, Any]] = field(default_factory=list)
     start_time: float = field(default_factory=time.time)
     checkpoint_file: str = ".notion_deploy_state"
-    
+
     def save_checkpoint(self):
         """Save current state to disk for recovery"""
         with open(self.checkpoint_file, 'wb') as f:
             pickle.dump(self, f)
         logging.debug(f"Checkpoint saved at phase: {self.phase.value}")
-    
+
     def load_checkpoint(self) -> Optional['DeploymentState']:
         """Load previous state if exists"""
         if Path(self.checkpoint_file).exists():
@@ -315,7 +315,7 @@ class DeploymentState:
             except Exception as e:
                 logging.warning(f"Could not recover state: {e}")
         return None
-    
+
     def clear_checkpoint(self):
         """Remove checkpoint after successful completion"""
         if Path(self.checkpoint_file).exists():
@@ -332,7 +332,7 @@ class ProgressTracker:
         self.total_steps = total_steps
         self.current_step = 0
         self.phase = DeploymentPhase.VALIDATION
-        
+
     def update(self, phase: DeploymentPhase, message: str):
         self.phase = phase
         self.current_step += 1
@@ -340,7 +340,7 @@ class ProgressTracker:
         bar_length = 40
         filled = int(bar_length * self.current_step / self.total_steps)
         bar = '█' * filled + '░' * (bar_length - filled)
-        
+
         print(f"\r[{bar}] {progress:.1f}% - {phase.value}: {message}", end='')
         if self.current_step >= self.total_steps:
             print()  # New line at completion
@@ -351,34 +351,34 @@ class ProgressTracker:
 
 class Validator:
     """Comprehensive validation from ChatGPT build"""
-    
+
     @staticmethod
     def validate_environment() -> List[str]:
         """Validate environment variables and configuration"""
         errors = []
-        
+
         if not NOTION_TOKEN:
             errors.append("NOTION_TOKEN environment variable not set")
         elif not NOTION_TOKEN.startswith(('secret_', 'ntn_')):
             errors.append("Invalid NOTION_TOKEN format (should start with 'secret_' or 'ntn_')")
-            
+
         if not NOTION_PARENT_PAGEID:
             errors.append("NOTION_PARENT_PAGEID environment variable not set")
-            
+
         return errors
-    
+
     @staticmethod
     def validate_yaml_structure(yaml_data: Dict) -> List[str]:
         """Validate YAML file structure"""
         errors = []
-        
+
         if not isinstance(yaml_data, dict):
             errors.append("YAML data must be a dictionary")
             return errors
-            
+
         if 'pages' in yaml_data and not isinstance(yaml_data['pages'], list):
             errors.append("'pages' must be a list")
-            
+
         if 'db' in yaml_data:
             if not isinstance(yaml_data['db'], dict):
                 errors.append("'db' must be a dictionary")
@@ -387,43 +387,43 @@ class Validator:
                     errors.append("'db.schemas' must be a dictionary")
                 if 'seed_rows' in yaml_data['db'] and not isinstance(yaml_data['db']['seed_rows'], dict):
                     errors.append("'db.seed_rows' must be a dictionary")
-                    
+
         return errors
-    
+
     @staticmethod
     def validate_dependencies(yaml_data: Dict) -> List[str]:
         """Check for circular dependencies and missing references"""
         errors = []
         dependencies = {}
-        
+
         # Build dependency graph
         if 'pages' in yaml_data:
             for page in yaml_data['pages']:
                 if 'parent' in page:
                     dependencies.setdefault(page.get('title'), []).append(page['parent'])
-                    
+
         # Check for cycles (simplified)
         def has_cycle(node, visited, rec_stack):
             visited[node] = True
             rec_stack[node] = True
-            
+
             for neighbor in dependencies.get(node, []):
                 if neighbor not in visited:
                     if has_cycle(neighbor, visited, rec_stack):
                         return True
                 elif rec_stack[neighbor]:
                     return True
-                    
+
             rec_stack[node] = False
             return False
-        
+
         visited = {}
         rec_stack = {}
         for node in dependencies:
             if node not in visited:
                 if has_cycle(node, visited, rec_stack):
                     errors.append(f"Circular dependency detected involving: {node}")
-                    
+
         return errors
 
 # ============================================================================
@@ -443,8 +443,8 @@ def _throttle():
         time.sleep(min_interval - elapsed + 0.02)
     _LAST_REQ_TS[0] = time.time()
 
-def req(method: str, url: str, headers: Optional[Dict] = None, 
-        data: Optional[str] = None, files: Optional[Any] = None, 
+def req(method: str, url: str, headers: Optional[Dict] = None,
+        data: Optional[str] = None, files: Optional[Any] = None,
         timeout: Optional[int] = None) -> requests.Response:
     """Enhanced request with retry logic and comprehensive error handling"""
     headers = headers or {}
@@ -454,24 +454,24 @@ def req(method: str, url: str, headers: Optional[Dict] = None,
         headers["Authorization"] = f'Bearer {NOTION_TOKEN}'
     if "Content-Type" not in headers and data is not None and files is None:
         headers["Content-Type"] = "application/json"
-    
+
     timeout = timeout or int(os.getenv("NOTION_TIMEOUT", "25"))
     max_try = int(os.getenv("RETRY_MAX", "5"))
     backoff = float(os.getenv("RETRY_BACKOFF_BASE", "1.5"))
-    
+
     for attempt in range(max_try):
         try:
             _throttle()
-            r = requests.request(method, url, headers=headers, data=data, 
+            r = requests.request(method, url, headers=headers, data=data,
                                files=files, timeout=timeout)
-            
+
             # Handle rate limiting
             if r.status_code == 429:
                 retry_after = int(r.headers.get('Retry-After', '5'))
                 logging.warning(f"Rate limited, waiting {retry_after}s")
                 time.sleep(retry_after)
                 continue
-                
+
             # Handle server errors with exponential backoff
             if r.status_code in (502, 503, 504):
                 if attempt < max_try - 1:
@@ -479,21 +479,21 @@ def req(method: str, url: str, headers: Optional[Dict] = None,
                     logging.warning(f"Server error {r.status_code}, retrying in {wait_time}s")
                     time.sleep(wait_time)
                     continue
-                    
+
             return r
-            
+
         except requests.exceptions.Timeout:
             if attempt == max_try - 1:
                 raise
             logging.warning(f"Timeout on attempt {attempt + 1}, retrying...")
             time.sleep(backoff ** attempt)
-            
+
         except requests.exceptions.ConnectionError as e:
             if attempt == max_try - 1:
                 raise
             logging.warning(f"Connection error: {e}, retrying...")
             time.sleep(backoff ** attempt)
-    
+
     return r
 
 def j(r: requests.Response) -> Dict:
@@ -528,11 +528,11 @@ def load_all_yaml(yaml_dir: Optional[Path] = None) -> Dict:
         yaml_dir = Path(__file__).parent / "split_yaml"
     else:
         yaml_dir = Path(yaml_dir)
-    
+
     if not yaml_dir.exists():
         logging.error(f"YAML directory not found: {yaml_dir}")
         return {}
-    
+
     merged = {
         "pages": [],
         "db": {
@@ -541,20 +541,20 @@ def load_all_yaml(yaml_dir: Optional[Path] = None) -> Dict:
         },
         "standalone_databases": []
     }
-    
+
     # Process YAML files in sorted order
     yaml_files = sorted(yaml_dir.glob("*.yaml"))
     logging.info(f"Found {len(yaml_files)} YAML files to process")
-    
+
     for yaml_file in yaml_files:
         logging.debug(f"Loading {yaml_file.name}")
         try:
             with open(yaml_file, 'r', encoding='utf-8') as f:
                 data = yaml.safe_load(f)
-                
+
             if not data:
                 continue
-                
+
             # Apply formula placeholders first, then variable substitution
             data = process_formula_substitution(data)
             data = process_content_substitution(data)
@@ -562,7 +562,7 @@ def load_all_yaml(yaml_dir: Optional[Path] = None) -> Dict:
             # Merge pages
             if 'pages' in data:
                 merged['pages'].extend(data['pages'])
-                
+
             # Merge database schemas
             if 'db' in data:
                 if 'schemas' in data['db']:
@@ -573,10 +573,10 @@ def load_all_yaml(yaml_dir: Optional[Path] = None) -> Dict:
             # Merge standalone databases
             if 'databases' in data:
                 merged['standalone_databases'].extend(data['databases'])
-                    
+
         except Exception as e:
             logging.error(f"Failed to load {yaml_file.name}: {e}")
-            
+
     logging.info(f"Merged {len(merged['pages'])} pages, {len(merged['db']['schemas'])} database schemas, and {len(merged['standalone_databases'])} standalone databases")
     return merged
 
@@ -612,11 +612,11 @@ def load_csv_data(csv_dir: Optional[Path] = None) -> Dict[str, List[Dict]]:
         csv_dir = Path(__file__).parent.parent / "csv"
     else:
         csv_dir = Path(csv_dir)
-    
+
     if not csv_dir.exists():
         logging.warning(f"CSV directory not found: {csv_dir}")
         return {}
-    
+
     csv_data = {}
     for csv_file in csv_dir.glob("*.csv"):
         db_name = csv_file.stem
@@ -627,8 +627,47 @@ def load_csv_data(csv_dir: Optional[Path] = None) -> Dict[str, List[Dict]]:
             logging.debug(f"Loaded {len(csv_data[db_name])} rows from {csv_file.name}")
         except Exception as e:
             logging.error(f"Failed to load {csv_file.name}: {e}")
-            
+
     return csv_data
+
+# ============================================================================
+# FILE UPLOAD UTILITY
+# ============================================================================
+
+def upload_to_fileio(filepath: str) -> Optional[str]:
+    """
+    Uploads a file to file.io and returns the public link.
+
+    Args:
+        filepath: The local path to the file to upload.
+
+    Returns:
+        The public URL of the uploaded file, or None if the upload fails.
+    """
+    if not Path(filepath).exists():
+        logging.error(f"[File.io] File not found for upload: {filepath}")
+        return None
+
+    logging.info(f"[File.io] Uploading {filepath}...")
+    try:
+        with open(filepath, 'rb') as f:
+            r = requests.post("https://file.io", files={"file": f}, timeout=30)
+
+        if r.status_code == 200:
+            response_json = r.json()
+            if response_json.get("success"):
+                link = response_json.get("link")
+                logging.info(f"[File.io] Upload successful: {link}")
+                return link
+            else:
+                logging.error(f"[File.io] API returned an error: {response_json.get('error')}")
+                return None
+        else:
+            logging.error(f"[File.io] Upload failed with status code {r.status_code}: {r.text}")
+            return None
+    except requests.exceptions.RequestException as e:
+        logging.error(f"[File.io] An exception occurred during upload: {e}")
+        return None
 
 # ============================================================================
 # PAGE & DATABASE CREATION
@@ -664,7 +703,7 @@ def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str
     # NOTE: Asset field placeholders disabled for regular pages - only for database entries
     # asset_properties = create_asset_field_placeholders(page_data)
     # properties.update(asset_properties)
-    
+
     # Determine parent
     if parent_id:
         parent = {"page_id": parent_id}
@@ -677,7 +716,7 @@ def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str
             parent = {"page_id": NOTION_PARENT_PAGEID}
     else:
         parent = {"page_id": NOTION_PARENT_PAGEID}
-    
+
     # Build content blocks - handle multiple field names
     children = []
     blocks_data = page_data.get('blocks', page_data.get('body', page_data.get('Body', [])))
@@ -732,14 +771,31 @@ def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str
                 payload["icon"] = {"type": "emoji", "emoji": icon_value.replace('emoji:', '')}
             elif icon_value.startswith('http'):
                 payload["icon"] = {"type": "external", "external": {"url": icon_value}}
+            else:
+                # Handle local file path
+                icon_path = Path("Notion_Template_v4.0_Production") / icon_value
+                public_url = upload_to_fileio(str(icon_path))
+                if public_url:
+                    payload["icon"] = {"type": "external", "external": {"url": public_url}}
+                else:
+                    logging.warning(f"Could not upload icon file for page '{title}': {icon_path}")
         elif isinstance(icon_value, dict):
             payload["icon"] = icon_value
 
     # Add cover if specified
     if 'cover' in page_data:
         cover_value = page_data['cover']
-        if isinstance(cover_value, str) and cover_value.startswith('http'):
-            payload["cover"] = {"type": "external", "external": {"url": cover_value}}
+        if isinstance(cover_value, str):
+            if cover_value.startswith('http'):
+                payload["cover"] = {"type": "external", "external": {"url": cover_value}}
+            else:
+                # Handle local file path
+                cover_path = Path("Notion_Template_v4.0_Production") / cover_value
+                public_url = upload_to_fileio(str(cover_path))
+                if public_url:
+                    payload["cover"] = {"type": "external", "external": {"url": public_url}}
+                else:
+                    logging.warning(f"Could not upload cover file for page '{title}': {cover_path}")
         elif isinstance(cover_value, dict):
             payload["cover"] = cover_value
 
@@ -959,7 +1015,7 @@ def create_database(db_name: str, schema: Dict, state: DeploymentState,
     # Ensure Name property exists
     if 'Name' not in properties:
         properties['Name'] = {"title": {}}
-    
+
     # Determine parent
     if parent_id:
         parent = {"type": "page_id", "page_id": parent_id}
@@ -971,14 +1027,14 @@ def create_database(db_name: str, schema: Dict, state: DeploymentState,
             parent = {"type": "page_id", "page_id": NOTION_PARENT_PAGEID}
     else:
         parent = {"type": "page_id", "page_id": NOTION_PARENT_PAGEID}
-    
+
     # Create database
     payload = {
         "parent": parent,
         "title": [{"text": {"content": db_name}}],
         "properties": properties
     }
-    
+
     try:
         r = req("POST", "https://api.notion.com/v1/databases", data=json.dumps(payload))
         if expect_ok(r, f"Creating database '{db_name}'"):
@@ -989,7 +1045,7 @@ def create_database(db_name: str, schema: Dict, state: DeploymentState,
     except Exception as e:
         logging.error(f"Failed to create database '{db_name}': {e}")
         state.errors.append({"phase": "databases", "item": db_name, "error": str(e)})
-    
+
     return None
 
 def add_rollup_properties(state: DeploymentState) -> bool:
@@ -1575,7 +1631,7 @@ def build_property_schema(prop_def) -> Dict:
         prop_def = {"type": prop_type}  # Convert to dict format
     else:
         prop_type = prop_def.get('type', 'rich_text')
-    
+
     if prop_type == 'title':
         return {"title": {}}
     elif prop_type == 'number':
@@ -1683,7 +1739,7 @@ def build_property_schema(prop_def) -> Dict:
 
 class CLIInterface:
     """Interactive CLI from Qwen build"""
-    
+
     @staticmethod
     def setup_parser() -> argparse.ArgumentParser:
         """Setup command line argument parser"""
@@ -1699,7 +1755,7 @@ Examples:
   %(prog)s --validate-only         # Only run validation
             """
         )
-        
+
         # Deployment modes
         mode_group = parser.add_mutually_exclusive_group()
         mode_group.add_argument('--dry-run', action='store_true',
@@ -1710,13 +1766,13 @@ Examples:
                                help='Resume from last checkpoint')
         mode_group.add_argument('--validate-only', action='store_true',
                                help='Only validate, no deployment')
-        
+
         # Selective deployment
         parser.add_argument('--phase', choices=[p.name.lower() for p in DeploymentPhase],
                           help='Deploy only specific phase')
         parser.add_argument('--skip-phases', nargs='+',
                           help='Skip specific phases')
-        
+
         # Configuration
         parser.add_argument('--yaml-dir', type=Path,
                           help='Directory containing YAML files')
@@ -1724,15 +1780,15 @@ Examples:
                           help='Directory containing CSV files')
         parser.add_argument('--parent-id',
                           help='Override parent page ID')
-        
+
         # Logging
         parser.add_argument('--verbose', '-v', action='count', default=0,
                           help='Increase verbosity (-v, -vv, -vvv)')
         parser.add_argument('--quiet', '-q', action='store_true',
                           help='Suppress non-error output')
-        
+
         return parser
-    
+
     @staticmethod
     def prompt_continue(message: str = "Continue?") -> bool:
         """Interactive prompt for user confirmation"""
@@ -1745,14 +1801,14 @@ Examples:
 
 class NotionTemplateDeployer:
     """Main deployment orchestrator combining all features"""
-    
+
     def __init__(self, args: argparse.Namespace):
         self.args = args
         self.state = DeploymentState()
         self.validator = Validator()
         self.progress = None
         self.setup_logging()
-        
+
     def setup_logging(self):
         """Configure unified color-coded logging"""
         # Always use DEBUG level for comprehensive logging
@@ -1809,7 +1865,7 @@ class NotionTemplateDeployer:
         logging.info("🚀 Unified debug logging initialized")
         logging.info(f"📝 All output in: {log_file}")
         logging.info("🟢=API | 🟤=LLM | 🔵=Assets | 🔴=Errors | ⚫=Info | 🟣=Trace | 🟠=YAML")
-    
+
     def run(self) -> bool:
         """Main deployment entry point"""
         try:
@@ -1821,24 +1877,24 @@ class NotionTemplateDeployer:
                     logging.info(f"Resuming from phase: {self.state.phase.value}")
                 else:
                     logging.info("No checkpoint found, starting fresh")
-            
+
             # Phase 1: Validation
             if not self.skip_phase(DeploymentPhase.VALIDATION):
                 if not self.validate():
                     return False
-                    
+
             if self.args.validate_only:
                 print("\n✅ Validation successful!")
                 return True
-                
+
             if self.args.dry_run:
                 print("\n✅ Dry run successful! Ready for deployment.")
                 return True
-            
+
             # Load configuration
             yaml_data = load_all_yaml(self.args.yaml_dir)
             csv_data = load_csv_data(self.args.csv_dir)
-            
+
             # Calculate total steps for progress tracking
             total_steps = (
                 len(yaml_data.get('pages', [])) +
@@ -1846,13 +1902,13 @@ class NotionTemplateDeployer:
                 len(csv_data) + 10  # Extra steps for patches and finalization
             )
             self.progress = ProgressTracker(total_steps)
-            
+
             # Phase 2: Preparation
             if not self.skip_phase(DeploymentPhase.PREPARATION):
                 self.state.phase = DeploymentPhase.PREPARATION
                 self.progress.update(DeploymentPhase.PREPARATION, "Setting up deployment")
                 self.state.save_checkpoint()
-            
+
             # Phase 3: Create Pages
             if not self.skip_phase(DeploymentPhase.PAGES):
                 # Clear existing content first to avoid archived conflicts
@@ -1861,37 +1917,37 @@ class NotionTemplateDeployer:
 
                 if not self.deploy_pages(yaml_data):
                     return False
-            
+
             # Phase 4: Create Databases
             if not self.skip_phase(DeploymentPhase.DATABASES):
                 if not self.deploy_databases(yaml_data):
                     return False
-            
+
             # Phase 5: Set Relations
             if not self.skip_phase(DeploymentPhase.RELATIONS):
                 if not self.setup_relations(yaml_data):
                     return False
-            
+
             # Phase 6: Import Data
             if not self.skip_phase(DeploymentPhase.DATA):
                 if not self.import_data(csv_data):
                     return False
-            
+
             # Phase 7: Apply Patches
             if not self.skip_phase(DeploymentPhase.PATCHES):
                 if not self.apply_patches(yaml_data):
                     return False
-            
+
             # Phase 8: Finalization
             if not self.skip_phase(DeploymentPhase.FINALIZATION):
                 self.finalize_deployment()
-            
+
             # Success!
             self.state.phase = DeploymentPhase.COMPLETED
             self.state.clear_checkpoint()
             self.print_summary()
             return True
-            
+
         except KeyboardInterrupt:
             logging.warning("\n\nDeployment interrupted! Run with --resume to continue.")
             self.state.save_checkpoint()
@@ -1901,7 +1957,7 @@ class NotionTemplateDeployer:
             self.state.errors.append({"phase": self.state.phase.value, "error": str(e)})
             self.state.save_checkpoint()
             return False
-    
+
     def skip_phase(self, phase: DeploymentPhase) -> bool:
         """Check if phase should be skipped"""
         if self.args.phase and phase.name.lower() != self.args.phase:
@@ -1914,17 +1970,17 @@ class NotionTemplateDeployer:
         if current_phase_order > target_phase_order:  # Already completed in previous run
             return True
         return False
-    
+
     def validate(self) -> bool:
         """Run all validations"""
         self.state.phase = DeploymentPhase.VALIDATION
         errors = []
-        
+
         # Environment validation
         env_errors = self.validator.validate_environment()
         if env_errors:
             errors.extend(env_errors)
-        
+
         # YAML validation
         yaml_data = load_all_yaml(self.args.yaml_dir)
         if not yaml_data:
@@ -1933,20 +1989,20 @@ class NotionTemplateDeployer:
             yaml_errors = self.validator.validate_yaml_structure(yaml_data)
             if yaml_errors:
                 errors.extend(yaml_errors)
-            
+
             dep_errors = self.validator.validate_dependencies(yaml_data)
             if dep_errors:
                 errors.extend(dep_errors)
-        
+
         if errors:
             print("\n❌ Validation failed:")
             for error in errors:
                 print(f"  - {error}")
             return False
-        
+
         logging.info("✅ All validations passed")
         return True
-    
+
     def clear_existing_content(self) -> bool:
         """Clear all existing content from the target page to avoid archived conflicts"""
         try:
@@ -2043,7 +2099,7 @@ class NotionTemplateDeployer:
             self.state.save_checkpoint()
 
         return True
-    
+
     def deploy_databases(self, yaml_data: Dict) -> bool:
         """Deploy all databases from both db.schemas and standalone databases formats
 
@@ -2102,7 +2158,7 @@ class NotionTemplateDeployer:
         logging.info("Databases created. Rollup properties will be added after relations are established.")
 
         return True
-    
+
     def setup_relations(self, yaml_data: Dict) -> bool:
         """Setup database relations and rollup properties
 
@@ -2133,56 +2189,56 @@ class NotionTemplateDeployer:
 
         self.state.save_checkpoint()
         return True
-    
+
     def import_data(self, csv_data: Dict[str, List[Dict]]) -> bool:
         """Import CSV data into databases"""
         self.state.phase = DeploymentPhase.DATA
-        
+
         if self.args.interactive:
             if not CLIInterface.prompt_continue(f"Import data for {len(csv_data)} databases?"):
                 return False
-        
+
         for db_name, rows in csv_data.items():
             if db_name in self.state.processed_csv:
                 continue
-                
+
             self.progress.update(DeploymentPhase.DATA, f"Importing: {db_name} ({len(rows)} rows)")
-            
+
             # TODO: Implement CSV import logic
             # This requires creating pages in the database with CSV data
-            
+
             self.state.processed_csv.append(db_name)
             self.state.save_checkpoint()
-        
+
         return True
-    
+
     def apply_patches(self, yaml_data: Dict) -> bool:
         """Apply any patches or updates"""
         self.state.phase = DeploymentPhase.PATCHES
         self.progress.update(DeploymentPhase.PATCHES, "Applying patches")
-        
+
         # TODO: Implement patch application logic
         # This could include updating properties, adding blocks, etc.
-        
+
         self.state.save_checkpoint()
         return True
-    
+
     def finalize_deployment(self):
         """Final cleanup and verification"""
         self.state.phase = DeploymentPhase.FINALIZATION
         self.progress.update(DeploymentPhase.FINALIZATION, "Finalizing deployment")
-        
+
         # TODO: Add final verification steps
         # - Verify all pages accessible
         # - Check database permissions
         # - Generate deployment report
-        
+
         time.sleep(1)  # Give progress bar time to complete
-    
+
     def print_summary(self):
         """Print deployment summary"""
         duration = time.time() - self.state.start_time
-        
+
         print("\n" + "="*60)
         print("DEPLOYMENT SUMMARY")
         print("="*60)
@@ -2191,12 +2247,12 @@ class NotionTemplateDeployer:
         print(f"📄 Pages created: {len(self.state.created_pages)}")
         print(f"🗄️  Databases created: {len(self.state.created_databases)}")
         print(f"📊 Data imported: {len(self.state.processed_csv)} datasets")
-        
+
         if self.state.errors:
             print(f"\n⚠️  Errors encountered: {len(self.state.errors)}")
             for error in self.state.errors[:5]:  # Show first 5 errors
                 print(f"  - {error['phase']}: {error.get('item', '')} - {error['error']}")
-        
+
         print("\n📍 Root page ID:", self.args.parent_id or NOTION_PARENT_PAGEID)
         print("="*60)
 
@@ -2209,15 +2265,15 @@ def main():
     cli = CLIInterface()
     parser = cli.setup_parser()
     args = parser.parse_args()
-    
+
     # Override parent ID if provided
     if args.parent_id:
         os.environ['NOTION_PARENT_PAGEID'] = args.parent_id
-    
+
     # Run deployment
     deployer = NotionTemplateDeployer(args)
     success = deployer.run()
-    
+
     sys.exit(0 if success else 1)
 
 if __name__ == "__main__":
