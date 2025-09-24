@@ -918,19 +918,40 @@ def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str
 
     return None
 
-def create_database(db_name: str, schema: Dict, state: DeploymentState, 
-                   parent_id: Optional[str] = None) -> Optional[str]:
-    """Create a Notion database with schema"""
-    
+def create_database(db_name: str, schema: Dict, state: DeploymentState,
+                   parent_id: Optional[str] = None, skip_rollups: bool = False) -> Optional[str]:
+    """Create a Notion database with schema
+
+    Args:
+        db_name: Name of the database
+        schema: Database schema definition
+        state: Deployment state tracking
+        parent_id: Parent page ID
+        skip_rollups: If True, skip rollup properties (for two-pass creation)
+    """
+
     # Check if already created
     if db_name in state.created_databases:
         logging.debug(f"Database '{db_name}' already exists: {state.created_databases[db_name]}")
         return state.created_databases[db_name]
-    
+
     # Build properties schema
     properties = {}
+    rollup_definitions = {}  # Store rollups for later if skipping
+
     for prop_name, prop_def in schema.get('properties', {}).items():
+        # Skip rollup properties if requested (first pass)
+        if skip_rollups and prop_def.get('type') == 'rollup':
+            rollup_definitions[prop_name] = prop_def
+            logging.debug(f"Skipping rollup property '{prop_name}' in database '{db_name}' (will add in second pass)")
+            continue
         properties[prop_name] = build_property_schema(prop_def)
+
+    # Store rollup definitions for later processing
+    if rollup_definitions:
+        if not hasattr(state, 'pending_rollups'):
+            state.pending_rollups = {}
+        state.pending_rollups[db_name] = rollup_definitions
 
     # Resolve database references in relation properties
     properties = resolve_database_references(properties, state)
@@ -1234,6 +1255,26 @@ def build_block(block_def) -> Dict:
                     "rich_text": [{"text": {"content": f"[DATABASE: {title} - Reference not resolved]"}}]
                 }
             }
+    elif 'linked_db' in block_def:
+        # Handle linked_db as a reference to a database (convert to child_database)
+        db_name = block_def.get('linked_db', '')
+        logger.info(f"Converting linked_db '{db_name}' to child_database reference")
+
+        # Try to find the database ID if it was already created
+        if hasattr(state, 'created_databases') and db_name in state.created_databases:
+            return {
+                "child_database": {
+                    "title": db_name
+                }
+            }
+        else:
+            # Fallback: create a placeholder that references the database
+            return {
+                "paragraph": {
+                    "rich_text": [{"text": {"content": f"[DATABASE VIEW: {db_name}]"}}],
+                    "color": "gray_background"
+                }
+            }
     elif block_type == "image":
         # Image block
         image_url = block_def.get("url") or block_def.get("src") or block_def.get("image_url") or ""
@@ -1515,11 +1556,19 @@ def build_property_schema(prop_def) -> Dict:
         relation_config = {"database_id": database_id}
 
         # Handle dual_property relations if specified
-        if prop_def.get('relation_type') == 'dual_property':
-            relation_config["dual_property"] = {
-                "synced_property_name": prop_def.get('synced_property_name', ''),
-                "synced_property_id": prop_def.get('synced_property_id', '')
-            }
+        # Check both old format (relation_type) and new format (nested in relation)
+        relation_def = prop_def.get('relation', {})
+
+        if prop_def.get('relation_type') == 'dual_property' or relation_def.get('type') == 'dual_property':
+            # Extract dual_property config from either format
+            dual_prop_config = prop_def.get('dual_property') or relation_def.get('dual_property', {})
+
+            if dual_prop_config:
+                relation_config["type"] = "dual_property"
+                relation_config["dual_property"] = {
+                    "synced_property_name": dual_prop_config.get('synced_property_name', ''),
+                    "synced_property_id": dual_prop_config.get('synced_property_id', '')
+                }
 
         return {"relation": relation_config}
     elif prop_type == 'rollup':
@@ -1538,6 +1587,12 @@ def build_property_schema(prop_def) -> Dict:
     elif prop_type == 'last_edited_time':
         # Handle last_edited_time property type
         return {"last_edited_time": {}}
+    elif prop_type == 'created_time':
+        # Handle created_time property type
+        return {"created_time": {}}
+    elif prop_type == 'files':
+        # Handle files property type for file attachments
+        return {"files": {}}
     else:  # Default to rich_text
         return {"rich_text": {}}
 
