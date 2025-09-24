@@ -4,19 +4,19 @@ complexity: moderate
 pages:
   - title: "Preparation Hub"
     body:
-      - type: callout
-        icon: "emoji:📊"
-        color: gray_background
-        text: "HUB_MARKER::PREP • Embed 'Setup & Acceptance – Active' view below for live progress. (Create the Saved View first in the DB.)"
+      - type: child_database
+        database_ref: "Setup & Acceptance"
+        title: "Setup & Acceptance - Active View"
   - title: "Executor Hub"
     body:
-      - type: callout
-        icon: "emoji:📊"
-        color: gray_background
-        text: "HUB_MARKER::EXEC • Embed 'Executor Tasks – Active' and 'Insurance Claims – Open' views below."
+      - type: child_database
+        database_ref: "Executor Tasks"
+        title: "Executor Tasks - Active View"
+      - type: child_database
+        database_ref: "Insurance Claims"
+        title: "Insurance Claims - Open View"
   - title: "Family Hub"
     body:
-      - type: callout
-        icon: "emoji:📊"
-        color: gray_background
-        text: "HUB_MARKER::FAM • Embed 'Letters – Outbox' view here for at-a-glance communication status."
+      - type: child_database
+        database_ref: "Letters"
+        title: "Letters - Outbox View"

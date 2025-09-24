@@ -37,11 +37,12 @@ import re
 # ============================================================================
 
 # Load environment variables from .env file
-load_dotenv()
+# Use override=True to force .env file values to override shell environment variables
+load_dotenv(override=True)
 
 NOTION_TOKEN = os.getenv("NOTION_TOKEN")
 NOTION_VERSION = os.getenv("NOTION_VERSION", "2025-09-03")
-NOTION_PARENT_PAGEID = os.getenv("NOTION_PARENT_PAGEID")
+NOTION_PARENT_PAGEID = "277a6c4ebadd80799d19d839db90e901"  # Hardcoded correct page ID
 
 GLOBAL_THROTTLE_RPS = float(os.getenv("THROTTLE_RPS", "2.5"))
 ENABLE_SEARCH_FALLBACK = os.getenv("ENABLE_SEARCH_FALLBACK", "1") in ("1", "true", "True", "yes", "YES")
@@ -681,6 +682,18 @@ def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str
     children = []
     blocks_data = page_data.get('blocks', page_data.get('body', page_data.get('Body', [])))
 
+    # If Body field contains a string, convert to proper block format per Notion API 2025
+    if isinstance(blocks_data, str):
+        # Split by double newlines to create logical paragraph blocks (API best practice)
+        paragraphs = blocks_data.split('\n\n')
+        blocks_data = []
+        for para in paragraphs:
+            if para.strip():  # Skip empty paragraphs
+                blocks_data.append({
+                    "type": "paragraph",
+                    "content": para.strip()
+                })
+
     if blocks_data:
         logging.debug(f"Found {len(blocks_data)} blocks for page '{title}'")
         for block in blocks_data:
@@ -1221,6 +1234,164 @@ def build_block(block_def) -> Dict:
                     "rich_text": [{"text": {"content": f"[DATABASE: {title} - Reference not resolved]"}}]
                 }
             }
+    elif block_type == "image":
+        # Image block
+        image_url = block_def.get("url") or block_def.get("src") or block_def.get("image_url") or ""
+        caption = block_def.get("caption") or block_def.get("alt") or ""
+
+        if not image_url:
+            logger.warning("Image block missing URL")
+            return {"paragraph": {"rich_text": [{"text": {"content": "[Image - URL missing]"}}]}}
+
+        return {
+            "image": {
+                "type": "external",
+                "external": {"url": image_url},
+                "caption": [{"text": {"content": caption}}] if caption else []
+            }
+        }
+
+    elif block_type == "file":
+        # File attachment block
+        file_url = block_def.get("url") or block_def.get("file_url") or ""
+        file_name = block_def.get("name") or block_def.get("filename") or "File"
+
+        if not file_url:
+            logger.warning("File block missing URL")
+            return {"paragraph": {"rich_text": [{"text": {"content": f"[File: {file_name} - URL missing]"}}]}}
+
+        return {
+            "file": {
+                "type": "external",
+                "external": {"url": file_url},
+                "caption": [{"text": {"content": file_name}}]
+            }
+        }
+
+    elif block_type == "pdf":
+        # PDF embed block
+        pdf_url = block_def.get("url") or block_def.get("pdf_url") or ""
+        title = block_def.get("title") or "PDF Document"
+
+        if not pdf_url:
+            logger.warning("PDF block missing URL")
+            return {"paragraph": {"rich_text": [{"text": {"content": f"[PDF: {title} - URL missing]"}}]}}
+
+        return {
+            "pdf": {
+                "type": "external",
+                "external": {"url": pdf_url},
+                "caption": [{"text": {"content": title}}]
+            }
+        }
+
+    elif block_type == "bookmark":
+        # Bookmark/web link block
+        url = block_def.get("url") or block_def.get("link") or ""
+        caption = block_def.get("caption") or block_def.get("title") or url
+
+        if not url:
+            logger.warning("Bookmark block missing URL")
+            return {"paragraph": {"rich_text": [{"text": {"content": "[Bookmark - URL missing]"}}]}}
+
+        return {
+            "bookmark": {
+                "url": url,
+                "caption": [{"text": {"content": caption}}] if caption != url else []
+            }
+        }
+
+    elif block_type == "quote":
+        # Quote block
+        text = block_def.get("content") or block_def.get("text") or ""
+        author = block_def.get("author") or block_def.get("citation") or ""
+
+        quote_content = text
+        if author:
+            quote_content = f"{text}\n— {author}"
+
+        return {
+            "quote": {
+                "rich_text": [{"text": {"content": quote_content}}],
+                "color": "default"
+            }
+        }
+
+    elif block_type == "column_list":
+        # Column layout container - requires special handling
+        columns = block_def.get("columns") or []
+
+        if not columns:
+            logger.warning("Column list block missing columns")
+            return {"paragraph": {"rich_text": [{"text": {"content": "[Column Layout]"}}]}}
+
+        # For now, flatten columns into sequential blocks
+        # Notion API requires creating column_list with column children
+        # This would need special handling in create_page_with_blocks
+        logger.info(f"Column layout with {len(columns)} columns - flattening for now")
+        return {"paragraph": {"rich_text": [{"text": {"content": f"[Column Layout: {len(columns)} columns]"}}]}}
+
+    elif block_type == "link_to_page":
+        # Link to another page block
+        page_id = block_def.get("page_id") or block_def.get("target_page_id") or ""
+        page_title = block_def.get("title") or block_def.get("page_title") or "Linked Page"
+
+        if not page_id:
+            # Try to find page by title if ID not provided
+            page_title_to_find = block_def.get("page_title") or block_def.get("title")
+            # Note: page_ids would need to be tracked globally or passed in
+            # For now, just fallback to text
+
+        if not page_id:
+            logger.warning(f"Link to page block missing page_id for: {page_title}")
+            return {"paragraph": {"rich_text": [{"text": {"content": f"→ {page_title}"}}]}}
+
+        return {
+            "link_to_page": {
+                "type": "page_id",
+                "page_id": page_id
+            }
+        }
+
+    elif block_type == "child_page":
+        # Child page reference block - creates a link to a subpage
+        page_id = block_def.get("page_id") or ""
+        title = block_def.get("title") or block_def.get("page_title") or "Child Page"
+        icon = block_def.get("icon") or ""
+
+        if not page_id:
+            # Note: Would need global page_ids tracking for title resolution
+            logger.warning(f"Child page block missing page_id, using fallback for: {title}")
+            # Fallback to a styled paragraph that looks like a child page link
+            icon_str = f"{icon} " if icon else "📄 "
+            return {"paragraph": {"rich_text": [{"text": {"content": f"{icon_str}{title}"}}]}}
+
+        return {
+            "child_page": {
+                "page_id": page_id
+            }
+        }
+
+    elif block_type == "table_of_contents":
+        # Automatic table of contents from headings in the page
+        # TOC automatically includes all heading_1, heading_2, heading_3 blocks
+        color = block_def.get("color") or block_def.get("background_color") or "default"
+
+        # Notion API table_of_contents block
+        return {
+            "table_of_contents": {
+                "color": color
+            }
+        }
+
+    elif block_type == "breadcrumb":
+        # Navigation breadcrumb showing page hierarchy
+        # Breadcrumb automatically generates from the page's position in workspace
+        # No additional configuration needed - it reads from page hierarchy
+        return {
+            "breadcrumb": {}
+        }
+
     else:  # Default to paragraph
         return {
             "paragraph": {
