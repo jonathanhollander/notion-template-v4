@@ -203,10 +203,49 @@ class DeploymentRequirementsTest:
 
     def test_no_duplicate_functions(self) -> bool:
         """Test for duplicate function definitions"""
-        # This check is currently flawed and producing false positives for __init__ in different classes.
-        # It will be disabled for now.
-        print("  ✓ Skipping duplicate function check (flawed).")
-        return True
+        deploy_file = Path("deploy.py")
+
+        if not deploy_file.exists():
+            self.errors.append("deploy.py not found")
+            return False
+
+        with open(deploy_file, 'r') as f:
+            lines = f.readlines()
+
+        # Track function definitions
+        functions = {}
+        duplicates = []
+
+        for i, line in enumerate(lines, 1):
+            if line.strip().startswith('def '):
+                func_name = line.strip().split('(')[0].replace('def ', '')
+                if func_name in functions:
+                    duplicates.append(f"{func_name} (lines {functions[func_name]} and {i})")
+                else:
+                    functions[func_name] = i
+
+        # Check for specific known duplicates that should be removed
+        problematic_funcs = ['validate_token', 'validate_token_with_api']
+
+        for func in problematic_funcs:
+            if func in functions:
+                # Check if it's imported from modules
+                import_line = f"from modules.auth import {func}"
+                content = ''.join(lines)
+                if import_line in content:
+                    self.warnings.append(
+                        f"{func} is both imported and defined locally - potential conflict"
+                    )
+                    print(f"  ⚠️  {func} may have namespace conflict")
+
+        if duplicates:
+            for dup in duplicates:
+                self.errors.append(f"Duplicate function: {dup}")
+                print(f"  ✗ Duplicate: {dup}")
+            return False
+        else:
+            print(f"  ✓ No duplicate functions found")
+            return True
 
     def test_api_configuration(self) -> bool:
         """Test API configuration consistency"""
@@ -349,10 +388,34 @@ class DeploymentRequirementsTest:
 
     def test_security(self) -> bool:
         """Test for security issues"""
-        # This check is currently flawed and producing false positives.
-        # It will be disabled for now.
-        print("  ✓ Skipping security check (flawed).")
-        return True
+        deploy_file = Path("deploy.py")
+
+        if not deploy_file.exists():
+            return False
+
+        with open(deploy_file, 'r') as f:
+            content = f.read()
+
+        security_issues = []
+
+        # Check for hardcoded tokens
+        if 'secret_' in content and '="secret_' in content:
+            security_issues.append("Possible hardcoded token found")
+            print(f"  ⚠️  Possible hardcoded token")
+
+        # Check for SQL injection protection
+        if 'sanitize_input' in content or 'check_role_permission' in content:
+            print(f"  ✓ Input sanitization functions present")
+        else:
+            self.warnings.append("Input sanitization may be missing")
+
+        # Check for proper token validation
+        if 'validate_token' in content:
+            print(f"  ✓ Token validation present")
+        else:
+            security_issues.append("Token validation missing")
+
+        return len(security_issues) == 0
 
     def test_file_structure(self) -> bool:
         """Test required file structure"""
