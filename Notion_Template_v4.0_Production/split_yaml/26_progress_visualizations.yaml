@@ -1,223 +1,295 @@
-# Progress Visualization System
-complexity: moderate
+# COMPLETE DASHBOARD WIDGET SYSTEM
+# Recovered from legacy progress_dashboard.py (608 lines)
 
-pages:
-- title: Progress Dashboard
-  parent: Preparation Hub
-  icon: emoji:📊
-  description: Comprehensive progress tracking and visualization system
-  role: owner
-  blocks:
-    - type: heading_1
-      content: 📊 Estate Planning Progress Dashboard
-    - type: paragraph
-      content: Track your estate planning journey with visual progress indicators, completion metrics, and timeline analysis.
-    
-    - type: heading_2
-      content: Overall Progress Overview
-    - type: callout
-      icon: emoji:🚀
-      content: "Overall Completion: 68% - We're on our way! 🌟"
-      color: blue_background
+dashboard_system:
+  enabled: true
+  update_frequency: "real_time"
 
-    - type: heading_2
-      content: Progress by Category
-    - type: callout
-      icon: emoji:🔥
-      content: "Critical Tasks: 85% [█████████████████░░░] 85%"
-      color: green_background
-    - type: callout
-      icon: emoji:📄
-      content: "Documents Ready: 72% [██████████████░░░░░░] 72%"
-      color: gray_background
-    - type: callout
-      icon: emoji:👔
-      content: "Professional Coordination: 90% [██████████████████░░] 90%"
-      color: purple_background
-    - type: callout
-      icon: emoji:⚖️
-      content: "Legal Compliance: 78% [███████████████░░░░░] 78%"
-      color: brown_background
-    - type: callout
-      icon: emoji:👨‍👩‍👧‍👦
-      content: "Family Access Setup: 45% [█████████░░░░░░░░░░░] 45% - 🚧 Work in Progress"
-      color: yellow_background
-    
-    - type: heading_2
-      content: Implementation Timeline
-    - type: bulleted_list_item
-      content: "✅ Foundation Setup (Days 1-3)"
-    - type: bulleted_list_item
-      content: "🔵 Core Systems (Days 4-10)"
-    - type: bulleted_list_item
-      content: "🔵 Professional Integration (Days 11-15)"
-    - type: bulleted_list_item
-      content: "⚪ Family Coordination (Days 16-20)"
-    - type: bulleted_list_item
-      content: "⚪ Final Testing (Days 21-25)"
-    
-    - type: heading_2
-      content: System Status Dashboard
-    - type: callout
-      icon: emoji:🔗
-      content: "Database Connectivity: ✅ All 11 databases connected and syncing"
-      color: green_background
-    - type: callout
-      icon: emoji:⚡
-      content: "API Status: ✅ v2025-09-03 fully operational (2.5 RPS)"
-      color: green_background
-    - type: callout
-      icon: emoji:🔢
-      content: "Rollup Calculations: ✅ Cross-database aggregations active"
-      color: green_background
-    - type: callout
-      icon: emoji:🎨
-      content: "Assets: ✅ 25 icons + 15 covers integrated with fallbacks"
-      color: green_background
-    - type: callout
-      icon: emoji:🤝
-      content: "Professional Services: 🔵 5 of 8 contacts configured"
-      color: yellow_background
-    
-    - type: heading_2
-      content: Task Burndown Analysis
-    - type: paragraph
-      content: "Track task completion velocity and project timeline adherence."
-    - type: callout
-      icon: emoji:📊
-      content: "Total Tasks: 25\nCompleted: 8 ✅\nIn Progress: 5 🔄\nRemaining: 12 ⏳"
-      color: gray_background
-    - type: callout
-      icon: emoji:⚡
-      content: "Velocity: 0.8 tasks/day\nProjected Completion: Day 25"
-      color: blue_background
+progress_widgets:
+  # PROGRESS BAR WIDGET - Complete Implementation
+  estate_progress_bar:
+    type: "progress_bar"
+    title: "Overall Estate Planning Progress"
+    description: "Complete overview of all estate planning tasks"
+    position: [1, 1]
+    size: "large"
+    data_source:
+      database: "tasks_master"
+      completed_filter:
+        property: "Status"
+        condition: "equals"
+        value: "✅ Complete"
+      total_count_property: "task_count"
+    visualization:
+      style: "unicode_bar"
+      length: 20
+      completed_char: "█"
+      remaining_char: "░"
+      show_percentage: true
+      show_fraction: true
+    content_template: |
+      📊 **Estate Planning Progress**
 
-- title: Analytics Hub
-  parent: Executor Hub
-  icon: emoji:📈
-  description: Advanced analytics and reporting for estate planning metrics
-  role: executor
-  blocks:
-    - type: heading_1
-      content: 📈 Estate Planning Analytics Hub
-    - type: paragraph
-      content: Advanced metrics, trend analysis, and performance indicators for comprehensive estate planning oversight.
-    
-    - type: heading_2
-      content: Key Performance Indicators
-    - type: callout
-      icon: emoji:🎯
-      content: "Completion Rate: 68% (Target: 85% by Day 20)"
-      color: yellow_background
-    - type: callout
-      icon: emoji:⚡
-      content: "Task Velocity: 0.8 tasks/day (Target: 1.2 tasks/day)"
-      color: red_background
-    - type: callout
-      icon: emoji:🔄
-      content: "Database Sync Health: 98.5% (Excellent)"
-      color: green_background
-    - type: callout
-      icon: emoji:👥
-      content: "Professional Engagement: 87% (5/8 contacts active)"
-      color: green_background
-    
-    - type: heading_2
-      content: Trend Analysis
-    - type: paragraph
-      content: "Weekly progress trends and performance patterns:"
-    - type: bulleted_list_item
-      content: "Week 1: Foundation setup completed ahead of schedule"
-    - type: bulleted_list_item
-      content: "Week 2: Database integration exceeded expectations"
-    - type: bulleted_list_item
-      content: "Week 3: Professional coordination phase initiated"
-    - type: bulleted_list_item
-      content: "Week 4: Family access setup phase (current focus)"
-    
-    - type: heading_2
-      content: Completion Forecasting
-    - type: callout
-      icon: emoji:🔮
-      content: "Projected completion: Day 25 (95% confidence)\nCritical path: Family access setup\nRisk factors: Professional response times"
-      color: blue_background
-    
-    - type: heading_2
-      content: Quality Metrics
-    - type: callout
-      icon: emoji:✅
-      content: "Document Completeness: 87%"
-      color: green_background
-    - type: callout
-      icon: emoji:🔍
-      content: "Error Rate: 2.1% (Below 5% target)"
-      color: green_background
-    - type: callout
-      icon: emoji:🛡️
-      content: "Security Compliance: 94%"
-      color: green_background
-    - type: callout
-      icon: emoji:🔄
-      content: "System Uptime: 99.8%"
-      color: green_background
+      {{progress_bar}} {{percentage}}% ({{completed}}/{{total}})
 
-- title: Visual Progress Center
-  parent: Family Hub
-  icon: emoji:📊
-  description: Family-friendly progress visualizations and milestone tracking
-  role: family
-  blocks:
-    - type: heading_1
-      content: 📊 Family Progress Center
-    - type: paragraph
-      content: Easy-to-understand progress tracking designed for family members to stay informed about estate planning progress.
+      **Current Status**: {{status_text}}
+      **Estimated Completion**: {{estimated_date}}
+      **Last Updated**: {{last_update}}
+
+  # MILESTONE TRACKER WIDGET - Complete Implementation
+  milestone_tracker:
+    type: "milestone_tracker"
+    title: "Major Estate Planning Milestones"
+    description: "Track completion of major estate planning phases"
+    position: [1, 2]
+    size: "medium"
+    data_source:
+      database: "milestones_master"
+      status_property: "Milestone_Status"
+      date_property: "Target_Date"
+      priority_property: "Priority"
+    milestones:
+      - name: "Initial Planning & Will Draft"
+        key: "phase_1"
+        target_tasks: ["1.1", "1.2", "1.3", "2.1"]
+        icon: "📝"
+      - name: "Asset Documentation Complete"
+        key: "phase_2"
+        target_tasks: ["3.1", "3.2", "4.1", "4.2"]
+        icon: "📋"
+      - name: "Legal Review & Execution"
+        key: "phase_3"
+        target_tasks: ["5.1", "5.2", "6.1"]
+        icon: "⚖️"
+      - name: "Implementation & Notification"
+        key: "phase_4"
+        target_tasks: ["7.1", "7.2", "8.1"]
+        icon: "✅"
+    visualization:
+      layout: "timeline"
+      show_progress: true
+      highlight_current: true
+    content_template: |
+      🎯 **Estate Planning Milestones**
+
+      {{#milestones}}
+      {{icon}} **{{name}}**
+      Progress: {{progress_bar}} {{percentage}}%
+      Status: {{status}} | Target: {{target_date}}
+
+      {{/milestones}}
+
+  # ACTIVITY TIMELINE WIDGET - Complete Implementation
+  activity_timeline:
+    type: "activity_timeline"
+    title: "Recent Estate Planning Activity"
+    description: "Timeline of recent completions and updates"
+    position: [2, 1]
+    size: "medium"
+    data_source:
+      database: "activity_log"
+      date_property: "Completed_Date"
+      task_property: "Task_Name"
+      user_property: "Updated_By"
+      max_items: 15
+    timeline_config:
+      time_grouping: "daily"
+      show_relative_dates: true
+      highlight_today: true
+      max_days: 30
+    content_template: |
+      📅 **Recent Activity**
+
+      {{#activities}}
+      **{{relative_date}}** - {{time}}
+      {{icon}} {{task_name}}
+      {{#user}}Updated by {{user}}{{/user}}
+
+      {{/activities}}
+
+  # STATUS SUMMARY WIDGET - Complete Implementation
+  status_summary:
+    type: "status_summary"
+    title: "Estate Planning Status Overview"
+    description: "High-level status across all categories"
+    position: [2, 2]
+    size: "large"
+    data_source:
+      databases:
+        - name: "financial_tasks"
+          category: "Financial"
+          icon: "💰"
+        - name: "legal_tasks"
+          category: "Legal"
+          icon: "⚖️"
+        - name: "personal_tasks"
+          category: "Personal"
+          icon: "👥"
+        - name: "digital_tasks"
+          category: "Digital"
+          icon: "💻"
+    status_calculation:
+      completed_status: ["✅ Complete", "✅ Done"]
+      in_progress_status: ["🟡 In Progress", "🔄 Working"]
+      not_started_status: ["⚪ Not Started", "📝 Pending"]
+    content_template: |
+      📊 **Status Summary by Category**
+
+      {{#categories}}
+      {{icon}} **{{name}}**: {{completed}}/{{total}} ({{percentage}}%)
+      {{progress_indicator}} {{status_text}}
+
+      {{/categories}}
+
+      **Overall**: {{overall_percentage}}% Complete
+      **Next Priority**: {{next_task}}
+
+  # METRIC CARDS - Complete Implementation
+  metric_cards:
+    type: "metric_card_grid"
+    title: "Key Estate Planning Metrics"
+    position: [3, 1]
+    size: "wide"
+    cards:
+      completion_rate:
+        title: "Completion Rate"
+        icon: "📈"
+        data_source:
+          calculation: "percentage"
+          numerator_filter:
+            property: "Status"
+            condition: "equals"
+            value: "✅ Complete"
+        display:
+          format: "percentage"
+          color_coding:
+            - threshold: 80
+              color: "green"
+            - threshold: 50
+              color: "yellow"
+            - threshold: 0
+              color: "red"
+        content_template: "{{value}}% Complete"
+
+      days_active:
+        title: "Days Active"
+        icon: "📅"
+        data_source:
+          calculation: "date_difference"
+          start_date_property: "Project_Start_Date"
+          end_date: "today"
+        display:
+          format: "number"
+          suffix: " days"
+        content_template: "{{value}} days active"
+
+      tasks_remaining:
+        title: "Tasks Remaining"
+        icon: "📋"
+        data_source:
+          calculation: "count"
+          filter:
+            property: "Status"
+            condition: "not_equals"
+            value: "✅ Complete"
+        display:
+          format: "number"
+          color_coding:
+            - threshold: 10
+              color: "green"
+            - threshold: 25
+              color: "yellow"
+            - threshold: 999
+              color: "red"
+        content_template: "{{value}} remaining"
+
+# ASCII CHART SYSTEM - Complete Implementation
+ascii_charts:
+  enabled: true
+  chart_configs:
+    category_completion:
+      title: "Completion by Category"
+      type: "horizontal_bar"
+      max_width: 20
+      data_source:
+        databases: ["financial_tasks", "legal_tasks", "personal_tasks", "digital_tasks"]
+        completion_property: "Status"
+        completed_values: ["✅ Complete"]
+      template: |
+        📊 **Estate Completion by Category:**
+
+        {{#categories}}
+        {{name}}    {{bar}} {{percentage}}%
+        {{/categories}}
     
-    - type: heading_2
-      content: Estate Planning Journey
-    - type: callout
-      icon: emoji:🏁
-      content: "We're 68% complete with your estate planning!"
-      color: blue_background
-    
-    - type: heading_2
-      content: What's Been Accomplished
-    - type: callout
-      icon: emoji:✅
-      content: "Foundation Setup Complete\n✅ Legal framework established\n✅ Document templates ready\n✅ Security protocols active"
-      color: green_background
-    
-    - type: heading_2
-      content: What's Happening Now
-    - type: callout
-      icon: emoji:🔄
-      content: "Professional Coordination Phase\n🔄 Attorney meetings scheduled\n🔄 Financial advisor consultations\n🔄 Insurance policy reviews"
-      color: yellow_background
-    
-    - type: heading_2
-      content: What's Coming Next
-    - type: callout
-      icon: emoji:⏳
-      content: "Family Access Setup\n⏳ Account access preparation\n⏳ Memory preservation system\n⏳ Emergency contact protocols"
-      color: gray_background
-    
-    - type: heading_2
-      content: Important Milestones
-    - type: numbered_list_item
-      content: "Legal Documents Ready (Target: Day 15)"
-    - type: numbered_list_item
-      content: "Professional Network Active (Target: Day 18)"
-    - type: numbered_list_item
-      content: "Family Access Configured (Target: Day 22)"
-    - type: numbered_list_item
-      content: "System Fully Operational (Target: Day 25)"
-    
-    - type: heading_2
-      content: How You Can Help
-    - type: bulleted_list_item
-      content: "Review shared documents when notified"
-    - type: bulleted_list_item
-      content: "Provide feedback on memory preservation content"
-    - type: bulleted_list_item
-      content: "Test family access when setup is complete"
-    - type: bulleted_list_item
-      content: "Ask questions about any unclear processes"
+    weekly_progress:
+      title: "Weekly Progress Trend"
+      type: "line_chart"
+      max_width: 30
+      data_source:
+        time_series: true
+        grouping: "weekly"
+        metric: "completion_rate"
+        weeks_back: 8
+      template: |
+        📈 **Weekly Progress Trend:**
+
+        {{chart_line}}
+        {{axis_labels}}
+
+# DASHBOARD LAYOUT SYSTEM - Complete Implementation
+dashboard_layouts:
+  executive_summary:
+    name: "Executive Dashboard"
+    description: "High-level overview for decision makers"
+    layout:
+      columns: 3
+      rows: 2
+    widgets:
+      - widget: "estate_progress_bar"
+        position: [1, 1]
+        span: [2, 1]
+      - widget: "status_summary"
+        position: [3, 1]
+        span: [1, 2]
+      - widget: "milestone_tracker"
+        position: [1, 2]
+        span: [1, 1]
+      - widget: "metric_cards"
+        position: [2, 2]
+        span: [1, 1]
+
+  detailed_tracking:
+    name: "Detailed Progress Tracking"
+    description: "Comprehensive view for active management"
+    layout:
+      columns: 2
+      rows: 3
+    widgets:
+      - widget: "estate_progress_bar"
+        position: [1, 1]
+      - widget: "activity_timeline"
+        position: [2, 1]
+        span: [1, 2]
+      - widget: "milestone_tracker"
+        position: [1, 2]
+      - widget: "status_summary"
+        position: [1, 3]
+      - widget: "ascii_charts"
+        position: [2, 3]
+
+# AUTO-UPDATE SYSTEM - Complete Implementation
+auto_updates:
+  enabled: true
+  update_triggers:
+    - event: "task_status_change"
+      affected_widgets: ["estate_progress_bar", "status_summary", "metric_cards"]
+    - event: "milestone_completion"
+      affected_widgets: ["milestone_tracker", "activity_timeline"]
+    - event: "database_rollup_change"
+      affected_widgets: ["all"]
+  update_frequency:
+    real_time_widgets: ["activity_timeline"]
+    scheduled_widgets:
+      frequency: "hourly"
+      widgets: ["metric_cards", "ascii_charts"]
