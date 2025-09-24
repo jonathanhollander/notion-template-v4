@@ -733,6 +733,8 @@ def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str
     if children:
         payload["children"] = children
 
+    # Proactive deletion commented out for debugging child page creation failure
+    """
     # Check if page already exists and delete it to avoid archived conflicts
     try:
         parent_page_id = parent.get("page_id")
@@ -758,6 +760,7 @@ def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str
                         logging.warning(f"Failed to delete existing page '{title}', continuing with creation...")
     except Exception as e:
         logging.warning(f"Error checking for existing page '{title}': {e}, continuing with creation...")
+    """
 
     try:
         logging.info(f"Creating page '{title}' with {len(children)} blocks")
