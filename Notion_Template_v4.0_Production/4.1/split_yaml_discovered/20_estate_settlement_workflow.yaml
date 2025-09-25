@@ -1,0 +1,51 @@
+# Estate Planning Template v4.0 - Estate Settlement Workflow
+# Generated from comprehensive architectural conversation analysis
+# Output Directory: split_yaml_discovered/
+pages:
+  - title: "Estate Settlement Workflow"
+    parent: "Executor Tools"
+    description: "A step-by-step workflow to guide you through the estate settlement process."
+    role: "executor"
+    icon_file: "emoji:🛤️"
+    blocks:
+      - type: heading_1
+        content: "The Estate Settlement Journey"
+      - type: paragraph
+        content: "Settling an estate is a marathon, not a sprint. This workflow breaks the process down into manageable stages. Use the tracker below to monitor your progress."
+      - type: callout
+        icon: emoji:🧘
+        content: "This process can take months or even years. Be patient with yourself and the process. Celebrate small victories along the way."
+        color: "gray_background"
+      - type: heading_2
+        content: "Estate Settlement Tracker"
+      - type: child_database
+        title: "Estate Settlement Tracker"
+        database_ref: "Estate Settlement Tracker"
+databases:
+  - title: "Estate Settlement Tracker"
+    description: "A database to track the stages of the estate settlement process."
+    properties:
+      Stage:
+        type: title
+        title: {}
+      Status:
+        type: select
+        select:
+          options:
+            - name: "Not Started"
+              color: "gray"
+            - name: "In Progress"
+              color: "blue"
+            - name: "Completed"
+              color: "green"
+      Tasks:
+        type: relation
+        relation:
+          database_id: "Master Task List"
+      Notes:
+        type: rich_text
+        rich_text: {}
+    views:
+      - name: "Settlement Stages"
+        type: "board"
+        group_by: "Status"

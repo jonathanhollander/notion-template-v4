@@ -1,0 +1,90 @@
+# Estate Planning Template v4.0 - Executor Tools
+# Generated from comprehensive architectural conversation analysis
+# Output Directory: split_yaml_discovered/
+pages:
+  - title: "Executor Tools"
+    parent: "The Legacy Vault"
+    description: "A gentle guide for the executor to navigate the process of settling an estate."
+    role: "executor"
+    icon_file: "emoji:🔑"
+    blocks:
+      - type: heading_1
+        content: "A Guide for the Executor"
+      - type: paragraph
+        content: "We know this is a difficult time. This section is designed to provide you with clear, step-by-step guidance to help you navigate your responsibilities as an executor. Please remember to take care of yourself during this process."
+      - type: callout
+        icon: emoji:🤝
+        content: "You are not alone in this. This guide is here to support you. If you feel overwhelmed, take a break and return when you are ready."
+        color: "gray_background"
+      - type: heading_2
+        content: "Immediate First Steps"
+      - type: to_do
+        to_do:
+          rich_text:
+            - type: text
+              text:
+                content: "Locate the will and other essential documents."
+          checked: false
+      - type: to_do
+        to_do:
+          rich_text:
+            - type: text
+              text:
+                content: "Secure the deceased's property."
+          checked: false
+      - type: to_do
+        to_do:
+          rich_text:
+            - type: text
+              text:
+                content: "Obtain multiple copies of the death certificate."
+          checked: false
+      - type: heading_2
+        content: "Executor's Task List"
+      - type: paragraph
+        content: "This is a comprehensive list of tasks that may be required to settle the estate. Use this list to track your progress."
+      - type: child_database
+        title: "Executor Task List"
+        database_ref: "Master Task List"
+        view_filter:
+          property: "Module"
+          value: "Executor Tools"
+      - type: heading_2
+        content: "Important Contacts"
+      - type: paragraph
+        content: "A directory of professionals and family members you may need to contact."
+      - type: child_database
+        title: "Contacts Directory"
+        database_ref: "Contacts Directory"
+databases:
+  - title: "Contacts Directory"
+    description: "A database of important contacts for the estate."
+    properties:
+      Name:
+        type: title
+        title: {}
+      Role:
+        type: select
+        select:
+          options:
+            - name: "Lawyer"
+            - name: "Financial Advisor"
+            - name: "Accountant"
+            - name: "Family Member"
+            - name: "Other"
+      Email:
+        type: email
+        email: {}
+      Phone:
+        type: phone_number
+        phone_number: {}
+      Notes:
+        type: rich_text
+        rich_text: {}
+    views:
+      - name: "All Contacts"
+        type: "table"
+# Metadata comments:
+# - This module is based on the explicit requirement for "Executor Tools."
+# - The content is designed to be supportive and action-oriented for a user in a time of grief.
+# - It integrates with the Master Task List and introduces a new Contacts Directory database.

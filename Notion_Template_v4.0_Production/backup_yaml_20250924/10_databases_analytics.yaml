@@ -1,0 +1,1646 @@
+# Estate Analytics Database Configuration
+complexity: moderate
+# This database tracks key rollout and completion metrics across the workspace
+
+databases:
+  - title: Estate Analytics
+    icon: 
+      type: emoji
+      emoji: 📊
+    description: Key rollout and completion metrics across the workspace.
+    properties:
+      Metric Name:
+        type: title
+        title: {}
+      
+      Section:
+        type: select
+        select:
+          options:
+            - name: Preparation
+              color: blue
+            - name: Executor
+              color: purple
+            - name: Family
+              color: green
+            - name: Letters
+              color: yellow
+            - name: Legal
+              color: red
+            - name: Accounts
+              color: orange
+            - name: Property
+              color: pink
+            - name: Insurance
+              color: brown
+            - name: Subscriptions
+              color: gray
+            - name: Digital Assets
+              color: default
+      
+      Category:
+        type: select
+        select:
+          options:
+            - name: Progress
+              color: blue
+            - name: Financial
+              color: green
+            - name: Legal
+              color: red
+            - name: Digital
+              color: purple
+      
+      Value:
+        type: number
+        number:
+          format: number
+      
+      Target:
+        type: number
+        number:
+          format: number
+      
+      Progress %:
+        type: formula
+        formula:
+          expression: "if(empty(prop(\"Target\")), 0, round(100 * prop(\"Value\") / prop(\"Target\")))"
+      
+      Completion Status:
+        type: formula
+        formula:
+          expression: "if(prop(\"Progress %\") >= 100, \"✅ Complete\", if(prop(\"Progress %\") >= 75, \"🔵 Almost Done\", if(prop(\"Progress %\") >= 50, \"🟡 In Progress\", if(prop(\"Progress %\") >= 25, \"🟠 Started\", \"⚪ Not Started\"))))"
+      
+      Priority:
+        type: select
+        select:
+          options:
+            - name: Critical
+              color: red
+            - name: High
+              color: orange
+            - name: Medium
+              color: yellow
+            - name: Low
+              color: green
+      
+      Last Updated:
+        type: last_edited_time
+        last_edited_time: {}
+      
+      Notes:
+        type: rich_text
+        rich_text: {}
+      
+      Related Pages:
+        type: relation
+        relation:
+          database_id: null  # Will be linked to Pages Index
+          type: dual_property
+          dual_property:
+            synced_property_name: Analytics Link
+            synced_property_id: null
+      
+      Dependencies:
+        type: relation
+        relation:
+          database_id: null  # Self-referential for metric dependencies
+          type: dual_property
+          dual_property:
+            synced_property_name: Dependent Metrics
+            synced_property_id: null
+      
+      # Rollup properties for aggregating data from related databases
+      Total Financial Accounts:
+        type: rollup
+        rollup:
+          relation_property_name: Related Pages
+          rollup_property_name: Value
+          function: count
+      
+      Financial Account Value Sum:
+        type: rollup
+        rollup:
+          relation_property_name: Related Pages
+          rollup_property_name: Value
+          function: sum
+      
+      Insurance Policies Count:
+        type: rollup
+        rollup:
+          relation_property_name: Related Pages
+          rollup_property_name: Value
+          function: count
+          
+      Active Professional Contacts:
+        type: rollup
+        rollup:
+          relation_property_name: Related Pages
+          rollup_property_name: Value
+          function: count
+      
+      Completed Tasks Progress:
+        type: rollup
+        rollup:
+          relation_property_name: Dependencies
+          rollup_property_name: Progress %
+          function: average
+      
+      High Priority Items:
+        type: rollup
+        rollup:
+          relation_property_name: Dependencies
+          rollup_property_name: Priority
+          function: count
+    
+    seed_rows:
+      - Metric Name: "Will and Testament Completion"
+        Section: Legal
+        Category: Legal
+        Value: 1
+        Target: 1
+        Priority: Critical
+        Notes: "Updated with Attorney Johnson after Emma's birth. Includes guardianship provisions."
+      
+      - Metric Name: "Healthcare Directives Filed"
+        Section: Legal
+        Category: Legal
+        Value: 2
+        Target: 2
+        Priority: Critical
+        Notes: "Both Sarah and I have living wills on file with Dr. Martinez and the hospital."
+      
+      - Metric Name: "Life Insurance Beneficiaries Updated"
+        Section: Insurance
+        Category: Financial
+        Value: 3
+        Target: 4
+        Priority: High
+        Notes: "Updated primary policy. Need to update employer policy after open enrollment."
+      
+      - Metric Name: "Digital Legacy Instructions"
+        Section: Digital Assets
+        Category: Digital
+        Value: 8
+        Target: 12
+        Priority: Medium
+        Notes: "Google, Apple, Facebook complete. Banking and investment accounts pending."
+      
+      - Metric Name: "Family Letters Written"
+        Section: Letters
+        Category: Progress
+        Value: 5
+        Target: 7
+        Priority: Medium
+        Notes: "Completed letters for Sarah, Emma, and Mom. Still need Dad, James, and best friends."
+      
+      - Metric Name: "Emergency Contacts Documented"
+        Section: Executor
+        Category: Progress
+        Value: 15
+        Target: 15
+        Priority: High
+        Notes: "All critical contacts documented and shared with executor (brother James)."
+      
+      - Metric Name: "Financial Accounts Catalogued"
+        Section: Accounts
+        Category: Financial
+        Value: 12
+        Target: 14
+        Priority: High
+        Notes: "Missing: PayPal business account and old 401k from previous employer."
+      
+      - Metric Name: "Property Documentation"
+        Section: Property
+        Category: Legal
+        Value: 3
+        Target: 3
+        Priority: Medium
+        Notes: "House deed, car titles, and boat registration all documented and accessible."
+      
+      - Metric Name: "Funeral Preferences Documented"
+        Section: Executor
+        Category: Progress
+        Value: 1
+        Target: 1
+        Priority: Low
+        Notes: "Discussed with Sarah. Preference for celebration of life, not traditional service."
+      
+      - Metric Name: "Password Manager Shared"
+        Section: Digital Assets
+        Category: Digital
+        Value: 1
+        Target: 1
+        Priority: Critical
+        Notes: "1Password family vault shared with Sarah. Emergency kit in safe deposit box."
+      
+      - Metric Name: "Investment Account Access"
+        Section: Accounts
+        Category: Financial
+        Value: 4
+        Target: 4
+        Priority: High
+        Notes: "Vanguard, Fidelity, E*TRADE, and Robinhood all documented with 2FA backup codes."
+      
+      - Metric Name: "Medical History Compiled"
+        Section: Family
+        Category: Progress
+        Value: 3
+        Target: 4
+        Priority: Medium
+        Notes: "Family medical history documented for Emma's future. Missing Dad's side details."
+      
+      - Metric Name: "Executor Briefing Complete"
+        Section: Executor
+        Category: Progress
+        Value: 1
+        Target: 1
+        Priority: Critical
+        Notes: "James fully briefed on responsibilities. Has access to this system and key documents."
+      
+      - Metric Name: "Trust Fund Established"
+        Section: Legal
+        Category: Legal
+        Value: 0
+        Target: 1
+        Priority: Medium
+        Notes: "Meeting with attorney next month to establish education trust for Emma."
+      
+      - Metric Name: "Business Succession Plan"
+        Section: Accounts
+        Category: Financial
+        Value: 0
+        Target: 1
+        Priority: High
+        Notes: "Need to document consulting business wind-down procedures and client transitions."
+      
+      - Metric Name: "Safe Deposit Box Inventory"
+        Section: Property
+        Category: Legal
+        Value: 1
+        Target: 1
+        Priority: Medium
+        Notes: "Complete inventory with photos. Sarah added as co-signer at First National Bank."
+      
+      - Metric Name: "Charitable Bequests Planned"
+        Section: Legal
+        Category: Financial
+        Value: 2
+        Target: 3
+        Priority: Low
+        Notes: "Local food bank and alma mater designated. Considering children's hospital."
+      
+      - Metric Name: "Family Photo Archive Organized"
+        Section: Family
+        Category: Digital
+        Value: 1
+        Target: 1
+        Priority: Low
+        Notes: "Google Photos shared album created. 20 years of memories accessible to family."
+      
+      - Metric Name: "Pet Care Instructions"
+        Section: Family
+        Category: Progress
+        Value: 1
+        Target: 1
+        Priority: Medium
+        Notes: "Max's vet records and care instructions documented. Sister agrees to adopt if needed."
+      
+      - Metric Name: "Estate Planning Review Scheduled"
+        Section: Legal
+        Category: Progress
+        Value: 1
+        Target: 1
+        Priority: Medium
+        Notes: "Annual review with Attorney Johnson scheduled for March. Will address trust creation."
+
+  - title: Professional Coordination
+    icon:
+      type: emoji
+      emoji: 👔
+    description: Track professional service providers and coordination activities.
+    properties:
+      Professional Name:
+        type: title
+        title: {}
+      
+      Service Type:
+        type: select
+        select:
+          options:
+            - name: Attorney
+              color: blue
+            - name: CPA/Tax Professional
+              color: green
+            - name: Financial Advisor
+              color: purple
+            - name: Insurance Agent
+              color: orange
+            - name: Funeral Director
+              color: gray
+            - name: Real Estate Agent
+              color: pink
+            - name: Other Professional
+              color: default
+      
+      Contact Information:
+        type: rich_text
+        rich_text: {}
+      
+      Phone:
+        type: phone_number
+        phone_number: {}
+      
+      Email:
+        type: email
+        email: {}
+      
+      Firm/Company:
+        type: rich_text
+        rich_text: {}
+      
+      Status:
+        type: select
+        select:
+          options:
+            - name: Active
+              color: green
+            - name: Pending
+              color: yellow
+            - name: On Hold
+              color: orange
+            - name: Completed
+              color: blue
+            - name: Inactive
+              color: gray
+      
+      Last Contact Date:
+        type: date
+        date: {}
+      
+      Next Action Required:
+        type: rich_text
+        rich_text: {}
+      
+      Documents Shared:
+        type: files
+        files: {}
+      
+      Notes:
+        type: rich_text
+        rich_text: {}
+      
+      Related Estate Items:
+        type: relation
+        relation:
+          database_id: null  # Will be linked to appropriate databases
+          type: dual_property
+          dual_property:
+            synced_property_name: Professional Contact
+            synced_property_id: null
+    
+    seed_rows:
+      - Professional Name: "Margaret Johnson, Esq."
+        Service Type: Attorney
+        Contact Information: "Estate Planning Attorney, 15 years specializing in family trusts"
+        Phone: "(555) 234-5678"
+        Email: "mjohnson@johnsonlawfirm.com"
+        Firm/Company: "Johnson & Associates Law Firm"
+        Status: Active
+        Last Contact Date: "2024-11-15"
+        Next Action Required: "Annual review meeting scheduled for March 2025"
+        Notes: "Excellent communicator. Helped with guardianship provisions for Emma. Very patient with our questions."
+      
+      - Professional Name: "Robert Chen, CPA"
+        Service Type: CPA/Tax Professional
+        Contact Information: "Certified Public Accountant, handles personal and business taxes"
+        Phone: "(555) 345-6789"
+        Email: "robert.chen@chentaxservices.com"
+        Firm/Company: "Chen Tax Services LLC"
+        Status: Active
+        Last Contact Date: "2024-10-01"
+        Next Action Required: "Provide 1099s and W-2s by February 15"
+        Notes: "Has handled our taxes for 8 years. Familiar with consulting business structure."
+      
+      - Professional Name: "Jennifer Williams, CFP"
+        Service Type: Financial Advisor
+        Contact Information: "Certified Financial Planner, retirement and education planning specialist"
+        Phone: "(555) 456-7890"
+        Email: "jwilliams@wealthadvisors.com"
+        Firm/Company: "Wealth Advisors Group"
+        Status: Active
+        Last Contact Date: "2024-12-01"
+        Next Action Required: "Quarterly portfolio review in January"
+        Notes: "Managing Emma's 529 plan and our retirement accounts. Conservative approach aligns with our values."
+      
+      - Professional Name: "Michael Torres"
+        Service Type: Insurance Agent
+        Contact Information: "Life and disability insurance specialist"
+        Phone: "(555) 567-8901"
+        Email: "mtorres@stateinsurance.com"
+        Firm/Company: "State Insurance Agency"
+        Status: Active
+        Last Contact Date: "2024-09-15"
+        Next Action Required: "Update employer policy beneficiary during open enrollment"
+        Notes: "Helped increase coverage after Emma was born. Very responsive to questions."
+      
+      - Professional Name: "David Memorial Services"
+        Service Type: Funeral Director
+        Contact Information: "Pre-planning counselor"
+        Phone: "(555) 678-9012"
+        Email: "planning@davidmemorial.com"
+        Firm/Company: "David Memorial Services"
+        Status: Pending
+        Last Contact Date: "2024-08-20"
+        Next Action Required: "Complete pre-planning forms"
+        Notes: "Recommended by neighbors. Offers green burial options we're considering."
+      
+      - Professional Name: "Lisa Park"
+        Service Type: Real Estate Agent
+        Contact Information: "Residential real estate specialist, helped purchase current home"
+        Phone: "(555) 789-0123"
+        Email: "lpark@homerealty.com"
+        Firm/Company: "Home Realty Partners"
+        Status: Inactive
+        Last Contact Date: "2022-06-15"
+        Next Action Required: "Contact if considering sale or rental of property"
+        Notes: "Excellent agent who helped us find our dream home. Keep for future reference."
+      
+      - Professional Name: "Dr. Carlos Martinez"
+        Service Type: Other Professional
+        Contact Information: "Primary Care Physician for the family"
+        Phone: "(555) 890-1234"
+        Email: "info@martinezmedical.com"
+        Firm/Company: "Martinez Family Medicine"
+        Status: Active
+        Last Contact Date: "2024-11-30"
+        Next Action Required: "Annual physicals in June"
+        Notes: "Has our healthcare directives on file. Excellent with Emma's pediatric care too."
+      
+      - Professional Name: "Susan Blake"
+        Service Type: Other Professional
+        Contact Information: "Elder law attorney for Mom's care planning"
+        Phone: "(555) 901-2345"
+        Email: "sblake@elderlaw.com"
+        Firm/Company: "Blake Elder Law"
+        Status: Active
+        Last Contact Date: "2024-10-15"
+        Next Action Required: "Review Mom's long-term care insurance options"
+        Notes: "Specializes in Medicaid planning. Very knowledgeable about memory care facilities."
+      
+      - Professional Name: "Thomas Green"
+        Service Type: Financial Advisor
+        Contact Information: "401(k) advisor through employer"
+        Phone: "(555) 012-3456"
+        Email: "tgreen@401kadvisors.com"
+        Firm/Company: "Corporate Retirement Solutions"
+        Status: Active
+        Last Contact Date: "2024-07-01"
+        Next Action Required: "Annual rebalancing in January"
+        Notes: "Employer-provided advisor. Good for basic questions but we prefer Jennifer for comprehensive planning."
+      
+      - Professional Name: "Rachel Foster"
+        Service Type: Attorney
+        Contact Information: "Business attorney for consulting practice"
+        Phone: "(555) 123-4567"
+        Email: "rfoster@businesslaw.com"
+        Firm/Company: "Foster Business Law"
+        Status: On Hold
+        Last Contact Date: "2024-05-10"
+        Next Action Required: "Draft business succession/wind-down plan"
+        Notes: "Helped establish LLC. Will need her expertise for business transition planning."
+
+  - Crisis Management:
+    icon:
+      type: emoji
+      emoji: 🚨
+    description: Emergency protocols and crisis response procedures.
+    properties:
+      Crisis Type:
+        type: title
+        title: {}
+      
+      Priority Level:
+        type: select
+        select:
+          options:
+            - name: Critical - Immediate Action
+              color: red
+            - name: High - Within 24 Hours
+              color: orange
+            - name: Medium - Within 48 Hours
+              color: yellow
+            - name: Low - Within 1 Week
+              color: green
+      
+      Action Required:
+        type: rich_text
+        rich_text: {}
+      
+      Responsible Party:
+        type: relation
+        relation:
+          database_id: null  # Will be linked to Contacts
+          type: dual_property
+          dual_property:
+            synced_property_name: Crisis Assignments
+            synced_property_id: null
+      
+      Status:
+        type: select
+        select:
+          options:
+            - name: Not Started
+              color: gray
+            - name: In Progress
+              color: yellow
+            - name: Blocked
+              color: red
+            - name: Completed
+              color: green
+            - name: Deferred
+              color: default
+      
+      Deadline:
+        type: date
+        date: {}
+      
+      Resolution Notes:
+        type: rich_text
+        rich_text: {}
+      
+      Related Documents:
+        type: files
+        files: {}
+      
+      Emergency Contacts:
+        type: relation
+        relation:
+          database_id: null  # Will be linked to Contacts
+          type: dual_property
+          dual_property:
+            synced_property_name: Emergency Role
+            synced_property_id: null
+
+  - title: Memory Preservation
+    icon:
+      type: emoji
+      emoji: 💝
+    description: Preserve and organize cherished memories and family stories.
+    properties:
+      Memory Title:
+        type: title
+        title: {}
+      
+      Memory Type:
+        type: select
+        select:
+          options:
+            - name: Story
+              color: blue
+            - name: Photo Collection
+              color: green
+            - name: Video Message
+              color: purple
+            - name: Letter
+              color: yellow
+            - name: Achievement
+              color: orange
+            - name: Tradition
+              color: pink
+            - name: Life Lesson
+              color: red
+            - name: Other
+              color: default
+      
+      Date/Period:
+        type: date
+        date: {}
+      
+      Description:
+        type: rich_text
+        rich_text: {}
+      
+      People Involved:
+        type: multi_select
+        multi_select:
+          options:
+            - name: Spouse
+              color: blue
+            - name: Children
+              color: green
+            - name: Parents
+              color: purple
+            - name: Siblings
+              color: yellow
+            - name: Extended Family
+              color: orange
+            - name: Friends
+              color: pink
+            - name: Colleagues
+              color: gray
+      
+      Location:
+        type: rich_text
+        rich_text: {}
+      
+      Media Files:
+        type: files
+        files: {}
+      
+      Significance:
+        type: rich_text
+        rich_text: {}
+      
+      Share With:
+        type: multi_select
+        multi_select:
+          options:
+            - name: Everyone
+              color: green
+            - name: Family Only
+              color: blue
+            - name: Specific Individuals
+              color: purple
+            - name: Keep Private
+              color: red
+      
+      Preservation Status:
+        type: select
+        select:
+          options:
+            - name: Draft
+              color: gray
+            - name: In Progress
+              color: yellow
+            - name: Ready to Share
+              color: green
+            - name: Archived
+              color: blue
+      
+      Tags:
+        type: multi_select
+        multi_select:
+          options:
+            - name: Childhood
+              color: yellow
+            - name: Education
+              color: blue
+            - name: Career
+              color: purple
+            - name: Marriage
+              color: pink
+            - name: Parenting
+              color: green
+            - name: Travel
+              color: orange
+            - name: Hobbies
+              color: default
+            - name: Milestones
+              color: red
+
+  # Phase 2.1 Enhancement: Advanced contextual guidance database
+  - title: "Enhanced Estate Analytics with Contextual Guidance"
+    icon:
+      type: emoji
+      emoji: 🎯
+    description: "Advanced estate analytics with smart contextual help and workflow guidance"
+    properties:
+      Task_Name:
+        type: title
+        title: {}
+
+      Section:
+        type: select
+        select:
+          options:
+            - name: "📊 Financial Planning"
+              color: "blue"
+            - name: "📋 Legal Documentation"
+              color: "green"
+            - name: "🏠 Property Management"
+              color: "yellow"
+            - name: "👥 Family Coordination"
+              color: "purple"
+            - name: "💼 Professional Services"
+              color: "orange"
+            - name: "📱 Digital Assets"
+              color: "red"
+            - name: "📝 Administrative Tasks"
+              color: "gray"
+
+      Status:
+        type: select
+        select:
+          options:
+            - name: "Not Started"
+              color: "red"
+            - name: "In Progress"
+              color: "yellow"
+            - name: "Review Needed"
+              color: "orange"
+            - name: "Complete"
+              color: "green"
+            - name: "Deferred"
+              color: "gray"
+
+      Priority_Level:
+        type: select
+        select:
+          options:
+            - name: "Critical"
+              color: "red"
+            - name: "High"
+              color: "orange"
+            - name: "Medium"
+              color: "yellow"
+            - name: "Low"
+              color: "green"
+
+      Estimated_Hours:
+        type: number
+        number:
+          format: "number"
+
+      Completion_Percentage:
+        type: number
+        number:
+          format: "percent"
+
+      Target_Date:
+        type: date
+        date: {}
+
+      # Phase 2.1: Smart Contextual Help Formulas
+      Smart_Help_Guidance:
+        type: formula
+        formula:
+          expression: "if(prop(\"Status\") == \"Not Started\", \"🚀 GET STARTED: \" + if(prop(\"Section\") == \"📊 Financial Planning\", \"Begin by gathering all financial statements and account information\", if(prop(\"Section\") == \"📋 Legal Documentation\", \"Start with will preparation - contact attorney for consultation\", if(prop(\"Section\") == \"🏠 Property Management\", \"Create comprehensive property inventory with valuations\", if(prop(\"Section\") == \"👥 Family Coordination\", \"Schedule family meeting to discuss roles and expectations\", if(prop(\"Section\") == \"💼 Professional Services\", \"Research and interview estate planning professionals\", if(prop(\"Section\") == \"📱 Digital Assets\", \"Compile list of all digital accounts and access methods\", \"Review task requirements and create action plan\")))))), if(prop(\"Status\") == \"In Progress\", \"⚡ KEEP GOING: \" + if(prop(\"Completion_Percentage\") >= 75, \"You're almost done! Focus on final details and quality check\", if(prop(\"Completion_Percentage\") >= 50, \"Good progress! Continue with current approach and maintain momentum\", if(prop(\"Completion_Percentage\") >= 25, \"Building momentum! Consider if you need additional resources or help\", \"Just getting started! Break this into smaller, manageable steps\"))), if(prop(\"Status\") == \"Review Needed\", \"👀 REVIEW TIME: \" + if(prop(\"Priority_Level\") == \"Critical\", \"Critical item needs immediate review - don't delay\", \"Schedule review session and gather all relevant materials\"), if(prop(\"Status\") == \"Complete\", \"✅ COMPLETED: \" + if(prop(\"Priority_Level\") == \"Critical\", \"Critical task done! This is a major milestone for your estate plan\", \"Task completed successfully! Consider next steps and dependencies\"), \"📝 DEFERRED: Review if this task is still needed or can be eliminated\"))))"
+
+      Next_Action_Guidance:
+        type: formula
+        formula:
+          expression: "if(prop(\"Status\") == \"Not Started\", \"📋 FIRST STEP: \" + if(prop(\"Priority_Level\") == \"Critical\", \"HIGH PRIORITY - Schedule this within 48 hours\", if(prop(\"Priority_Level\") == \"High\", \"Important task - plan for this week\", if(prop(\"Priority_Level\") == \"Medium\", \"Standard task - include in next planning session\", \"Lower priority - add to future task list\"))), if(prop(\"Status\") == \"In Progress\", \"🎯 NEXT ACTION: \" + if(empty(prop(\"Target_Date\")), \"Set a target completion date to maintain momentum\", if(dateBetween(prop(\"Target_Date\"), now(), \"days\") < 3, \"Target date approaching - focus your efforts here\", \"Continue current progress and check in regularly\")), if(prop(\"Status\") == \"Review Needed\", \"🔍 REVIEW ACTION: \" + if(prop(\"Section\") == \"📋 Legal Documentation\", \"Have attorney review all documents before finalizing\", if(prop(\"Section\") == \"📊 Financial Planning\", \"Verify all numbers and get professional validation\", \"Schedule thorough review with relevant experts\")), if(prop(\"Status\") == \"Complete\", \"🔄 FOLLOW-UP: \" + if(prop(\"Section\") == \"📋 Legal Documentation\", \"Ensure documents are properly stored and copies distributed\", if(prop(\"Section\") == \"📊 Financial Planning\", \"Update beneficiaries and notify financial institutions\", \"Document completion and update related systems\")), \"📌 DEFERRED: Periodically review if circumstances change\"))))"
+
+      Time_Priority_Alert:
+        type: formula
+        formula:
+          expression: "if(empty(prop(\"Target_Date\")), \"⏰ NO DEADLINE: Consider setting target date for better planning\", if(dateBetween(prop(\"Target_Date\"), now(), \"days\") < 0, \"🚨 OVERDUE: \" + format(abs(dateBetween(prop(\"Target_Date\"), now(), \"days\"))) + \" days past deadline - immediate attention needed!\", if(dateBetween(prop(\"Target_Date\"), now(), \"days\") <= 3, \"⚠️ DUE SOON: \" + format(dateBetween(prop(\"Target_Date\"), now(), \"days\")) + \" days remaining - prioritize this task\", if(dateBetween(prop(\"Target_Date\"), now(), \"days\") <= 7, \"📅 THIS WEEK: \" + format(dateBetween(prop(\"Target_Date\"), now(), \"days\")) + \" days remaining - plan completion\", if(dateBetween(prop(\"Target_Date\"), now(), \"days\") <= 14, \"📋 UPCOMING: \" + format(dateBetween(prop(\"Target_Date\"), now(), \"days\")) + \" days remaining - good planning horizon\", \"✅ GOOD TIMELINE: \" + format(dateBetween(prop(\"Target_Date\"), now(), \"days\")) + \" days remaining - maintain current pace\")))))"
+
+      Workflow_Coordination:
+        type: formula
+        formula:
+          expression: "if(prop(\"Section\") == \"📊 Financial Planning\", \"💰 COORDINATION: \" + if(prop(\"Status\") == \"Not Started\", \"Connect with financial advisor and gather all account statements\", if(prop(\"Status\") == \"In Progress\", \"Regular check-ins with financial professionals and beneficiary updates\", \"Ensure all financial institutions have updated beneficiary information\")), if(prop(\"Section\") == \"📋 Legal Documentation\", \"⚖️ COORDINATION: \" + if(prop(\"Status\") == \"Not Started\", \"Schedule consultation with estate planning attorney\", if(prop(\"Status\") == \"In Progress\", \"Regular attorney meetings and document review sessions\", \"Finalize all documents and ensure proper execution and storage\")), if(prop(\"Section\") == \"👥 Family Coordination\", \"👨‍👩‍👧‍👦 COORDINATION: \" + if(prop(\"Status\") == \"Not Started\", \"Plan family meeting to discuss roles and responsibilities\", if(prop(\"Status\") == \"In Progress\", \"Regular family updates and role clarification meetings\", \"Ensure all family members understand their roles and have access\")), \"🔄 COORDINATION: \" + if(prop(\"Status\") == \"Complete\", \"Monitor for changes and maintain current systems\", \"Coordinate with relevant professionals and family members as needed\"))))"
+
+      Resource_Recommendations:
+        type: formula
+        formula:
+          expression: "if(prop(\"Section\") == \"📊 Financial Planning\", \"📚 RESOURCES: \" + if(prop(\"Priority_Level\") == \"Critical\", \"Essential: Fee-only financial planner, estate tax attorney, CPA with estate experience\", \"Helpful: Financial advisor, tax professional, estate planning software\"), if(prop(\"Section\") == \"📋 Legal Documentation\", \"📚 RESOURCES: \" + if(prop(\"Priority_Level\") == \"Critical\", \"Essential: Estate planning attorney, notary services, document storage system\", \"Helpful: Online legal resources, document templates, legal review services\"), if(prop(\"Section\") == \"🏠 Property Management\", \"📚 RESOURCES: \" + if(prop(\"Priority_Level\") == \"Critical\", \"Essential: Real estate appraiser, property attorney, title company\", \"Helpful: Property management company, real estate agent, maintenance contacts\"), if(prop(\"Section\") == \"👥 Family Coordination\", \"📚 RESOURCES: \" + if(prop(\"Priority_Level\") == \"Critical\", \"Essential: Family meeting facilitator, communication platform, role documentation\", \"Helpful: Family counselor, mediation services, coordination tools\"), if(prop(\"Section\") == \"💼 Professional Services\", \"📚 RESOURCES: \" + if(prop(\"Priority_Level\") == \"Critical\", \"Essential: Vetted professional network, service agreements, performance metrics\", \"Helpful: Professional referral services, review platforms, coordination tools\"), \"📚 RESOURCES: Research relevant professionals and tools for your specific situation\")))))"
+
+      Progress_Insights:
+        type: formula
+        formula:
+          expression: "if(prop(\"Status\") == \"Complete\", \"🎉 ACHIEVEMENT: \" + prop(\"Section\") + \" task completed successfully! \", \"\") + if(prop(\"Completion_Percentage\") >= 80, \"🔥 EXCELLENT PROGRESS: You're in the final stretch - maintain focus and attention to detail\", if(prop(\"Completion_Percentage\") >= 60, \"📈 STRONG MOMENTUM: Good progress being made - consider what support you need for final push\", if(prop(\"Completion_Percentage\") >= 40, \"⚡ BUILDING STEAM: You're making solid progress - stay consistent with your efforts\", if(prop(\"Completion_Percentage\") >= 20, \"🌱 EARLY PROGRESS: Good start! Break down remaining work into manageable chunks\", if(prop(\"Status\") != \"Not Started\", \"🚀 GETTING STARTED: Every expert was once a beginner - you're on the right path\", \"💡 READY TO BEGIN: Take the first small step - momentum builds from action\"))))))"
+
+      Smart_Recommendations:
+        type: formula
+        formula:
+          expression: "\"💡 SMART TIP: \" + if(prop(\"Estimated_Hours\") > 10 and prop(\"Status\") == \"Not Started\", \"Large task ahead - consider breaking this into smaller milestones\", if(prop(\"Priority_Level\") == \"Critical\" and prop(\"Status\") == \"In Progress\" and prop(\"Completion_Percentage\") < 50, \"Critical task needs acceleration - consider adding resources or help\", if(empty(prop(\"Target_Date\")) and prop(\"Status\") == \"In Progress\", \"Set a target completion date to maintain accountability and momentum\", if(prop(\"Status\") == \"Review Needed\" and dateBetween(prop(\"Target_Date\"), now(), \"days\") < 7, \"Review needed urgently - don't let this become a bottleneck\", if(prop(\"Section\") == \"📋 Legal Documentation\" and prop(\"Status\") == \"Complete\", \"Legal docs complete - ensure copies are stored securely and accessible\", if(prop(\"Section\") == \"👥 Family Coordination\" and prop(\"Completion_Percentage\") < 30, \"Family coordination is crucial - invest time in clear communication early\", \"Stay focused and maintain steady progress - you're doing great!\"))))))"
+
+    seed_rows:
+      - Task_Name: "Create Comprehensive Will Document"
+        Section: "📋 Legal Documentation"
+        Status: "In Progress"
+        Priority_Level: "Critical"
+        Estimated_Hours: 15
+        Completion_Percentage: 0.65
+      - Task_Name: "Establish Family Trust Structure"
+        Section: "📋 Legal Documentation"
+        Status: "Review Needed"
+        Priority_Level: "Critical"
+        Estimated_Hours: 25
+        Completion_Percentage: 0.80
+      - Task_Name: "Financial Account Beneficiary Updates"
+        Section: "📊 Financial Planning"
+        Status: "In Progress"
+        Priority_Level: "High"
+        Estimated_Hours: 8
+        Completion_Percentage: 0.45
+      - Task_Name: "Family Roles and Responsibilities Meeting"
+        Section: "👥 Family Coordination"
+        Status: "Not Started"
+        Priority_Level: "High"
+        Estimated_Hours: 6
+        Completion_Percentage: 0
+      - Task_Name: "Digital Asset Inventory and Access"
+        Section: "📱 Digital Assets"
+        Status: "In Progress"
+        Priority_Level: "Medium"
+        Estimated_Hours: 12
+        Completion_Percentage: 0.30
+
+# Initial database entries for Estate Analytics
+database_entries:
+  Estate Analytics:
+    - Metric Name: Pages Created
+      Section: Preparation
+      Category: Progress
+      Value: 0
+      Target: 100
+      Priority: Critical
+      Notes: Total number of pages created in the workspace
+    
+    - Metric Name: Databases Deployed
+      Section: Preparation
+      Category: Progress
+      Value: 7
+      Target: 11
+      Priority: Critical
+      Notes: Number of databases successfully deployed
+    
+    - Metric Name: Letter Templates Ready
+      Section: Letters
+      Category: Progress
+      Value: 17
+      Target: 17
+      Priority: High
+      Notes: Pre-written letter templates configured
+    
+    - Metric Name: Financial Accounts Documented
+      Section: Accounts
+      Category: Financial
+      Value: 0
+      Target: 10
+      Priority: High
+      Notes: Number of financial accounts added to system
+    
+    - Metric Name: Insurance Policies Tracked
+      Section: Insurance
+      Category: Financial
+      Value: 0
+      Target: 5
+      Priority: Medium
+      Notes: Insurance policies documented in system
+    
+    - Metric Name: Legal Documents Uploaded
+      Section: Legal
+      Category: Legal
+      Value: 0
+      Target: 10
+      Priority: Critical
+      Notes: Essential legal documents added to system
+    
+    - Metric Name: Digital Assets Catalogued
+      Section: Digital Assets
+      Category: Digital
+      Value: 0
+      Target: 20
+      Priority: Medium
+      Notes: Online accounts and digital properties documented
+    
+    - Metric Name: Professional Contacts Added
+      Section: Executor
+      Category: Progress
+      Value: 0
+      Target: 5
+      Priority: High
+      Notes: Professional service providers configured
+    
+    - Metric Name: Family Members Granted Access
+      Section: Family
+      Category: Progress
+      Value: 0
+      Target: 3
+      Priority: Medium
+      Notes: Family members with system access
+    
+    # Additional comprehensive metrics for complete estate planning tracking
+    - Metric Name: Will Execution Progress
+      Section: Legal
+      Category: Legal
+      Value: 75
+      Target: 100
+      Priority: Critical
+      Notes: Percentage completion of will and testament execution steps
+    
+    - Metric Name: Trust Document Status
+      Section: Legal
+      Category: Legal
+      Value: 60
+      Target: 100
+      Priority: Critical
+      Notes: Trust documentation preparation and execution progress
+    
+    - Metric Name: Power of Attorney Completion
+      Section: Legal
+      Category: Legal
+      Value: 100
+      Target: 100
+      Priority: Critical
+      Notes: Healthcare and financial power of attorney documents executed
+    
+    - Metric Name: Beneficiary Designations Updated
+      Section: Accounts
+      Category: Financial
+      Value: 4
+      Target: 8
+      Priority: High
+      Notes: Financial accounts with updated beneficiary information
+    
+    - Metric Name: Estate Tax Compliance
+      Section: Legal
+      Category: Legal
+      Value: 85
+      Target: 100
+      Priority: Critical
+      Notes: Estate tax documentation and compliance checklist completion
+    
+    - Metric Name: Asset Valuation Progress
+      Section: Property
+      Category: Financial
+      Value: 3
+      Target: 5
+      Priority: High
+      Notes: Professional asset valuations completed for estate
+    
+    - Metric Name: Digital Asset Recovery Accounts
+      Section: Digital Assets
+      Category: Digital
+      Value: 12
+      Target: 25
+      Priority: Medium
+      Notes: Digital accounts with recovery information documented
+    
+    - Metric Name: Emergency Contact Response Rate
+      Section: Family
+      Category: Progress
+      Value: 80
+      Target: 100
+      Priority: High
+      Notes: Percentage of emergency contacts who have confirmed availability
+    
+    - Metric Name: Legal Document Accessibility Score
+      Section: Legal
+      Category: Legal
+      Value: 90
+      Target: 100
+      Priority: Critical
+      Notes: Legal documents properly stored and accessible to executors
+    
+    - Metric Name: Financial Institution Notifications
+      Section: Accounts
+      Category: Financial
+      Value: 2
+      Target: 6
+      Priority: High
+      Notes: Financial institutions notified of estate planning documentation
+    
+    - Metric Name: Insurance Claim Process Preparation
+      Section: Insurance
+      Category: Financial
+      Value: 100
+      Target: 100
+      Priority: High
+      Notes: Insurance claim processes documented and executor-ready
+    
+    - Metric Name: Property Transfer Documentation
+      Section: Property
+      Category: Legal
+      Value: 40
+      Target: 100
+      Priority: Medium
+      Notes: Property transfer documents prepared and notarized
+    
+    - Metric Name: Tax Record Organization
+      Section: Accounts
+      Category: Financial
+      Value: 95
+      Target: 100
+      Priority: High
+      Notes: Tax records organized for executor and CPA access
+    
+    - Metric Name: Family Communication Plan Activation
+      Section: Family
+      Category: Progress
+      Value: 70
+      Target: 100
+      Priority: Medium
+      Notes: Family members briefed on estate plan and emergency procedures
+    
+    - Metric Name: Professional Service Provider Coordination
+      Section: Executor
+      Category: Progress
+      Value: 6
+      Target: 8
+      Priority: High
+      Notes: Professional service providers contacted and coordinated
+    
+    - Metric Name: Subscription Cancellation Preparation
+      Section: Subscriptions
+      Category: Digital
+      Value: 15
+      Target: 20
+      Priority: Low
+      Notes: Subscription services identified with cancellation procedures
+    
+    - Metric Name: Memory Preservation Completion
+      Section: Family
+      Category: Progress
+      Value: 8
+      Target: 20
+      Priority: Medium
+      Notes: Personal memories and stories documented for family
+    
+    - Metric Name: Legal Compliance Audit Score
+      Section: Legal
+      Category: Legal
+      Value: 92
+      Target: 100
+      Priority: Critical
+      Notes: Overall legal compliance and documentation audit score
+    
+    - Metric Name: Financial Portfolio Documentation
+      Section: Accounts
+      Category: Financial
+      Value: 85
+      Target: 100
+      Priority: High
+      Notes: Investment portfolio documented with transfer instructions
+    
+    - Metric Name: Healthcare Directive Activation
+      Section: Legal
+      Category: Legal
+      Value: 100
+      Target: 100
+      Priority: Critical
+      Notes: Healthcare directives completed and properly filed
+    
+    - Metric Name: Executor Training Completion
+      Section: Executor
+      Category: Progress
+      Value: 60
+      Target: 100
+      Priority: High
+      Notes: Executors trained on their responsibilities and procedures
+    
+    - Metric Name: Secure Document Storage Setup
+      Section: Digital Assets
+      Category: Digital
+      Value: 80
+      Target: 100
+      Priority: High
+      Notes: Secure storage systems established for critical documents
+    
+    - Metric Name: Business Interest Transfer Planning
+      Section: Property
+      Category: Financial
+      Value: 30
+      Target: 100
+      Priority: Medium
+      Notes: Business ownership transfer documentation and planning
+    
+    - Metric Name: Charitable Giving Setup
+      Section: Legal
+      Category: Financial
+      Value: 50
+      Target: 100
+      Priority: Low
+      Notes: Charitable giving vehicles and beneficiary setup completion
+    
+    - Metric Name: Final Review Checklist Progress
+      Section: Preparation
+      Category: Progress
+      Value: 70
+      Target: 100
+      Priority: Critical
+      Notes: Comprehensive final review checklist completion status
+
+  Professional Coordination:
+    - Professional Name: Primary Attorney
+      Service Type: Attorney
+      Contact Information: "Contact details to be filled"
+      Phone: ""
+      Email: ""
+      Firm/Company: "Law Firm Name"
+      Status: Pending
+      Last Contact Date: ""
+      Next Action Required: "Initial consultation to discuss estate planning"
+      Notes: "Primary legal counsel for estate planning and document preparation"
+    
+    - Professional Name: Financial Advisor
+      Service Type: Financial Advisor
+      Contact Information: "Contact details to be filled"
+      Phone: ""
+      Email: ""
+      Firm/Company: "Advisory Firm Name"
+      Status: Pending
+      Last Contact Date: ""
+      Next Action Required: "Review current portfolio and estate tax implications"
+      Notes: "Responsible for investment portfolio management and tax planning"
+      
+    - Professional Name: CPA/Tax Professional
+      Service Type: CPA/Tax Professional
+      Contact Information: "Contact details to be filled"
+      Phone: ""
+      Email: ""
+      Firm/Company: "Accounting Firm"
+      Status: Pending
+      Last Contact Date: ""
+      Next Action Required: "Prepare year-of-death tax returns and filings"
+      Notes: "Handles tax preparation and estate tax filings"
+    
+    # Additional comprehensive professional contacts
+    - Professional Name: Probate Attorney
+      Service Type: Attorney
+      Contact Information: "Specialized in probate and estate administration"
+      Phone: "+1-555-0234"
+      Email: "probate@lawfirm.com"
+      Firm/Company: "Probate & Estate Law Group"
+      Status: Active
+      Last Contact Date: ""
+      Next Action Required: "Guide probate process and court filings"
+      Notes: "Specialized probate attorney for estate administration and court proceedings"
+      
+    - Professional Name: Trust Officer
+      Service Type: Financial Advisor
+      Contact Information: "Bank trust department specialist"
+      Phone: "+1-555-0345"
+      Email: "trust@bank.com"
+      Firm/Company: "First National Trust Department"
+      Status: Active
+      Last Contact Date: ""
+      Next Action Required: "Establish trust administration procedures"
+      Notes: "Corporate trustee and trust administration specialist"
+      
+    - Professional Name: Financial Planner
+      Service Type: Financial Advisor
+      Contact Information: "Comprehensive financial planning specialist"
+      Phone: "+1-555-0456"
+      Email: "planner@wealth.com"
+      Firm/Company: "Comprehensive Financial Planning"
+      Status: Pending
+      Last Contact Date: ""
+      Next Action Required: "Review estate liquidity and cash flow planning"
+      Notes: "Estate liquidity planning and beneficiary financial education"
+      
+    - Professional Name: Real Estate Appraiser
+      Service Type: Other Professional
+      Contact Information: "Certified real estate appraiser"
+      Phone: "+1-555-0567"
+      Email: "appraiser@valuations.com"
+      Firm/Company: "Professional Property Valuations LLC"
+      Status: Pending
+      Last Contact Date: ""
+      Next Action Required: "Conduct estate property appraisals for tax purposes"
+      Notes: "Licensed appraiser for estate tax valuation requirements"
+      
+    - Professional Name: Business Valuation Specialist
+      Service Type: Other Professional
+      Contact Information: "Certified business appraiser"
+      Phone: "+1-555-0678"
+      Email: "valuation@businessappraisers.com"
+      Firm/Company: "Business Valuation Associates"
+      Status: Pending
+      Last Contact Date: ""
+      Next Action Required: "Value business interests for estate planning"
+      Notes: "ASA certified appraiser for business interest valuations"
+      
+    - Professional Name: Elder Law Attorney
+      Service Type: Attorney
+      Contact Information: "Elder law and Medicaid planning specialist"
+      Phone: "+1-555-0789"
+      Email: "elderlaw@senioradvocates.com"
+      Firm/Company: "Senior Legal Advocates"
+      Status: Pending
+      Last Contact Date: ""
+      Next Action Required: "Review long-term care and Medicaid planning options"
+      Notes: "Specializes in elder law, long-term care planning, and asset protection"
+      
+    - Professional Name: Insurance Specialist
+      Service Type: Insurance Agent
+      Contact Information: "Estate planning insurance specialist"
+      Phone: "+1-555-0890"
+      Email: "estate@insuranceexperts.com"
+      Firm/Company: "Estate Insurance Specialists"
+      Status: Active
+      Last Contact Date: ""
+      Next Action Required: "Review life insurance needs and beneficiary planning"
+      Notes: "Specializes in life insurance for estate planning and liquidity needs"
+
+  Crisis Management:
+    - Crisis Type: Immediate Medical Emergency
+      Priority Level: Critical - Immediate Action
+      Action Required: "Contact emergency services, notify family members, ensure medical power of attorney is accessible"
+      Status: Not Started
+      Deadline: ""
+      Resolution Notes: ""
+      
+    - Crisis Type: Financial Institution Freeze
+      Priority Level: High - Within 24 Hours
+      Action Required: "Contact financial institutions with death certificate, executor documentation"
+      Status: Not Started
+      Deadline: ""
+      Resolution Notes: ""
+      
+    - Crisis Type: Digital Asset Access Loss
+      Priority Level: Medium - Within 48 Hours
+      Action Required: "Initiate password manager emergency access, contact tech support for major accounts"
+      Status: Not Started
+      Deadline: ""
+      Resolution Notes: ""
+    
+    # Additional comprehensive crisis scenarios
+    - Crisis Type: Unexpected Legal Challenge
+      Priority Level: High - Within 24 Hours
+      Action Required: "Contact probate attorney immediately, gather all legal documents, prepare for court proceedings"
+      Status: Not Started
+      Deadline: ""
+      Resolution Notes: ""
+      
+    - Crisis Type: Insurance Claim Denial
+      Priority Level: High - Within 24 Hours
+      Action Required: "Review policy terms, contact insurance specialist, prepare appeal documentation"
+      Status: Not Started
+      Deadline: ""
+      Resolution Notes: ""
+      
+    - Crisis Type: Family Dispute Over Estate
+      Priority Level: High - Within 24 Hours
+      Action Required: "Contact family mediator, review will provisions, engage legal counsel for guidance"
+      Status: Not Started
+      Deadline: ""
+      Resolution Notes: ""
+      
+    - Crisis Type: Business Partnership Issues
+      Priority Level: High - Within 24 Hours
+      Action Required: "Review partnership agreements, contact business attorney, assess valuation impact"
+      Status: Not Started
+      Deadline: ""
+      Resolution Notes: ""
+      
+    - Crisis Type: Tax Authority Audit Notice
+      Priority Level: Critical - Immediate Action
+      Action Required: "Contact CPA immediately, gather all tax records, prepare audit response strategy"
+      Status: Not Started
+      Deadline: ""
+      Resolution Notes: ""
+      
+    - Crisis Type: Professional Service Provider Unavailable
+      Priority Level: Medium - Within 48 Hours
+      Action Required: "Activate backup professional contacts, transfer critical documentation, establish new relationships"
+      Status: Not Started
+      Deadline: ""
+      Resolution Notes: ""
+      
+    - Crisis Type: Document Location Unknown
+      Priority Level: Medium - Within 48 Hours
+      Action Required: "Check all secure storage locations, contact attorneys who may have copies, recreate if necessary"
+      Status: Not Started
+      Deadline: ""
+      Resolution Notes: ""
+      
+    - Crisis Type: Executor Incapacity or Unavailability
+      Priority Level: Critical - Immediate Action
+      Action Required: "Activate successor executor, transfer all documentation, brief on current status"
+      Status: Not Started
+      Deadline: ""
+      Resolution Notes: ""
+      
+    - Crisis Type: Real Estate Market Volatility
+      Priority Level: Medium - Within 48 Hours
+      Action Required: "Get updated property appraisals, review sale timing options, assess tax implications"
+      Status: Not Started
+      Deadline: ""
+      Resolution Notes: ""
+      
+    - Crisis Type: Beneficiary Contact Loss
+      Priority Level: Medium - Within 48 Hours
+      Action Required: "Use emergency contact networks, hire professional locator if needed, update legal notices"
+      Status: Not Started
+      Deadline: ""
+      Resolution Notes: ""
+      
+    - Crisis Type: Technology System Failure
+      Priority Level: High - Within 24 Hours
+      Action Required: "Activate backup documentation systems, recover from secure storage, rebuild critical systems"
+      Status: Not Started
+      Deadline: ""
+      Resolution Notes: ""
+      
+    - Crisis Type: International Asset Complications
+      Priority Level: High - Within 24 Hours
+      Action Required: "Contact international legal counsel, review treaty provisions, assess tax implications"
+      Status: Not Started
+      Deadline: ""
+      Resolution Notes: ""
+      
+    - Crisis Type: Creditor Claims Against Estate
+      Priority Level: High - Within 24 Hours
+      Action Required: "Review claim validity, contact estate attorney, prepare response strategy"
+      Status: Not Started
+      Deadline: ""
+      Resolution Notes: ""
+      
+    - Crisis Type: Sudden Illness of Key Family Member
+      Priority Level: Medium - Within 48 Hours
+      Action Required: "Adjust family coordination plan, activate support networks, update communication protocols"
+      Status: Not Started
+      Deadline: ""
+      Resolution Notes: ""
+      
+    - Crisis Type: Court-Ordered Asset Freeze
+      Priority Level: Critical - Immediate Action
+      Action Required: "Contact legal counsel immediately, review court orders, prepare asset documentation"
+      Status: Not Started
+      Deadline: ""
+      Resolution Notes: ""
+
+  Memory Preservation:
+    - Memory Title: Family Vacation Memories
+      Memory Type: Photo Collection
+      Date/Period: ""
+      Description: "Collection of family vacation photos and stories from our annual trips"
+      People Involved: ["Spouse", "Children"]
+      Location: "Various vacation destinations"
+      Media Files: ""
+      Significance: "Documents our family bonding time and adventures together"
+      Share With: Family Only
+      Preservation Status: Draft
+      Tags: ["Travel", "Family"]
+      
+    - Memory Title: Career Achievement Stories
+      Memory Type: Achievement
+      Date/Period: ""
+      Description: "Professional milestones and career accomplishments"
+      People Involved: ["Colleagues"]
+      Location: "Various workplaces"
+      Media Files: ""
+      Significance: "Professional legacy and work contributions"
+      Share With: Specific Individuals
+      Preservation Status: Draft
+      Tags: ["Career", "Milestones"]
+
+    - Memory Title: Our Wedding Day
+      Memory Type: Story
+      Date/Period: "2010-06-12"
+      Description: "The story of our wedding day, from the proposal to the last dance."
+      People Involved: ["Spouse", "Family", "Friends"]
+      Location: "The Old Mill, Anytown, USA"
+      Media Files: "/assets/images/wedding.jpg"
+      Significance: "The day we started our life together."
+      Share With: Family Only
+      Preservation Status: Ready to Share
+      Tags: ["Wedding", "Family", "Milestones"]
+
+    - Memory Title: First Home
+      Memory Type: Story
+      Date/Period: "2012-03-20"
+      Description: "Buying our first home and all the adventures that came with it."
+      People Involved: ["Spouse"]
+      Location: "123 Main Street, Anytown, USA"
+      Media Files: "/assets/images/first_home.jpg"
+      Significance: "The place where we built our family."
+      Share With: Family Only
+      Preservation Status: Ready to Share
+      Tags: ["Home", "Family", "Milestones"]
+    
+    # Additional comprehensive memory preservation templates
+    - Memory Title: Wedding Day Memories
+      Memory Type: Story
+      Date/Period: ""
+      Description: "The story of our wedding day, from preparation to celebration"
+      People Involved: ["Spouse", "Parents", "Siblings", "Friends"]
+      Location: "Wedding venue and celebration locations"
+      Media Files: ""
+      Significance: "Foundation of our family and lifelong partnership"
+      Share With: Everyone
+      Preservation Status: Draft
+      Tags: ["Marriage", "Milestones", "Family"]
+      
+    - Memory Title: Children's Birth Stories
+      Memory Type: Story
+      Date/Period: ""
+      Description: "The arrival of each child and early memories"
+      People Involved: ["Spouse", "Children", "Parents"]
+      Location: "Hospital and home"
+      Media Files: ""
+      Significance: "Beginning of parenthood and family expansion"
+      Share With: Family Only
+      Preservation Status: Draft
+      Tags: ["Parenting", "Milestones", "Family"]
+      
+    - Memory Title: Family Holiday Traditions
+      Memory Type: Tradition
+      Date/Period: ""
+      Description: "Annual holiday celebrations and family traditions"
+      People Involved: ["Spouse", "Children", "Extended Family"]
+      Location: "Home and family gathering places"
+      Media Files: ""
+      Significance: "Family bonding and continuation of traditions"
+      Share With: Everyone
+      Preservation Status: Draft
+      Tags: ["Family", "Hobbies", "Milestones"]
+      
+    - Memory Title: Grandparents' Wisdom Stories
+      Memory Type: Life Lesson
+      Date/Period: ""
+      Description: "Important life lessons and wisdom shared by grandparents"
+      People Involved: ["Parents", "Extended Family"]
+      Location: "Childhood home and family gatherings"
+      Media Files: ""
+      Significance: "Family wisdom and values passed down through generations"
+      Share With: Everyone
+      Preservation Status: Draft
+      Tags: ["Family", "Childhood", "Education"]
+      
+    - Memory Title: Educational Milestones
+      Memory Type: Achievement
+      Date/Period: ""
+      Description: "School graduations, degrees, and educational achievements"
+      People Involved: ["Parents", "Siblings", "Friends"]
+      Location: "Schools and universities"
+      Media Files: ""
+      Significance: "Personal growth and academic accomplishments"
+      Share With: Everyone
+      Preservation Status: Draft
+      Tags: ["Education", "Milestones", "Career"]
+      
+    - Memory Title: First Home Purchase
+      Memory Type: Achievement
+      Date/Period: ""
+      Description: "The story of buying our first home together"
+      People Involved: ["Spouse"]
+      Location: "First home address"
+      Media Files: ""
+      Significance: "Major life milestone and financial achievement"
+      Share With: Family Only
+      Preservation Status: Draft
+      Tags: ["Marriage", "Milestones", "Family"]
+      
+    - Memory Title: Special Friendship Stories
+      Memory Type: Story
+      Date/Period: ""
+      Description: "Meaningful friendships and their impact on my life"
+      People Involved: ["Friends"]
+      Location: "Various friendship locations"
+      Media Files: ""
+      Significance: "Importance of friendship and community in life"
+      Share With: Specific Individuals
+      Preservation Status: Draft
+      Tags: ["Friends", "Education"]
+      
+    - Memory Title: Overcoming Life Challenges
+      Memory Type: Life Lesson
+      Date/Period: ""
+      Description: "Difficult times overcome and lessons learned"
+      People Involved: ["Spouse", "Family", "Friends"]
+      Location: "Various locations during challenges"
+      Media Files: ""
+      Significance: "Resilience, growth, and life wisdom gained through adversity"
+      Share With: Family Only
+      Preservation Status: Draft
+      Tags: ["Education", "Milestones"]
+      
+    - Memory Title: Parenting Philosophy and Advice
+      Memory Type: Life Lesson
+      Date/Period: ""
+      Description: "Parenting approach, mistakes made, wisdom gained"
+      People Involved: ["Spouse", "Children"]
+      Location: "Home and family settings"
+      Media Files: ""
+      Significance: "Guidance for children in their own parenting journey"
+      Share With: Family Only
+      Preservation Status: Draft
+      Tags: ["Parenting", "Education", "Family"]
+      
+    - Memory Title: Special Pet Memories
+      Memory Type: Story
+      Date/Period: ""
+      Description: "Beloved family pets and their impact on our lives"
+      People Involved: ["Spouse", "Children"]
+      Location: "Home and pet-related locations"
+      Media Files: ""
+      Significance: "Love, responsibility, and joy that pets brought to family"
+      Share With: Family Only
+      Preservation Status: Draft
+      Tags: ["Family", "Hobbies"]
+      
+    - Memory Title: Community Service and Giving
+      Memory Type: Achievement
+      Date/Period: ""
+      Description: "Volunteer work and community contributions"
+      People Involved: ["Friends", "Colleagues"]
+      Location: "Community organizations and service locations"
+      Media Files: ""
+      Significance: "Values of service and making a positive impact"
+      Share With: Everyone
+      Preservation Status: Draft
+      Tags: ["Career", "Education", "Milestones"]
+      
+    - Memory Title: Hobby and Interest Stories
+      Memory Type: Story
+      Date/Period: ""
+      Description: "Passionate hobbies and interests that brought joy"
+      People Involved: ["Friends", "Spouse"]
+      Location: "Hobby-related locations"
+      Media Files: ""
+      Significance: "Importance of pursuing passions and personal interests"
+      Share With: Everyone
+      Preservation Status: Draft
+      Tags: ["Hobbies", "Education"]
+      
+    - Memory Title: Family Recipe Collection
+      Memory Type: Tradition
+      Date/Period: ""
+      Description: "Family recipes and cooking traditions"
+      People Involved: ["Parents", "Spouse", "Children"]
+      Location: "Kitchen and family gathering spaces"
+      Media Files: ""
+      Significance: "Family traditions and cultural heritage preservation"
+      Share With: Family Only
+      Preservation Status: Draft
+      Tags: ["Family", "Hobbies"]
+      
+    - Memory Title: Letters to Future Generations
+      Memory Type: Letter
+      Date/Period: ""
+      Description: "Personal letters to children and future family members"
+      People Involved: ["Children", "Extended Family"]
+      Location: "Home office"
+      Media Files: ""
+      Significance: "Personal wisdom and love shared across generations"
+      Share With: Family Only
+      Preservation Status: Draft
+      Tags: ["Family", "Education", "Parenting"]
+      
+    - Memory Title: Professional Mentorship Stories
+      Memory Type: Life Lesson
+      Date/Period: ""
+      Description: "Mentors who shaped my career and people I mentored"
+      People Involved: ["Colleagues"]
+      Location: "Workplace environments"
+      Media Files: ""
+      Significance: "Professional development and paying it forward"
+      Share With: Specific Individuals
+      Preservation Status: Draft
+      Tags: ["Career", "Education"]
+      
+    - Memory Title: Travel Adventures and Discoveries
+      Memory Type: Story
+      Date/Period: ""
+      Description: "Memorable travel experiences and cultural discoveries"
+      People Involved: ["Spouse", "Children", "Friends"]
+      Location: "Travel destinations worldwide"
+      Media Files: ""
+      Significance: "Broadening perspectives and creating lasting memories"
+      Share With: Everyone
+      Preservation Status: Draft
+      Tags: ["Travel", "Education", "Family"]
+      
+    - Memory Title: Life Philosophy and Values
+      Memory Type: Life Lesson
+      Date/Period: ""
+      Description: "Core beliefs, values, and life philosophy that guided decisions"
+      People Involved: ["Family", "Friends"]
+      Location: "Throughout life experiences"
+      Media Files: ""
+      Significance: "Foundation of character and decision-making principles"
+      Share With: Everyone
+      Preservation Status: Draft
+      Tags: ["Education", "Philosophy"]
+      
+    - Memory Title: Financial Success and Setback Stories
+      Memory Type: Life Lesson
+      Date/Period: ""
+      Description: "Financial achievements, mistakes, and lessons learned"
+      People Involved: ["Spouse"]
+      Location: "Various life stages"
+      Media Files: ""
+      Significance: "Financial wisdom and responsibility lessons for family"
+      Share With: Family Only
+      Preservation Status: Draft
+      Tags: ["Education", "Career", "Milestones"]
+      
+    - Memory Title: Health Journey and Wellness Stories
+      Memory Type: Story
+      Date/Period: ""
+      Description: "Health challenges overcome and wellness approaches"
+      People Involved: ["Spouse", "Family"]
+      Location: "Healthcare settings and home"
+      Media Files: ""
+      Significance: "Health awareness and wellness wisdom for family"
+      Share With: Family Only
+      Preservation Status: Draft
+      Tags: ["Education", "Family"]
+      
+    - Memory Title: Spiritual and Faith Journey
+      Memory Type: Life Lesson
+      Date/Period: ""
+      Description: "Spiritual growth, faith experiences, and religious involvement"
+      People Involved: ["Spouse", "Extended Family"]
+      Location: "Religious institutions and personal reflection spaces"
+      Media Files: ""
+      Significance: "Spiritual foundation and faith-based guidance"
+      Share With: Family Only
+      Preservation Status: Draft
+      Tags: ["Education", "Philosophy", "Family"]

@@ -1,0 +1,217 @@
+# Professional Services Integration Pages
+complexity: moderate
+# Comprehensive coordination tools for attorneys, CPAs, and other professionals
+
+pages:
+  - title: Attorney Coordination
+    parent: Executor Hub
+    icon: "⚖️"
+    description: Legal professional coordination and document management
+    helpers:
+      - Review estate planning documents with attorney
+      - Coordinate probate proceedings
+      - Manage legal document requests
+      - Track court filings and deadlines
+      - Document attorney communications
+    role: executor
+
+  - title: CPA Tax Planning
+    parent: Executor Hub  
+    icon: "📊"
+    description: Tax professional coordination for estate tax matters
+    helpers:
+      - Coordinate with CPA for final tax returns
+      - Track estate tax deadlines (Form 706)
+      - Document tax planning strategies
+      - Manage tax document collection
+      - Review beneficiary tax implications
+    role: executor
+
+  - title: Financial Advisor Hub
+    parent: Preparation Hub
+    icon: "💼"
+    description: Investment and financial planning coordination
+    helpers:
+      - Review investment portfolio allocations
+      - Document beneficiary designations
+      - Coordinate account transfers
+      - Track retirement account requirements
+      - Plan for estate liquidity needs
+    role: owner
+
+  - title: Insurance Agent Portal
+    parent: Preparation Hub
+    icon: "🛡️"
+    description: Insurance professional coordination
+    helpers:
+      - Review life insurance beneficiaries
+      - Document policy details and claims procedures
+      - Coordinate death benefit claims
+      - Manage policy ownership transfers
+      - Track premium payments and lapses
+    role: owner
+
+  - title: Professional Documents
+    parent: Preparation Hub
+    icon: "📁"
+    description: Secure document sharing with professionals
+    helpers:
+      - Upload engagement letters
+      - Store professional correspondence
+      - Track document requests
+      - Manage confidential information
+      - Maintain audit trail
+    role: owner
+
+# Professional contact template entries
+database_entries:
+  Professional Coordination:
+    - Professional Name: Estate Attorney
+      Service Type: Attorney
+      Firm/Company: "[Law Firm Name]"
+      Contact Information: "Phone: (555) 123-4567\nEmail: attorney@lawfirm.com"
+      Status: Active
+      Next Action Required: Schedule initial estate planning consultation
+      Notes: Primary attorney for will, trust, and estate planning documents
+
+    - Professional Name: Tax CPA
+      Service Type: CPA/Tax Professional
+      Firm/Company: "[CPA Firm Name]"
+      Contact Information: "Phone: (555) 234-5678\nEmail: cpa@taxfirm.com"
+      Status: Active
+      Next Action Required: Review current year tax planning strategies
+      Notes: Handles annual tax returns and estate tax planning
+
+    - Professional Name: Financial Advisor
+      Service Type: Financial Advisor
+      Firm/Company: "[Investment Firm Name]"
+      Contact Information: "Phone: (555) 345-6789\nEmail: advisor@investments.com"
+      Status: Active
+      Next Action Required: Annual portfolio review
+      Notes: Manages investment accounts and retirement planning
+
+    - Professional Name: Insurance Agent
+      Service Type: Insurance Agent
+      Firm/Company: "[Insurance Company]"
+      Contact Information: "Phone: (555) 456-7890\nEmail: agent@insurance.com"
+      Status: Active
+      Next Action Required: Review life insurance coverage amounts
+      Notes: Handles life, disability, and long-term care insurance
+
+    - Professional Name: Real Estate Agent
+      Service Type: Real Estate Agent
+      Firm/Company: "[Realty Company]"
+      Contact Information: "Phone: (555) 567-8901\nEmail: agent@realty.com"
+      Status: Pending
+      Next Action Required: Property valuation for estate planning
+      Notes: Will assist with property sales if needed
+
+# Professional coordination templates
+letters:
+  - title: Attorney Engagement Letter Template
+    description: Template for engaging estate planning attorney
+    category: Professional
+    body: |
+      [Date]
+      
+      [Attorney Name]
+      [Law Firm]
+      [Address]
+      
+      Dear [Attorney Name],
+      
+      I am writing to formally engage your services for estate planning matters. I would like assistance with:
+      
+      • Reviewing and updating my will
+      • Establishing/updating trust documents
+      • Power of attorney documents
+      • Healthcare directives
+      • Beneficiary designation review
+      
+      Please provide:
+      1. Engagement letter outlining scope of services
+      2. Fee structure and billing arrangements
+      3. Timeline for document preparation
+      4. List of information/documents needed from me
+      
+      I am available for an initial consultation at your earliest convenience. Please contact me at [phone] or [email] to schedule.
+      
+      Thank you for your assistance with these important matters.
+      
+      Sincerely,
+      [Your Name]
+
+  - title: CPA Estate Tax Planning Request
+    description: Request for tax planning assistance
+    category: Professional
+    body: |
+      [Date]
+      
+      [CPA Name]
+      [Firm Name]
+      [Address]
+      
+      Dear [CPA Name],
+      
+      I am requesting your assistance with estate tax planning. Specifically, I need help with:
+      
+      Current Planning Needs:
+      • Estate tax projection based on current assets
+      • Gifting strategies to reduce estate taxes
+      • Charitable giving optimization
+      • Generation-skipping transfer tax planning
+      
+      Post-Death Administration (for Executor):
+      • Final individual income tax return (Form 1040)
+      • Estate income tax returns (Form 1041)
+      • Estate tax return (Form 706) if required
+      • State estate/inheritance tax returns
+      
+      Please advise on:
+      1. Documents needed for analysis
+      2. Fee structure for services
+      3. Timeline for tax projections
+      4. Recommended tax-saving strategies
+      
+      I look forward to working with you on these matters.
+      
+      Sincerely,
+      [Your Name]
+
+  - title: Financial Advisor Estate Review Request
+    description: Request for investment and estate liquidity review
+    category: Professional
+    body: |
+      [Date]
+      
+      [Advisor Name]
+      [Firm Name]
+      [Address]
+      
+      Dear [Advisor Name],
+      
+      I would like to schedule a comprehensive review of my investment portfolio with a focus on estate planning considerations:
+      
+      Review Objectives:
+      • Ensure adequate liquidity for estate taxes and expenses
+      • Review beneficiary designations on all accounts
+      • Optimize asset allocation for estate planning goals
+      • Discuss wealth transfer strategies
+      • Consider charitable giving vehicles
+      
+      Specific Topics:
+      1. IRA and retirement account distribution planning
+      2. Life insurance needs analysis
+      3. Trust funding strategies
+      4. Investment account titling
+      5. Tax-efficient wealth transfer options
+      
+      Please let me know your availability for a meeting to discuss these matters. I would also appreciate receiving:
+      • Current portfolio summary
+      • Beneficiary designation report
+      • Fee schedule for estate planning services
+      
+      Thank you for your continued guidance.
+      
+      Sincerely,
+      [Your Name]

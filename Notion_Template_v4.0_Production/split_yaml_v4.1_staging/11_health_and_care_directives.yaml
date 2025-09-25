@@ -1,0 +1,82 @@
+# Estate Planning Template v4.0 - Health & Care Directives (Detailed)
+# Generated from comprehensive architectural conversation analysis
+# Output Directory: split_yaml_discovered/
+pages:
+  - title: "Advance Directive & Living Will"
+    parent: "Health & Care"
+    description: "A detailed guide to documenting your wishes for medical treatment."
+    role: "owner"
+    icon_file: "emoji:📄"
+    blocks:
+      - type: heading_1
+        content: "Crafting Your Advance Directive & Living Will"
+      - type: paragraph
+        content: "This document, also known as a living will, allows you to state your wishes for end-of-life medical care in case you become unable to communicate your decisions. It is a profound gift to your loved ones, sparing them from making difficult choices on your behalf."
+      - type: callout
+        icon: emoji:🤝
+        content: "We recommend discussing your wishes with your family and your doctor as you complete this document. This ensures everyone understands your choices."
+        color: "gray_background"
+      - type: heading_2
+        content: "Key Sections of Your Living Will"
+      - type: toggle
+        content: "Life-Sustaining Treatment"
+        blocks:
+          - type: paragraph
+            content: "Specify your wishes regarding treatments like mechanical ventilation, dialysis, and artificial nutrition. You can choose to receive, refuse, or set conditions for these treatments."
+      - type: toggle
+        content: "Palliative Care & Pain Management"
+        blocks:
+          - type: paragraph
+            content: "State your desire for comfort care and pain relief, even if it may indirectly hasten the end of life. This is about ensuring your quality of life is prioritized."
+      - type: toggle
+        content: "Do Not Resuscitate (DNR) & Do Not Intubate (DNI) Orders"
+        blocks:
+          - type: paragraph
+            content: "Clearly state your wishes regarding CPR and intubation. These are specific medical orders that can be included in your advance directive."
+      - type: heading_2
+        content: "Health Care Power of Attorney"
+      - type: paragraph
+        content: "It is highly recommended to appoint a Health Care Power of Attorney (also known as a health care proxy or agent). This is someone you trust to make medical decisions for you if you cannot."
+      - type: child_database
+        title: "My Health Care Agent"
+        database_ref: "Contacts Directory"
+
+  - title: "Funeral & Memorial Plans"
+    parent: "Health & Care"
+    description: "A comprehensive guide to planning your final arrangements."
+    role: "owner"
+    icon_file: "emoji:🕊️"
+    blocks:
+      - type: heading_1
+        content: "Planning Your Final Arrangements"
+      - type: paragraph
+        content: "Planning your own funeral or memorial service can provide peace of mind and relieve your family of a significant burden. This is a space to outline your wishes, from the big picture to the small details."
+      - type: heading_2
+        content: "My Wishes for Final Arrangements"
+      - type: child_database
+        title: "Memorial Planning Checklist"
+        database_ref: "Memorial Planning Checklist"
+databases:
+  - title: "Memorial Planning Checklist"
+    description: "A checklist to plan all aspects of a funeral or memorial service."
+    properties:
+      Task:
+        type: title
+        title: {}
+      Preference:
+        type: rich_text
+        rich_text: {}
+      Status:
+        type: select
+        select:
+          options:
+            - name: "Decided"
+              color: "green"
+            - name: "Undecided"
+              color: "yellow"
+      Notes:
+        type: rich_text
+        rich_text: {}
+    views:
+      - name: "Planning Checklist"
+        type: "table"

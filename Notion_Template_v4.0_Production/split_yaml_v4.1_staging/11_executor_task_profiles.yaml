@@ -1,0 +1,530 @@
+# 11_executor_task_profiles.yaml
+complexity: moderate
+# Provides three executor task packs as pages with checklists (copy/adapt; delete non-applicable).
+
+databases:
+  - title: "Enhanced Executor Workflow Guidance"
+    icon: emoji:⚡
+    description: "Intelligent workflow tracking with time estimates and smart guidance"
+    properties:
+      Task_Name:
+        type: title
+        title: {}
+      Estate_Complexity:
+        type: select
+        select:
+          options:
+            - name: "Simple"
+              color: "blue"
+            - name: "Moderate"
+              color: "yellow"
+            - name: "Complex"
+              color: "red"
+      Time_Estimate:
+        type: select
+        select:
+          options:
+            - name: "Quick (< 1 hour)"
+              color: "green"
+            - name: "Half Day (1-4 hours)"
+              color: "yellow"
+            - name: "Full Day (4-8 hours)"
+              color: "orange"
+            - name: "Multi-Day (1-3 days)"
+              color: "red"
+            - name: "Ongoing (weeks/months)"
+              color: "purple"
+      Priority_Level:
+        type: select
+        select:
+          options:
+            - name: "Immediate (0-3 days)"
+              color: "red"
+            - name: "Urgent (1-2 weeks)"
+              color: "orange"
+            - name: "Important (2-4 weeks)"
+              color: "yellow"
+            - name: "Routine (1-3 months)"
+              color: "blue"
+            - name: "Future Planning"
+              color: "gray"
+      Status:
+        type: select
+        select:
+          options:
+            - name: "Not Started"
+              color: "gray"
+            - name: "In Progress"
+              color: "yellow"
+            - name: "Waiting for Others"
+              color: "orange"
+            - name: "Completed"
+              color: "green"
+            - name: "Not Applicable"
+              color: "red"
+      Professional_Help_Needed:
+        type: checkbox
+        checkbox: {}
+      Dependencies:
+        type: rich_text
+        rich_text: {}
+      # Workflow Guidance Formulas
+      Smart_Workflow_Guidance:
+        type: formula
+        formula:
+          expression: "if(prop(\"Status\") == \"Not Started\", \"🚀 START: \" + if(prop(\"Priority_Level\") == \"Immediate (0-3 days)\", \"URGENT - Begin immediately\", if(prop(\"Priority_Level\") == \"Urgent (1-2 weeks)\", \"High priority - Schedule this week\", if(prop(\"Priority_Level\") == \"Important (2-4 weeks)\", \"Important - Plan for next 2 weeks\", \"Routine - Add to monthly planning\"))), if(prop(\"Status\") == \"In Progress\", \"⚡ CONTINUE: \" + if(prop(\"Time_Estimate\") == \"Quick (< 1 hour)\", \"Should finish today\", if(prop(\"Time_Estimate\") == \"Half Day (1-4 hours)\", \"Schedule completion block\", if(prop(\"Time_Estimate\") == \"Full Day (4-8 hours)\", \"Dedicate full day\", if(prop(\"Time_Estimate\") == \"Multi-Day (1-3 days)\", \"Break into daily milestones\", \"Set weekly check-ins\")))), if(prop(\"Status\") == \"Waiting for Others\", \"⏳ WAITING: \" + if(prop(\"Professional_Help_Needed\"), \"Follow up with professional team\", \"Follow up with family/contacts\"), if(prop(\"Status\") == \"Completed\", \"✅ DONE: Great progress!\", \"❌ SKIPPED: Marked not applicable\"))))"
+      Next_Step_Guidance:
+        type: formula
+        formula:
+          expression: "if(prop(\"Status\") == \"Not Started\", if(prop(\"Dependencies\") != \"\", \"⚠️ CHECK DEPENDENCIES: \" + prop(\"Dependencies\"), \"✅ READY TO START: No dependencies blocking\"), if(prop(\"Status\") == \"In Progress\", if(prop(\"Professional_Help_Needed\"), \"📞 COORDINATE: Contact attorney/CPA/professionals\", \"🎯 EXECUTE: Continue with current work\"), if(prop(\"Status\") == \"Waiting for Others\", \"📋 FOLLOW UP: Set reminder to check status in 2-3 days\", \"➡️ NEXT TASK: Move to next item in workflow\")))"
+      Time_Management_Alert:
+        type: formula
+        formula:
+          expression: "if(and(prop(\"Priority_Level\") == \"Immediate (0-3 days)\", prop(\"Time_Estimate\") == \"Multi-Day (1-3 days)\"), \"🚨 TIME CONFLICT: Immediate task needs multi-day work - get help!\", if(and(prop(\"Priority_Level\") == \"Urgent (1-2 weeks)\", prop(\"Time_Estimate\") == \"Full Day (4-8 hours)\"), \"⏰ SCHEDULE BLOCK: Reserve full day this week\", if(and(prop(\"Priority_Level\") == \"Important (2-4 weeks)\", prop(\"Time_Estimate\") == \"Ongoing (weeks/months)\"), \"📅 LONG-TERM PLAN: Start now, plan regular check-ins\", \"✅ TIMING OK: Normal scheduling applies\")))"
+      Professional_Coordination_Guide:
+        type: formula
+        formula:
+          expression: "if(prop(\"Professional_Help_Needed\"), if(prop(\"Estate_Complexity\") == \"Complex\", \"👥 TEAM APPROACH: Schedule coordination meeting with attorney, CPA, and other professionals\", if(prop(\"Estate_Complexity\") == \"Moderate\", \"📞 CONSULT PROFESSIONAL: Call attorney or relevant expert before proceeding\", \"💡 CONSIDER HELP: Simple task but professional input may save time/errors\")), \"✅ SELF-EXECUTE: You can handle this independently\")"
+      Deadline_Calculator:
+        type: formula
+        formula:
+          expression: "if(prop(\"Priority_Level\") == \"Immediate (0-3 days)\", \"📅 DEADLINE: Within 3 days of death\", if(prop(\"Priority_Level\") == \"Urgent (1-2 weeks)\", \"📅 DEADLINE: Within 2 weeks of death\", if(prop(\"Priority_Level\") == \"Important (2-4 weeks)\", \"📅 DEADLINE: Within 1 month of death\", if(prop(\"Priority_Level\") == \"Routine (1-3 months)\", \"📅 DEADLINE: Within 3 months of death\", \"📅 TIMELINE: Long-term planning, no immediate deadline\"))))"
+      Complexity_Scaling_Guide:
+        type: formula
+        formula:
+          expression: "if(prop(\"Estate_Complexity\") == \"Simple\", \"🟦 SIMPLE APPROACH: Basic requirements only\", if(prop(\"Estate_Complexity\") == \"Moderate\", \"🟨 MODERATE APPROACH: Additional documentation and coordination needed\", \"🟥 COMPLEX APPROACH: Extensive professional coordination, detailed tracking required\"))"
+
+pages:
+  - title: "Enhanced Executor Workflow System"
+    icon: "emoji:🧰"
+    description: "Comprehensive workflow guidance with time estimates and smart guidance formulas. Pick ONE pack based on Estate Complexity."
+    blocks:
+      - type: heading_1
+        content: "🧰 Enhanced Executor Workflow System"
+      - type: paragraph
+        content: "Intelligent task management system with time estimates, priority guidance, and professional coordination recommendations."
+
+      - type: callout
+        icon: emoji:💡
+        content: "SMART SYSTEM: Each task includes time estimates, priority levels, and contextual guidance based on your estate's complexity."
+        color: blue_background
+
+      - type: heading_2
+        content: "Workflow Selection Guide"
+      - type: toggle
+        content: "🟦 Simple Estate Workflow (< $500K, basic assets)"
+        blocks:
+          - type: paragraph
+            content: "For estates with straightforward assets: primary residence, basic investments, simple family structure."
+          - type: bulleted_list_item
+            content: "Estimated total time: 20-40 hours over 3-6 months"
+          - type: bulleted_list_item
+            content: "Professional help: Minimal attorney consultation"
+          - type: bulleted_list_item
+            content: "Key focus: Document gathering, basic notifications, simple distribution"
+
+      - type: toggle
+        content: "🟨 Moderate Estate Workflow ($500K-$2M, some complexity)"
+        blocks:
+          - type: paragraph
+            content: "For estates with multiple asset types: investment accounts, business interests, or moderate family complexity."
+          - type: bulleted_list_item
+            content: "Estimated total time: 60-120 hours over 6-12 months"
+          - type: bulleted_list_item
+            content: "Professional help: Regular attorney/CPA coordination"
+          - type: bulleted_list_item
+            content: "Key focus: Asset valuation, tax planning, coordinated professional support"
+
+      - type: toggle
+        content: "🟥 Complex Estate Workflow (> $2M, high complexity)"
+        blocks:
+          - type: paragraph
+            content: "For estates with significant assets: business ownership, real estate portfolio, trust structures, tax implications."
+          - type: bulleted_list_item
+            content: "Estimated total time: 150+ hours over 12-24 months"
+          - type: bulleted_list_item
+            content: "Professional help: Dedicated professional team coordination"
+          - type: bulleted_list_item
+            content: "Key focus: Tax optimization, business management, complex distributions"
+
+    children:
+      - title: "🟦 Simple Estate Workflow"
+        icon: "emoji:🟦"
+        blocks:
+          - type: heading_1
+            content: "🟦 Simple Estate Workflow"
+          - type: paragraph
+            content: "Streamlined process for straightforward estates. Tasks organized by priority with time estimates."
+
+          - type: heading_2
+            content: "Phase 1: Immediate Actions (Days 0-7)"
+
+          - type: toggle
+            content: "🚨 Critical First Week Tasks"
+            blocks:
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Locate will and death certificate; store in Legal Documents [Time: 2-4 hours] [Priority: Immediate]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Secure home, pets, vehicles, valuables [Time: 2-6 hours] [Priority: Immediate]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Notify immediate family and close friends [Time: 2-4 hours] [Priority: Immediate]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Contact funeral director and make arrangements [Time: 3-6 hours] [Priority: Immediate]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Order certified copies of death certificate (10-15 copies) [Time: 1 hour] [Priority: Immediate]"
+                  checked: false
+
+          - type: heading_2
+            content: "Phase 2: Foundation Building (Days 7-30)"
+
+          - type: toggle
+            content: "🏗️ Core Setup Tasks"
+            blocks:
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Open estate bank account [Time: 2-3 hours] [Priority: Urgent] [Depends: Death certificates]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Notify key financial accounts (bank, credit card, investment) [Time: 3-5 hours] [Priority: Urgent]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Cancel/transfer utilities and subscriptions [Time: 2-4 hours] [Priority: Urgent]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Inventory assets and create basic list [Time: 4-8 hours] [Priority: Important]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Pay immediate expenses and track all receipts [Time: 1-2 hours weekly] [Priority: Important]"
+                  checked: false
+
+          - type: heading_2
+            content: "Phase 3: Documentation & Distribution (Days 30-90)"
+
+          - type: toggle
+            content: "📋 Final Tasks"
+            blocks:
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Prepare simple asset distribution plan [Time: 3-6 hours] [Priority: Important] [Consider: Professional review]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "File final tax return (if needed) [Time: 2-4 hours] [Priority: Routine] [Consider: CPA help]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Distribute assets to beneficiaries [Time: 2-8 hours] [Priority: Routine] [Depends: All prior tasks]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Close estate accounts and finalize records [Time: 2-4 hours] [Priority: Future Planning]"
+                  checked: false
+
+          - type: callout
+            icon: emoji:⏰
+            content: "SIMPLE ESTATE TIMELINE: Total estimated time 20-40 hours over 3-6 months. Most tasks can be self-executed with minimal professional help."
+            color: blue_background
+
+      - title: "🟨 Moderate Estate Workflow"
+        icon: "emoji:🟨"
+        blocks:
+          - type: heading_1
+            content: "🟨 Moderate Estate Workflow"
+          - type: paragraph
+            content: "Enhanced process for estates with multiple asset types and moderate complexity. Includes all Simple tasks plus additional coordination."
+
+          - type: heading_2
+            content: "Phase 1: Enhanced Immediate Actions (Days 0-7)"
+
+          - type: toggle
+            content: "🚨 All Simple Estate Tasks PLUS:"
+            blocks:
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Contact estate attorney for initial consultation [Time: 2-3 hours] [Priority: Immediate] [Professional: Required]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Secure business interests and review key documents [Time: 4-8 hours] [Priority: Immediate]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Notify employer(s) and handle immediate benefits [Time: 2-4 hours] [Priority: Immediate]"
+                  checked: false
+
+          - type: heading_2
+            content: "Phase 2: Professional Coordination (Days 7-60)"
+
+          - type: toggle
+            content: "👥 Professional Team Tasks"
+            blocks:
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "File insurance claims (Home/Auto/Life) [Time: 4-8 hours] [Priority: Urgent] [Track: Insurance Claims DB]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Complete detailed asset/liability inventory [Time: 8-16 hours] [Priority: Important] [Reconcile: Accounts DB]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Schedule regular check-ins with attorney/CPA [Time: 1 hour monthly] [Priority: Important] [Professional: Coordination]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Obtain professional asset appraisals [Time: 4-6 hours coordination] [Priority: Important] [Professional: Required]"
+                  checked: false
+
+          - type: heading_2
+            content: "Phase 3: Advanced Distribution (Days 60-180)"
+
+          - type: toggle
+            content: "📊 Complex Distribution Tasks"
+            blocks:
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Prepare detailed distribution plan with tax implications [Time: 6-12 hours] [Priority: Important] [Professional: CPA consultation]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "File estate tax return (if applicable) [Time: 8-16 hours] [Priority: Routine] [Professional: CPA required]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Coordinate complex asset distributions [Time: 8-20 hours] [Priority: Routine] [Professional: Attorney oversight]"
+                  checked: false
+
+          - type: callout
+            icon: emoji:⏰
+            content: "MODERATE ESTATE TIMELINE: Total estimated time 60-120 hours over 6-12 months. Regular professional coordination essential."
+            color: yellow_background
+
+      - title: "🟥 Complex Estate Workflow"
+        icon: "emoji:🟥"
+        blocks:
+          - type: heading_1
+            content: "🟥 Complex Estate Workflow"
+          - type: paragraph
+            content: "Comprehensive process for high-value, complex estates requiring extensive professional coordination and sophisticated planning."
+
+          - type: heading_2
+            content: "Phase 1: Emergency Complex Actions (Days 0-7)"
+
+          - type: toggle
+            content: "🚨 All Moderate Estate Tasks PLUS:"
+            blocks:
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Assemble professional team: estate attorney, CPA, financial advisor [Time: 4-8 hours] [Priority: Immediate] [Professional: Team assembly]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Emergency business management decisions [Time: 6-12 hours] [Priority: Immediate] [Professional: Business attorney]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Secure valuable assets and collections [Time: 4-8 hours] [Priority: Immediate] [Professional: Insurance review]"
+                  checked: false
+
+          - type: heading_2
+            content: "Phase 2: Sophisticated Asset Management (Days 7-120)"
+
+          - type: toggle
+            content: "🏢 Business & Investment Management"
+            blocks:
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Manage business interests and review operating agreements [Time: 10-20 hours] [Priority: Urgent] [Professional: Business attorney]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Coordinate real property management: appraisals, maintenance, insurance [Time: 8-16 hours] [Priority: Important] [Professional: Real estate attorney]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Investment portfolio review and management [Time: 6-12 hours] [Priority: Important] [Professional: Financial advisor]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Trust administration and coordination [Time: 8-20 hours ongoing] [Priority: Important] [Professional: Trust attorney]"
+                  checked: false
+
+          - type: heading_2
+            content: "Phase 3: Advanced Tax & Legal Strategy (Days 120-365+)"
+
+          - type: toggle
+            content: "⚖️ Sophisticated Legal & Tax Work"
+            blocks:
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Comprehensive tax strategy and filings [Time: 20-40 hours] [Priority: Routine] [Professional: Estate CPA team]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Complex distribution planning with tax optimization [Time: 15-30 hours] [Priority: Routine] [Professional: Estate planning team]"
+                  checked: false
+              - type: to_do
+                to_do:
+                  rich_text:
+                    - type: text
+                      text:
+                        content: "Ongoing business/trust management [Time: 5-10 hours monthly] [Priority: Future Planning] [Professional: Ongoing team]"
+                  checked: false
+
+          - type: callout
+            icon: emoji:⏰
+            content: "COMPLEX ESTATE TIMELINE: Total estimated time 150+ hours over 12-24 months. Dedicated professional team coordination essential."
+            color: red_background
+
+      - type: heading_2
+        content: "Workflow Enhancement Features"
+      - type: paragraph
+        content: "This enhanced system includes:"
+
+      - type: toggle
+        content: "📊 Smart Time Management"
+        blocks:
+          - type: bulleted_list_item
+            content: "Time estimates for every task"
+          - type: bulleted_list_item
+            content: "Priority-based scheduling guidance"
+          - type: bulleted_list_item
+            content: "Conflict alerts for unrealistic timelines"
+          - type: bulleted_list_item
+            content: "Professional coordination time built-in"
+
+      - type: toggle
+        content: "🧭 Intelligent Guidance"
+        blocks:
+          - type: bulleted_list_item
+            content: "Context-aware next step recommendations"
+          - type: bulleted_list_item
+            content: "Dependency tracking and alerts"
+          - type: bulleted_list_item
+            content: "Professional help recommendations"
+          - type: bulleted_list_item
+            content: "Estate complexity scaling"
+
+      - type: toggle
+        content: "⚡ Dynamic Workflow Adaptation"
+        blocks:
+          - type: bulleted_list_item
+            content: "Tasks scale based on estate complexity"
+          - type: bulleted_list_item
+            content: "Real-time progress tracking"
+          - type: bulleted_list_item
+            content: "Automated deadline calculations"
+          - type: bulleted_list_item
+            content: "Status-based guidance updates"

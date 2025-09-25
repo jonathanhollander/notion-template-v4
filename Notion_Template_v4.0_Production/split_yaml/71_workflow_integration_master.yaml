@@ -1,0 +1,58 @@
+# Estate Planning Template v4.0 - 21: Master Workflow Integration
+# Generated from comprehensive architectural conversation analysis
+# Output Directory: split_yaml_discovered_phase2/
+pages:
+  - title: "Legacy OS: Master Command Center"
+    parent: "The Legacy Vault"
+    description: "A unified command center that integrates all modules into a single, seamless workflow."
+    role: "owner"
+    icon_file: "emoji:🚀"
+    blocks:
+      - type: heading_1
+        content: "Legacy OS: Master Command Center"
+      - type: paragraph
+        content: "Welcome to your integrated command center. This dashboard provides a high-level overview of the entire Legacy Vault, bringing together tasks, progress, and key information from all modules into a single view."
+      - type: callout
+        icon: emoji:🎯
+        content: "Use this dashboard to get a quick sense of where you are and what needs your attention next. Dive into the individual modules for more detailed work."
+        color: "gray_background"
+      - type: heading_2
+        content: "Overall Progress Tracker"
+      - type: paragraph
+        content: "This view shows the completion status of all tasks across the entire vault."
+      - type: child_database
+        title: "Overall Progress"
+        database_ref: "Executor Task Checklist"
+        view_type: "board"
+        group_by: "Status"
+
+      - type: heading_2
+        content: "Upcoming Deadlines"
+      - type: paragraph
+        content: "A calendar view of all tasks with due dates."
+      - type: child_database
+        title: "Upcoming Deadlines"
+        database_ref: "Executor Task Checklist"
+        view_type: "calendar"
+        calendar_by: "Due Date"
+
+      - type: heading_2
+        content: "Quick Access Modules"
+      - type: paragraph
+        content: "Navigate to any of the core command centers below."
+      - type: column_list
+        columns:
+          - children:
+              - type: child_page
+                title: "Executor's Comprehensive Workflow"
+              - type: child_page
+                title: "Digital Legacy Command Center"
+              - type: child_page
+                title: "Legal & Financial Command Center"
+          - children:
+              - type: child_page
+                title: "Health & Care Command Center"
+              - type: child_page
+                title: "Memory Preservation Studio"
+              - type: child_page
+                title: "Family Support Center"

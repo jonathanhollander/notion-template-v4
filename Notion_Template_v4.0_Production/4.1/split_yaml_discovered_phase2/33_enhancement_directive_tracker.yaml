@@ -1,0 +1,79 @@
+# Estate Planning Template v4.0 - 33: Enhancement - Directive Tracker
+# Implements the suggestion from DATABASE_ENHANCEMENT_SUGGESTIONS.md
+# Output Directory: split_yaml_discovered_phase2/
+pages:
+  - title: "Advanced Directives Wizard (Enhanced)"
+    parent: "Health & Care Command Center"
+    description: "A guided wizard with a status tracker for creating and finalizing your advance directives."
+    role: "owner"
+    icon_file: "emoji:🪄"
+    blocks:
+      - type: heading_1
+        content: "Advanced Directives Wizard"
+      - type: paragraph
+        content: "This wizard guides you through creating and, most importantly, finalizing your legal health care documents. Use the tracker below to monitor the status of each directive."
+      - type: heading_2
+        content: "Directive Status Tracker"
+      - type: paragraph
+        content: "Track each document from draft to final, notarized copy."
+      - type: child_database
+        title: "Directive Status Tracker"
+        database_ref: "Directive Status Tracker"
+      - type: heading_2
+        content: "Wizard Steps"
+      - type: to_do
+        to_do:
+          rich_text:
+            - type: text
+              text:
+                content: "Step 1: Choose Your Health Care Agent (Proxy)."
+          checked: false
+      - type: to_do
+        to_do:
+          rich_text:
+            - type: text
+              text:
+                content: "Step 2: Document Your Wishes for Life-Sustaining Treatment."
+          checked: false
+      - type: to_do
+        to_do:
+          rich_text:
+            - type: text
+              text:
+                content: "Step 3: State Your Preferences for Palliative Care."
+          checked: false
+      - type: to_do
+        to_do:
+          rich_text:
+            - type: text
+              text:
+                content: "Step 4: Sign and Notarize Your Documents as per State Law."
+          checked: false
+databases:
+  - title: "Directive Status Tracker"
+    description: "A database to track the status of legal health care documents."
+    properties:
+      Document:
+        type: title
+        title: {}
+      Status:
+        type: select
+        select:
+          options:
+            - name: "Not Started"
+              color: "gray"
+            - name: "Drafting"
+              color: "blue"
+            - name: "Reviewing with Lawyer"
+              color: "orange"
+            - name: "Signed & Notarized"
+              color: "green"
+      Date Completed:
+        type: date
+        date: {}
+      Location of Final Document:
+        type: rich_text
+        rich_text: {}
+    views:
+      - name: "Directives Status"
+        type: "table"

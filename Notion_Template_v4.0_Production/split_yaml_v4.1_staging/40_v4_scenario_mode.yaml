@@ -1,0 +1,48 @@
+# Estate Planning Template v4.0 - 40: Scenario Mode
+# Implements the Scenario Mode feature for the v4.0 Gold Bundle.
+# Output Directory: split_yaml_discovered_phase2/
+pages:
+  - title: "Executor Guide (v4)"
+    parent: "The Legacy Vault"
+    description: "A scenario-driven guide for the executor."
+    role: "executor"
+    icon_file: "emoji:🧭"
+    blocks:
+      - type: heading_1
+        content: "Executor Guide"
+      - type: paragraph
+        content: "This guide adapts to the circumstances of the passing. Please select the appropriate scenario in the User Preferences to see the relevant checklist."
+      - type: heading_2
+        content: "Checklist for a Sudden Passing"
+      - type: paragraph
+        content: "A prioritized checklist for when there was no time to prepare."
+      - type: child_database
+        title: "Sudden Passing Checklist"
+        database_ref: "Executor Task Checklist"
+        view_filter:
+          property: "Scenario"
+          value: "Sudden Passing"
+      - type: heading_2
+        content: "Checklist for a Planned Passing"
+      - type: paragraph
+        content: "A checklist for when there was time to prepare and organize."
+      - type: child_database
+        title: "Planned Passing Checklist"
+        database_ref: "Executor Task Checklist"
+        view_filter:
+          property: "Scenario"
+          value: "Planned Passing"
+databases:
+  - title: "User Preferences"
+    description: "A database to store user preferences for the template."
+    properties:
+      Preference:
+        type: title
+        title: {}
+      Scenario:
+        type: select
+        select:
+          options:
+            - name: "Sudden Passing"
+            - name: "Planned Passing"
+            - name: "General"

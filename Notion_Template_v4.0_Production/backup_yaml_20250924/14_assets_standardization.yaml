@@ -1,0 +1,18 @@
+# 14_assets_standardization.yaml
+complexity: moderate
+# Admin assets checklist + guidance to keep visuals consistent.
+pages:
+  - title: "Admin – Assets & Icons"
+    icon: "emoji:🖼️"
+    description: "Standardize icons and covers for a cohesive look. Delete before sharing."
+    body:
+      - type: callout
+        icon: "emoji:⚠️"
+        color: gray_background
+        text: "ADMIN_ONLY • ASSETS_MARKER • Host icons/covers at ASSET_BASE_URL. Use consistent naming: hub_prep.svg, doc_legal.svg, db_accounts.svg."
+      - type: bulleted_list
+        items:
+          - "Upload icons and covers to GitHub Pages (or your host)"
+          - "Set ASSET_BASE_URL in .env"
+          - "Run deploy (icons/covers auto-attach via YAML)"
+          - "Scan pages for any missing assets and adjust naming"

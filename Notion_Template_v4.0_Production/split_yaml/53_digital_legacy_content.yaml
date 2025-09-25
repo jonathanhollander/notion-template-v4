@@ -1,0 +1,71 @@
+# Estate Planning Template v4.0 - Digital Legacy
+# Generated from comprehensive architectural conversation analysis
+# Output Directory: split_yaml_discovered/
+pages:
+  - title: "Digital Legacy"
+    parent: "The Legacy Vault"
+    description: "Manage your online accounts and digital assets to ensure they are handled according to your wishes."
+    role: "owner"
+    icon_file: "emoji:🌐"
+    blocks:
+      - type: heading_1
+        content: "Managing Your Digital World"
+      - type: paragraph
+        content: "In today's world, our digital lives are as important as our physical ones. This section helps you organize your digital accounts, from social media to online banking, to ensure a smooth transition for your loved ones."
+      - type: callout
+        icon: emoji:🔒
+        content: "Security is paramount. We recommend using a secure password manager to store your credentials and sharing the master password with your executor in a safe, offline manner."
+        color: "gray_background"
+      - type: heading_2
+        content: "Digital Accounts Inventory"
+      - type: paragraph
+        content: "Use this database to catalog your important digital accounts. For each account, provide instructions on whether it should be closed, memorialized, or transferred."
+      - type: child_database
+        title: "Digital Accounts Inventory"
+        database_ref: "Digital Accounts Inventory"
+databases:
+  - title: "Digital Accounts Inventory"
+    description: "A database to catalog all digital accounts and assets."
+    properties:
+      Account:
+        type: title
+        title: {}
+      Category:
+        type: select
+        select:
+          options:
+            - name: "Email"
+            - name: "Social Media"
+            - name: "Financial"
+            - name: "Shopping"
+            - name: "Utilities"
+            - name: "Other"
+      Username:
+        type: rich_text
+        rich_text: {}
+      Access Instructions:
+        type: rich_text
+        rich_text: {}
+      Action:
+        type: select
+        select:
+          options:
+            - name: "Close Account"
+              color: "red"
+            - name: "Memorialize"
+              color: "blue"
+            - name: "Transfer to Heir"
+              color: "green"
+      Notes:
+        type: rich_text
+        rich_text: {}
+    views:
+      - name: "All Accounts"
+        type: "table"
+      - name: "By Category"
+        type: "board"
+        group_by: "Category"
+# Metadata comments:
+# - The need for a Digital Legacy module was inferred from the analysis of competitor features in the architectural chats.
+# - The content focuses on providing practical advice while emphasizing security.
+# - This module introduces a new database, the Digital Accounts Inventory, to store this critical information.

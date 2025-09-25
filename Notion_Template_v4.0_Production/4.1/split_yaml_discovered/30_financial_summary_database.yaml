@@ -1,0 +1,66 @@
+# Estate Planning Template v4.0 - Financial Summary Database
+# Generated from comprehensive architectural conversation analysis
+# Output Directory: split_yaml_discovered/
+pages:
+  - title: "Your Financial Snapshot"
+    parent: "Legal & Financial"
+    description: "A comprehensive summary of your assets and liabilities to provide a clear financial overview."
+    role: "owner"
+    icon_file: "emoji:📊"
+    blocks:
+      - type: heading_1
+        content: "Creating Your Financial Snapshot"
+      - type: paragraph
+        content: "A clear financial picture is essential for effective estate planning. This section provides a tool to create a net worth statement, giving you and your executor a comprehensive overview of your financial situation."
+      - type: callout
+        icon: emoji:💡
+        content: "Review and update this snapshot annually. It is a powerful tool for both personal financial planning and for easing the administrative burden on your executor."
+        color: "gray_background"
+      - type: heading_2
+        content: "Net Worth Statement"
+      - type: paragraph
+        content: "Use the database below to catalog your assets (what you own) and liabilities (what you owe)."
+      - type: child_database
+        title: "Financial Summary"
+        database_ref: "Financial Summary"
+databases:
+  - title: "Financial Summary"
+    description: "A database to act as a net worth statement, summarizing assets and liabilities."
+    properties:
+      Item:
+        type: title
+        title: {}
+      Type:
+        type: select
+        select:
+          options:
+            - name: "Asset"
+              color: "green"
+            - name: "Liability"
+              color: "red"
+      Category:
+        type: select
+        select:
+          options:
+            - name: "Real Estate"
+            - name: "Bank Accounts"
+            - name: "Investments"
+            - name: "Vehicles"
+            - name: "Mortgage"
+            - name: "Loans"
+            - name: "Credit Card Debt"
+            - name: "Other"
+      Value:
+        type: number
+        number:
+          format: "dollar"
+      Notes:
+        type: rich_text
+        rich_text: {}
+    views:
+      - name: "Net Worth Overview"
+        type: "table"
+        group_by: "Type"
+        sort:
+          - property: "Value"
+            direction: "descending"

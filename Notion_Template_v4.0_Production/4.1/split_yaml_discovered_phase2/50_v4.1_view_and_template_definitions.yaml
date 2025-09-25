@@ -1,0 +1,42 @@
+# Estate Planning Template v4.1 - 50: View and Template Definitions
+# Implements the automation of database views and page templates.
+# Output Directory: split_yaml_discovered_phase2/
+database_views:
+  - database: "Executor Task Checklist"
+    views:
+      - name: "By Stage"
+        type: "board"
+        group_by: "Stage"
+      - name: "Active Tasks"
+        type: "table"
+        filter:
+          property: "Status"
+          value: "Completed"
+          condition: "does_not_equal"
+
+  - database: "Funeral Budget"
+    views:
+      - name: "Budget by Category"
+        type: "board"
+        group_by: "Category"
+
+database_templates:
+  - database: "Memories & Stories"
+    templates:
+      - name: "New Memory"
+        icon: "emoji:✨"
+        blocks:
+          - type: heading_2
+            content: "A New Memory"
+          - type: paragraph
+            content: "What happened? Who was there? Why was it special?"
+
+  - database: "Executor Task Checklist"
+    templates:
+      - name: "New Executor Task"
+        icon: "emoji:📝"
+        blocks:
+          - type: heading_2
+            content: "New Task"
+          - type: paragraph
+            content: "What needs to be done? What is the priority? When is it due?"

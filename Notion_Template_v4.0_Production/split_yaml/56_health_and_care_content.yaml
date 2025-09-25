@@ -1,0 +1,52 @@
+# Estate Planning Template v4.0 - Health & Care
+# Generated from comprehensive architectural conversation analysis
+# Output Directory: split_yaml_discovered/
+pages:
+  - title: "Health & Care"
+    parent: "The Legacy Vault"
+    description: "Document your medical information and end-of-life wishes to ensure your choices are honored."
+    role: "owner"
+    icon_file: "emoji:⚕️"
+    blocks:
+      - type: heading_1
+        content: "Your Health & Care Plan"
+      - type: paragraph
+        content: "This section is for recording your important medical information and your wishes for end-of-life care. Sharing this information can bring peace of mind to you and your loved ones, knowing that your choices will be respected."
+      - type: callout
+        icon: emoji:❤️
+        content: "These can be difficult conversations to have, but they are a profound act of love for your family. They ensure that your wishes are known, relieving your family of the burden of making these decisions in a time of crisis."
+        color: "gray_background"
+      - type: heading_2
+        content: "Medical Information"
+      - type: child_database
+        title: "Medical Contacts"
+        database_ref: "Contacts Directory"
+        view_filter:
+          property: "Role"
+          value: "Doctor"
+      - type: heading_3
+        content: "Health History"
+      - type: toggle
+        content: "Medications & Allergies"
+        blocks:
+          - type: paragraph
+            content: "List all current medications, dosages, and any known allergies."
+      - type: toggle
+        content: "Medical Conditions"
+        blocks:
+          - type: paragraph
+            content: "List all chronic or major medical conditions."
+      - type: heading_2
+        content: "End-of-Life Wishes"
+      - type: child_page
+        title: "Advance Directive & Living Will"
+      - type: child_page
+        title: "DNR & DNI Orders"
+      - type: child_page
+        title: "Organ Donation Preferences"
+      - type: child_page
+        title: "Funeral & Memorial Plans"
+# Metadata comments:
+# - This module was explicitly required by the task brief.
+# - The content is designed to be both practical and empathetic, acknowledging the sensitive nature of the topic.
+# - It reuses the Contacts Directory for medical contacts and includes child pages for detailed directives.

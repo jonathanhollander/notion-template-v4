@@ -1,0 +1,22 @@
+# 13_hub_ui_embeds.yaml
+complexity: moderate
+# Adds guided embed instructions and progress snapshots to Hubs (idempotent via markers).
+pages:
+  - title: "Preparation Hub"
+    body:
+      - type: child_database
+        database_ref: "Setup & Acceptance"
+        title: "Setup & Acceptance - Active View"
+  - title: "Executor Hub"
+    body:
+      - type: child_database
+        database_ref: "Executor Tasks"
+        title: "Executor Tasks - Active View"
+      - type: child_database
+        database_ref: "Insurance Claims"
+        title: "Insurance Claims - Open View"
+  - title: "Family Hub"
+    body:
+      - type: child_database
+        database_ref: "Letters"
+        title: "Letters - Outbox View"

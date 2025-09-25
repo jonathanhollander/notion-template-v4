@@ -1,0 +1,89 @@
+# Estate Planning Template v4.0 - 12: Complete Digital Legacy System
+# Generated from comprehensive architectural conversation analysis
+# Output Directory: split_yaml_discovered_phase2/
+pages:
+  - title: "Digital Legacy Command Center"
+    parent: "The Legacy Vault"
+    description: "A comprehensive system for managing your entire digital estate, from social media to cryptocurrency."
+    role: "owner"
+    icon_file: "emoji:🖥️"
+    blocks:
+      - type: heading_1
+        content: "Your Digital Legacy Command Center"
+      - type: paragraph
+        content: "Your digital life is a significant part of your legacy. This system provides the tools to manage it with care and security, ensuring your digital assets are handled exactly as you wish."
+      - type: heading_2
+        content: "Core Digital Legacy Components"
+      - type: child_page
+        title: "Digital Asset Inventory"
+      - type: child_page
+        title: "Password & Access Management"
+      - type: child_page
+        title: "Social Media & Online Accounts Guide"
+      - type: child_page
+        title: "Digital Memorials & Keepsakes"
+
+  - title: "Digital Asset Inventory"
+    parent: "Digital Legacy Command Center"
+    description: "A detailed inventory for all your digital assets, including crypto, NFTs, and cloud storage."
+    role: "owner"
+    blocks:
+      - type: heading_1
+        content: "Inventory of Digital Assets"
+      - type: paragraph
+        content: "Use this database to catalog all of your valuable digital assets."
+      - type: child_database
+        title: "Digital Asset Inventory"
+        database_ref: "Digital Asset Inventory"
+
+  - title: "Password & Access Management"
+    parent: "Digital Legacy Command Center"
+    description: "Guidance on securely managing and passing on access to your accounts."
+    role: "owner"
+    blocks:
+      - type: heading_1
+        content: "Secure Password & Access Strategy"
+      - type: paragraph
+        content: "The single most important part of your digital legacy plan is ensuring your executor can gain access when needed. A password manager is the most secure and effective way to achieve this."
+      - type: callout
+        icon: emoji:🔒
+        content: "**Action Plan:** 1. Choose a reputable password manager (e.g., 1Password, Dashlane). 2. Store all your passwords in it. 3. Document the master password and store it in a secure physical location (like a safe deposit box) accessible by your executor."
+        color: "blue_background"
+
+  - title: "Social Media & Online Accounts Guide"
+    parent: "Digital Legacy Command Center"
+    description: "Step-by-step procedures for major platforms like Google, Facebook, and Apple."
+    role: "owner"
+    blocks:
+      - type: heading_1
+        content: "Platform-Specific Guides"
+      - type: toggle
+        content: "Google: Inactive Account Manager"
+        blocks:
+          - type: paragraph
+            content: "Google's Inactive Account Manager allows you to designate a trusted contact to receive your data after a period of inactivity. It is highly recommended to set this up for your Google account."
+      - type: toggle
+        content: "Facebook: Legacy Contact"
+        blocks:
+          - type: paragraph
+            content: "Facebook allows you to designate a Legacy Contact who can manage your memorialized account. This person can pin a post, change the profile picture, and respond to friend requests."
+      - type: toggle
+        content: "Apple: Digital Legacy Program"
+        blocks:
+          - type: paragraph
+            content: "Apple's Digital Legacy program allows you to designate Legacy Contacts who can access your data after you die. You will need to generate an access key for each contact and share it with them."
+
+  - title: "Digital Memorials & Keepsakes"
+    parent: "Digital Legacy Command Center"
+    description: "Options for creating online memorials and preserving digital memories."
+    role: "owner"
+    blocks:
+      - type: heading_1
+        content: "Preserving Your Digital Memories"
+      - type: paragraph
+        content: "Consider how you want your digital presence to be remembered. There are many services that can help create lasting digital tributes."
+      - type: bulleted_list
+        bulleted_list:
+          - "Online memorial websites (e.g., MyKeeper, EverLoved)"
+          - "Creating a digital photo album or slideshow"
+          - "Compiling a playlist of meaningful music"

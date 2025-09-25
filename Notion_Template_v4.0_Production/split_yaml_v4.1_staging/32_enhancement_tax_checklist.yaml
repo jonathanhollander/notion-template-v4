@@ -1,0 +1,59 @@
+# Estate Planning Template v4.0 - 32: Enhancement - Tax Checklist
+# Implements the suggestion from DATABASE_ENHANCEMENT_SUGGESTIONS.md
+# Output Directory: split_yaml_discovered_phase2/
+pages:
+  - title: "Tax Preparation Center (Enhanced)"
+    parent: "Legal & Financial Command Center"
+    description: "Guidance and a checklist for managing final tax obligations."
+    role: "executor"
+    icon_file: "emoji:🧾"
+    blocks:
+      - type: heading_1
+        content: "Tax Preparation Center"
+      - type: paragraph
+        content: "This center provides guidance on the estate's tax obligations and a checklist to ensure you collect all necessary documents for your CPA."
+      - type: heading_2
+        content: "Tax Documents Checklist"
+      - type: paragraph
+        content: "Use this checklist to track the collection of all documents required for filing the decedent's final personal and estate tax returns."
+      - type: child_database
+        title: "Tax Documents Checklist"
+        database_ref: "Tax Documents Checklist"
+      - type: heading_2
+        content: "Key Tax Obligations Overview"
+      - type: toggle
+        content: "Final Personal Income Tax Return (Form 1040)"
+        blocks:
+          - type: paragraph
+            content: "A final income tax return must be filed for the decedent for the year of their death."
+      - type: toggle
+        content: "Estate Income Tax Return (Form 1041)"
+        blocks:
+          - type: paragraph
+            content: "If the estate generates income after the decedent's death, it must file its own income tax return."
+databases:
+  - title: "Tax Documents Checklist"
+    description: "A checklist to track the collection of necessary tax documents."
+    properties:
+      Document:
+        type: title
+        title: {}
+      Status:
+        type: select
+        select:
+          options:
+            - name: "Pending"
+              color: "gray"
+            - name: "Collected"
+              color: "green"
+            - name: "Not Applicable"
+              color: "brown"
+      Tax Year:
+        type: number
+        number: {}
+      Notes:
+        type: rich_text
+        rich_text: {}
+    views:
+      - name: "Tax Document Status"
+        type: "table"

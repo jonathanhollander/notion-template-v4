@@ -1,0 +1,64 @@
+# Estate Planning Template v4.0 - Legal & Financial
+# Generated from comprehensive architectural conversation analysis
+# Output Directory: split_yaml_discovered/
+pages:
+  - title: "Legal & Financial"
+    parent: "The Legacy Vault"
+    description: "Organize your essential legal and financial documents to ensure everything is in order."
+    role: "owner"
+    icon_file: "emoji:⚖️"
+    blocks:
+      - type: heading_1
+        content: "Your Legal & Financial Hub"
+      - type: paragraph
+        content: "Gathering your legal and financial documents is one of the most important steps in estate planning. This section provides a structured way to catalog these documents, ensuring your executor can find everything they need."
+      - type: callout
+        icon: emoji:🗂️
+        content: "This is a living inventory. Review it annually or after any major life event to ensure it remains up to date."
+        color: "gray_background"
+      - type: heading_2
+        content: "Documents Vault"
+      - type: paragraph
+        content: "Use this database to list all your important legal and financial documents, including their physical or digital location."
+      - type: child_database
+        title: "Documents Vault"
+        database_ref: "Documents Vault"
+databases:
+  - title: "Documents Vault"
+    description: "A database to catalog all important legal and financial documents."
+    properties:
+      Document:
+        type: title
+        title: {}
+      Category:
+        type: select
+        select:
+          options:
+            - name: "Will & Trust"
+            - name: "Insurance Policies"
+            - name: "Bank Accounts"
+            - name: "Investment Accounts"
+            - name: "Real Estate Deeds"
+            - name: "Vehicle Titles"
+            - name: "Tax Records"
+            - name: "Other"
+      Location:
+        type: rich_text
+        rich_text: {}
+      Contact:
+        type: relation
+        relation:
+          database_id: "Contacts Directory"
+      Notes:
+        type: rich_text
+        rich_text: {}
+    views:
+      - name: "All Documents"
+        type: "table"
+      - name: "By Category"
+        type: "board"
+        group_by: "Category"
+# Metadata comments:
+# - This module is a core component of any estate planning system, and its necessity was confirmed by the analysis of competitor features.
+# - It introduces a Documents Vault database to provide a structured way to catalog important information.
+# - The database is linked to the Contacts Directory, creating a relational structure that enhances the system's power.

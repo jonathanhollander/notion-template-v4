@@ -1,0 +1,98 @@
+# Estate Planning Template v4.0 - 15: Comprehensive Memory Preservation System
+# Generated from comprehensive architectural conversation analysis
+# Output Directory: split_yaml_discovered_phase2/
+pages:
+  - title: "Memory Preservation Studio"
+    parent: "The Legacy Vault"
+    description: "A rich, interactive studio for preserving your life story, memories, photos, and values."
+    role: "owner"
+    icon_file: "emoji:🎞️"
+    blocks:
+      - type: heading_1
+        content: "Your Memory Preservation Studio"
+      - type: paragraph
+        content: "Your legacy is a story, not just a balance sheet. This studio is a creative space to capture the moments, memories, and wisdom that define your life, creating a timeless gift for your family."
+      - type: column_list
+        columns:
+          - children:
+              - type: child_page
+                title: "Life Story Builder"
+              - type: child_page
+                title: "Photo & Media Archive"
+              - type: child_page
+                title: "Family History & Traditions"
+          - children:
+              - type: child_page
+                title: "Legacy Letter Library"
+              - type: child_page
+                title: "Video Message Booth"
+
+  - title: "Life Story Builder"
+    parent: "Memory Preservation Studio"
+    description: "A guided memoir creation tool with prompts for every stage of life."
+    role: "owner"
+    blocks:
+      - type: heading_1
+        content: "Build Your Life Story"
+      - type: paragraph
+        content: "This guided journal helps you write your autobiography, one memory at a time."
+      - type: child_database
+        title: "Life Story Chapters"
+        database_ref: "Life Story Builder"
+
+  - title: "Photo & Media Archive"
+    parent: "Memory Preservation Studio"
+    description: "An organized system for your most cherished photos and videos."
+    role: "owner"
+    blocks:
+      - type: heading_1
+        content: "Your Photo & Media Archive"
+      - type: paragraph
+        content: "Organize your favorite photos and videos, adding context and stories to each one."
+      - type: child_database
+        title: "Photo Archive"
+        database_ref: "Photo & Media Archive"
+        view_type: "gallery"
+
+  - title: "Family History & Traditions"
+    parent: "Memory Preservation Studio"
+    description: "A database to document your family's genealogy, stories, and traditions."
+    role: "owner"
+    blocks:
+      - type: heading_1
+        content: "Our Family's History"
+      - type: paragraph
+        content: "Preserve the stories, traditions, and recipes that make your family unique."
+      - type: child_database
+        title: "Family History"
+        database_ref: "Family History Database"
+
+  - title: "Legacy Letter Library"
+    parent: "Memory Preservation Studio"
+    description: "A library of templates for letters to be opened on future occasions."
+    role: "owner"
+    blocks:
+      - type: heading_1
+        content: "Letters for the Future"
+      - type: paragraph
+        content: "Write letters to your loved ones to be opened on future milestones."
+      - type: child_database
+        title: "Legacy Letters"
+        database_ref: "Legacy Letter Library"
+
+  - title: "Video Message Booth"
+    parent: "Memory Preservation Studio"
+    description: "A space to record video messages for your loved ones."
+    role: "owner"
+    blocks:
+      - type: heading_1
+        content: "Record Your Video Messages"
+      - type: paragraph
+        content: "A video message can be a powerful and comforting gift. Use this space to record messages for your family and friends."
+      - type: callout
+        icon: emoji:📹
+        content: "You can use a tool like Loom or your phone to record a video, then upload the file or link to it in the Video Message Library below."
+        color: "blue_background"
+      - type: child_database
+        title: "Video Message Library"
+        database_ref: "Video Message Library"

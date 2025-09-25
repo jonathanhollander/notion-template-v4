@@ -1,0 +1,41 @@
+# Estate Planning Template v4.0 - 45: Legacy Timeline View
+# Implements the Legacy Timeline View feature for the v4.0 Gold Bundle.
+# Output Directory: split_yaml_discovered_phase2/
+pages:
+  - title: "Memories & Letters"
+    parent: "The Legacy Vault"
+    description: "A space to preserve memories, stories, and letters, presented as a chronological timeline."
+    role: "family"
+    icon_file: "emoji:📜"
+    blocks:
+      - type: heading_1
+        content: "Memories & Letters"
+      - type: paragraph
+        content: "This section contains stories, memories, and letters, organized as a timeline of a life."
+      - type: heading_2
+        content: "Legacy Timeline"
+      - type: child_database
+        title: "Legacy Timeline"
+        database_ref: "Memories & Stories"
+        view_type: "timeline"
+        timeline_by: "Date"
+databases:
+  - title: "Memories & Stories"
+    description: "A database of memories, stories, and letters."
+    properties:
+      Title:
+        type: title
+        title: {}
+      Date:
+        type: date
+        date: {}
+      Type:
+        type: select
+        select:
+          options:
+            - name: "Memory"
+            - name: "Story"
+            - name: "Letter"
+      Content:
+        type: rich_text
+        rich_text: {}

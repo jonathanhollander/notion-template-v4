@@ -1,0 +1,103 @@
+# Estate Planning Template v4.0 - 14: Comprehensive Health & Care System
+# Generated from comprehensive architectural conversation analysis
+# Output Directory: split_yaml_discovered_phase2/
+pages:
+  - title: "Health & Care Command Center"
+    parent: "The Legacy Vault"
+    description: "A comprehensive system for documenting your medical information and end-of-life wishes."
+    role: "owner"
+    icon_file: "emoji:❤️‍🩹"
+    blocks:
+      - type: heading_1
+        content: "Your Health & Care Command Center"
+      - type: paragraph
+        content: "Making your healthcare wishes known is one of the most important things you can do for your loved ones. This system guides you through documenting your medical information and creating clear, actionable directives."
+      - type: column_list
+        columns:
+          - children:
+              - type: child_page
+                title: "Medical Information Vault"
+              - type: child_page
+                title: "Advanced Directives Wizard"
+          - children:
+              - type: child_page
+                title: "Long-Term Care Plan"
+              - type: child_page
+                title: "End-of-Life Preferences"
+
+  - title: "Medical Information Vault"
+    parent: "Health & Care Command Center"
+    description: "A secure place to store all your critical medical information."
+    role: "owner"
+    blocks:
+      - type: heading_1
+        content: "Your Medical Information Vault"
+      - type: paragraph
+        content: "Use this database to create a complete record of your health history. This information is invaluable in an emergency."
+      - type: child_database
+        title: "Medical Information Vault"
+        database_ref: "Medical Information Vault"
+
+  - title: "Advanced Directives Wizard"
+    parent: "Health & Care Command Center"
+    description: "A step-by-step guide to creating your living will and healthcare proxy."
+    role: "owner"
+    blocks:
+      - type: heading_1
+        content: "Advanced Directives Wizard"
+      - type: paragraph
+        content: "This wizard will guide you through the key decisions needed to create a comprehensive advance directive."
+      - type: to_do
+        to_do:
+          rich_text:
+            - type: text
+              text:
+                content: "Step 1: Choose Your Health Care Agent (Proxy)."
+          checked: false
+      - type: to_do
+        to_do:
+          rich_text:
+            - type: text
+              text:
+                content: "Step 2: Document Your Wishes for Life-Sustaining Treatment."
+          checked: false
+      - type: to_do
+        to_do:
+          rich_text:
+            - type: text
+              text:
+                content: "Step 3: State Your Preferences for Palliative Care."
+          checked: false
+      - type: to_do
+        to_do:
+          rich_text:
+            - type: text
+              text:
+                content: "Step 4: Sign and Notarize Your Documents as per State Law."
+          checked: false
+
+  - title: "Long-Term Care Plan"
+    parent: "Health & Care Command Center"
+    description: "A space to plan for potential long-term care needs."
+    role: "owner"
+    blocks:
+      - type: heading_1
+        content: "Planning for Long-Term Care"
+      - type: paragraph
+        content: "Thinking about long-term care now can ensure your preferences are honored in the future."
+      - type: child_database
+        title: "Long-Term Care Preferences"
+        database_ref: "Long-Term Care Plan"
+
+  - title: "End-of-Life Preferences"
+    parent: "Health & Care Command Center"
+    description: "A detailed checklist for your end-of-life wishes."
+    role: "owner"
+    blocks:
+      - type: heading_1
+        content: "My End-of-Life Preferences"
+      - type: paragraph
+        content: "This section is for wishes that go beyond medical treatment, covering your spiritual, emotional, and personal preferences."
+      - type: child_database
+        title: "End-of-Life Preferences Checklist"
+        database_ref: "End-of-Life Preferences"

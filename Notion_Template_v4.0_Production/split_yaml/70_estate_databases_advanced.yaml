@@ -1,0 +1,324 @@
+# Estate Planning Template v4.0 - 20: Advanced Database Architecture
+# Generated from comprehensive architectural conversation analysis
+# Output Directory: split_yaml_discovered_phase2/
+databases:
+  - title: "Executor Task Checklist"
+    description: "A comprehensive checklist of over 40 tasks for the executor."
+    properties:
+      Task:
+        type: title
+        title: {}
+      Stage:
+        type: select
+        select:
+          options:
+            - name: "Immediate Response"
+            - name: "Legal Foundation"
+            - name: "Asset Discovery"
+            - name: "Administration"
+            - name: "Closure"
+      Status:
+        type: select
+        select:
+          options:
+            - name: "Not Started"
+            - name: "In Progress"
+            - name: "Completed"
+      Priority:
+        type: select
+        select:
+          options:
+            - name: "High"
+            - name: "Medium"
+            - name: "Low"
+      Due Date:
+        type: date
+        date: {}
+      Assigned To:
+        type: relation
+        relation:
+          database_id: "Professional Contacts Directory"
+      Notes:
+        type: rich_text
+        rich_text: {}
+      Task Score:
+        type: formula
+        formula:
+          expression: "if(prop(\"Status\") == \"Completed\", if(prop(\"Priority\") == \"High\", 10, 5), 0)"
+      Scenario:
+        type: select
+        select:
+          options:
+            - name: "Sudden Passing"
+            - name: "Planned Passing"
+            - name: "General"
+
+  - title: "Professional Contacts Directory"
+    description: "A detailed directory of all professionals involved in the estate."
+    properties:
+      Name:
+        type: title
+        title: {}
+      Specialty:
+        type: select
+        select:
+          options:
+            - name: "Estate Attorney"
+            - name: "CPA"
+            - name: "Financial Advisor"
+            - name: "Insurance Agent"
+            - name: "Real Estate Agent"
+      Contact Info:
+        type: rich_text
+        rich_text: {}
+      Tasks:
+        type: rollup
+        rollup:
+          relation_property_name: "Assigned To"
+          function: "show_original"
+
+  - title: "Digital Asset Inventory"
+    description: "A detailed inventory for all digital assets."
+    properties:
+      Asset:
+        type: title
+        title: {}
+      Category:
+        type: multi_select
+        multi_select:
+          options:
+            - name: "Email"
+            - name: "Social Media"
+            - name: "Financial"
+            - name: "Cryptocurrency"
+            - name: "NFT"
+            - name: "Cloud Storage"
+      Access Instructions:
+        type: rich_text
+        rich_text: {}
+
+  - title: "Document Library"
+    description: "A library of important legal documents and templates."
+    properties:
+      Document:
+        type: title
+        title: {}
+      Category:
+        type: select
+        select:
+          options:
+            - name: "Wills & Trusts"
+            - name: "Property Deeds"
+            - name: "Tax Records"
+            - name: "Court Filings"
+      Status:
+        type: select
+        select:
+          options:
+            - name: "Draft"
+            - name: "Signed"
+            - name: "Filed"
+
+  - title: "State Requirements Database"
+    description: "A guide to state-specific probate and estate laws."
+    properties:
+      State:
+        type: title
+        title: {}
+      Probate Threshold:
+        type: number
+        number:
+          format: "dollar"
+      Filing Deadline:
+        type: rich_text
+        rich_text: {}
+
+  - title: "Financial Account Inventory"
+    description: "A detailed inventory of all financial accounts."
+    properties:
+      Account:
+        type: title
+        title: {}
+      Institution:
+        type: rich_text
+        rich_text: {}
+      Balance:
+        type: number
+        number:
+          format: "dollar"
+      Beneficiary:
+        type: rich_text
+        rich_text: {}
+
+  - title: "Financial Summary"
+    description: "A summary database to roll up financial totals."
+    properties:
+      Summary Item:
+        type: title
+        title: {}
+      Total Value:
+        type: rollup
+        rollup:
+          relation_property_name: "Accounts"
+          function: "sum"
+      Accounts:
+        type: relation
+        relation:
+          database_id: "Financial Account Inventory"
+
+  - title: "Medical Information Vault"
+    description: "A secure place to store all critical medical information."
+    properties:
+      Item:
+        type: title
+        title: {}
+      Category:
+        type: select
+        select:
+          options:
+            - name: "Condition"
+            - name: "Medication"
+            - name: "Allergy"
+            - name: "Provider"
+      Details:
+        type: rich_text
+        rich_text: {}
+
+  - title: "Long-Term Care Plan"
+    description: "A space to plan for potential long-term care needs."
+    properties:
+      Preference:
+        type: title
+        title: {}
+      Details:
+        type: rich_text
+        rich_text: {}
+
+  - title: "End-of-Life Preferences"
+    description: "A detailed checklist for end-of-life wishes."
+    properties:
+      Preference:
+        type: title
+        title: {}
+      Choice:
+        type: rich_text
+        rich_text: {}
+
+  - title: "Life Story Builder"
+    description: "A guided journal to help write an autobiography."
+    properties:
+      Chapter:
+        type: title
+        title: {}
+      Life Stage:
+        type: select
+        select:
+          options:
+            - name: "Early Years"
+            - name: "Formative Years"
+            - name: "Career"
+            - name: "Family"
+      Content:
+        type: rich_text
+        rich_text: {}
+
+  - title: "Photo & Media Archive"
+    description: "An organized system for cherished photos and videos."
+    properties:
+      Media:
+        type: files
+        files: {}
+      Description:
+        type: title
+        title: {}
+      Date:
+        type: date
+        date: {}
+      People:
+        type: multi_select
+        multi_select: {}
+
+  - title: "Family History Database"
+    description: "A database to document genealogy, stories, and traditions."
+    properties:
+      Item:
+        type: title
+        title: {}
+      Category:
+        type: select
+        select:
+          options:
+            - name: "Ancestor Story"
+            - name: "Family Tradition"
+            - name: "Recipe"
+      Content:
+        type: rich_text
+        rich_text: {}
+
+  - title: "Legacy Letter Library"
+    description: "A library of templates for letters to be opened on future occasions."
+    properties:
+      Recipient:
+        type: title
+        title: {}
+      Occasion:
+        type: select
+        select:
+          options:
+            - name: "Wedding Day"
+            - name: "Graduation"
+            - name: "Birth of a Child"
+      Status:
+        type: select
+        select:
+          options:
+            - name: "Draft"
+            - name: "Completed"
+
+  - title: "Video Message Library"
+    description: "A space to record and store video messages."
+    properties:
+      Title:
+        type: title
+        title: {}
+      Link:
+        type: url
+        url: {}
+      Recipient:
+        type: rich_text
+        rich_text: {}
+
+  - title: "Grief Resources Library"
+    description: "A curated library of resources on coping with loss."
+    properties:
+      Resource:
+        type: title
+        title: {}
+      Type:
+        type: select
+        select:
+          options:
+            - name: "Book"
+            - name: "Article"
+            - name: "Podcast"
+            - name: "Support Group"
+      Link:
+        type: url
+        url: {}
+
+  - title: "Anniversary Manager"
+    description: "A tool to remember and honor a loved one on important dates."
+    properties:
+      Event:
+        type: title
+        title: {}
+      Date:
+        type: date
+        date: {}
+      Type:
+        type: select
+        select:
+          options:
+            - name: "Birthday"
+            - name: "Anniversary of Passing"
+            - name: "Other Special Day"

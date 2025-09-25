@@ -1,0 +1,653 @@
+complexity: moderate
+pages:
+- title: Executor Task 01
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-01
+- title: Executor Task 02
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-02
+- title: Executor Task 03
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-03
+- title: Executor Task 04
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-04
+- title: Executor Task 05
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-05
+- title: Executor Task 06
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-06
+- title: Executor Task 07
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-07
+- title: Executor Task 08
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-08
+- title: Executor Task 09
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-09
+- title: Executor Task 10
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-10
+- title: Executor Task 11
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-11
+- title: Executor Task 12
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-12
+- title: Executor Task 13
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-13
+- title: Executor Task 14
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-14
+- title: Executor Task 15
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-15
+- title: Executor Task 16
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-16
+- title: Executor Task 17
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-17
+- title: Executor Task 18
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-18
+- title: Executor Task 19
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-19
+- title: Executor Task 20
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-20
+- title: Executor Task 21
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-21
+- title: Executor Task 22
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-22
+- title: Executor Task 23
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-23
+- title: Executor Task 24
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-24
+- title: Executor Task 25
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-25
+- title: Executor Task 26
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-26
+- title: Executor Task 27
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-27
+- title: Executor Task 28
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-28
+- title: Executor Task 29
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-29
+- title: Executor Task 30
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-30
+- title: Executor Task 31
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-31
+- title: Executor Task 32
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-32
+- title: Executor Task 33
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-33
+- title: Executor Task 34
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-34
+- title: Executor Task 35
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-35
+- title: Executor Task 36
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-36
+- title: Executor Task 37
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-37
+- title: Executor Task 38
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-38
+- title: Executor Task 39
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-39
+- title: Executor Task 40
+  parent: Executor Hub
+  icon: emoji:🧰
+  role: executor
+  description: A focused action item with context and space for notes.
+  slug: executor-task-40
+- title: Executor Guide – SSA Notification
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+  slug: executor-guide-ssa-notification
+- title: Executor Guide – IRS Final Return Notes
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+  slug: executor-guide-irs-final-return-notes
+- title: Executor Guide – DMV Title Transfer
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+  slug: executor-guide-dmv-title-transfer
+- title: Executor Guide – USPS Mail Forwarding
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+  slug: executor-guide-usps-mail-forwarding
+- title: Executor Guide – Mortgage Servicer
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+  slug: executor-guide-mortgage-servicer
+- title: Executor Guide – Landlord/HOA
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+  slug: executor-guide-landlord/hoa
+- title: Executor Guide – Pension/401(k) Administrator
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+  slug: executor-guide-pension/401(k)-administrator
+- title: Executor Guide – Brokerage Transfer
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+  slug: executor-guide-brokerage-transfer
+- title: Executor Guide – Credit Bureaus (Equifax/Experian/TransUnion)
+  parent: Executor Hub
+  icon: emoji:📑
+  role: executor
+  description: Instructions and links to complete this step.
+  slug: executor-guide-credit-bureaus-(equifax/experian/transunion)
+- title: Digital Assets – Passwords & Access Hints
+  parent: Property & Assets
+  icon: emoji:💾
+  role: owner
+  description: Where to find and how to handle this item.
+  slug: digital-assets-passwords-access-hints
+- title: Digital Assets – Email Accounts
+  parent: Property & Assets
+  icon: emoji:💾
+  role: owner
+  description: Where to find and how to handle this item.
+  slug: digital-assets-email-accounts
+- title: Digital Assets – Cloud Storage
+  parent: Property & Assets
+  icon: emoji:💾
+  role: owner
+  description: Where to find and how to handle this item.
+  slug: digital-assets-cloud-storage
+- title: Digital Assets – Photo Archives
+  parent: Property & Assets
+  icon: emoji:💾
+  role: owner
+  description: Where to find and how to handle this item.
+  slug: digital-assets-photo-archives
+- title: Digital Assets – Domain Names
+  parent: Property & Assets
+  icon: emoji:💾
+  role: owner
+  description: Where to find and how to handle this item.
+  slug: digital-assets-domain-names
+- title: Digital Assets – Crypto Wallets
+  parent: Property & Assets
+  icon: emoji:💾
+  role: owner
+  description: Where to find and how to handle this item.
+  slug: digital-assets-crypto-wallets
+- title: Letters of Sympathy (Optional)
+  parent: Family Hub
+  icon: emoji:📝
+  role: family
+  description: Optional items to help the family remember and gather.
+  slug: letters-of-sympathy-(optional)
+- title: Memorial Playlist
+  parent: Family Hub
+  icon: emoji:📝
+  role: family
+  description: Optional items to help the family remember and gather.
+  slug: memorial-playlist
+- title: Photo Collage Plan
+  parent: Family Hub
+  icon: emoji:📝
+  role: family
+  description: Optional items to help the family remember and gather.
+  slug: photo-collage-plan
+- title: Memorial Guestbook
+  parent: Family Hub
+  icon: emoji:📝
+  role: family
+  description: Optional items to help the family remember and gather.
+  slug: memorial-guestbook
+
+# Interactive Content Systems - Phase 1.2: Accordion Content
+# TEMPORARILY DISABLED - archived block issue
+# - title: Comprehensive Estate Planning Roadmap
+#   parent: Preparation Hub
+#   icon: emoji:🗺️
+#   description: Complete accordion-style roadmap with expandable sections for each planning phase
+#   role: owner
+#  blocks:
+#    - type: heading_1
+#      content: 🗺️ Comprehensive Estate Planning Roadmap
+#    - type: paragraph
+#      content: Navigate your estate planning journey with this comprehensive accordion-style guide. Each section expands to reveal detailed steps, timelines, and resources.
+#
+#    # Accordion Section 1: Foundation Phase
+#    - type: toggle
+#      content: "📅 Phase 1: Foundation (Months 1-2)"
+#      blocks:
+#        - type: paragraph
+#          content: "Essential groundwork for your estate plan. Timeline: 4-8 weeks."
+#
+#        - type: toggle
+#          content: "Week 1-2: Personal Inventory"
+#          blocks:
+#            - type: to_do
+#              to_do:
+#                rich_text:
+#                  - type: text
+#                    text:
+#                      content: "Complete personal information sheet"
+#                checked: false
+#            - type: to_do
+#              to_do:
+#                rich_text:
+#                  - type: text
+#                    text:
+#                      content: "List all family members and relationships"
+#                checked: false
+#            - type: to_do
+#              to_do:
+#                rich_text:
+#                  - type: text
+#                    text:
+#                      content: "Identify special family circumstances"
+#                checked: false
+#
+#        - type: toggle
+#          content: "Week 3-4: Financial Assessment"
+#          blocks:
+#            - type: to_do
+#              to_do:
+#                rich_text:
+#                  - type: text
+#                    text:
+#                      content: "Calculate total net worth"
+#                checked: false
+#            - type: to_do
+#              to_do:
+#                rich_text:
+#                  - type: text
+#                    text:
+#                      content: "List all debts and obligations"
+#                checked: false
+#            - type: to_do
+#              to_do:
+#                rich_text:
+#                  - type: text
+#                    text:
+#                      content: "Review beneficiary designations"
+#                checked: false
+#
+#        - type: toggle
+#          content: "Week 5-6: Goal Setting"
+#          blocks:
+#            - type: paragraph
+#              content: "Define your legacy objectives:"
+#            - type: bulleted_list_item
+#              content: "Family financial security goals"
+#            - type: bulleted_list_item
+#              content: "Charitable giving intentions"
+#            - type: bulleted_list_item
+#              content: "Business succession plans"
+#            - type: bulleted_list_item
+#              content: "Educational funding priorities"
+#
+#        - type: toggle
+#          content: "Week 7-8: Professional Selection"
+#          blocks:
+#            - type: paragraph
+#              content: "Interview and select your team:"
+#            - type: bulleted_list_item
+#              content: "Estate planning attorney - 3 consultations minimum"
+#            - type: bulleted_list_item
+#              content: "Financial advisor - review credentials"
+#            - type: bulleted_list_item
+#              content: "Tax professional - estate tax expertise"
+#            - type: bulleted_list_item
+#              content: "Insurance agent - life insurance review"
+#
+#    # Accordion Section 2: Documentation Phase
+#    - type: toggle
+#      content: "📝 Phase 2: Documentation (Months 3-4)"
+#      blocks:
+#        - type: paragraph
+#          content: "Create and formalize your legal documents. Timeline: 6-8 weeks."
+#
+#        - type: toggle
+#          content: "Core Documents Creation"
+#          blocks:
+#            - type: paragraph
+#              content: "📋 **Last Will and Testament** - Key decisions to make:"
+#            - type: bulleted_list_item
+#              content: "Executor selection and alternates"
+#            - type: bulleted_list_item
+#              content: "Guardian nominations for minors"
+#            - type: bulleted_list_item
+#              content: "Specific bequests and distributions"
+#            - type: bulleted_list_item
+#              content: "Residuary estate instructions"
+#
+#            - type: paragraph
+#              content: "🏛️ **Revocable Living Trust** - Consider if you have:"
+#            - type: bulleted_list_item
+#              content: "Assets over $150,000"
+#            - type: bulleted_list_item
+#              content: "Real estate in multiple states"
+#            - type: bulleted_list_item
+#              content: "Privacy concerns"
+#            - type: bulleted_list_item
+#              content: "Complex family situations"
+#
+#            - type: paragraph
+#              content: "⚖️ **Powers of Attorney** - Essential documents:"
+#            - type: bulleted_list_item
+#              content: "Financial Power of Attorney - immediate vs springing"
+#            - type: bulleted_list_item
+#              content: "Healthcare Power of Attorney - medical decisions"
+#            - type: bulleted_list_item
+#              content: "HIPAA releases - medical information access"
+#            - type: bulleted_list_item
+#              content: "Living Will - end-of-life preferences"
+#
+#        - type: toggle
+#          content: "Supporting Documents"
+#          blocks:
+#            - type: bulleted_list_item
+#              content: "Personal property memorandum"
+#            - type: bulleted_list_item
+#              content: "Ethical will or legacy letter"
+#            - type: bulleted_list_item
+#              content: "Funeral and burial instructions"
+#            - type: bulleted_list_item
+#              content: "Digital asset inventory"
+#
+#    # Accordion Section 3: Implementation Phase
+#    - type: toggle
+#      content: "⚙️ Phase 3: Implementation (Months 5-6)"
+#      blocks:
+#        - type: paragraph
+#          content: "Execute your plan and organize your affairs. Timeline: 4-6 weeks."
+#
+#        - type: toggle
+#          content: "Asset Titling and Beneficiaries"
+#          blocks:
+#            - type: paragraph
+#              content: "🏦 **Bank Accounts** - Essential steps:"
+#            - type: bulleted_list_item
+#              content: "Add POD (Payable on Death) beneficiaries"
+#            - type: bulleted_list_item
+#              content: "Consider joint ownership pros/cons"
+#            - type: bulleted_list_item
+#              content: "Maintain operating account access"
+#
+#            - type: paragraph
+#              content: "💼 **Investment Accounts** - Key updates:"
+#            - type: bulleted_list_item
+#              content: "Update TOD (Transfer on Death) forms"
+#            - type: bulleted_list_item
+#              content: "Review retirement account beneficiaries"
+#            - type: bulleted_list_item
+#              content: "Coordinate with trust funding"
+#
+#            - type: paragraph
+#              content: "🏘️ **Real Estate** - Transfer options:"
+#            - type: bulleted_list_item
+#              content: "Deed transfers to trust"
+#            - type: bulleted_list_item
+#              content: "Joint tenancy considerations"
+#            - type: bulleted_list_item
+#              content: "Transfer on death deeds (if available)"
+#
+#        - type: toggle
+#          content: "Insurance Review"
+#          blocks:
+#            - type: bulleted_list_item
+#              content: "Life insurance needs analysis"
+#            - type: bulleted_list_item
+#              content: "Long-term care insurance evaluation"
+#            - type: bulleted_list_item
+#              content: "Disability insurance adequacy"
+#            - type: bulleted_list_item
+#              content: "Umbrella policy considerations"
+#
+#    # Accordion Section 4: Communication Phase
+#    - type: toggle
+#      content: "💬 Phase 4: Communication (Month 7)"
+#      blocks:
+#        - type: paragraph
+#          content: "Share your plans with key people. Timeline: 2-3 weeks."
+#
+#        - type: toggle
+#          content: "Family Meetings"
+#          blocks:
+#            - type: paragraph
+#              content: "📋 **Meeting Preparation** - Essential steps:"
+#            - type: bulleted_list_item
+#              content: "Create meeting agenda"
+#            - type: bulleted_list_item
+#              content: "Prepare summary documents"
+#            - type: bulleted_list_item
+#              content: "Anticipate questions and concerns"
+#            - type: bulleted_list_item
+#              content: "Choose neutral meeting location"
+#
+#            - type: paragraph
+#              content: "💬 **Topics to Cover** - Important discussions:"
+#            - type: bulleted_list_item
+#              content: "General estate plan overview"
+#            - type: bulleted_list_item
+#              content: "Executor and trustee roles"
+#            - type: bulleted_list_item
+#              content: "Healthcare wishes"
+#            - type: bulleted_list_item
+#              content: "Location of important documents"
+#            - type: bulleted_list_item
+#              content: "Contact information for advisors"
+#
+#        - type: toggle
+#          content: "Professional Notifications"
+#          blocks:
+#            - type: bulleted_list_item
+#              content: "Inform selected executors and trustees"
+#            - type: bulleted_list_item
+#              content: "Notify healthcare agents"
+#            - type: bulleted_list_item
+#              content: "Update emergency contacts"
+#            - type: bulleted_list_item
+#              content: "Provide advisor contact lists"
+#
+#    # Accordion Section 5: Maintenance Phase
+#    - type: toggle
+#      content: "🔄 Phase 5: Ongoing Maintenance"
+#      blocks:
+#        - type: paragraph
+#          content: "Keep your estate plan current and effective. Ongoing timeline."
+#
+#        - type: toggle
+#          content: "Annual Reviews"
+#          blocks:
+#            - type: bulleted_list_item
+#              content: "Beneficiary designation check"
+#            - type: bulleted_list_item
+#              content: "Asset valuation updates"
+#            - type: bulleted_list_item
+#              content: "Insurance coverage review"
+#            - type: bulleted_list_item
+#              content: "Investment performance assessment"
+#
+#        - type: toggle
+#          content: "Life Event Updates"
+#          blocks:
+#            - type: paragraph
+#              content: "Review your plan after:"
+#            - type: bulleted_list_item
+#              content: "Marriage or divorce"
+#            - type: bulleted_list_item
+#              content: "Birth or adoption"
+#            - type: bulleted_list_item
+#              content: "Death of beneficiary or fiduciary"
+#            - type: bulleted_list_item
+#              content: "Significant financial changes"
+#            - type: bulleted_list_item
+#              content: "Major health diagnoses"
+#            - type: bulleted_list_item
+#              content: "Tax law changes"
+#
+#        - type: toggle
+#          content: "Document Management"
+#          blocks:
+#            - type: bulleted_list_item
+#              content: "Maintain original documents in fireproof safe"
+#            - type: bulleted_list_item
+#              content: "Store copies in secure cloud storage"
+#            - type: bulleted_list_item
+#              content: "Update document inventory annually"
+#            - type: bulleted_list_item
+#              content: "Refresh digital asset lists quarterly"

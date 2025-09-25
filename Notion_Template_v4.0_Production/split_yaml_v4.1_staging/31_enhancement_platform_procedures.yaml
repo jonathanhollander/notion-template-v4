@@ -1,0 +1,50 @@
+# Estate Planning Template v4.0 - 31: Enhancement - Platform Procedures
+# Implements the suggestion from DATABASE_ENHANCEMENT_SUGGESTIONS.md
+# Output Directory: split_yaml_discovered_phase2/
+pages:
+  - title: "Online Platform Procedures Guide"
+    parent: "Digital Legacy Command Center"
+    description: "A database of step-by-step procedures for managing online accounts after death."
+    role: "executor"
+    icon_file: "emoji:📖"
+    blocks:
+      - type: heading_1
+        content: "Online Platform Procedures Guide"
+      - type: paragraph
+        content: "This guide provides specific, step-by-step instructions for handling accounts on major online platforms. Use the filters to find the exact procedure you need."
+      - type: child_database
+        title: "Platform Procedures"
+        database_ref: "Platform Procedures Database"
+databases:
+  - title: "Platform Procedures Database"
+    description: "A database of procedures for handling online accounts."
+    properties:
+      Platform:
+        type: title
+        title: {}
+      Procedure Type:
+        type: select
+        select:
+          options:
+            - name: "Memorialize Account"
+            - name: "Close Account"
+            - name: "Export Data"
+      Category:
+        type: select
+        select:
+          options:
+            - name: "Social Media"
+            - name: "Email Provider"
+            - name: "Tech Ecosystem"
+      Link to Official Guide:
+        type: url
+        url: {}
+      Step-by-Step Instructions:
+        type: rich_text
+        rich_text: {}
+    views:
+      - name: "All Procedures"
+        type: "table"
+      - name: "By Platform"
+        type: "board"
+        group_by: "Platform"

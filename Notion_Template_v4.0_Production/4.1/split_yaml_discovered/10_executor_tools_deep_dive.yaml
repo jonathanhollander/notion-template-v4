@@ -1,0 +1,134 @@
+# Estate Planning Template v4.0 - Executor Tools (Deep Dive)
+# Generated from comprehensive architectural conversation analysis
+# Output Directory: split_yaml_discovered/
+pages:
+  - title: "The First 48 Hours"
+    parent: "Executor Tools"
+    description: "A detailed guide to the critical tasks in the first two days."
+    role: "executor"
+    icon_file: "emoji:⏳"
+    blocks:
+      - type: heading_1
+        content: "Guidance for the First 48 Hours"
+      - type: paragraph
+        content: "In these first moments, it's important to focus on the most critical tasks. This guide is here to help you navigate them. Please remember to breathe and take one step at a time."
+      - type: callout
+        icon: emoji:❤️
+        content: "This is an incredibly difficult time. Your well-being is the first priority. Ask for help from family and friends. You do not have to do this alone."
+        color: "blue_background"
+      - type: callout
+        icon: emoji:⚠️
+        content: "CRITICAL: Do not move or transfer any financial assets until you have been legally authorized by the court."
+        color: "red_background"
+      - type: callout
+        icon: emoji:💡
+        content: "IMPORTANT: Locate the will and other key documents, but do not feel pressured to act on them immediately. First, focus on family and immediate needs."
+        color: "yellow_background"
+      - type: heading_2
+        content: "Immediate Priorities Checklist"
+      - type: to_do
+        to_do:
+          rich_text:
+            - type: text
+              text:
+                content: "Confirm legal pronouncement of death."
+          checked: false
+      - type: to_do
+        to_do:
+          rich_text:
+            - type: text
+              text:
+                content: "Arrange for transportation of the body, if necessary."
+          checked: false
+      - type: to_do
+        to_do:
+          rich_text:
+            - type: text
+              text:
+                content: "Notify immediate family and close friends."
+          checked: false
+      - type: to_do
+        to_do:
+          rich_text:
+            - type: text
+              text:
+                content: "Locate the Letter of Instruction, if one exists."
+          checked: false
+      - type: to_do
+        to_do:
+          rich_text:
+            - type: text
+              text:
+                content: "Secure the deceased's home and vehicle."
+          checked: false
+      - type: to_do
+        to_do:
+          rich_text:
+            - type: text
+              text:
+                content: "Arrange for care of pets and dependents."
+          checked: false
+
+  - title: "Navigating Probate"
+    parent: "Executor Tools"
+    description: "Understanding the probate process."
+    role: "executor"
+    icon_file: "emoji:🏛️"
+    blocks:
+      - type: heading_1
+        content: "Understanding the Probate Process"
+      - type: paragraph
+        content: "Probate is the legal process of validating a will and administering an estate. It can seem complex, but this guide will break it down into understandable steps."
+      - type: heading_2
+        content: "What is Probate?"
+      - type: paragraph
+        content: "Probate is the court-supervised process of authenticating a last will and testament if the deceased made one. It includes locating and determining the value of the person's assets, paying their final bills and taxes, and distributing the remainder of the estate to their rightful heirs."
+      - type: heading_2
+        content: "Key Steps in the Probate Process"
+      - type: numbered_list
+        numbered_list:
+          - "Filing the Will with the appropriate probate court."
+          - "Petitioning the court to be appointed as executor."
+          - "Notifying heirs, beneficiaries, and creditors of the estate."
+          - "Inventorying and appraising all estate assets."
+          - "Paying all legitimate debts and taxes of the estate."
+          - "Distributing the remaining assets to the beneficiaries."
+          - "Closing the estate with the court."
+
+  - title: "Managing Estate Finances"
+    parent: "Executor Tools"
+    description: "A guide to handling the estate's financial responsibilities."
+    role: "executor"
+    icon_file: "emoji:💰"
+    blocks:
+      - type: heading_1
+        content: "A Guide to Estate Finances"
+      - type: paragraph
+        content: "As executor, you have a fiduciary duty to manage the estate's finances responsibly. This involves securing assets, paying debts, and keeping meticulous records."
+      - type: heading_2
+        content: "Initial Financial Steps"
+      - type: to_do
+        to_do:
+          rich_text:
+            - type: text
+              text:
+                content: "Obtain the estate's Tax Identification Number (EIN) from the IRS."
+          checked: false
+      - type: to_do
+        to_do:
+          rich_text:
+            - type: text
+              text:
+                content: "Open a new bank account in the name of the estate."
+          checked: false
+      - type: to_do
+        to_do:
+          rich_text:
+            - type: text
+              text:
+                content: "Consolidate all of the deceased's liquid assets into the estate account."
+          checked: false
+      - type: heading_2
+        content: "Paying Bills and Debts"
+      - type: paragraph
+        content: "You are responsible for paying the legitimate debts of the deceased from the estate's assets. It is crucial to verify all claims and pay them in the correct order of priority as dictated by state law."

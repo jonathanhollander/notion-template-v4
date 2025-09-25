@@ -1,0 +1,45 @@
+# Estate Planning Template v4.0 - Family Support
+# Generated from comprehensive architectural conversation analysis
+# Output Directory: split_yaml_discovered/
+pages:
+  - title: "Family Support"
+    parent: "The Legacy Vault"
+    description: "Resources and guidance to support your family during a difficult time."
+    role: "family"
+    icon_file: "emoji:👨‍👩‍👧‍👦"
+    blocks:
+      - type: heading_1
+        content: "For My Family & Friends"
+      - type: paragraph
+        content: "This section is for you, my loved ones. It contains information and resources to help you during the time of transition after I am gone. Please know that you are in my thoughts."
+      - type: callout
+        icon: emoji:❤️
+        content: "Grief is a journey, not a destination. Be kind to yourselves and each other. There is no right or wrong way to feel. Support each other, and know that it is okay to seek help."
+        color: "gray_background"
+      - type: heading_2
+        content: "Memorial & Funeral Information"
+      - type: paragraph
+        content: "Here you will find my wishes for my memorial service and final arrangements. These are my preferences, but please feel free to adapt them to what feels right for you."
+      - type: child_page
+        title: "My Funeral & Memorial Plans"
+      - type: heading_2
+        content: "Important Documents for the Family"
+      - type: paragraph
+        content: "This is a quick-access list of documents you may need."
+      - type: child_database
+        title: "Family Documents"
+        database_ref: "Documents Vault"
+        view_filter:
+          property: "Category"
+          value: "Will & Trust"
+      - type: heading_2
+        content: "Resources for Grief & Bereavement"
+      - type: bulleted_list
+        bulleted_list:
+          - "Grief counseling services"
+          - "Support groups"
+          - "Books and articles on grieving"
+# Metadata comments:
+# - This module is a direct implementation of the "Family Support" requirement and is crucial for the empathetic tone of the system.
+# - The content is written from the perspective of the owner, addressing the family directly.
+# - It provides practical information (funeral plans, documents) alongside emotional support resources.

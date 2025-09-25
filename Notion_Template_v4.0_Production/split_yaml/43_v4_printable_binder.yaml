@@ -1,0 +1,46 @@
+# Estate Planning Template v4.0 - 43: Printable Peace of Mind Binder
+# Implements the Printable Binder feature for the v4.0 Gold Bundle.
+# Output Directory: split_yaml_discovered_phase2/
+pages:
+  - title: "Print Your Peace of Mind Binder"
+    parent: "Executor Guide (v4)"
+    description: "A printable summary of the most critical information for the executor."
+    role: "executor"
+    icon_file: "emoji:🖨️"
+    blocks:
+      - type: heading_1
+        content: "Peace of Mind Binder"
+      - type: paragraph
+        content: "This page gathers the most essential information into one place. Use your browser's Print to PDF function to create a clean, offline document for your records."
+      - type: heading_2
+        content: "Key Contacts"
+      - type: child_database
+        title: "Key Contacts"
+        database_ref: "Professional Contacts Directory"
+        view_filter:
+          property: "Priority"
+          value: "High"
+      - type: heading_2
+        content: "Location of Will"
+      - type: child_database
+        title: "Will Location"
+        database_ref: "Document Library"
+        view_filter:
+          property: "Category"
+          value: "Will & Trust"
+      - type: heading_2
+        content: "First 48 Hours Checklist"
+      - type: child_database
+        title: "First 48 Hours Checklist"
+        database_ref: "Executor Task Checklist"
+        view_filter:
+          property: "Stage"
+          value: "Immediate Response"
+      - type: heading_2
+        content: "Medical Summary"
+      - type: child_database
+        title: "Medical Summary"
+        database_ref: "Medical Information Vault"
+        view_filter:
+          property: "Category"
+          value: "Condition,Medication"

@@ -1,0 +1,74 @@
+# Estate Planning Template v4.0 - Funeral Planning Checklist (Detailed)
+# Generated from comprehensive architectural conversation analysis
+# Output Directory: split_yaml_discovered/
+pages:
+  - title: "Comprehensive Memorial Planning Guide"
+    parent: "Family Support"
+    description: "A detailed guide and checklist for planning a meaningful memorial service."
+    role: "family"
+    icon_file: "emoji:🕊️"
+    blocks:
+      - type: heading_1
+        content: "A Guide to Planning a Meaningful Memorial"
+      - type: paragraph
+        content: "Planning a service during a time of grief can be challenging. This guide is designed to provide a clear path, helping you create a beautiful and healing tribute."
+      - type: callout
+        icon: emoji:❤️
+        content: "There is no right or wrong way to honor a loved one. The most important thing is that the service feels authentic and meaningful to you and your family."
+        color: "gray_background"
+      - type: heading_2
+        content: "Memorial Planning Dashboard"
+      - type: paragraph
+        content: "Use this dashboard to track all the details of the memorial service."
+      - type: child_database
+        title: "Memorial Planning Tasks"
+        database_ref: "Memorial Planning Dashboard"
+      - type: child_database
+        title: "Vendor Contacts"
+        database_ref: "Contacts Directory"
+        view_filter:
+          property: "Role"
+          value: "Vendor"
+databases:
+  - title: "Memorial Planning Dashboard"
+    description: "A dashboard to track tasks, vendors, and budget for the memorial service."
+    properties:
+      Task:
+        type: title
+        title: {}
+      Status:
+        type: select
+        select:
+          options:
+            - name: "To Do"
+              color: "gray"
+            - name: "In Progress"
+              color: "blue"
+            - name: "Done"
+              color: "green"
+      Category:
+        type: select
+        select:
+          options:
+            - name: "Venue"
+            - name: "Catering"
+            - name: "Music"
+            - name: "Flowers"
+            - name: "Invitations"
+            - name: "Other"
+      Budget:
+        type: number
+        number:
+          format: "dollar"
+      Actual Cost:
+        type: number
+        number:
+          format: "dollar"
+      Vendor:
+        type: relation
+        relation:
+          database_id: "Contacts Directory"
+    views:
+      - name: "Planning Board"
+        type: "board"
+        group_by: "Category"

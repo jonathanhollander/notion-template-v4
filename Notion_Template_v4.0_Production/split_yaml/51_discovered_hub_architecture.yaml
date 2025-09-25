@@ -1,0 +1,97 @@
+# Estate Planning Template v4.0 - Main Hub Discovered Architecture
+# Generated from comprehensive architectural conversation analysis
+# Output Directory: split_yaml_discovered/
+pages:
+  - title: "The Legacy Vault"
+    description: "A compassionate concierge experience for estate planning, end-of-life preparation, and family legacy preservation."
+    role: "owner"
+    icon_file: "emoji:💎"
+    cover_file: "https://www.notion.so/images/page-cover/solid_blue.png"
+    blocks:
+      - type: heading_1
+        content: "Welcome to Your Legacy Vault"
+      - type: paragraph
+        content: "We understand that preparing for the future can feel overwhelming. This vault is designed to be a gentle guide, helping you organize your affairs with clarity and peace of mind. It is a private, secure space to gather your important documents, wishes, and memories, ensuring that your legacy is preserved and your loved ones are supported."
+      - type: callout
+        icon: emoji:❤️
+        content: "A Note on This Space: This is a place of care and preparation. Work through it at your own pace. The goal is not to complete it all at once, but to make steady, thoughtful progress. We are here to support you every step of the way."
+        color: "gray_background"
+      - type: heading_2
+        content: "Your Compassionate Concierge Dashboard"
+      - type: paragraph
+        content: "From here, you can navigate to every part of your legacy plan. Each section is designed to be a self-contained module, allowing you to focus on one area at a time."
+      - type: child_database
+        title: "Master Task List"
+        database_ref: "Master Task List"
+      - type: heading_2
+        content: "Core Modules"
+      - type: paragraph
+        content: "Select a module below to begin your journey."
+      - type: child_page
+        title: "Executor Tools"
+      - type: child_page
+        title: "Digital Legacy"
+      - type: child_page
+        title: "Memory Preservation"
+      - type: child_page
+        title: "Legal & Financial"
+      - type: child_page
+        title: "Health & Care"
+      - type: child_page
+        title: "Family Support"
+databases:
+  - title: "Master Task List"
+    description: "A central database to track all tasks related to your estate planning."
+    properties:
+      Task:
+        type: title
+        title: {}
+      Status:
+        type: select
+        select:
+          options:
+            - name: "Not Started"
+              color: "gray"
+            - name: "In Progress"
+              color: "blue"
+            - name: "Completed"
+              color: "green"
+      Priority:
+        type: select
+        select:
+          options:
+            - name: "High"
+              color: "red"
+            - name: "Medium"
+              color: "orange"
+            - name: "Low"
+              color: "yellow"
+      Module:
+        type: select
+        select:
+          options:
+            - name: "Executor Tools"
+            - name: "Digital Legacy"
+            - name: "Memory Preservation"
+            - name: "Legal & Financial"
+            - name: "Health & Care"
+            - name: "Family Support"
+      Due Date:
+        type: date
+        date: {}
+      Notes:
+        type: rich_text
+        rich_text: {}
+    views:
+      - name: "All Tasks"
+        type: "table"
+        sort:
+          - property: "Priority"
+            direction: "ascending"
+      - name: "By Module"
+        type: "board"
+        group_by: "Module"
+# Metadata comments:
+# - This hub structure is inferred from the concept of a "centralized command center" and a "premium product with everything in it."
+# - It integrates a master task list to provide a "full-stack" experience, combining navigation with a functional back-end.
+# - This hub supports the owner's user journey by providing a clear, non-overwhelming starting point.

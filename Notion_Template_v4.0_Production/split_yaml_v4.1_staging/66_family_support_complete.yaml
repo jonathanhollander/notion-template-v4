@@ -1,0 +1,84 @@
+# Estate Planning Template v4.0 - 16: Complete Family Support System
+# Generated from comprehensive architectural conversation analysis
+# Output Directory: split_yaml_discovered_phase2/
+pages:
+  - title: "Family Support Center"
+    parent: "The Legacy Vault"
+    description: "A compassionate support center for your family, providing grief resources, guidance, and tools for remembrance."
+    role: "family"
+    icon_file: "emoji:🫂"
+    blocks:
+      - type: heading_1
+        content: "A Place of Support for Our Family"
+      - type: paragraph
+        content: "This space was created to provide comfort and guidance during a difficult time. It contains resources to help navigate grief and tools to honor the memory of our loved one."
+      - type: callout
+        icon: emoji:❤️
+        content: "Grief is a personal journey. There is no timeline and no right or wrong way to feel. Be gentle with yourself and each other."
+        color: "gray_background"
+      - type: column_list
+        columns:
+          - children:
+              - type: child_page
+                title: "Grief Resources Library"
+              - type: child_page
+                title: "Guidance for Children & Teens"
+          - children:
+              - type: child_page
+                title: "Memorial & Anniversary Manager"
+
+  - title: "Grief Resources Library"
+    parent: "Family Support Center"
+    description: "A curated library of resources on coping with loss and navigating the grieving process."
+    role: "family"
+    blocks:
+      - type: heading_1
+        content: "Grief & Bereavement Resources"
+      - type: paragraph
+        content: "This library contains articles, books, podcasts, and organizations that can provide support."
+      - type: child_database
+        title: "Grief Resources"
+        database_ref: "Grief Resources Library"
+
+  - title: "Guidance for Children & Teens"
+    parent: "Family Support Center"
+    description: "Age-appropriate resources to help younger family members navigate grief."
+    role: "family"
+    blocks:
+      - type: heading_1
+        content: "Supporting Children & Teens"
+      - type: paragraph
+        content: "Explaining loss to children can be one of the most difficult challenges. This section provides resources to help."
+      - type: toggle
+        content: "For Young Children (Ages 3-6)"
+        blocks:
+          - type: paragraph
+            content: "Focus on simple, concrete language. Reassure them they are safe and loved. Books like 'The Invisible String' can be helpful."
+      - type: toggle
+        content: "For School-Aged Children (Ages 7-12)"
+        blocks:
+          - type: paragraph
+            content: "Encourage them to ask questions and express their feelings through drawing or writing. Be honest and direct."
+      - type: toggle
+        content: "For Teenagers (Ages 13-18)"
+        blocks:
+          - type: paragraph
+            content: "Respect their need for space, but keep lines of communication open. Encourage connection with friends and support groups for teens."
+
+  - title: "Memorial & Anniversary Manager"
+    parent: "Family Support Center"
+    description: "A tool to help remember and honor a loved one on important dates."
+    role: "family"
+    blocks:
+      - type: heading_1
+        content: "Remembering and Honoring"
+      - type: paragraph
+        content: "This tool helps track important anniversaries and plan ways to remember and celebrate a life."
+      - type: child_database
+        title: "Anniversary Manager (Calendar)"
+        database_ref: "Anniversary Manager"
+        view_type: "calendar"
+      - type: child_database
+        title: "Anniversary Manager (Timeline)"
+        database_ref: "Anniversary Manager"
+        view_type: "timeline"

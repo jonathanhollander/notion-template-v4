@@ -1,0 +1,153 @@
+complexity: simple
+letters:
+- Title: Bank Notification – Deceased Account Holder
+  Audience: Bank
+  Category: Financial
+  Body: Dear  [insert appropriate detail] , I’m writing to inform you of the passing
+    of  [insert appropriate detail] . I’m assisting with the estate and would appreciate
+    guidance on required documents...
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Credit Card Closure Request
+  Audience: Credit Card
+  Category: Financial
+  Body: Hello  [insert appropriate detail] , Please close the account ending in  [insert
+    appropriate detail]  for  [insert appropriate detail] , who has passed away. Attached
+    are the documents you requested...
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Utility Account Transfer/Closure
+  Audience: Utility
+  Category: Household
+  Body: To  [insert appropriate detail] , Please transfer or close services for the
+    account at  [insert appropriate detail] . The account holder,  [insert appropriate
+    detail] , has passed away...
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Insurance Claim Notification
+  Audience: Insurance
+  Category: Insurance
+  Body: Dear Claims Department, This is to notify you of a claim for policy  [insert
+    appropriate detail]  for  [insert appropriate detail] . Please advise on next
+    steps...
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Employer HR Notification
+  Audience: Employer
+  Category: Employment
+  Body: Dear HR, I’m writing regarding  [insert appropriate detail] . Would you guide
+    us through any benefits, payroll, or COBRA steps that apply?
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Subscription Cancellation (General)
+  Audience: Provider
+  Category: Digital
+  Body: Hello, Please cancel the subscription for  [insert appropriate detail]  associated
+    with  [insert appropriate detail] . The account holder  [insert appropriate detail]  has
+    passed away...
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Social Media Memorialization
+  Audience: Platform
+  Category: Digital
+  Body: Hello  [insert appropriate detail] , Please memorialize or close the account
+    for  [insert appropriate detail] . I can provide documentation as needed...
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: SSA Notification of Death
+  Audience: Agency
+  Category: Government
+  Body: 'To the Social Security Administration: I’m writing to report the passing
+    of  [insert appropriate detail] , SSN ending  [insert appropriate detail] . Please
+    advise documentation required.'
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: IRS Final Return & Estate EIN
+  Audience: Agency
+  Category: Government
+  Body: 'To the IRS: Please guide us on filing the final return for  [insert appropriate
+    detail]  and obtaining an EIN for the estate, if required.'
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: DMV Title Transfer Request
+  Audience: Agency
+  Category: Transportation
+  Body: 'To the DMV: Please provide instructions to transfer vehicle title(s) for  [insert
+    appropriate detail] . Documentation can be provided.'
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: USPS Mail Forwarding for Estate
+  Audience: Agency
+  Category: Mail
+  Body: 'To the USPS: Please enable forwarding for mail addressed to  [insert appropriate
+    detail]  to  [insert appropriate detail]  for estate administration.'
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Mortgage Servicer Notice
+  Audience: Lender
+  Category: Financial
+  Body: 'To the Servicer: Please note the passing of  [insert appropriate detail]
+    , borrower on loan  [insert appropriate detail] . Kindly advise on next steps.'
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Landlord/HOA Notification
+  Audience: Housing
+  Category: Housing
+  Body: Hello, This is to inform you of the passing of  [insert appropriate detail]
+    . We will coordinate keys, dues, and next steps with your guidance.
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Pension/401(k) Administrator Notice
+  Audience: Plan Admin
+  Category: Retirement
+  Body: 'To the Plan Administrator: Please guide beneficiary claim steps for  [insert
+    appropriate detail]  under plan  [insert appropriate detail] .'
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Brokerage Transfer/Beneficiary Claim
+  Audience: Brokerage
+  Category: Financial
+  Body: 'To  [insert appropriate detail] : Please advise on beneficiary claim or transfer
+    of assets for account(s) owned by  [insert appropriate detail] .'
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Credit Bureaus Deceased Flag
+  Audience: Credit Bureau
+  Category: Financial
+  Body: 'To  [insert appropriate detail] : Please place a deceased flag on the credit
+    file for  [insert appropriate detail]  to help prevent fraud. Supporting documents
+    available.'
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Cover Letter – Family Essentials QR Pack
+  Audience: Family
+  Category: QR Pack
+  Body: I’ve included a few QR codes that open only the pages you’ll likely need first.
+    They don’t expose everything, just the essentials.
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.
+- Title: Cover Letter – Full Executor QR Pack
+  Audience: Executor
+  Category: QR Pack
+  Body: These QR codes open all sections the executor will need. Please keep them
+    secure and use them only when it’s time to act.
+  Prompt: Use the details on this page (names, account numbers, addresses, dates)
+    to customize the draft. Keep the tone respectful and concise.
+  Disclaimer: Suggested draft only; confirm recipient requirements.

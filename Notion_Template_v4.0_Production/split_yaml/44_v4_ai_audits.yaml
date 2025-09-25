@@ -1,0 +1,26 @@
+# Estate Planning Template v4.0 - 44: AI-Powered Completeness Audits
+# Implements the AI Audits feature for the v4.0 Gold Bundle.
+# Output Directory: split_yaml_discovered_phase2/
+pages:
+  - title: "AI Completeness Check"
+    parent: "The Legacy Vault"
+    description: "Use AI to review your setup and identify potential gaps."
+    role: "owner"
+    icon_file: "emoji:🤖"
+    blocks:
+      - type: heading_1
+        content: "AI Completeness Check"
+      - type: paragraph
+        content: "This page contains prompts you can use with Notion AI to audit your setup. Copy a prompt and run it on the relevant page to get feedback."
+      - type: heading_2
+        content: "Prompt for Document Review"
+      - type: code
+        content: "Review the 'Important Documents & Essentials' database above and list any common document types (like 'Power of Attorney' or 'Trust Documents') that appear to be missing."
+      - type: heading_2
+        content: "Prompt for Digital Legacy Review"
+      - type: code
+        content: "Scan the 'Digital Accounts Inventory' and suggest any common account types (like 'online shopping' or 'utilities') that may have been forgotten."
+      - type: heading_2
+        content: "Prompt for Contacts Review"
+      - type: code
+        content: "Review the 'Contacts Directory'. Are there any key roles missing for a typical estate plan, such as 'Accountant' or 'Financial Advisor'?"

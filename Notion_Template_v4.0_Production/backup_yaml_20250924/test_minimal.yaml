@@ -1,0 +1,60 @@
+# test_minimal.yaml - Minimal test file with 2-3 pages for REAL API testing
+complexity: simple
+# This test file will generate ACTUAL images via Replicate API
+
+pages:
+  - title: "Test Hub Page"
+    icon: "emoji:🏠"
+    cover: "mahogany desk with estate planning documents"
+    description: "Test hub page for asset generation validation"
+    body:
+      - type: heading_1
+        text: "Test Hub - Estate Planning"
+      - type: paragraph
+        text: "This is a test page to validate the asset generation system works end-to-end."
+      - type: callout
+        icon: "emoji:✅"
+        color: gray_background
+        text: "TEST_MARKER • This page tests icon and cover generation."
+
+  - title: "Test Document Page"
+    icon: "emoji:📄"
+    cover: "legal documents with fountain pen on desk"
+    description: "Test document page for secondary asset generation"
+    body:
+      - type: heading_2
+        text: "Important Documents"
+      - type: paragraph
+        text: "Testing document page with different asset types."
+      - type: toggle
+        summary: "Document Details"
+        children:
+          - type: bulleted_list
+            items:
+              - "Test item 1 - Will and Testament"
+              - "Test item 2 - Power of Attorney"
+              - "Test item 3 - Healthcare Directive"
+
+  - title: "Test Family Page"
+    icon: "emoji:👨‍👩‍👧‍👦"
+    cover: "family photo album on wooden table"
+    description: "Test family section for third asset generation"
+    body:
+      - type: heading_2
+        text: "Family Messages"
+      - type: paragraph
+        text: "Testing family-oriented page with emotional context."
+      - type: divider
+      - type: paragraph
+        text: "This tests the complete pipeline from YAML to actual images."
+
+acceptance:
+  rows:
+    - Title: "Test Task 1 - Validate Asset Generation"
+      Section: "Testing"
+      Status: "Not Started"
+      Role: "Tester"
+    - Title: "Test Task 2 - Verify Image Creation"
+      Section: "Testing"
+      Status: "Not Started"
+      Role: "Tester"

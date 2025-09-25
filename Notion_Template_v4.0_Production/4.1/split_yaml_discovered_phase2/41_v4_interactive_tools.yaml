@@ -1,0 +1,40 @@
+# Estate Planning Template v4.0 - 41: Interactive Tools
+# Implements the Interactive Tools feature for the v4.0 Gold Bundle.
+# Output Directory: split_yaml_discovered_phase2/
+pages:
+  - title: "Service Checklist & Timeline"
+    parent: "Life Story & Guidance"
+    description: "A checklist and timeline for planning a memorial service, including an interactive budget tool."
+    role: "family"
+    icon_file: "emoji:🗓️"
+    blocks:
+      - type: heading_1
+        content: "Service Checklist & Timeline"
+      - type: paragraph
+        content: "This page provides tools to help you plan a meaningful service."
+      - type: heading_2
+        content: "Funeral Budget"
+      - type: paragraph
+        content: "Use this interactive budget to track expenses for the service."
+      - type: child_database
+        title: "Funeral Budget"
+        database_ref: "Funeral Budget"
+databases:
+  - title: "Funeral Budget"
+    description: "An interactive budget to track expenses for the memorial service."
+    properties:
+      Item:
+        type: title
+        title: {}
+      Estimated Cost:
+        type: number
+        number:
+          format: "dollar"
+      Actual Cost:
+        type: number
+        number:
+          format: "dollar"
+      Variance:
+        type: formula
+        formula:
+          expression: "prop(\"Estimated Cost\") - prop(\"Actual Cost\")"

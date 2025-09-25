@@ -1,0 +1,477 @@
+complexity: simple
+pages:
+- title: Preparation Hub
+  icon: emoji:🧭
+  description: Your personal starting place to set everything in motion.
+  role: owner
+  slug: preparation-hub
+  icon_file: assets/icons/preparation-hub-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/preparation-hub-cover.svg
+  icon_png: assets/icons_png/preparation-hub-icon.png
+  cover_png: assets/covers_png/preparation-hub-cover.png
+  alt_text: "An icon representing the preparation hub."
+- title: Executor Hub
+  icon: emoji:🧑‍⚖️
+  description: Resources your executor will use to honor your wishes.
+  role: executor
+  disclaimer: This section offers practical guidance; it is not legal advice.
+  slug: executor-hub
+  icon_file: assets/icons/executor-hub-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/executor-hub-cover.svg
+  icon_png: assets/icons_png/executor-hub-icon.png
+  cover_png: assets/covers_png/executor-hub-cover.png
+  alt_text: "An icon representing the executor hub."
+- title: Family Hub
+  icon: emoji:👪
+  description: Gentle guidance and memories for family.
+  role: family
+  slug: family-hub
+  icon_file: assets/icons/family-hub-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/family-hub-cover.svg
+  icon_png: assets/icons_png/family-hub-icon.png
+  cover_png: assets/covers_png/family-hub-cover.png
+  alt_text: "An icon representing the family hub."
+- title: Legal Documents
+  icon: emoji:📜
+  description: Important documents and samples (not legal advice).
+  role: owner
+  icon_file: assets/icons/legal-documents-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/legal-documents-cover.svg
+  icon_png: assets/icons_png/legal-documents-icon.png
+  cover_png: assets/covers_png/legal-documents-cover.png
+- title: Financial Accounts
+  icon: emoji:💳
+  description: Accounts, cards, and institutions to settle and notify.
+  role: owner
+  icon_file: assets/icons/financial-accounts-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/financial-accounts-cover.svg
+  icon_png: assets/icons_png/financial-accounts-icon.png
+  cover_png: assets/covers_png/financial-accounts-cover.png
+- title: Property & Assets
+  icon: emoji:🏠
+  description: Homes, vehicles, valuables, and digital assets.
+  role: owner
+  icon_file: assets/icons/property-assets-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/property-assets-cover.svg
+  icon_png: assets/icons_png/property-assets-icon.png
+  cover_png: assets/covers_png/property-assets-cover.png
+- title: Insurance
+  icon: emoji:🛡️
+  description: Policies and claims info.
+  role: owner
+  icon_file: assets/icons/insurance-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/insurance-cover.svg
+  icon_png: assets/icons_png/insurance-icon.png
+  cover_png: assets/covers_png/insurance-cover.png
+- title: Subscriptions
+  icon: emoji:🧾
+  description: Recurring services to cancel or transfer.
+  role: owner
+  icon_file: assets/icons/subscriptions-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/subscriptions-cover.svg
+  icon_png: assets/icons_png/subscriptions-icon.png
+  cover_png: assets/covers_png/subscriptions-cover.png
+- title: Letters
+  icon: emoji:✉️
+  description: Ready-to-adapt letters for banks, utilities, and more.
+  role: owner
+  icon_file: assets/icons/letters-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/letters-cover.svg
+  icon_png: assets/icons_png/letters-icon.png
+  cover_png: assets/covers_png/letters-cover.png
+- title: Memories & Keepsakes
+  icon: emoji:📷
+  description: Notes, photos, and stories worth saving.
+  role: family
+  icon_file: assets/icons/memories-keepsakes-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/memories-keepsakes-cover.svg
+  icon_png: assets/icons_png/memories-keepsakes-icon.png
+  cover_png: assets/covers_png/memories-keepsakes-cover.png
+- title: Contacts
+  icon: emoji:📇
+  description: People and organizations who matter in this process.
+  role: owner
+  icon_file: assets/icons/contacts-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/contacts-cover.svg
+  icon_png: assets/icons_png/contacts-icon.png
+  cover_png: assets/covers_png/contacts-cover.png
+- title: QR Codes
+  icon: emoji:🔗
+  description: Pages linked by printed QR codes.
+  role: owner
+  icon_file: assets/icons/qr-codes-icon.svg
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+  cover_file: assets/covers/qr-codes-cover.svg
+  icon_png: assets/icons_png/qr-codes-icon.png
+  cover_png: assets/covers_png/qr-codes-cover.png
+- title: Living Will – Sample Document
+  parent: Legal Documents
+  icon: emoji:📄
+  description: A gentle example to help you think through choices.
+  role: owner
+  disclaimer: Sample language only; not legal advice.
+  slug: legal-living-will
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Power of Attorney – Sample
+  parent: Legal Documents
+  icon: emoji:📄
+  description: Sample wording to discuss with your attorney.
+  role: owner
+  disclaimer: Sample only; not legal advice.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Advance Directive – Sample
+  parent: Legal Documents
+  icon: emoji:📄
+  role: owner
+  description: Guidance to capture your preferences.
+  disclaimer: Sample only; not legal advice.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Trust – Sample Outline
+  parent: Legal Documents
+  icon: emoji:📄
+  role: owner
+  description: Common sections to consider with counsel.
+  disclaimer: Informational only; not legal advice.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Executor Checklist
+  parent: Executor Hub
+  icon: emoji:✅
+  role: executor
+  description: A practical list of the first tasks to complete.
+  disclaimer: Checklist is informational; confirm local requirements.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Bank & Account Access Notes
+  parent: Executor Hub
+  icon: emoji:🏦
+  role: executor
+  description: Where to find account details and documents.
+  disclaimer: Handle credentials securely.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Funeral & Memorial Preferences
+  parent: Executor Hub
+  icon: emoji:🕊️
+  role: executor
+  description: Notes to guide thoughtful arrangements.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Messages for Family
+  parent: Family Hub
+  icon: emoji:💬
+  role: family
+  description: Short notes you’d like loved ones to read.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Keepsakes Index
+  parent: Family Hub
+  icon: emoji:🎁
+  role: family
+  description: A list of items with stories attached.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Primary Bank Accounts
+  parent: Financial Accounts
+  icon: emoji:🏦
+  role: owner
+  description: Main checking/savings with contact details.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Credit Cards
+  parent: Financial Accounts
+  icon: emoji:💳
+  role: owner
+  description: Active cards and closure notes.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Brokerage & Retirement
+  parent: Financial Accounts
+  icon: emoji:📈
+  role: owner
+  description: Investment and retirement accounts.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Real Estate
+  parent: Property & Assets
+  icon: emoji:🏡
+  role: owner
+  description: Properties with addresses, contacts, documents.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Vehicles
+  parent: Property & Assets
+  icon: emoji:🚗
+  role: owner
+  description: Cars, motorcycles—VINs, titles, insurers.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Digital Assets
+  parent: Property & Assets
+  icon: emoji:💾
+  role: owner
+  description: Domains, wallets, important logins.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Life Insurance
+  parent: Insurance
+  icon: emoji:🧾
+  role: owner
+  description: Policies, beneficiaries, contact paths.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Homeowners/Renters
+  parent: Insurance
+  icon: emoji:🏠
+  role: owner
+  description: Policy numbers, adjuster contacts.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Health Insurance
+  parent: Insurance
+  icon: emoji:🏥
+  role: owner
+  description: Carrier, member IDs, claims steps.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Streaming Services
+  parent: Subscriptions
+  icon: emoji:📺
+  role: owner
+  description: Netflix, Spotify, etc.—how to cancel.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Utilities
+  parent: Subscriptions
+  icon: emoji:💡
+  role: owner
+  description: Electric, gas, water—account numbers, final meter reads.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: Online Services
+  parent: Subscriptions
+  icon: emoji:🌐
+  role: owner
+  description: Web tools with billing attached.
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: QR – Family Essentials
+  parent: QR Codes
+  icon: emoji:🔖
+  role: owner
+  description: A small set of pages for family to access quickly.
+  slug: qr-family-essentials
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+- title: QR – Full Access for Executor
+  parent: QR Codes
+  icon: emoji:🧩
+  role: owner
+  description: Links to all sections your executor will need.
+  slug: qr-executor-full
+  cover: https://images.unsplash.com/photo-1530027621759-7b31d11a3a48?w=1200&q=80
+
+# Interactive Content Systems - Phase 1.1
+- title: Estate Planning Guide - Interactive
+  parent: Preparation Hub
+  icon: emoji:📚
+  description: Interactive step-by-step guide for comprehensive estate planning
+  role: owner
+  blocks:
+    - type: heading_1
+      content: 📚 Estate Planning Guide - Interactive
+    - type: paragraph
+      content: Complete your estate planning journey with this interactive, step-by-step guide. Click each section to expand detailed instructions and checklists.
+
+    - type: heading_2
+      content: Getting Started
+
+    # Toggle System 1: Basic Estate Setup
+    - type: toggle
+      content: "🏠 Step 1: Basic Estate Setup"
+      blocks:
+        - type: paragraph
+          content: Start with these fundamental estate planning steps to build a solid foundation.
+        - type: bulleted_list_item
+          content: "✅ Create or update your will"
+        - type: bulleted_list_item
+          content: "✅ Designate beneficiaries on all accounts"
+        - type: bulleted_list_item
+          content: "✅ Choose an executor you trust"
+        - type: bulleted_list_item
+          content: "✅ Consider a healthcare power of attorney"
+
+        # Nested Toggle for Advanced Options
+        - type: toggle
+          content: "💡 Advanced Will Options"
+          blocks:
+            - type: paragraph
+              content: Consider these advanced will provisions for comprehensive protection
+            - type: bulleted_list_item
+              content: "Contingent beneficiaries for unexpected situations"
+            - type: bulleted_list_item
+              content: "Guardian nominations for minor children"
+            - type: bulleted_list_item
+              content: "Specific bequests for meaningful items"
+            - type: bulleted_list_item
+              content: "Pet care provisions and funding"
+
+    # Toggle System 2: Financial Organization
+    - type: toggle
+      content: "💰 Step 2: Financial Account Organization"
+      blocks:
+        - type: paragraph
+          content: Organize your financial accounts systematically for easy management and transfer.
+
+        # Nested Banking Toggle
+        - type: toggle
+          content: "🏦 Banking Accounts"
+          blocks:
+            - type: bulleted_list_item
+              content: "Primary checking account with direct deposit"
+            - type: bulleted_list_item
+              content: "High-yield savings account for emergency fund"
+            - type: bulleted_list_item
+              content: "Certificate of deposits (CDs) for long-term savings"
+            - type: bulleted_list_item
+              content: "Safe deposit box inventory and access"
+
+        # Nested Investment Toggle
+        - type: toggle
+          content: "📈 Investment Accounts"
+          blocks:
+            - type: bulleted_list_item
+              content: "401(k) or employer-sponsored retirement plans"
+            - type: bulleted_list_item
+              content: "IRA accounts (Traditional and Roth)"
+            - type: bulleted_list_item
+              content: "Taxable brokerage accounts for additional investments"
+            - type: bulleted_list_item
+              content: "529 education savings accounts"
+            - type: bulleted_list_item
+              content: "HSA health savings accounts"
+
+    # Toggle System 3: Document Checklist
+    - type: toggle
+      content: "📋 Step 3: Important Documents Checklist"
+      blocks:
+        - type: paragraph
+          content: Essential documents to locate, organize, and secure properly.
+
+        # Interactive Checklist with to_do blocks
+        - type: to_do
+          to_do:
+            rich_text:
+              - type: text
+                text:
+                  content: "Birth certificate and Social Security card"
+            checked: false
+        - type: to_do
+          to_do:
+            rich_text:
+              - type: text
+                text:
+                  content: "Marriage certificate / divorce decree"
+            checked: false
+        - type: to_do
+          to_do:
+            rich_text:
+              - type: text
+                text:
+                  content: "Property deeds and mortgage documents"
+            checked: false
+        - type: to_do
+          to_do:
+            rich_text:
+              - type: text
+                text:
+                  content: "Vehicle titles and registrations"
+            checked: false
+        - type: to_do
+          to_do:
+            rich_text:
+              - type: text
+                text:
+                  content: "Insurance policies (life, health, disability)"
+            checked: false
+        - type: to_do
+          to_do:
+            rich_text:
+              - type: text
+                text:
+                  content: "Tax returns (last 7 years)"
+            checked: false
+
+    # Toggle System 4: Professional Team
+    - type: toggle
+      content: "👥 Step 4: Assemble Your Professional Team"
+      blocks:
+        - type: paragraph
+          content: Build a team of trusted professionals to guide your estate planning.
+
+        - type: toggle
+          content: "⚖️ Estate Planning Attorney"
+          blocks:
+            - type: paragraph
+              content: "Essential for creating legally valid documents:"
+            - type: bulleted_list_item
+              content: "Research attorneys specializing in estate planning"
+            - type: bulleted_list_item
+              content: "Check state bar associations for credentials"
+            - type: bulleted_list_item
+              content: "Schedule initial consultation"
+            - type: bulleted_list_item
+              content: "Prepare questions about fees and process"
+
+        - type: toggle
+          content: "💼 Financial Advisor"
+          blocks:
+            - type: paragraph
+              content: "Helps optimize your financial legacy:"
+            - type: bulleted_list_item
+              content: "Review investment strategies for beneficiaries"
+            - type: bulleted_list_item
+              content: "Plan for tax-efficient transfers"
+            - type: bulleted_list_item
+              content: "Coordinate with insurance planning"
+            - type: bulleted_list_item
+              content: "Consider charitable giving strategies"
+
+        - type: toggle
+          content: "📊 Tax Professional"
+          blocks:
+            - type: paragraph
+              content: "Critical for minimizing tax burden:"
+            - type: bulleted_list_item
+              content: "Estate tax planning and exemptions"
+            - type: bulleted_list_item
+              content: "Gift tax strategies"
+            - type: bulleted_list_item
+              content: "Income tax implications for beneficiaries"
+            - type: bulleted_list_item
+              content: "Trust taxation considerations"
+
+    # Toggle System 5: Digital Legacy
+    - type: toggle
+      content: "💻 Step 5: Digital Asset Management"
+      blocks:
+        - type: paragraph
+          content: "Secure and organize your digital presence for future access."
+
+        - type: toggle
+          content: "🔑 Password Management"
+          blocks:
+            - type: bulleted_list_item
+              content: "Use a password manager with emergency access feature"
+            - type: bulleted_list_item
+              content: "Document master password securely"
+            - type: bulleted_list_item
+              content: "Set up legacy contact for password manager"
+            - type: bulleted_list_item
+              content: "Enable two-factor authentication recovery options"
+
+        - type: toggle
+          content: "🌐 Online Accounts"
+          blocks:
+            - type: bulleted_list_item
+              content: "Email accounts - set up inactive account manager"
+            - type: bulleted_list_item
+              content: "Social media - configure memorialization settings"
+            - type: bulleted_list_item
+              content: "Cloud storage - grant emergency access"
+            - type: bulleted_list_item
+              content: "Cryptocurrency wallets - secure key storage"
+            - type: bulleted_list_item
+              content: "Domain names - set auto-renewal or transfer"

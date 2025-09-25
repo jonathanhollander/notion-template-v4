@@ -1,0 +1,39 @@
+# Estate Planning Template v4.0 - Professional Integration
+# Generated from comprehensive architectural conversation analysis
+# Output Directory: split_yaml_discovered/
+pages:
+  - title: "Working with Your Professional Team"
+    parent: "Executor Tools"
+    description: "Guidance and tools for collaborating with lawyers, financial advisors, and other professionals."
+    role: "executor"
+    icon_file: "emoji:🤝"
+    blocks:
+      - type: heading_1
+        content: "Collaborating with Professionals"
+      - type: paragraph
+        content: "As an executor, you will likely need to work closely with a team of professionals. This section provides tools and guidance to make that collaboration smooth and efficient."
+      - type: callout
+        icon: emoji:🔒
+        content: "When sharing information, always prioritize security. Use secure methods to share sensitive data and grant access only when necessary."
+        color: "gray_background"
+      - type: heading_2
+        content: "Your Professional Team"
+      - type: paragraph
+        content: "This is a filtered view of your contacts directory, showing the professionals involved in the estate."
+      - type: child_database
+        title: "Professional Contacts"
+        database_ref: "Contacts Directory"
+        view_filter:
+          property: "Role"
+          value: "Lawyer,Financial Advisor,Accountant"
+      - type: heading_2
+        content: "Sharing Information Securely"
+      - type: paragraph
+        content: "Notion provides several ways to securely share specific pages with guests. You can create a dedicated page for each professional and share only the information they need to see."
+      - type: heading_3
+        content: "Template for Professional Collaboration"
+      - type: toggle
+        content: "New Professional Sharing Page Template"
+        blocks:
+          - type: paragraph
+            content: "Create a new page and add the relevant databases (e.g., Documents Vault, Financial Summary) as linked views. Filter these views to show only the information the professional needs. Then, use Notion's sharing features to invite the professional to this specific page as a guest."

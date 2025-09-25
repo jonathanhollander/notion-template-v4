@@ -1,0 +1,44 @@
+# Estate Planning Template v4.0 - Memory Preservation
+# Generated from comprehensive architectural conversation analysis
+# Output Directory: split_yaml_discovered/
+pages:
+  - title: "Memory Preservation"
+    parent: "The Legacy Vault"
+    description: "A space to leave behind letters, stories, and memories for your loved ones."
+    role: "owner"
+    icon_file: "emoji:💌"
+    blocks:
+      - type: heading_1
+        content: "Preserving Your Memories"
+      - type: paragraph
+        content: "Your legacy is more than just your assets; it's about the memories, stories, and values you share. This section is a private space for you to reflect and to leave meaningful messages for your loved ones."
+      - type: callout
+        icon: emoji:✍️
+        content: "Take your time here. Write from the heart. These words will be a cherished gift for your family and friends."
+        color: "gray_background"
+      - type: heading_2
+        content: "Letters to Loved Ones"
+      - type: paragraph
+        content: "You can write letters to be opened on special occasions or after you are gone. Create a new page for each letter."
+      - type: child_page
+        title: "Letter to My Spouse/Partner"
+      - type: child_page
+        title: "Letter to My Children"
+      - type: child_page
+        title: "Letter to a Friend"
+      - type: heading_2
+        content: "My Life Story"
+      - type: paragraph
+        content: "Share your story in your own words. You can write about your childhood, your proudest moments, your challenges, and the lessons you've learned."
+      - type: child_page
+        title: "My Autobiography"
+      - type: heading_2
+        content: "Ethical Will"
+      - type: paragraph
+        content: "An ethical will is a document that passes on your values, beliefs, and life lessons to your family. It is not a legal document, but a personal one."
+      - type: child_page
+        title: "My Ethical Will"
+# Metadata comments:
+# - This module is a direct implementation of the "Integrate Functional and Philosophical Depth" concept from the early design chats.
+# - The content is designed to be reflective and personal, providing a space for the user to express themselves.
+# - This module is composed of child pages to encourage free-form writing and reflection.

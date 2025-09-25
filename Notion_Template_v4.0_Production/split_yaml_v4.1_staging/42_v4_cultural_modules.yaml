@@ -1,0 +1,71 @@
+# Estate Planning Template v4.0 - 42: Cultural & Global Modules
+# Implements the Cultural & Global Modules feature for the v4.0 Gold Bundle.
+# Output Directory: split_yaml_discovered_phase2/
+pages:
+  - title: "Cultural & Religious Traditions"
+    parent: "The Legacy Vault"
+    description: "Guidance and resources for incorporating cultural and religious traditions into memorial services."
+    role: "family"
+    icon_file: "emoji:🌍"
+    blocks:
+      - type: heading_1
+        content: "Cultural & Religious Traditions"
+      - type: paragraph
+        content: "This section provides informational guides on various traditions. These are starting points for discussion and planning."
+      - type: child_page
+        title: "Christian Traditions"
+      - type: child_page
+        title: "Jewish Traditions"
+      - type: child_page
+        title: "Secular & Humanist Traditions"
+
+  - title: "Christian Traditions"
+    parent: "Cultural & Religious Traditions"
+    description: "An overview of common Christian funeral and memorial traditions."
+    role: "family"
+    blocks:
+      - type: heading_1
+        content: "Christian Funeral Traditions"
+      - type: paragraph
+        content: "This guide covers common practices. Traditions can vary widely by denomination."
+      - type: heading_2
+        content: "Key Elements"
+      - type: bulleted_list
+        bulleted_list:
+          - "Vigil (Wake)"
+          - "Funeral Service (often with Eucharist or Mass)"
+          - "Committal Service at the graveside or crematorium"
+
+  - title: "Jewish Traditions"
+    parent: "Cultural & Religious Traditions"
+    description: "An overview of common Jewish mourning and funeral traditions."
+    role: "family"
+    blocks:
+      - type: heading_1
+        content: "Jewish Mourning Traditions"
+      - type: paragraph
+        content: "This guide covers traditions observed in many Jewish communities."
+      - type: heading_2
+        content: "Key Periods of Mourning"
+      - type: bulleted_list
+        bulleted_list:
+          - "Aninut (from death to burial)"
+          - "Shiva (seven days of mourning after burial)"
+          - "Shloshim (thirty days after burial)"
+
+  - title: "Secular & Humanist Traditions"
+    parent: "Cultural & Religious Traditions"
+    description: "An overview of non-religious memorial services."
+    role: "family"
+    blocks:
+      - type: heading_1
+        content: "Secular & Humanist Memorials"
+      - type: paragraph
+        content: "These services focus on celebrating the life and legacy of the individual."
+      - type: heading_2
+        content: "Key Elements"
+      - type: bulleted_list
+        bulleted_list:
+          - "Celebration of Life gathering"
+          - "Focus on personal stories, music, and achievements"
+          - "Absence of religious rites or clergy"

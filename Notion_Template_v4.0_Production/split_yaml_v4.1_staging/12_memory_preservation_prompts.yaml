@@ -1,0 +1,85 @@
+# Estate Planning Template v4.0 - Memory Preservation (Prompts & Templates)
+# Generated from comprehensive architectural conversation analysis
+# Output Directory: split_yaml_discovered/
+pages:
+  - title: "My Autobiography"
+    parent: "Memory Preservation"
+    description: "A guided journey through your life story with thoughtful prompts."
+    role: "owner"
+    icon_file: "emoji:📖"
+    blocks:
+      - type: heading_1
+        content: "Your Life, In Your Words"
+      - type: paragraph
+        content: "This is a space to share your story. It doesn't need to be a masterpiece; it just needs to be yours. Use the prompts below to help you reflect on your journey."
+      - type: callout
+        icon: emoji:✍️
+        content: "Answer as many or as few as you like. There is no right or wrong way to tell your story."
+        color: "gray_background"
+      - type: heading_2
+        content: "Prompts for Reflection"
+      - type: toggle
+        content: "Early Years"
+        blocks:
+          - type: bulleted_list
+            bulleted_list:
+              - "What is your earliest memory?"
+              - "Describe your childhood home."
+              - "Who were your childhood heroes?"
+      - type: toggle
+        content: "Formative Years"
+        blocks:
+          - type: bulleted_list
+            bulleted_list:
+              - "What was your proudest moment as a young adult?"
+              - "Describe a challenge that shaped who you are today."
+              - "What is the most important lesson you learned in your 20s?"
+      - type: toggle
+        content: "Career & Accomplishments"
+        blocks:
+          - type: bulleted_list
+            bulleted_list:
+              - "What was your most fulfilling work?"
+              - "Describe a professional achievement you are proud of."
+              - "How did you choose your career path?"
+      - type: toggle
+        content: "Love & Family"
+        blocks:
+          - type: bulleted_list
+            bulleted_list:
+              - "How did you meet your partner?"
+              - "What is your favorite family tradition?"
+              - "What does family mean to you?"
+
+  - title: "My Ethical Will"
+    parent: "Memory Preservation"
+    description: "A template to help you articulate your values, beliefs, and life lessons."
+    role: "owner"
+    icon_file: "emoji:📜"
+    blocks:
+      - type: heading_1
+        content: "Your Ethical Will: A Legacy of Values"
+      - type: paragraph
+        content: "An ethical will is a way to share your values, beliefs, and life lessons with your loved ones. It is a gift of wisdom and love that will be cherished for generations."
+      - type: heading_2
+        content: "Template for Your Ethical Will"
+      - type: toggle
+        content: "My Most Important Values"
+        blocks:
+          - type: paragraph
+            content: "What are the core values that have guided your life? (e.g., honesty, kindness, perseverance)"
+      - type: toggle
+        content: "Life Lessons I Want to Share"
+        blocks:
+          - type: paragraph
+            content: "What are the most important lessons you have learned about life, love, and happiness?"
+      - type: toggle
+        content: "My Hopes for My Loved Ones"
+        blocks:
+          - type: paragraph
+            content: "What are your hopes and dreams for your family's future?"
+      - type: toggle
+        content: "Words of Forgiveness"
+        blocks:
+          - type: paragraph
+            content: "Is there anything you wish to say about forgiveness, to others or to yourself?"

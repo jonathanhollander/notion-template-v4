@@ -1,0 +1,21 @@
+# 20_blueprints.yaml
+complexity: moderate
+view_blueprints:
+  - name: "Accounts — Active Only"
+    database: "Accounts"
+    filter: {"Archived": false}
+    sort: {"Updated": "desc"}
+    link: ""
+
+  - name: "Letters — Drafts"
+    database: "Letters"
+    filter: {"Status": "Draft"}
+    sort: {"Last Sent": "desc"}
+    link: ""
+
+rollup_blueprints:
+  - name: "Estate — Liquid Assets Sum"
+    database: "Estate Analytics"
+    relation_property: "Related Page"
+    rollup_property: "Balance"
+    function: "sum"

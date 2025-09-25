@@ -1,0 +1,52 @@
+# Estate Planning Template v4.0 - 11: Professional Integration System
+# Generated from comprehensive architectural conversation analysis
+# Output Directory: split_yaml_discovered_phase2/
+pages:
+  - title: "Your Professional Team Hub"
+    parent: "Executor's Comprehensive Workflow"
+    description: "A central hub for managing and collaborating with your team of legal, financial, and other professionals."
+    role: "executor"
+    icon_file: "emoji:🧑‍💼"
+    blocks:
+      - type: heading_1
+        content: "Managing Your Professional Team"
+      - type: paragraph
+        content: "Effectively managing the estate requires a team of trusted professionals. This hub is your command center for tracking, communicating, and collaborating with them."
+      - type: heading_2
+        content: "Professional Contacts Directory"
+      - type: paragraph
+        content: "A detailed directory of all professionals involved in the estate."
+      - type: child_database
+        title: "Professional Contacts"
+        database_ref: "Professional Contacts Directory"
+        view_type: "gallery"
+
+  - title: "Beneficiary Communication Templates"
+    parent: "Your Professional Team Hub"
+    description: "A library of templates for communicating with beneficiaries."
+    role: "executor"
+    icon_file: "emoji:✉️"
+    blocks:
+      - type: heading_1
+        content: "Beneficiary Communication Library"
+      - type: paragraph
+        content: "Clear and empathetic communication with beneficiaries is crucial. Use these templates as a starting point for your correspondence."
+      - type: toggle
+        content: "Template: Initial Notification to Beneficiaries"
+        blocks:
+          - type: quote
+            content: "Dear [Beneficiary Name], I am writing to you with a heavy heart to inform you of the passing of [Decedent Name]. As the named executor of the estate, I will be in touch with you throughout this process..."
+      - type: toggle
+        content: "Template: Update on Estate Progress"
+        blocks:
+          - type: quote
+            content: "Dear [Beneficiary Name], I am writing to provide you with a brief update on the settlement of [Decedent Name]'s estate. We are currently in the [Stage Name] phase..."
+      - type: toggle
+        content: "Template: Notice of Final Distribution"
+        blocks:
+          - type: quote
+            content: "Dear [Beneficiary Name], I am pleased to inform you that the estate of [Decedent Name] is nearing completion. This letter outlines the final distribution of assets..."
+
+# This file does not introduce a new database, but it would be implemented
+# using the Professional Contacts Directory database defined in
+# 20_estate_databases_advanced.yaml

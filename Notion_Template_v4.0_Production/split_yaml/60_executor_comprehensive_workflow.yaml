@@ -1,0 +1,112 @@
+# Estate Planning Template v4.0 - 10: Comprehensive Executor Workflow
+# Generated from comprehensive architectural conversation analysis
+# Output Directory: split_yaml_discovered_phase2/
+pages:
+  - title: "Executor's Comprehensive Workflow"
+    parent: "The Legacy Vault"
+    description: "A complete, step-by-step workflow to guide the executor through the entire estate settlement process."
+    role: "executor"
+    icon_file: "emoji:🗺️"
+    blocks:
+      - type: heading_1
+        content: "The Complete Estate Settlement Guide"
+      - type: paragraph
+        content: "We know this is a monumental task. This comprehensive guide is designed to be your trusted companion, breaking down the process into clear, manageable stages and tasks. You are capable, and you are not alone."
+      - type: callout
+        icon: emoji:🤝
+        content: "This is a marathon, not a sprint. The process can take many months. Be patient, keep meticulous records, and do not hesitate to lean on the professional team for support."
+        color: "gray_background"
+      - type: heading_2
+        content: "Master Workflow Dashboard"
+      - type: paragraph
+        content: "Use these views to track your progress from multiple perspectives."
+      - type: child_database
+        title: "Master Task Checklist (by Stage)"
+        database_ref: "Executor Task Checklist"
+        view_type: "board"
+        group_by: "Stage"
+      - type: child_database
+        title: "Task Timeline"
+        database_ref: "Executor Task Checklist"
+        view_type: "timeline"
+        timeline_by: "Due Date"
+
+  - title: "Immediate Response (0-7 Days)"
+    parent: "Executor's Comprehensive Workflow"
+    description: "Critical tasks for the first week."
+    role: "executor"
+    blocks:
+      - type: heading_1
+        content: "Stage 1: Immediate Response"
+      - type: paragraph
+        content: "Focus only on these essential first steps."
+      - type: child_database
+        title: "Immediate Tasks"
+        database_ref: "Executor Task Checklist"
+        view_filter:
+          property: "Stage"
+          value: "Immediate Response"
+
+  - title: "Legal Foundation (Week 2-4)"
+    parent: "Executor's Comprehensive Workflow"
+    description: "Establishing the legal groundwork for the estate."
+    role: "executor"
+    blocks:
+      - type: heading_1
+        content: "Stage 2: Legal Foundation"
+      - type: paragraph
+        content: "This stage involves formally beginning the probate process."
+      - type: child_database
+        title: "Legal Foundation Tasks"
+        database_ref: "Executor Task Checklist"
+        view_filter:
+          property: "Stage"
+          value: "Legal Foundation"
+
+  - title: "Asset Discovery (Month 2-3)"
+    parent: "Executor's Comprehensive Workflow"
+    description: "Inventorying and valuing all estate assets."
+    role: "executor"
+    blocks:
+      - type: heading_1
+        content: "Stage 3: Asset Discovery"
+      - type: paragraph
+        content: "Creating a comprehensive inventory of everything the estate owns."
+      - type: child_database
+        title: "Asset Discovery Tasks"
+        database_ref: "Executor Task Checklist"
+        view_filter:
+          property: "Stage"
+          value: "Asset Discovery"
+
+  - title: "Administration (Month 3-12)"
+    parent: "Executor's Comprehensive Workflow"
+    description: "Managing the estate's finances and obligations."
+    role: "executor"
+    blocks:
+      - type: heading_1
+        content: "Stage 4: Estate Administration"
+      - type: paragraph
+        content: "This is the longest phase, involving paying debts, filing taxes, and managing assets."
+      - type: child_database
+        title: "Administration Tasks"
+        database_ref: "Executor Task Checklist"
+        view_filter:
+          property: "Stage"
+          value: "Administration"
+
+  - title: "Closure (Year 1-2)"
+    parent: "Executor's Comprehensive Workflow"
+    description: "Finalizing the estate and distributing assets."
+    role: "executor"
+    blocks:
+      - type: heading_1
+        content: "Stage 5: Estate Closure"
+      - type: paragraph
+        content: "The final steps to close the estate and fulfill the decedent's wishes."
+      - type: child_database
+        title: "Closure Tasks"
+        database_ref: "Executor Task Checklist"
+        view_filter:
+          property: "Stage"
+          value: "Closure"

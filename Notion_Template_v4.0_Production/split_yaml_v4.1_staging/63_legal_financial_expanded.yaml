@@ -1,0 +1,96 @@
+# Estate Planning Template v4.0 - 13: Expanded Legal & Financial System
+# Generated from comprehensive architectural conversation analysis
+# Output Directory: split_yaml_discovered_phase2/
+pages:
+  - title: "Legal & Financial Command Center"
+    parent: "The Legacy Vault"
+    description: "A comprehensive system for managing legal documents, financial accounts, and tax obligations."
+    role: "owner"
+    icon_file: "emoji:🏛️"
+    blocks:
+      - type: heading_1
+        content: "Your Legal & Financial Command Center"
+      - type: paragraph
+        content: "This system is designed to bring clarity and organization to the legal and financial aspects of your estate. It provides a central place to manage documents, understand requirements, and guide your executor."
+      - type: callout
+        icon: emoji:⚠️
+        content: "This system provides guidance and templates, not legal or financial advice. Always consult with a qualified attorney and CPA."
+        color: "red_background"
+      - type: column_list
+        columns:
+          - children:
+              - type: child_page
+                title: "Master Document Library"
+              - type: child_page
+                title: "State Requirements Guide"
+          - children:
+              - type: child_page
+                title: "Financial Accounts & Institutions"
+              - type: child_page
+                title: "Tax Preparation Center"
+
+  - title: "Master Document Library"
+    parent: "Legal & Financial Command Center"
+    description: "A library of important legal documents and templates."
+    role: "owner"
+    blocks:
+      - type: heading_1
+        content: "Master Document Library"
+      - type: paragraph
+        content: "Use this database to track the location and status of all your critical legal documents."
+      - type: child_database
+        title: "Document Library"
+        database_ref: "Document Library"
+
+  - title: "State Requirements Guide"
+    parent: "Legal & Financial Command Center"
+    description: "A guide to understanding state-specific probate and estate laws."
+    role: "owner"
+    blocks:
+      - type: heading_1
+        content: "Guide to State Requirements"
+      - type: paragraph
+        content: "Probate and estate laws vary significantly by state. This database provides a starting point for understanding the requirements in your jurisdiction."
+      - type: child_database
+        title: "State Requirements"
+        database_ref: "State Requirements Database"
+
+  - title: "Financial Accounts & Institutions"
+    parent: "Legal & Financial Command Center"
+    description: "A detailed inventory of all financial accounts."
+    role: "owner"
+    blocks:
+      - type: heading_1
+        content: "Inventory of Financial Accounts"
+      - type: paragraph
+        content: "A clear record of all financial accounts is crucial for your executor."
+      - type: child_database
+        title: "Financial Account Inventory"
+        database_ref: "Financial Account Inventory"
+
+  - title: "Tax Preparation Center"
+    parent: "Legal & Financial Command Center"
+    description: "Guidance on final tax returns and estate taxes."
+    role: "executor"
+    blocks:
+      - type: heading_1
+        content: "Tax Preparation Guidance"
+      - type: paragraph
+        content: "The estate is responsible for filing several tax returns. This section provides an overview of what to expect."
+      - type: heading_2
+        content: "Key Tax Obligations"
+      - type: toggle
+        content: "Final Personal Income Tax Return (Form 1040)"
+        blocks:
+          - type: paragraph
+            content: "A final income tax return must be filed for the decedent for the year of their death."
+      - type: toggle
+        content: "Estate Income Tax Return (Form 1041)"
+        blocks:
+          - type: paragraph
+            content: "If the estate generates income after the decedent's death, it must file its own income tax return."
+      - type: toggle
+        content: "Federal Estate Tax Return (Form 706)"
+        blocks:
+          - type: paragraph
+            content: "This is only required for very large estates that exceed the federal estate tax exemption limit. Consult with a CPA to determine if this is necessary."

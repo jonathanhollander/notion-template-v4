@@ -522,47 +522,86 @@ def expect_ok(resp: requests.Response, context: str = "") -> bool:
 # YAML & DATA LOADING
 # ============================================================================
 
+def flatten_pages_with_children(pages: List[Dict]) -> List[Dict]:
+    """Recursively process pages with children field to create flat list with parent references"""
+    flattened = []
+
+    def process_page(page: Dict, parent_title: Optional[str] = None):
+        """Process a single page and its children"""
+        # Create a copy to avoid modifying original
+        page_copy = page.copy()
+
+        # Set parent if provided
+        if parent_title:
+            page_copy['parent'] = parent_title
+
+        # Remove children from the copy to avoid it being treated as content
+        children = page_copy.pop('children', None)
+
+        # Add the page itself
+        flattened.append(page_copy)
+
+        # Process children if they exist
+        if children:
+            for child_page in children:
+                process_page(child_page, page_copy.get('title', 'Untitled'))
+
+    # Process all top-level pages
+    for page in pages:
+        process_page(page)
+
+    return flattened
+
 def load_all_yaml(yaml_dir: Optional[Path] = None) -> Dict:
     """Load and merge all YAML files from split_yaml directory"""
     if yaml_dir is None:
         yaml_dir = Path(__file__).parent / "split_yaml"
     else:
         yaml_dir = Path(yaml_dir)
-    
+
     if not yaml_dir.exists():
         logging.error(f"YAML directory not found: {yaml_dir}")
         return {}
-    
+
     merged = {
         "pages": [],
         "db": {
             "schemas": {},
             "seed_rows": {}
         },
-        "standalone_databases": []
+        "standalone_databases": [],
+        "letters": []  # Add letters tracking
     }
-    
+
     # Process YAML files in sorted order
     yaml_files = sorted(yaml_dir.glob("*.yaml"))
     logging.info(f"Found {len(yaml_files)} YAML files to process")
-    
+
     for yaml_file in yaml_files:
         logging.debug(f"Loading {yaml_file.name}")
         try:
             with open(yaml_file, 'r', encoding='utf-8') as f:
                 data = yaml.safe_load(f)
-                
+
             if not data:
                 continue
-                
+
             # Apply formula placeholders first, then variable substitution
             data = process_formula_substitution(data)
             data = process_content_substitution(data)
 
-            # Merge pages
+            # Merge pages (including processing children)
             if 'pages' in data:
-                merged['pages'].extend(data['pages'])
-                
+                pages = data['pages']
+                # Flatten pages with children into single list with parent references
+                flattened_pages = flatten_pages_with_children(pages)
+                merged['pages'].extend(flattened_pages)
+                logging.debug(f"Processed {len(pages)} pages -> {len(flattened_pages)} total (including children)")
+
+            # Merge letters (for later content addition)
+            if 'letters' in data:
+                merged['letters'].extend(data['letters'])
+
             # Merge database schemas
             if 'db' in data:
                 if 'schemas' in data['db']:
@@ -573,11 +612,11 @@ def load_all_yaml(yaml_dir: Optional[Path] = None) -> Dict:
             # Merge standalone databases
             if 'databases' in data:
                 merged['standalone_databases'].extend(data['databases'])
-                    
+
         except Exception as e:
             logging.error(f"Failed to load {yaml_file.name}: {e}")
-            
-    logging.info(f"Merged {len(merged['pages'])} pages, {len(merged['db']['schemas'])} database schemas, and {len(merged['standalone_databases'])} standalone databases")
+
+    logging.info(f"Merged {len(merged['pages'])} pages (including children), {len(merged['db']['schemas'])} database schemas, {len(merged['standalone_databases'])} standalone databases, and {len(merged['letters'])} letters")
     return merged
 
 def convert_standalone_db_to_schema(standalone_db: Dict) -> Dict:
@@ -633,6 +672,64 @@ def load_csv_data(csv_dir: Optional[Path] = None) -> Dict[str, List[Dict]]:
 # ============================================================================
 # PAGE & DATABASE CREATION
 # ============================================================================
+
+def upload_local_asset_file(file_path: str) -> Optional[str]:
+    """Upload a local asset file and return its URL
+
+    For now, this returns None as Notion API doesn't support direct file uploads.
+    Files need to be hosted externally. In production, this would upload to S3/Cloudinary.
+    """
+    # Check if file exists
+    if os.path.exists(file_path):
+        logging.debug(f"Asset file found: {file_path}")
+        # In production, upload to cloud storage and return URL
+        # For now, we can't upload local files directly to Notion
+        return None
+    return None
+
+def get_asset_url(page_data: Dict, asset_type: str) -> Optional[str]:
+    """Get URL for an asset, either from URL field or by uploading local file
+
+    Args:
+        page_data: Page data dictionary
+        asset_type: 'icon' or 'cover'
+
+    Returns:
+        URL string or None
+    """
+    # First check for direct URL
+    url_field = asset_type  # 'icon' or 'cover'
+    if url_field in page_data:
+        value = page_data[url_field]
+        if isinstance(value, str) and value.startswith('http'):
+            return value
+
+    # Then check for local file paths
+    file_fields = {
+        'icon': ['icon_file', 'icon_png'],
+        'cover': ['cover_file', 'cover_png']
+    }
+
+    for field in file_fields.get(asset_type, []):
+        if field in page_data:
+            file_path = page_data[field]
+            # Convert relative path to absolute
+            if not os.path.isabs(file_path):
+                # Try multiple base paths
+                base_paths = [
+                    Path(__file__).parent / "asset_generation" / "output",
+                    Path(__file__).parent,
+                    Path.cwd()
+                ]
+                for base_path in base_paths:
+                    full_path = base_path / file_path
+                    if full_path.exists():
+                        url = upload_local_asset_file(str(full_path))
+                        if url:
+                            return url
+                        break
+
+    return None
 
 def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str] = None) -> Optional[str]:
     """Create a Notion page with comprehensive error handling"""
@@ -694,8 +791,65 @@ def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str
                     "content": para.strip()
                 })
 
+    # Generate default content from metadata if no blocks provided
+    if not blocks_data:
+        blocks_data = []
+
+        # Add title as heading if different from page title
+        if 'description' in page_data and page_data['description']:
+            blocks_data.append({
+                "type": "paragraph",
+                "content": page_data['description']
+            })
+
+        # Add disclaimer as callout if present
+        if 'disclaimer' in page_data and page_data['disclaimer']:
+            blocks_data.append({
+                "type": "callout",
+                "icon": "⚠️",
+                "content": page_data['disclaimer'],
+                "color": "yellow_background"
+            })
+
+        # Add role information if present
+        if 'role' in page_data and page_data['role']:
+            role_map = {
+                'owner': 'This section is for the estate owner to prepare.',
+                'executor': 'This section contains resources for the executor.',
+                'family': 'This section provides guidance and support for family members.'
+            }
+            if page_data['role'] in role_map:
+                blocks_data.append({
+                    "type": "callout",
+                    "icon": "👤",
+                    "content": role_map[page_data['role']],
+                    "color": "blue_background"
+                })
+
+        # Add prompt as guidance if present
+        if 'Prompt' in page_data and page_data['Prompt']:
+            blocks_data.append({
+                "type": "toggle",
+                "content": "📝 Instructions",
+                "blocks": [{
+                    "type": "paragraph",
+                    "content": page_data['Prompt']
+                }]
+            })
+
+        # Special handling for Letters page - add letter templates
+        if title == "Letters":
+            blocks_data.append({
+                "type": "heading_2",
+                "content": "Letter Templates"
+            })
+            blocks_data.append({
+                "type": "paragraph",
+                "content": "Use these ready-to-adapt letter templates for banks, utilities, and more. Each template includes customizable fields and suggested language."
+            })
+
     if blocks_data:
-        logging.debug(f"Found {len(blocks_data)} blocks for page '{title}'")
+        logging.debug(f"Processing {len(blocks_data)} blocks for page '{title}'")
         for block in blocks_data:
             # Process variable substitution in block content
             block = process_content_substitution(block)
@@ -709,7 +863,7 @@ def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str
                 children.append(built_block)
                 logging.debug(f"Built block: {json.dumps(built_block, indent=2)}")
     else:
-        logging.debug(f"No blocks found for page '{title}', adding empty paragraph")
+        logging.debug(f"No content generated for page '{title}', adding empty paragraph")
         # Add an empty paragraph block for pages without content
         children = [{"type": "paragraph", "paragraph": {"rich_text": []}}]
 
@@ -724,24 +878,36 @@ def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str
         "properties": properties
     }
 
-    # Add icon if specified
+    # Add icon if specified - enhanced to handle local files
     if 'icon' in page_data:
         icon_value = page_data['icon']
         if isinstance(icon_value, str):
             if icon_value.startswith('emoji:'):
                 payload["icon"] = {"type": "emoji", "emoji": icon_value.replace('emoji:', '')}
-            elif icon_value.startswith('http'):
-                payload["icon"] = {"type": "external", "external": {"url": icon_value}}
+            else:
+                # Try to get icon URL (from direct URL or local file)
+                icon_url = self.get_asset_url(icon_value if icon_value.startswith('http') else None,
+                                             page_data.get('icon_file'), 'icon')
+                if icon_url:
+                    payload["icon"] = {"type": "external", "external": {"url": icon_url}}
         elif isinstance(icon_value, dict):
             payload["icon"] = icon_value
+    elif 'icon_file' in page_data:
+        # No icon property but has icon_file - try to use it
+        icon_url = self.get_asset_url(None, page_data.get('icon_file'), 'icon')
+        if icon_url:
+            payload["icon"] = {"type": "external", "external": {"url": icon_url}}
 
-    # Add cover if specified
-    if 'cover' in page_data:
-        cover_value = page_data['cover']
-        if isinstance(cover_value, str) and cover_value.startswith('http'):
-            payload["cover"] = {"type": "external", "external": {"url": cover_value}}
-        elif isinstance(cover_value, dict):
-            payload["cover"] = cover_value
+    # Add cover if specified - enhanced to handle local files
+    cover_url = self.get_asset_url(
+        page_data.get('cover') if isinstance(page_data.get('cover'), str) and page_data.get('cover').startswith('http') else None,
+        page_data.get('cover_file'),
+        'cover'
+    )
+    if cover_url:
+        payload["cover"] = {"type": "external", "external": {"url": cover_url}}
+    elif isinstance(page_data.get('cover'), dict):
+        payload["cover"] = page_data.get('cover')
 
     if children:
         payload["children"] = children
@@ -917,6 +1083,144 @@ def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str
         state.errors.append({"phase": "pages", "item": title, "error": str(e)})
 
     return None
+
+def add_database_view_to_page(page_id: str, database_id: str, title: str = "") -> bool:
+    """Add a linked database view to an existing page"""
+    try:
+        logging.info(f"Adding database view to page {page_id}")
+
+        payload = {
+            "children": [
+                {
+                    "type": "child_database",
+                    "child_database": {
+                        "title": title,
+                        "is_inline": True
+                    }
+                }
+            ]
+        }
+
+        # Add the database view as a child block
+        r = req("PATCH", f"https://api.notion.com/v1/blocks/{page_id}/children",
+                data=json.dumps(payload))
+
+        if expect_ok(r, f"Adding database view to page"):
+            logging.info(f"✅ Added database view to page")
+            return True
+        else:
+            logging.error(f"Failed to add database view to page")
+            return False
+
+    except Exception as e:
+        logging.error(f"Error adding database view: {e}")
+        return False
+
+def add_letters_content_to_page(page_id: str, letters: List[Dict]) -> bool:
+    """Add letter templates as content blocks to the Letters page"""
+    try:
+        if not letters:
+            logging.info("No letters to add")
+            return True
+
+        logging.info(f"Adding {len(letters)} letter templates to page")
+
+        children = []
+
+        # Group letters by category
+        categories = {}
+        for letter in letters:
+            category = letter.get('Category', 'General')
+            if category not in categories:
+                categories[category] = []
+            categories[category].append(letter)
+
+        # Create content for each category
+        for category, category_letters in categories.items():
+            # Add category heading
+            children.append({
+                "heading_2": {
+                    "rich_text": [{"text": {"content": f"{category} Letters"}}]
+                }
+            })
+
+            # Add each letter as a toggle block
+            for letter in category_letters:
+                title = letter.get('Title', 'Untitled Letter')
+                audience = letter.get('Audience', '')
+                body = letter.get('Body', '')
+                prompt = letter.get('Prompt', '')
+                disclaimer = letter.get('Disclaimer', '')
+
+                # Create toggle with letter content
+                toggle_children = []
+
+                # Add audience info
+                if audience:
+                    toggle_children.append({
+                        "paragraph": {
+                            "rich_text": [
+                                {"text": {"content": "To: ", "annotations": {"bold": True}}},
+                                {"text": {"content": audience}}
+                            ]
+                        }
+                    })
+
+                # Add body
+                if body:
+                    toggle_children.append({
+                        "paragraph": {
+                            "rich_text": [{"text": {"content": body}}]
+                        }
+                    })
+
+                # Add customization prompt
+                if prompt:
+                    toggle_children.append({
+                        "callout": {
+                            "rich_text": [{"text": {"content": prompt}}],
+                            "icon": {"emoji": "💡"},
+                            "color": "blue_background"
+                        }
+                    })
+
+                # Add disclaimer
+                if disclaimer:
+                    toggle_children.append({
+                        "callout": {
+                            "rich_text": [{"text": {"content": disclaimer}}],
+                            "icon": {"emoji": "⚠️"},
+                            "color": "yellow_background"
+                        }
+                    })
+
+                # Create the toggle block
+                children.append({
+                    "toggle": {
+                        "rich_text": [{"text": {"content": f"📄 {title}"}}],
+                        "children": toggle_children
+                    }
+                })
+
+        # Split into chunks if needed (Notion has a 100-block limit per request)
+        chunk_size = 50
+        for i in range(0, len(children), chunk_size):
+            chunk = children[i:i+chunk_size]
+            payload = {"children": chunk}
+
+            r = req("PATCH", f"https://api.notion.com/v1/blocks/{page_id}/children",
+                    data=json.dumps(payload))
+
+            if not expect_ok(r, f"Adding letter templates chunk {i//chunk_size + 1}"):
+                logging.error(f"Failed to add letter templates chunk")
+                return False
+
+        logging.info(f"✅ Added all letter templates to page")
+        return True
+
+    except Exception as e:
+        logging.error(f"Error adding letters content: {e}")
+        return False
 
 def create_database(db_name: str, schema: Dict, state: DeploymentState,
                    parent_id: Optional[str] = None, skip_rollups: bool = False) -> Optional[str]:
@@ -1199,12 +1503,49 @@ def build_block(block_def) -> Dict:
     elif block_type == 'divider':
         return {"divider": {}}
     elif block_type == 'to_do':
-        return {
-            "to_do": {
-                "rich_text": [{"text": {"content": content}}],
-                "checked": block_def.get('checked', False)
+        # Handle complex to_do structure from YAML files
+        if 'to_do' in block_def:
+            to_do_data = block_def['to_do']
+            # Check if it has rich_text array structure
+            if 'rich_text' in to_do_data:
+                rich_text_array = []
+                for rt_item in to_do_data['rich_text']:
+                    if isinstance(rt_item, dict):
+                        if 'text' in rt_item and 'content' in rt_item['text']:
+                            rich_text_array.append({
+                                "text": {"content": rt_item['text']['content']}
+                            })
+                        elif 'type' in rt_item and rt_item['type'] == 'text':
+                            # Handle alternative format
+                            rich_text_array.append({
+                                "text": {"content": rt_item.get('text', {}).get('content', '')}
+                            })
+                    elif isinstance(rt_item, str):
+                        # If rich_text item is just a string
+                        rich_text_array.append({"text": {"content": rt_item}})
+
+                return {
+                    "to_do": {
+                        "rich_text": rich_text_array if rich_text_array else [{"text": {"content": content}}],
+                        "checked": to_do_data.get('checked', False)
+                    }
+                }
+            else:
+                # Fallback for simpler to_do structure
+                return {
+                    "to_do": {
+                        "rich_text": [{"text": {"content": to_do_data.get('content', content)}}],
+                        "checked": to_do_data.get('checked', False)
+                    }
+                }
+        else:
+            # Original simple to_do handling
+            return {
+                "to_do": {
+                    "rich_text": [{"text": {"content": content}}],
+                    "checked": block_def.get('checked', False)
+                }
             }
-        }
     elif block_type == 'bulleted_list':
         # Handle bulleted_list with items array - this is a special case
         # We need to return a list of blocks, not a single block
@@ -2156,14 +2497,72 @@ class NotionTemplateDeployer:
         
         return True
     
+    def deploy_page_content(self, yaml_data: Dict) -> bool:
+        """Add additional content to pages after databases are created
+
+        This includes:
+        - Letter templates on the Letters page
+        - Database views linked to relevant pages
+        - Additional rich content blocks
+        """
+        try:
+            logging.info("Deploying additional page content...")
+
+            # Add letters content to Letters page if it exists
+            if "Letters" in self.state.created_pages:
+                letters_page_id = self.state.created_pages["Letters"]
+                letters = yaml_data.get("letters", [])
+                if letters:
+                    logging.info(f"Adding {len(letters)} letter templates to Letters page")
+                    add_letters_content_to_page(letters_page_id, letters)
+
+            # Add database views to relevant pages
+            database_page_mappings = {
+                "Accounts": "Financial Accounts",
+                "Insurance": "Insurance",
+                "Properties": "Property & Assets",
+                "Contacts": "Contacts",
+                "Subscriptions": "Subscriptions",
+                "Digital Accounts": "Digital Accounts"
+            }
+
+            for db_name, page_title in database_page_mappings.items():
+                if db_name in self.state.created_databases and page_title in self.state.created_pages:
+                    database_id = self.state.created_databases[db_name]
+                    page_id = self.state.created_pages[page_title]
+                    logging.info(f"Linking database '{db_name}' to page '{page_title}'")
+                    add_database_view_to_page(page_id, database_id, f"{db_name} Database")
+
+            # Add any standalone database views to their parent pages
+            for db_data in yaml_data.get("standalone_databases", []):
+                db_title = db_data.get("title", "")
+                parent_page = db_data.get("parent", "")
+
+                if db_title in self.state.created_databases and parent_page in self.state.created_pages:
+                    database_id = self.state.created_databases[db_title]
+                    page_id = self.state.created_pages[parent_page]
+                    logging.info(f"Linking standalone database '{db_title}' to page '{parent_page}'")
+                    add_database_view_to_page(page_id, database_id, db_title)
+
+            logging.info("✅ Page content deployment complete")
+            return True
+
+        except Exception as e:
+            logging.error(f"Error deploying page content: {e}")
+            return False
+
     def apply_patches(self, yaml_data: Dict) -> bool:
         """Apply any patches or updates"""
         self.state.phase = DeploymentPhase.PATCHES
         self.progress.update(DeploymentPhase.PATCHES, "Applying patches")
-        
-        # TODO: Implement patch application logic
+
+        # First, deploy additional page content
+        if not self.deploy_page_content(yaml_data):
+            logging.warning("Failed to deploy some page content, continuing...")
+
+        # TODO: Implement other patch application logic
         # This could include updating properties, adding blocks, etc.
-        
+
         self.state.save_checkpoint()
         return True
     

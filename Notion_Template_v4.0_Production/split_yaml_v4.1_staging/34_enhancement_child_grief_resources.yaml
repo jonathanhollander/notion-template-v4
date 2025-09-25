@@ -1,0 +1,53 @@
+# Estate Planning Template v4.0 - 34: Enhancement - Child Grief Resources
+# Implements the suggestion from DATABASE_ENHANCEMENT_SUGGESTIONS.md
+# Output Directory: split_yaml_discovered_phase2/
+pages:
+  - title: "Guidance for Children & Teens (Enhanced)"
+    parent: "Family Support Center"
+    description: "A filterable database of resources to help younger family members navigate grief."
+    role: "family"
+    icon_file: "emoji:🧸"
+    blocks:
+      - type: heading_1
+        content: "Supporting Grieving Children & Teens"
+      - type: paragraph
+        content: "This resource center is designed to help you find the right support for the younger members of your family based on their age and needs. Use the filters to narrow down the resources."
+      - type: child_database
+        title: "Child Grief Support Resources"
+        database_ref: "Child Grief Support Resources"
+databases:
+  - title: "Child Grief Support Resources"
+    description: "A database of resources to help children and teens with grief."
+    properties:
+      Resource:
+        type: title
+        title: {}
+      Type:
+        type: select
+        select:
+          options:
+            - name: "Book"
+            - name: "Video"
+            - name: "Website"
+            - name: "Local Group"
+            - name: "Therapist"
+      Age Group:
+        type: multi_select
+        multi_select:
+          options:
+            - name: "Ages 3-6"
+              color: "green"
+            - name: "Ages 7-12"
+              color: "blue"
+            - name: "Ages 13-18"
+              color: "purple"
+      Link / Details:
+        type: url
+        url: {}
+      Notes:
+        type: rich_text
+        rich_text: {}
+    views:
+      - name: "All Resources"
+        type: "gallery"
+        group_by: "Age Group"

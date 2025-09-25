@@ -1,0 +1,165 @@
+# 16_letters_database.yaml
+complexity: moderate
+# Converts Letters into a proper database with realistic seeds.
+# Also creates a parallel "Letters – Library (Pages)" branch so subpages
+# exist even before any automations—satisfying both DB-first and page-first flows.
+
+db:
+  schemas:
+    "Letters":
+      properties:
+        Name: { type: title }
+        Recipient Type:
+          type: select
+          options: [Bank, Credit Card, Utility, Insurer, Employer, Other]
+        Purpose:
+          type: select
+          options: [Notification of Death, Close Account, Transfer Service, Benefits, Claim, Other]
+        Recipient Name: { type: rich_text }
+        Related Account/Page:
+          type: relation   # will be bound to Pages Index by deployer
+        Body: { type: rich_text }
+        Disclaimer: { type: rich_text }
+        Status:
+          type: select
+          options: [Draft, Ready, Sent, Follow-up Needed]
+        Last Sent: { type: date }
+
+  seed_rows:
+    "Letters":
+      - Name: "Credit Card — Notification of Death"
+        Recipient Type: "Credit Card"
+        Purpose: "Notification of Death"
+        Recipient Name: "Premier Card Services"
+        Related Page Title: "Account – Credit Card (Premier)"
+        Body: |
+          Re: Account {{Last 4 digits}} — Notification of Death
+
+          To whom it may concern,
+
+          I am writing to notify you of the death of {{Decedent Full Name}}, who held the above account. I am the appointed executor and request that the account be noted accordingly. Please provide the process for closing the account and the list of any required documents.
+
+          Attached/Available on request:
+          • Copy of death certificate
+          • Proof of executor appointment
+
+          Please direct future correspondence to:
+          {{Executor Name}}
+          {{Executor Address}}
+          {{Executor Phone}} • {{Executor Email}}
+
+          Thank you for your assistance.
+
+          Sincerely,
+          {{Executor Name}}
+        Disclaimer: "This is a general sample. Requirements vary by issuer. Confirm instructions before sending."
+        Status: "Draft"
+
+      - Name: "Bank — Account Transition/Closure"
+        Recipient Type: "Bank"
+        Purpose: "Close Account"
+        Recipient Name: "Wayfinder Community Bank — Estate Services"
+        Related Page Title: "Account – Checking (Everyday)"
+        Body: |
+          Re: {{Bank Name}} — {{Account Type}} — {{Last 4 digits}}
+
+          Dear {{Bank Name}} Estate Services,
+
+          I am notifying you of the death of {{Decedent Full Name}} and request guidance to transition or close the referenced account. I am the executor for the estate. Please provide required forms and next steps.
+
+          Included/Available:
+          • Death certificate
+          • Executor appointment
+          • Government-issued ID
+
+          Please confirm receipt and the expected timeline.
+
+          Sincerely,
+          {{Executor Name}} — Executor
+        Disclaimer: "General sample; verify bank-specific estate procedures."
+        Status: "Draft"
+
+      - Name: "Utility — Service Transfer/Closure"
+        Recipient Type: "Utility"
+        Purpose: "Transfer Service"
+        Recipient Name: "City Water & Power"
+        Related Page Title: "Property – Primary Residence (Maple St.)"
+        Body: |
+          Re: Service at {{Service Address}} — Account {{Account Number}}
+
+          Hello,
+
+          I’m writing to notify you of the death of {{Decedent Full Name}}. Please advise on closing or transferring this service and any final bill requirements.
+
+          Contact for this account:
+          {{Executor Name}} — Executor
+          {{Executor Phone}} • {{Executor Email}}
+
+          Thank you.
+        Disclaimer: "Confirm utility’s policy; some allow transfer with minimal documentation."
+        Status: "Draft"
+
+pages:
+  - title: "Letters – Library (Pages)"
+    icon: "emoji:📚"
+    description: "If you prefer working with pages, use these draft letters. The Letters database above holds the canonical versions."
+    children:
+      - title: "Letter – Credit Card Company (Notification of Death)"
+        icon: "emoji:✉️"
+        Body: |
+          Re: Account {{Last 4 digits}} — Notification of Death
+
+          To whom it may concern,
+
+          I am writing to notify you of the death of {{Decedent Full Name}}, who held the above account. I am the appointed executor and request that the account be noted accordingly. Please provide the process for closing the account and the list of any required documents.
+
+          Attached/Available on request:
+          • Copy of death certificate
+          • Proof of executor appointment
+
+          Please direct future correspondence to:
+          {{Executor Name}}
+          {{Executor Address}}
+          {{Executor Phone}} • {{Executor Email}}
+
+          Thank you for your assistance.
+
+          Sincerely,
+          {{Executor Name}}
+        Disclaimer: "This is a general sample. Requirements vary by issuer. Confirm instructions before sending."
+
+      - title: "Letter – Bank (Account Transition/Closure)"
+        icon: "emoji:✉️"
+        Body: |
+          Re: {{Bank Name}} — {{Account Type}} — {{Last 4 digits}}
+
+          Dear {{Bank Name}} Estate Services,
+
+          I am notifying you of the death of {{Decedent Full Name}} and request guidance to transition or close the referenced account. I am the executor for the estate. Please provide required forms and next steps.
+
+          Included/Available:
+          • Death certificate
+          • Executor appointment
+          • Government-issued ID
+
+          Please confirm receipt and the expected timeline.
+
+          Sincerely,
+          {{Executor Name}} — Executor
+        Disclaimer: "General sample; verify bank-specific estate procedures."
+
+      - title: "Letter – Utility Provider (Service Change/Closure)"
+        icon: "emoji:✉️"
+        Body: |
+          Re: Service at {{Service Address}} — Account {{Account Number}}
+
+          Hello,
+
+          I’m writing to notify you of the death of {{Decedent Full Name}}. Please advise on closing or transferring this service and any final bill requirements.
+
+          Contact for this account:
+          {{Executor Name}} — Executor
+          {{Executor Phone}} • {{Executor Email}}
+
+          Thank you.
+        Disclaimer: "Confirm utility’s policy; some allow transfer with minimal documentation."

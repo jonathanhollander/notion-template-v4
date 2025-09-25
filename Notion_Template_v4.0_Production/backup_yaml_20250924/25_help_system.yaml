@@ -1,0 +1,714 @@
+# Help System
+complexity: moderate
+
+pages:
+- title: Help Center
+  parent: Preparation Hub
+  icon: emoji:❓
+  description: Comprehensive help and support system
+  role: owner
+  blocks:
+    - type: heading_1
+      content: ❓ Estate Planning Help Center
+    - type: paragraph
+      content: Comprehensive help system with tooltips, FAQs, troubleshooting guides, and best practices for estate planning management.
+    
+    - type: heading_2
+      content: Quick Help Topics
+    - type: callout
+      icon: emoji:🚀
+      content: "Getting Started: Complete setup guide and first steps"
+      color: blue_background
+    - type: callout
+      icon: emoji:📋
+      content: "Task Management: How to create, track, and complete tasks"
+      color: green_background
+    - type: callout
+      icon: emoji:👥
+      content: "Family Coordination: Setting up access and sharing information"
+      color: yellow_background
+    - type: callout
+      icon: emoji:⚖️
+      content: "Legal Documents: Will, trust, and power of attorney guidance"
+      color: purple_background
+    
+    - type: heading_2
+      content: Emergency Quick Actions
+    - type: callout
+      icon: emoji:🚨
+      content: "URGENT: Death occurred - Click here for immediate action checklist"
+      color: red_background
+    - type: callout
+      icon: emoji:📞
+      content: "Emergency Contacts: Attorney, doctor, insurance, funeral director"
+      color: orange_background
+    - type: callout
+      icon: emoji:🏥
+      content: "Medical Emergency: Healthcare directives and medical power of attorney"
+      color: red_background
+
+- title: Contextual Help System
+  parent: Preparation Hub
+  icon: emoji:💡
+  description: Inline help tooltips and contextual guidance
+  role: owner
+  blocks:
+    - type: heading_1
+      content: 💡 Contextual Help System
+    - type: paragraph
+      content: Smart help tooltips and contextual guidance that appears throughout the estate planning system.
+    
+    - type: heading_2
+      content: Help Tooltip Categories
+    - type: toggle
+      content: Legal Terminology Help
+      blocks:
+        - type: paragraph
+          content: "Hover help for legal terms throughout the system:"
+        - type: bulleted_list_item
+          content: "Will vs Testament: Explanation of legal document differences"
+        - type: bulleted_list_item
+          content: "Power of Attorney: Types and when each is needed"
+        - type: bulleted_list_item
+          content: "Beneficiary vs Heir: Legal distinction and implications"
+        - type: bulleted_list_item
+          content: "Trust Types: Revocable vs irrevocable trust guidance"
+    
+    - type: toggle
+      content: Process Guidance
+      blocks:
+        - type: paragraph
+          content: "Step-by-step guidance for complex processes:"
+        - type: bulleted_list_item
+          content: "Document execution: Signing, witnessing, notarization requirements"
+        - type: bulleted_list_item
+          content: "Asset valuation: How to determine fair market value"
+        - type: bulleted_list_item
+          content: "Beneficiary updates: When and how to update designations"
+        - type: bulleted_list_item
+          content: "Professional coordination: Working with attorneys and financial advisors"
+    
+    - type: heading_2
+      content: Smart Help Features
+    - type: bulleted_list_item
+      content: "📍 Context-aware: Help appears based on current page and task"
+    - type: bulleted_list_item
+      content: "🎯 Progressive disclosure: Basic → intermediate → advanced help levels"
+    - type: bulleted_list_item
+      content: "🔍 Search integration: Help content indexed for quick search"
+    - type: bulleted_list_item
+      content: "📱 Mobile-optimized: Help tooltips work on all devices"
+
+- title: FAQ Center
+  parent: Executor Hub
+  icon: emoji:❓
+  description: Frequently asked questions and comprehensive answers
+  role: executor
+  blocks:
+    - type: heading_1
+      content: ❓ Frequently Asked Questions
+    - type: paragraph
+      content: Comprehensive answers to common estate planning questions organized by category.
+    
+    - type: heading_2
+      content: Estate Planning Basics
+    - type: toggle
+      content: What is the difference between a will and a trust?
+      blocks:
+        - type: paragraph
+          content: "A will is a legal document that directs how your assets will be distributed after death and goes through probate court. A trust is a legal entity that holds assets during your lifetime and can distribute them without probate, providing privacy and potentially reducing costs."
+    
+    - type: toggle
+      content: Do I need an attorney to create estate planning documents?
+      blocks:
+        - type: paragraph
+          content: "While not legally required, working with an estate planning attorney is highly recommended for most situations. They ensure documents comply with state laws, are properly executed, and address your specific circumstances. Simple situations might use online tools, but complex estates benefit from professional guidance."
+    
+    - type: toggle
+      content: How often should I update my estate plan?
+      blocks:
+        - type: paragraph
+          content: "Review your estate plan every 3-5 years or after major life events: marriage, divorce, birth/adoption, death of beneficiary, significant asset changes, or moves to different states. Tax law changes may also trigger updates."
+    
+    - type: heading_2
+      content: Digital Assets and Technology
+    - type: toggle
+      content: How do I handle digital assets like cryptocurrency and online accounts?
+      blocks:
+        - type: paragraph
+          content: "Create a digital asset inventory including accounts, passwords (stored securely), and instructions for executors. Consider using password managers, digital legacy services, and specific provisions in your will for digital assets. Include social media account memorialization preferences."
+    
+    - type: toggle
+      content: Can family members access this estate planning system?
+      blocks:
+        - type: paragraph
+          content: "Yes, the Family Hub provides controlled access for family members to view relevant information without access to sensitive details. You control what information is shared and can grant different access levels to different family members."
+    
+    - type: heading_2
+      content: Professional Coordination
+    - type: toggle
+      content: How do I choose the right professionals for my estate planning team?
+      blocks:
+        - type: paragraph
+          content: "Select professionals based on: estate complexity, specializations needed, geographic location, communication style, fee structure, and referrals. Your team typically includes an estate attorney, financial advisor, CPA, and possibly insurance professionals."
+
+- title: Troubleshooting Guide
+  parent: Executor Hub
+  icon: emoji:🔧
+  description: Problem resolution and technical support
+  role: executor
+  blocks:
+    - type: heading_1
+      content: 🔧 Troubleshooting Guide
+    - type: paragraph
+      content: Step-by-step solutions for common issues and technical problems.
+    
+    - type: heading_2
+      content: Common Issues and Solutions
+    - type: toggle
+      content: Documents won't upload or display
+      blocks:
+        - type: numbered_list_item
+          content: "Check file size (max 25MB for most file types)"
+        - type: numbered_list_item
+          content: "Verify file format (PDF, DOC, JPG, PNG supported)"
+        - type: numbered_list_item
+          content: "Try refreshing your browser page"
+        - type: numbered_list_item
+          content: "Clear browser cache and cookies"
+        - type: numbered_list_item
+          content: "Try uploading from a different browser or device"
+    
+    - type: toggle
+      content: Family members can't access shared information
+      blocks:
+        - type: numbered_list_item
+          content: "Verify sharing permissions are enabled for that family member"
+        - type: numbered_list_item
+          content: "Check that they're using the correct login credentials"
+        - type: numbered_list_item
+          content: "Confirm their email address is correctly entered in the system"
+        - type: numbered_list_item
+          content: "Have them check spam folder for invitation emails"
+    
+    - type: toggle
+      content: Formulas or calculations appear incorrect
+      blocks:
+        - type: numbered_list_item
+          content: "Verify all required fields are completed"
+        - type: numbered_list_item
+          content: "Check for empty or zero values that might affect calculations"
+        - type: numbered_list_item
+          content: "Ensure date formats are consistent"
+        - type: numbered_list_item
+          content: "Refresh the page to recalculate formulas"
+    
+    - type: heading_2
+      content: Professional Support Escalation
+    - type: callout
+      icon: emoji:📞
+      content: "Technical Issues: Contact your estate planning attorney or system administrator"
+      color: blue_background
+    - type: callout
+      icon: emoji:⚖️
+      content: "Legal Questions: Consult with your estate planning attorney - never rely solely on system guidance"
+      color: red_background
+    - type: callout
+      icon: emoji:🚨
+      content: "Emergency Situations: Call 911 for medical emergencies, then follow estate plan emergency procedures"
+      color: red_background
+
+- title: Video Learning Center
+  parent: Family Hub
+  icon: emoji:🎥
+  description: Video tutorials and educational content placeholders
+  role: family
+  blocks:
+    - type: heading_1
+      content: 🎥 Video Learning Center
+    - type: paragraph
+      content: Educational videos and tutorials to help family members understand and use the estate planning system.
+    
+    - type: heading_2
+      content: Getting Started Videos
+    - type: callout
+      icon: emoji:▶️
+      content: "Video: Estate Planning System Overview (5 minutes) [PLACEHOLDER - Add video link]"
+      color: blue_background
+    - type: callout
+      icon: emoji:▶️
+      content: "Video: How to Access Your Family Information (3 minutes) [PLACEHOLDER - Add video link]"
+      color: blue_background
+    - type: callout
+      icon: emoji:▶️
+      content: "Video: Understanding Your Role in the Estate Plan (7 minutes) [PLACEHOLDER - Add video link]"
+      color: blue_background
+    
+    - type: heading_2
+      content: Educational Content
+    - type: callout
+      icon: emoji:📚
+      content: "Video: Estate Planning Basics for Families (12 minutes) [PLACEHOLDER - Add video link]"
+      color: green_background
+    - type: callout
+      icon: emoji:📚
+      content: "Video: What Happens When Someone Dies (10 minutes) [PLACEHOLDER - Add video link]"
+      color: green_background
+    - type: callout
+      icon: emoji:📚
+      content: "Video: Digital Legacy and Online Accounts (8 minutes) [PLACEHOLDER - Add video link]"
+      color: green_background
+    
+    - type: heading_2
+      content: How-To Tutorials
+    - type: callout
+      icon: emoji:🔧
+      content: "Video: How to Update Your Contact Information (2 minutes) [PLACEHOLDER - Add video link]"
+      color: yellow_background
+    - type: callout
+      icon: emoji:🔧
+      content: "Video: How to Add Memory Content (4 minutes) [PLACEHOLDER - Add video link]"
+      color: yellow_background
+    - type: callout
+      icon: emoji:🔧
+      content: "Video: How to Use Emergency Procedures (6 minutes) [PLACEHOLDER - Add video link]"
+      color: yellow_background
+    
+    - type: heading_2
+      content: Video Production Notes
+    - type: paragraph
+      content: "All videos should be professionally produced with captions for accessibility. Consider creating versions in multiple languages for international families. Keep videos under 10 minutes for better engagement."
+
+- title: Best Practices Guide
+  parent: Family Hub
+  icon: emoji:⭐
+  description: Recommended practices and optimization tips
+  role: family
+  blocks:
+    - type: heading_1
+      content: ⭐ Estate Planning Best Practices
+    - type: paragraph
+      content: Recommended practices and expert tips for effective estate planning management.
+    
+    - type: heading_2
+      content: Document Management Best Practices
+    - type: bulleted_list_item
+      content: "📁 Keep original documents in fireproof safe, copies in system"
+    - type: bulleted_list_item
+      content: "📋 Update documents immediately after major life changes"
+    - type: bulleted_list_item
+      content: "🔄 Review and refresh all documents every 3-5 years"
+    - type: bulleted_list_item
+      content: "👥 Ensure executors and trustees have access to necessary documents"
+    - type: bulleted_list_item
+      content: "📧 Notify professionals immediately of any document changes"
+    
+    - type: heading_2
+      content: Family Communication Best Practices
+    - type: bulleted_list_item
+      content: "💬 Hold annual family meetings to discuss estate plan updates"
+    - type: bulleted_list_item
+      content: "📖 Educate family members about their roles and responsibilities"
+    - type: bulleted_list_item
+      content: "🎯 Set clear expectations about inheritance and distributions"
+    - type: bulleted_list_item
+      content: "📝 Document family stories and values for future generations"
+    - type: bulleted_list_item
+      content: "🤝 Address conflicts openly and consider family mediation if needed"
+    
+    - type: heading_2
+      content: Security and Privacy Best Practices
+    - type: callout
+      icon: emoji:🔒
+      content: "Password Security: Use unique, strong passwords and enable two-factor authentication"
+      color: red_background
+    - type: callout
+      icon: emoji:🛡️
+      content: "Information Sharing: Only share sensitive information with trusted family members and professionals"
+      color: yellow_background
+    - type: callout
+      icon: emoji:📱
+      content: "Device Security: Keep devices updated and use secure networks for accessing estate information"
+      color: blue_background
+    
+    - type: heading_2
+      content: Professional Relationship Best Practices
+    - type: numbered_list_item
+      content: "Maintain regular communication with your estate planning team"
+    - type: numbered_list_item
+      content: "Provide annual updates on asset changes and family situations"
+    - type: numbered_list_item
+      content: "Ask questions and seek clarification on complex matters"
+    - type: numbered_list_item
+      content: "Keep detailed records of all professional consultations"
+    - type: numbered_list_item
+      content: "Review and update professional contact information annually"
+
+# Interactive Content Systems - Phase 1.3: Advanced Progressive Disclosure
+- title: Advanced Estate Planning Guidance
+  parent: Help Center
+  icon: emoji:🎯
+  description: Sophisticated guidance system with progressive disclosure and contextual help
+  role: owner
+  blocks:
+    - type: heading_1
+      content: 🎯 Advanced Estate Planning Guidance
+    - type: paragraph
+      content: Comprehensive guidance system that adapts to your progress and provides contextual help at every step.
+
+    - type: heading_2
+      content: Interactive Planning Modules
+
+    # Progressive Disclosure Module 1: Estate Size Assessment
+    - type: toggle
+      content: "💰 Estate Size Assessment & Tax Planning"
+      blocks:
+        - type: paragraph
+          content: "Determine your estate's size and tax implications through progressive questions."
+
+        - type: toggle
+          content: "Step 1: Basic Asset Calculation"
+          blocks:
+            - type: paragraph
+              content: "Start with these fundamental calculations:"
+            - type: to_do
+              to_do:
+                rich_text:
+                  - type: text
+                    text:
+                      content: "List all bank accounts and current balances"
+                checked: false
+            - type: to_do
+              to_do:
+                rich_text:
+                  - type: text
+                    text:
+                      content: "Value investment and retirement accounts"
+                checked: false
+            - type: to_do
+              to_do:
+                rich_text:
+                  - type: text
+                    text:
+                      content: "Estimate real estate fair market value"
+                checked: false
+
+            # Nested progressive disclosure
+            - type: toggle
+              content: "💡 Need Help Valuing Assets?"
+              blocks:
+                - type: paragraph
+                  content: "Professional valuation resources:"
+                - type: bulleted_list_item
+                  content: "Real Estate: Use Zillow/Redfin estimates or hire appraiser"
+                - type: bulleted_list_item
+                  content: "Business Interests: Require professional business valuation"
+                - type: bulleted_list_item
+                  content: "Collectibles: Certified appraisal for items over $3,000"
+                - type: bulleted_list_item
+                  content: "Investments: Use current market value from statements"
+
+        - type: toggle
+          content: "Step 2: Debt Assessment"
+          blocks:
+            - type: to_do
+              to_do:
+                rich_text:
+                  - type: text
+                    text:
+                      content: "Calculate total mortgage balances"
+                checked: false
+            - type: to_do
+              to_do:
+                rich_text:
+                  - type: text
+                    text:
+                      content: "List credit card and consumer debt"
+                checked: false
+            - type: to_do
+              to_do:
+                rich_text:
+                  - type: text
+                    text:
+                      content: "Include business debts and obligations"
+                checked: false
+
+        - type: toggle
+          content: "Step 3: Net Estate Calculation"
+          blocks:
+            - type: paragraph
+              content: "Your net estate determines tax implications:"
+            - type: callout
+              icon: emoji:✅
+              content: "Estate under $12.92 million (2023): No federal estate tax"
+              color: green_background
+            - type: callout
+              icon: emoji:⚠️
+              content: "Estate $12.92M - $50M: Moderate tax planning needed"
+              color: yellow_background
+            - type: callout
+              icon: emoji:🚨
+              content: "Estate over $50M: Advanced tax strategies essential"
+              color: red_background
+
+            # Advanced nested disclosure
+            - type: toggle
+              content: "🔍 Advanced Tax Strategies (High Net Worth)"
+              blocks:
+                - type: paragraph
+                  content: "For estates over $12.92 million, consider:"
+                - type: bulleted_list_item
+                  content: "Grantor Retained Annuity Trusts (GRATs)"
+                - type: bulleted_list_item
+                  content: "Charitable Lead Annuity Trusts (CLATs)"
+                - type: bulleted_list_item
+                  content: "Intentionally Defective Grantor Trusts (IDGTs)"
+                - type: bulleted_list_item
+                  content: "Annual gifting strategies"
+
+                - type: toggle
+                  content: "⚖️ When to Hire Estate Tax Attorney"
+                  blocks:
+                    - type: paragraph
+                      content: "Immediate consultation needed if:"
+                    - type: bulleted_list_item
+                      content: "Net worth exceeds $10 million"
+                    - type: bulleted_list_item
+                      content: "Complex business ownership structures"
+                    - type: bulleted_list_item
+                      content: "Significant charitable giving goals"
+                    - type: bulleted_list_item
+                      content: "Multi-generational wealth transfer plans"
+
+    # Progressive Disclosure Module 2: Family Situation Analysis
+    - type: toggle
+      content: "👨‍👩‍👧‍👦 Family Situation Analysis"
+      blocks:
+        - type: paragraph
+          content: "Tailor your estate plan to your unique family circumstances."
+
+        - type: toggle
+          content: "Traditional Nuclear Family"
+          blocks:
+            - type: paragraph
+              content: "Straightforward planning considerations:"
+            - type: bulleted_list_item
+              content: "Simple will with spouse as primary beneficiary"
+            - type: bulleted_list_item
+              content: "Guardian nominations for minor children"
+            - type: bulleted_list_item
+              content: "Basic trust considerations for minors"
+            - type: bulleted_list_item
+              content: "Joint ownership strategies"
+
+            - type: toggle
+              content: "🔍 Minor Children Considerations"
+              blocks:
+                - type: paragraph
+                  content: "Special provisions for families with minors:"
+                - type: toggle
+                  content: "Guardian Selection Process"
+                  blocks:
+                    - type: bulleted_list_item
+                      content: "Interview potential guardians thoroughly"
+                    - type: bulleted_list_item
+                      content: "Consider geographic location preferences"
+                    - type: bulleted_list_item
+                      content: "Discuss parenting philosophy alignment"
+                    - type: bulleted_list_item
+                      content: "Plan for financial support of guardians"
+
+                - type: toggle
+                  content: "Trust Setup for Minors"
+                  blocks:
+                    - type: bulleted_list_item
+                      content: "Age-based distribution schedules (e.g., 25, 30, 35)"
+                    - type: bulleted_list_item
+                      content: "Educational spending provisions"
+                    - type: bulleted_list_item
+                      content: "Health and maintenance standards"
+                    - type: bulleted_list_item
+                      content: "Trustee selection and succession"
+
+        - type: toggle
+          content: "Blended Family Situations"
+          blocks:
+            - type: paragraph
+              content: "Complex family structures require careful planning:"
+            - type: callout
+              icon: emoji:⚠️
+              content: "Blended families have unique challenges - professional guidance strongly recommended"
+              color: yellow_background
+
+            - type: toggle
+              content: "Current Spouse vs Children from Previous Marriage"
+              blocks:
+                - type: paragraph
+                  content: "Balance competing interests:"
+                - type: bulleted_list_item
+                  content: "QTIP trust for spouse with remainder to children"
+                - type: bulleted_list_item
+                  content: "Life insurance for children's inheritance"
+                - type: bulleted_list_item
+                  content: "Separate property identification"
+                - type: bulleted_list_item
+                  content: "Prenuptial agreement considerations"
+
+            - type: toggle
+              content: "Step-Children and Adoption"
+              blocks:
+                - type: bulleted_list_item
+                  content: "Formal adoption creates full inheritance rights"
+                - type: bulleted_list_item
+                  content: "Step-children have NO automatic inheritance rights"
+                - type: bulleted_list_item
+                  content: "Explicit naming required in will and trusts"
+                - type: bulleted_list_item
+                  content: "Consider equal vs proportionate treatment"
+
+        - type: toggle
+          content: "Single Parent Households"
+          blocks:
+            - type: paragraph
+              content: "Single parents need comprehensive backup plans:"
+            - type: bulleted_list_item
+              content: "Multiple guardian options and detailed preferences"
+            - type: bulleted_list_item
+              content: "Robust trustee selection for financial management"
+            - type: bulleted_list_item
+              content: "Detailed child-rearing instructions"
+            - type: bulleted_list_item
+              content: "Strong healthcare directive provisions"
+
+        - type: toggle
+          content: "Adult Children with Special Needs"
+          blocks:
+            - type: callout
+              icon: emoji:🩺
+              content: "Special needs planning requires specialized legal expertise"
+              color: blue_background
+
+            - type: toggle
+              content: "Special Needs Trust Considerations"
+              blocks:
+                - type: paragraph
+                  content: "Protect government benefits while providing support:"
+                - type: bulleted_list_item
+                  content: "First-party vs third-party special needs trusts"
+                - type: bulleted_list_item
+                  content: "ABLE account coordination"
+                - type: bulleted_list_item
+                  content: "Medicaid planning implications"
+                - type: bulleted_list_item
+                  content: "Future care coordination"
+
+    # Progressive Disclosure Module 3: Advanced Document Strategy
+    - type: toggle
+      content: "📚 Advanced Document Strategy"
+      blocks:
+        - type: paragraph
+          content: "Beyond basic documents - sophisticated estate planning tools."
+
+        - type: toggle
+          content: "Revocable Trust Decision Tree"
+          blocks:
+            - type: paragraph
+              content: "Do you need a revocable living trust? Work through these questions:"
+
+            - type: toggle
+              content: "✅ Strong Candidates for Revocable Trust"
+              blocks:
+                - type: bulleted_list_item
+                  content: "Net worth over $300,000"
+                - type: bulleted_list_item
+                  content: "Real estate in multiple states"
+                - type: bulleted_list_item
+                  content: "Privacy concerns about probate"
+                - type: bulleted_list_item
+                  content: "Desire for incapacity management"
+                - type: bulleted_list_item
+                  content: "Complex family situations requiring ongoing management"
+
+            - type: toggle
+              content: "❌ Poor Candidates for Revocable Trust"
+              blocks:
+                - type: bulleted_list_item
+                  content: "Simple estates under $100,000"
+                - type: bulleted_list_item
+                  content: "All assets have beneficiary designations"
+                - type: bulleted_list_item
+                  content: "Cost concerns override benefits"
+                - type: bulleted_list_item
+                  content: "Unwillingness to transfer asset ownership"
+
+            - type: toggle
+              content: "🤔 Borderline Cases - Need Professional Analysis"
+              blocks:
+                - type: bulleted_list_item
+                  content: "Net worth $100,000 - $300,000"
+                - type: bulleted_list_item
+                  content: "Primarily retirement accounts and life insurance"
+                - type: bulleted_list_item
+                  content: "Young families with growing assets"
+                - type: bulleted_list_item
+                  content: "Business owners with fluctuating values"
+
+        - type: toggle
+          content: "Advanced Trust Strategies"
+          blocks:
+            - type: paragraph
+              content: "Sophisticated trust planning for specific goals:"
+
+            - type: toggle
+              content: "Asset Protection Trusts"
+              blocks:
+                - type: paragraph
+                  content: "Consider for high-risk professions:"
+                - type: bulleted_list_item
+                  content: "Domestic Asset Protection Trusts (DAPTs)"
+                - type: bulleted_list_item
+                  content: "Offshore trust considerations"
+                - type: bulleted_list_item
+                  content: "Professional liability protection"
+                - type: bulleted_list_item
+                  content: "Fraudulent transfer timing rules"
+
+            - type: toggle
+              content: "Generation-Skipping Strategies"
+              blocks:
+                - type: paragraph
+                  content: "Multi-generational wealth transfer:"
+                - type: bulleted_list_item
+                  content: "Dynasty trust structures"
+                - type: bulleted_list_item
+                  content: "GST tax exemption optimization"
+                - type: bulleted_list_item
+                  content: "Rule against perpetuities considerations"
+                - type: bulleted_list_item
+                  content: "Distribution standards for multiple generations"
+
+    - type: heading_2
+      content: Contextual Help Triggers
+    - type: paragraph
+      content: "Smart guidance appears based on your specific circumstances and progress."
+
+    - type: callout
+      icon: emoji:💡
+      content: "SMART TIP: This help system adapts to your entries. Complete basic information first to unlock personalized guidance."
+      color: blue_background
+
+    - type: toggle
+      content: "How Contextual Help Works"
+      blocks:
+        - type: paragraph
+          content: "The system provides targeted advice based on:"
+        - type: bulleted_list_item
+          content: "Estate size and complexity level"
+        - type: bulleted_list_item
+          content: "Family composition and special circumstances"
+        - type: bulleted_list_item
+          content: "Geographic location and state law variations"
+        - type: bulleted_list_item
+          content: "Professional team composition and gaps"
+        - type: bulleted_list_item
+          content: "Document completion status and next steps"

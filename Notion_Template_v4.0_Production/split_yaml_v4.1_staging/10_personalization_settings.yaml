@@ -1,0 +1,38 @@
+# 10_personalization_settings.yaml
+complexity: moderate
+# Personalization baseline without new script logic.
+# Adds an Admin Settings page and patches Acceptance DB with an "Estate Complexity" selector.
+pages:
+  - title: "Admin – Settings"
+    icon: "emoji:⚙️"
+    description: "Set foundational options before sharing the template. Delete Admin branch before handoff."
+    body:
+      - type: callout
+        icon: "emoji:⚠️"
+        color: gray_background
+        text: "ADMIN_ONLY • SETTINGS_MARKER • Choose Estate Complexity to guide which executor task packs you keep."
+      - type: toggle
+        summary: "Estate Complexity (choose one)"
+        children:
+          - type: bulleted_list
+            items:
+              - "Simple — few accounts/assets, single property, straightforward will"
+              - "Moderate — multiple accounts/assets, property + insurance claims"
+              - "Complex — businesses, multiple properties, trusts, tax planning"
+      - type: paragraph
+        text: "After choosing, keep the matching executor task pack (see 'Executor Task Packs') and archive/delete the others."
+
+acceptance:
+  rows:
+    - Title: "Set Estate Complexity (Simple/Moderate/Complex)"
+      Section: "Admin"
+      Status: "Not Started"
+      Role: "Owner"
+
+db:
+  property_patches:
+    "Setup & Acceptance":
+      add_properties:
+        "Estate Complexity":
+          type: select
+          options: [Simple, Moderate, Complex]
