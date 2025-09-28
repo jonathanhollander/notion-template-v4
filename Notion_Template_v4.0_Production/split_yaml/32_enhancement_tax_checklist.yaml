@@ -2,7 +2,7 @@
 # Implements the suggestion from DATABASE_ENHANCEMENT_SUGGESTIONS.md
 # Output Directory: split_yaml_discovered_phase2/
 pages:
-  - title: "Tax Preparation Center (Enhanced)"
+  - title: "Tax Preparation Center"
     parent: "Legal & Financial Command Center"
     description: "Guidance and a checklist for managing final tax obligations."
     role: "executor"

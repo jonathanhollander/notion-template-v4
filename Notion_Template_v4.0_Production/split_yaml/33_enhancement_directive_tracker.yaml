@@ -2,7 +2,7 @@
 # Implements the suggestion from DATABASE_ENHANCEMENT_SUGGESTIONS.md
 # Output Directory: split_yaml_discovered_phase2/
 pages:
-  - title: "Advanced Directives Wizard (Enhanced)"
+  - title: "Advanced Directives Wizard"
     parent: "Health & Care Command Center"
     description: "A guided wizard with a status tracker for creating and finalizing your advance directives."
     role: "owner"

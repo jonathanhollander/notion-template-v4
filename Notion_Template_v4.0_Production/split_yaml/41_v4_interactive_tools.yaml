@@ -3,7 +3,7 @@
 # Output Directory: split_yaml_discovered_phase2/
 pages:
   - title: "Service Checklist & Timeline"
-    parent: "Life Story & Guidance"
+    parent: "Executor Hub"
     description: "A checklist and timeline for planning a memorial service, including an interactive budget tool."
     role: "family"
     icon_file: "emoji:🗓️"

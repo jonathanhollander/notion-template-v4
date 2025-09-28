@@ -3,6 +3,7 @@ complexity: moderate
 # Admin-only rollout helpers. Delete this branch before sharing.
 pages:
   - title: "Admin – Rollout"
+    parent: "Admin Hub"
     icon: "emoji:🧩"
     description: "Admin-only setup workspace. Complete these steps, verify Rollout Summary hits 100%, then delete this branch."
     hub: false

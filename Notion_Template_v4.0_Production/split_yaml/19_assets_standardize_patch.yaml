@@ -4,6 +4,7 @@ complexity: moderate
 
 pages:
   - title: "Admin – Visual Assets"
+    parent: "Admin Hub"
     icon: "emoji:🖼️"
     description: "Keep icons and covers consistent across the workspace. Delete before sharing."
     body:

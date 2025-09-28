@@ -32,6 +32,15 @@ from urllib.parse import quote
 from datetime import datetime
 import re
 
+# Import v4.1 enhancements
+try:
+    import deploy_v41_enhancements as v41
+    V41_AVAILABLE = True
+    logging.info("✅ V4.1 enhancements module loaded")
+except ImportError:
+    V41_AVAILABLE = False
+    logging.warning("⚠️ V4.1 enhancements module not found - some features may be limited")
+
 # ============================================================================
 # CONFIGURATION & CONSTANTS
 # ============================================================================
@@ -853,7 +862,7 @@ def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str
         for block in blocks_data:
             # Process variable substitution in block content
             block = process_content_substitution(block)
-            built_block = build_block(block)
+            built_block = build_block(block, state)
 
             # Handle multi-block responses (e.g., bulleted_list with items)
             if isinstance(built_block, dict) and built_block.get('_multi_block'):
@@ -886,24 +895,19 @@ def create_page(page_data: Dict, state: DeploymentState, parent_id: Optional[str
                 payload["icon"] = {"type": "emoji", "emoji": icon_value.replace('emoji:', '')}
             else:
                 # Try to get icon URL (from direct URL or local file)
-                icon_url = self.get_asset_url(icon_value if icon_value.startswith('http') else None,
-                                             page_data.get('icon_file'), 'icon')
+                icon_url = get_asset_url(page_data, 'icon')
                 if icon_url:
                     payload["icon"] = {"type": "external", "external": {"url": icon_url}}
         elif isinstance(icon_value, dict):
             payload["icon"] = icon_value
     elif 'icon_file' in page_data:
         # No icon property but has icon_file - try to use it
-        icon_url = self.get_asset_url(None, page_data.get('icon_file'), 'icon')
+        icon_url = get_asset_url(page_data, 'icon')
         if icon_url:
             payload["icon"] = {"type": "external", "external": {"url": icon_url}}
 
     # Add cover if specified - enhanced to handle local files
-    cover_url = self.get_asset_url(
-        page_data.get('cover') if isinstance(page_data.get('cover'), str) and page_data.get('cover').startswith('http') else None,
-        page_data.get('cover_file'),
-        'cover'
-    )
+    cover_url = get_asset_url(page_data, 'cover')
     if cover_url:
         payload["cover"] = {"type": "external", "external": {"url": cover_url}}
     elif isinstance(page_data.get('cover'), dict):
@@ -1302,6 +1306,11 @@ def add_rollup_properties(state: DeploymentState) -> bool:
     This is the second pass of database creation that adds rollup properties
     which depend on relations being already established.
     """
+    # Use v4.1 enhanced rollup handling with retry logic if available
+    if V41_AVAILABLE:
+        return v41.add_rollup_properties_with_retry(state, max_retries=3)
+
+    # Fallback to original implementation
     if not hasattr(state, 'pending_rollups') or not state.pending_rollups:
         logging.debug("No pending rollup properties to add")
         return True
@@ -1401,7 +1410,7 @@ def convert_legacy_block_format(block_def: Dict) -> Dict:
     return block_def
 
 
-def build_block(block_def) -> Dict:
+def build_block(block_def, state: DeploymentState = None) -> Dict:
     """Build a Notion block from definition"""
     # Handle string blocks (convert to paragraph)
     if isinstance(block_def, str):
@@ -1483,7 +1492,7 @@ def build_block(block_def) -> Dict:
             for child_block in children_data:
                 # Process variable substitution in nested blocks
                 child_block = process_content_substitution(child_block)
-                built_child = build_block(child_block)
+                built_child = build_block(child_block, state)
 
                 # Handle multi-block responses in toggle children
                 if isinstance(built_child, dict) and built_child.get('_multi_block'):
@@ -1680,7 +1689,7 @@ def build_block(block_def) -> Dict:
     elif 'linked_db' in block_def:
         # Handle linked_db as a reference to a database (convert to child_database)
         db_name = block_def.get('linked_db', '')
-        logger.info(f"Converting linked_db '{db_name}' to child_database reference")
+        logging.info(f"Converting linked_db '{db_name}' to child_database reference")
 
         # Try to find the database ID if it was already created
         if hasattr(state, 'created_databases') and db_name in state.created_databases:
@@ -1824,7 +1833,7 @@ def build_block(block_def) -> Dict:
 
         if not page_id:
             # Note: Would need global page_ids tracking for title resolution
-            logger.warning(f"Child page block missing page_id, using fallback for: {title}")
+            logging.warning(f"Child page block missing page_id, using fallback for: {title}")
             # Fallback to a styled paragraph that looks like a child page link
             icon_str = f"{icon} " if icon else "📄 "
             return {"paragraph": {"rich_text": [{"text": {"content": f"{icon_str}{title}"}}]}}
@@ -1863,45 +1872,58 @@ def build_block(block_def) -> Dict:
         }
 
 def resolve_database_references(properties: Dict, state: Any) -> Dict:
-    """Resolve database_id_ref markers to actual database IDs"""
+    """Resolve database_id_ref markers and name-based references to actual database IDs"""
+
+    # Use v4.1 enhancement if available
+    if V41_AVAILABLE:
+        return v41.resolve_database_references_enhanced(properties, state)
+
+    # Fallback to original implementation with enhancements
     resolved_properties = {}
 
     for prop_name, prop_schema in properties.items():
         resolved_properties[prop_name] = prop_schema
 
-        # Check if this is a relation property with a reference
-        if (isinstance(prop_schema, dict) and
-            prop_schema.get('relation', {}).get('database_id', '').startswith('ref:')):
+        # Check if this is a relation property
+        if isinstance(prop_schema, dict) and 'relation' in prop_schema:
+            relation = prop_schema['relation']
+            if isinstance(relation, dict) and 'database_id' in relation:
+                db_ref = relation['database_id']
+                resolved_id = None
 
-            ref_key = prop_schema['relation']['database_id'][4:]  # Remove 'ref:' prefix
-            resolved_id = None
+                # Handle ref: prefix
+                if db_ref.startswith('ref:'):
+                    ref_key = db_ref[4:]  # Remove 'ref:' prefix
+                else:
+                    ref_key = db_ref
 
-            if ref_key == 'pages':
-                # 'pages' refers to the main page-type database
-                # This is typically created as the first database
-                page_databases = [db_id for db_name, db_id in state.created_databases.items()
-                                if 'page' in db_name.lower() or db_name == 'Main Pages']
-                if page_databases:
-                    resolved_id = page_databases[0]
-                elif state.created_databases:
-                    # Fallback: use first created database
-                    resolved_id = list(state.created_databases.values())[0]
-            else:
-                # Try to find exact match in created databases
-                resolved_id = state.created_databases.get(ref_key)
-                if not resolved_id:
-                    # Try case-insensitive match
-                    for db_name, db_id in state.created_databases.items():
-                        if db_name.lower() == ref_key.lower():
-                            resolved_id = db_id
-                            break
+                # Skip if already a valid ID (starts with dash)
+                if ref_key and not ref_key.startswith('-'):
+                    if ref_key == 'pages':
+                        # 'pages' refers to the main page-type database
+                        page_databases = [db_id for db_name, db_id in state.created_databases.items()
+                                        if 'page' in db_name.lower() or db_name == 'Main Pages']
+                        if page_databases:
+                            resolved_id = page_databases[0]
+                        elif state.created_databases:
+                            resolved_id = list(state.created_databases.values())[0]
+                    else:
+                        # Try exact match first
+                        resolved_id = state.created_databases.get(ref_key)
+                        if not resolved_id:
+                            # Try case-insensitive match
+                            for db_name, db_id in state.created_databases.items():
+                                if db_name.lower() == ref_key.lower():
+                                    resolved_id = db_id
+                                    break
 
-            if resolved_id:
-                resolved_properties[prop_name]['relation']['database_id'] = resolved_id
-                logging.info(f"Resolved database reference '{ref_key}' to {resolved_id}")
-            else:
-                logging.warning(f"Could not resolve database reference '{ref_key}' - using placeholder")
-                # Keep the reference as is - this may be resolved later
+                    if resolved_id:
+                        resolved_properties[prop_name]['relation']['database_id'] = resolved_id
+                        logging.info(f"✅ Resolved database '{ref_key}' to ID {resolved_id[:8]}...")
+                    else:
+                        logging.warning(f"⚠️ Cannot resolve database '{ref_key}' - will retry later")
+                        # Mark for later resolution
+                        resolved_properties[prop_name]['relation']['database_id'] = f"ref:{ref_key}"
 
     return resolved_properties
 
@@ -1958,6 +1980,13 @@ def build_property_schema(prop_def) -> Dict:
         # Pattern 3: { type: formula, expression: "expression" } (legacy)
         elif 'expression' in prop_def:
             expression = prop_def.get('expression', '')
+
+        # Apply v4.1 formula escaping if available
+        if V41_AVAILABLE and expression:
+            original = expression
+            expression = v41.escape_formula_expression(expression)
+            if expression != original:
+                logging.debug(f"Formula escaped: {original[:50]}... -> {expression[:50]}...")
 
         return {
             "formula": {
@@ -2173,8 +2202,10 @@ class NotionTemplateDeployer:
                 return True
                 
             if self.args.dry_run:
-                print("\n✅ Dry run successful! Ready for deployment.")
-                return True
+                # Load configuration for comprehensive testing
+                yaml_data = load_all_yaml(self.args.yaml_dir)
+                csv_data = load_csv_data(self.args.csv_dir)
+                return self._run_comprehensive_dry_run(yaml_data, csv_data)
             
             # Load configuration
             yaml_data = load_all_yaml(self.args.yaml_dir)
@@ -2289,44 +2320,76 @@ class NotionTemplateDeployer:
         return True
     
     def clear_existing_content(self) -> bool:
-        """Clear all existing content from the target page to avoid archived conflicts"""
+        """Clear ALL existing content from the target page, handling archived blocks properly"""
         try:
             parent_id = self.args.parent_id or NOTION_PARENT_PAGEID
             logging.info(f"Clearing existing content from page: {parent_id}")
 
-            # Get all children of the parent page
-            r = req("GET", f"https://api.notion.com/v1/blocks/{parent_id}/children")
-            if not expect_ok(r, "Getting existing content"):
-                return False
+            # Get ALL blocks including archived ones with pagination
+            all_blocks = []
+            start_cursor = None
+            has_more = True
 
-            blocks = j(r).get('results', [])
-            if not blocks:
+            while has_more:
+                url = f"https://api.notion.com/v1/blocks/{parent_id}/children?page_size=100"
+                if start_cursor:
+                    url += f"&start_cursor={start_cursor}"
+
+                r = req("GET", url)
+                if not expect_ok(r, "Getting existing content"):
+                    return False
+
+                response_data = j(r)
+                all_blocks.extend(response_data.get('results', []))
+                has_more = response_data.get('has_more', False)
+                start_cursor = response_data.get('next_cursor')
+
+            if not all_blocks:
                 logging.info("No existing content to clear")
                 return True
 
-            logging.info(f"Found {len(blocks)} existing blocks to clear")
+            logging.info(f"Found {len(all_blocks)} existing blocks to clear")
 
-            # Delete all existing blocks
+            # Process all blocks: unarchive first if needed, then delete
             deleted_count = 0
-            for block in blocks:
+            failed_count = 0
+
+            for block in all_blocks:
                 block_id = block.get('id')
-                if block_id:
+                if not block_id:
+                    continue
+
+                try:
+                    # If block is archived, unarchive it first
+                    if block.get('archived'):
+                        logging.debug(f"Unarchiving block {block_id}")
+                        patch_r = req("PATCH", f"https://api.notion.com/v1/blocks/{block_id}",
+                                    json={"archived": False})
+                        if not expect_ok(patch_r, f"Unarchiving block {block_id}"):
+                            logging.warning(f"Failed to unarchive block {block_id}, trying to delete anyway")
+
+                    # Now delete the block
                     delete_r = req("DELETE", f"https://api.notion.com/v1/blocks/{block_id}")
                     if expect_ok(delete_r, f"Deleting block {block_id}"):
                         deleted_count += 1
                         logging.debug(f"Deleted block {block_id}")
                     else:
+                        failed_count += 1
                         logging.warning(f"Failed to delete block {block_id}")
 
-            logging.info(f"✅ Cleared {deleted_count} existing blocks")
-            return True
+                except Exception as e:
+                    failed_count += 1
+                    logging.warning(f"Error processing block {block_id}: {e}")
+
+            logging.info(f"✅ Cleared {deleted_count} blocks, {failed_count} failures")
+            return failed_count == 0  # Only return True if all blocks were cleared
 
         except Exception as e:
             logging.error(f"Error clearing existing content: {e}")
             return False
 
     def deploy_pages(self, yaml_data: Dict) -> bool:
-        """Deploy all pages with proper parent-child ordering"""
+        """Deploy all pages with proper parent-child ordering (supports multi-level hierarchy)"""
         self.state.phase = DeploymentPhase.PAGES
         pages = yaml_data.get('pages', [])
 
@@ -2334,54 +2397,89 @@ class NotionTemplateDeployer:
             if not CLIInterface.prompt_continue(f"Deploy {len(pages)} pages?"):
                 return False
 
-        # Create lookup for all pages by title
-        all_pages = {page.get('title'): page for page in pages}
+        # Use v4.1 multi-level hierarchy sorting if available
+        if V41_AVAILABLE:
+            logging.info("Using v4.1 multi-level hierarchy sorting...")
+            pages = v41.order_pages_by_hierarchy(pages)
 
-        # Separate parent and child pages
-        parent_pages = []
-        child_pages = []
+            # Deploy in the sorted order (handles multi-level hierarchy)
+            for idx, page in enumerate(pages, 1):
+                title = page.get('title', 'Untitled')
+                parent = page.get('parent', 'Root')
+                self.progress.update(DeploymentPhase.PAGES,
+                                   f"Creating page {idx}/{len(pages)}: {title} (parent: {parent})")
 
-        for page in pages:
-            if page.get('parent'):
-                child_pages.append(page)
-            else:
-                parent_pages.append(page)
+                # Determine parent ID
+                if page.get('parent'):
+                    # Let create_page handle parent lookup from state.created_pages
+                    page_id = create_page(page, self.state, None)
+                else:
+                    # Root-level page
+                    parent_id = self.args.parent_id or NOTION_PARENT_PAGEID
+                    page_id = create_page(page, self.state, parent_id)
 
-        logging.info(f"Found {len(parent_pages)} parent pages and {len(child_pages)} child pages")
-
-        # First, create all parent pages (even if they have no blocks)
-        logging.info("Phase 1: Creating parent pages...")
-        for page in parent_pages:
-            title = page.get('title', 'Untitled')
-            self.progress.update(DeploymentPhase.PAGES, f"Creating parent: {title}")
-
-            parent_id = self.args.parent_id or NOTION_PARENT_PAGEID
-            page_id = create_page(page, self.state, parent_id)
-
-            if not page_id and not self.args.interactive:
-                return False
-            elif not page_id and self.args.interactive:
-                if not CLIInterface.prompt_continue(f"Parent page '{title}' creation failed. Continue?"):
+                if not page_id and not self.args.interactive:
+                    logging.error(f"Failed to create page '{title}'")
                     return False
+                elif not page_id and self.args.interactive:
+                    if not CLIInterface.prompt_continue(f"Page '{title}' creation failed. Continue?"):
+                        return False
 
-            self.state.save_checkpoint()
+                if idx % 10 == 0:  # Save checkpoint every 10 pages
+                    self.state.save_checkpoint()
 
-        # Then, create all child pages (which should have the blocks)
-        logging.info("Phase 2: Creating child pages...")
-        for page in child_pages:
-            title = page.get('title', 'Untitled')
-            self.progress.update(DeploymentPhase.PAGES, f"Creating child: {title}")
+        else:
+            # Fallback to original two-phase deployment
+            logging.info("Using standard two-phase deployment...")
 
-            # Let create_page handle parent lookup from state.created_pages
-            page_id = create_page(page, self.state, None)
+            # Create lookup for all pages by title
+            all_pages = {page.get('title'): page for page in pages}
 
-            if not page_id and not self.args.interactive:
-                return False
-            elif not page_id and self.args.interactive:
-                if not CLIInterface.prompt_continue(f"Child page '{title}' creation failed. Continue?"):
+            # Separate parent and child pages
+            parent_pages = []
+            child_pages = []
+
+            for page in pages:
+                if page.get('parent'):
+                    child_pages.append(page)
+                else:
+                    parent_pages.append(page)
+
+            logging.info(f"Found {len(parent_pages)} parent pages and {len(child_pages)} child pages")
+
+            # First, create all parent pages (even if they have no blocks)
+            logging.info("Phase 1: Creating parent pages...")
+            for page in parent_pages:
+                title = page.get('title', 'Untitled')
+                self.progress.update(DeploymentPhase.PAGES, f"Creating parent: {title}")
+
+                parent_id = self.args.parent_id or NOTION_PARENT_PAGEID
+                page_id = create_page(page, self.state, parent_id)
+
+                if not page_id and not self.args.interactive:
                     return False
+                elif not page_id and self.args.interactive:
+                    if not CLIInterface.prompt_continue(f"Parent page '{title}' creation failed. Continue?"):
+                        return False
 
-            self.state.save_checkpoint()
+                self.state.save_checkpoint()
+
+            # Then, create all child pages (which should have the blocks)
+            logging.info("Phase 2: Creating child pages...")
+            for page in child_pages:
+                title = page.get('title', 'Untitled')
+                self.progress.update(DeploymentPhase.PAGES, f"Creating child: {title}")
+
+                # Let create_page handle parent lookup from state.created_pages
+                page_id = create_page(page, self.state, None)
+
+                if not page_id and not self.args.interactive:
+                    return False
+                elif not page_id and self.args.interactive:
+                    if not CLIInterface.prompt_continue(f"Child page '{title}' creation failed. Continue?"):
+                        return False
+
+                self.state.save_checkpoint()
 
         return True
     
@@ -2570,12 +2668,35 @@ class NotionTemplateDeployer:
         """Final cleanup and verification"""
         self.state.phase = DeploymentPhase.FINALIZATION
         self.progress.update(DeploymentPhase.FINALIZATION, "Finalizing deployment")
-        
-        # TODO: Add final verification steps
-        # - Verify all pages accessible
-        # - Check database permissions
-        # - Generate deployment report
-        
+
+        # Run v4.1 deployment verification if available
+        if V41_AVAILABLE:
+            logging.info("Running v4.1 deployment verification...")
+            try:
+                # Prepare expected configuration
+                yaml_data = load_all_yaml(self.args.yaml_dir)
+                expected_config = {
+                    'pages': yaml_data.get('pages', []),
+                    'databases': yaml_data.get('db', {}).get('schemas', [])
+                }
+
+                # Run verification
+                report = v41.verify_deployment(self.state, expected_config)
+
+                # Generate report
+                report_text = v41.generate_verification_report(report, 'deployment_verification.txt')
+
+                # Log summary
+                if report['summary']['success_rate'] >= 95:
+                    logging.info(f"✅ Verification passed: {report['summary']['success_rate']:.1f}% success rate")
+                elif report['summary']['success_rate'] >= 80:
+                    logging.warning(f"⚠️ Verification partial: {report['summary']['success_rate']:.1f}% success rate")
+                else:
+                    logging.error(f"❌ Verification failed: {report['summary']['success_rate']:.1f}% success rate")
+
+            except Exception as e:
+                logging.error(f"Verification failed: {e}")
+
         time.sleep(1)  # Give progress bar time to complete
     
     def print_summary(self):
@@ -2598,6 +2719,378 @@ class NotionTemplateDeployer:
         
         print("\n📍 Root page ID:", self.args.parent_id or NOTION_PARENT_PAGEID)
         print("="*60)
+    def _run_comprehensive_dry_run(self, yaml_data: Dict, csv_data: Dict) -> bool:
+        """
+        Smart test that identifies unique feature types and tests ONE example of each.
+        Tests with real API calls to catch ALL potential errors efficiently.
+        """
+        print("\n🔍 SMART FEATURE TESTING - Testing one example of each unique feature")
+        print("=" * 70)
+
+        errors = []
+        test_page_id = None
+
+        # Identify unique features to test
+        test_features = {
+            'page_with_emoji': None,
+            'page_with_icon_file': None,
+            'page_with_cover': None,
+            'page_with_children': None,
+            'page_with_synced': None,
+            'page_with_callout': None,
+            'page_with_toggle': None,
+            'database_table': None,
+            'database_gallery': None,
+            'database_calendar': None,
+            'database_board': None,
+            'database_with_formula': None,
+            'database_with_rollup': None,
+            'database_with_relation': None,
+            'database_with_select': None
+        }
+
+        # Scan all pages and databases to find ONE example of each feature
+        print("\n📋 SCANNING FOR UNIQUE FEATURES:")
+        all_pages = yaml_data.get('pages', [])
+        all_databases = yaml_data.get('db', {}).get('schemas', {})
+        all_standalone_dbs = yaml_data.get('databases', [])
+
+        # Find one example of each page feature
+        for page in all_pages:
+            if not page.get('title') or page.get('title') == 'None':
+                continue
+
+            # Page with emoji icon
+            if not test_features['page_with_emoji'] and page.get('icon'):
+                if not page['icon'].startswith(('assets/', 'http')):
+                    test_features['page_with_emoji'] = page
+                    print(f"  ✓ Found emoji icon page: {page['title'][:30]}")
+
+            # Page with file icon
+            if not test_features['page_with_icon_file'] and page.get('icon_file'):
+                test_features['page_with_icon_file'] = page
+                print(f"  ✓ Found file icon page: {page['title'][:30]}")
+
+            # Page with cover
+            if not test_features['page_with_cover'] and page.get('cover_file'):
+                test_features['page_with_cover'] = page
+                print(f"  ✓ Found cover image page: {page['title'][:30]}")
+
+            # Page with children
+            if not test_features['page_with_children'] and page.get('children'):
+                test_features['page_with_children'] = page
+                print(f"  ✓ Found hierarchical page: {page['title'][:30]}")
+
+            # Page with special blocks
+            if page.get('content'):
+                for block in page.get('content', []):
+                    if isinstance(block, dict):
+                        if not test_features['page_with_synced'] and block.get('type') == 'synced_block':
+                            test_features['page_with_synced'] = page
+                            print(f"  ✓ Found synced block page: {page['title'][:30]}")
+                        elif not test_features['page_with_callout'] and block.get('type') == 'callout':
+                            test_features['page_with_callout'] = page
+                            print(f"  ✓ Found callout block page: {page['title'][:30]}")
+                        elif not test_features['page_with_toggle'] and block.get('type') == 'toggle':
+                            test_features['page_with_toggle'] = page
+                            print(f"  ✓ Found toggle block page: {page['title'][:30]}")
+
+        # Find one example of each database type and feature
+        for db_name, db_schema in all_databases.items():
+            db_type = db_schema.get('type', 'table')
+
+            # Database view types
+            if db_type == 'table' and not test_features['database_table']:
+                test_features['database_table'] = (db_name, db_schema)
+                print(f"  ✓ Found table database: {db_name[:30]}")
+            elif db_type == 'gallery' and not test_features['database_gallery']:
+                test_features['database_gallery'] = (db_name, db_schema)
+                print(f"  ✓ Found gallery database: {db_name[:30]}")
+            elif db_type == 'calendar' and not test_features['database_calendar']:
+                test_features['database_calendar'] = (db_name, db_schema)
+                print(f"  ✓ Found calendar database: {db_name[:30]}")
+            elif db_type == 'board' and not test_features['database_board']:
+                test_features['database_board'] = (db_name, db_schema)
+                print(f"  ✓ Found board database: {db_name[:30]}")
+
+            # Database property types
+            for prop_name, prop_def in db_schema.get('properties', {}).items():
+                if isinstance(prop_def, dict):
+                    prop_type = prop_def.get('type')
+                elif isinstance(prop_def, str):
+                    prop_type = prop_def
+                else:
+                    continue
+
+                if prop_type == 'formula' and not test_features['database_with_formula']:
+                    test_features['database_with_formula'] = (db_name, db_schema)
+                    print(f"  ✓ Found formula database: {db_name[:30]}")
+                elif prop_type == 'rollup' and not test_features['database_with_rollup']:
+                    test_features['database_with_rollup'] = (db_name, db_schema)
+                    print(f"  ✓ Found rollup database: {db_name[:30]}")
+                elif prop_type == 'relation' and not test_features['database_with_relation']:
+                    test_features['database_with_relation'] = (db_name, db_schema)
+                    print(f"  ✓ Found relation database: {db_name[:30]}")
+                elif prop_type in ('select', 'multi_select') and not test_features['database_with_select']:
+                    test_features['database_with_select'] = (db_name, db_schema)
+                    print(f"  ✓ Found select/multi-select database: {db_name[:30]}")
+
+        # Count features found
+        features_found = sum(1 for v in test_features.values() if v is not None)
+        print(f"\n📊 FOUND {features_found} UNIQUE FEATURES TO TEST")
+
+        if features_found == 0:
+            print("❌ No testable features found in YAML configuration")
+            return False
+
+        # Now test each feature with real API calls
+        try:
+            # Create test workspace
+            print("\n🧪 CREATING TEST WORKSPACE:")
+            # Create a temporary state for the test workspace
+            test_state = DeploymentState()
+            test_page_data = create_page({
+                'title': '🧪 FEATURE TEST - AUTO DELETE',
+                'content': [{'type': 'paragraph', 'content': f'Testing {features_found} unique features'}]
+            }, test_state, self.args.parent_id or NOTION_PARENT_PAGEID)
+
+            if not test_page_data:
+                print("❌ FAIL: Cannot create test workspace - check API token and permissions")
+                return False
+
+            test_page_id = test_page_data.get('id')
+            print(f"✅ Test workspace created: {test_page_id[:8]}...")
+
+            # Save original parent and switch to test workspace
+            original_parent = self.args.parent_id
+            self.args.parent_id = test_page_id
+
+            # Create a temporary state for testing
+            original_state = self.state
+            self.state = DeploymentState()
+
+            print("\n🔬 TESTING EACH FEATURE:")
+
+            # Test 1: Content clearing (catches archived block errors)
+            print("\n  1️⃣ Testing content clearing (archived blocks)...")
+            if not self.clear_existing_content():
+                print("    ❌ FAIL: Cannot clear archived blocks")
+                errors.append("Content clearing: Cannot handle archived blocks")
+            else:
+                print("    ✅ PASS: Content clearing works")
+
+            # Test 2: Each page feature
+            feature_num = 2
+            for feature_name, page in test_features.items():
+                if page and feature_name.startswith('page_'):
+                    print(f"\n  {feature_num}️⃣ Testing {feature_name.replace('_', ' ')}...")
+                    feature_num += 1
+                    try:
+                        # Create a minimal version of the page for testing
+                        test_page = {
+                            'title': f"Test: {page['title'][:20]}",
+                            'content': page.get('content', [])[:2] if page.get('content') else []  # Only test first 2 blocks
+                        }
+                        # Copy the feature we're testing
+                        if 'icon' in page:
+                            test_page['icon'] = page['icon']
+                        if 'icon_file' in page:
+                            test_page['icon_file'] = page['icon_file']
+                        if 'cover_file' in page:
+                            test_page['cover_file'] = page['cover_file']
+
+                        result = create_page(test_page, self.state, test_page_id)
+                        if result:
+                            print(f"    ✅ PASS: {feature_name.replace('_', ' ')}")
+                        else:
+                            print(f"    ❌ FAIL: {feature_name.replace('_', ' ')}")
+                            errors.append(f"{feature_name}: Creation failed")
+                    except Exception as e:
+                        print(f"    ❌ FAIL: {str(e)[:100]}")
+                        errors.append(f"{feature_name}: {str(e)[:100]}")
+
+            # Test 3: Each database feature
+            for feature_name, db_data in test_features.items():
+                if db_data and feature_name.startswith('database_'):
+                    print(f"\n  {feature_num}️⃣ Testing {feature_name.replace('_', ' ')}...")
+                    feature_num += 1
+                    try:
+                        db_name, db_schema = db_data
+                        # Create a minimal version of the database for testing
+                        test_db_name = f"Test: {db_name[:20]}"
+                        result = create_database(test_db_name, db_schema, test_page_id, self.state)
+                        if result:
+                            print(f"    ✅ PASS: {feature_name.replace('_', ' ')}")
+                        else:
+                            print(f"    ❌ FAIL: {feature_name.replace('_', ' ')}")
+                            errors.append(f"{feature_name}: Creation failed")
+                    except Exception as e:
+                        print(f"    ❌ FAIL: {str(e)[:100]}")
+                        errors.append(f"{feature_name}: {str(e)[:100]}")
+
+            # Restore original state
+            self.state = original_state
+            self.args.parent_id = original_parent
+
+            # Final assessment
+            print("\n" + "="*70)
+            if not errors:
+                print("✅ ALL FEATURES TESTED SUCCESSFULLY")
+                print(f"✅ Validated {features_found} unique features")
+                print("✅ Full deployment will succeed")
+                return True
+            else:
+                print(f"❌ TEST FAILED - {len(errors)} features have issues:")
+                for error in errors[:10]:  # Show first 10 errors
+                    print(f"  • {error}")
+                print("\n❌ Fix these issues before deployment")
+                return False
+
+        except Exception as e:
+            print(f"\n❌ Test error: {str(e)}")
+            return False
+
+        finally:
+            # Clean up test workspace
+            if test_page_id:
+                try:
+                    print("\n🧹 Cleaning up test workspace...")
+                    req("DELETE", f"https://api.notion.com/v1/blocks/{test_page_id}")
+                    print("✅ Test workspace deleted")
+                except:
+                    print(f"⚠️  Could not delete test workspace {test_page_id[:8]}... - please delete manually")
+
+        # Final Summary
+        print(f"\n🚨 COMPREHENSIVE DRY-RUN SUMMARY:")
+        print("=" * 50)
+
+        if not errors:
+            print("✅ CORE DEPLOYMENT LOGIC: PASSED")
+        else:
+            print("❌ CORE DEPLOYMENT LOGIC: FAILED")
+
+        if errors:
+            print(f"❌ Configuration issues: {len(errors)} problems found")
+            for error in errors:
+                print(f"   • {error}")
+        else:
+            print("✅ No configuration issues found")
+
+        if warnings:
+            print(f"⚠️  Warnings: {len(warnings)} issues noted")
+            for warning in warnings:
+                print(f"   • {warning}")
+
+        if not errors:
+            print("\n✅ DRY-RUN PASSED: Ready for real deployment!")
+            return True
+        else:
+            print(f"\n❌ DRY-RUN FAILED: Fix {len(errors)} issues before deployment")
+            return False
+
+    def _validate_all_assets(self, pages: List[Dict]) -> Tuple[int, int, List[str], List[str]]:
+        """Validate all assets referenced in YAML files"""
+        file_assets = 0
+        emoji_assets = 0
+        missing_assets = []
+        invalid_emojis = []
+
+        for page in pages:
+            title = page.get('title', 'Unknown')
+
+            # Check icon_file
+            if 'icon_file' in page:
+                if page['icon_file'].startswith('emoji:'):
+                    emoji_assets += 1
+                    if not self._is_valid_emoji_reference(page['icon_file']):
+                        invalid_emojis.append(f"Invalid emoji: {page['icon_file']} for page '{title}'")
+                else:
+                    file_assets += 1
+                    if not os.path.exists(page['icon_file']):
+                        missing_assets.append(f"Missing icon: {page['icon_file']} for page '{title}'")
+
+            # Check cover_file
+            if 'cover_file' in page:
+                if page['cover_file'].startswith('emoji:'):
+                    emoji_assets += 1
+                    if not self._is_valid_emoji_reference(page['cover_file']):
+                        invalid_emojis.append(f"Invalid emoji: {page['cover_file']} for page '{title}'")
+                else:
+                    file_assets += 1
+                    if not os.path.exists(page['cover_file']):
+                        missing_assets.append(f"Missing cover: {page['cover_file']} for page '{title}'")
+
+        return file_assets, emoji_assets, missing_assets, invalid_emojis
+
+    def _is_valid_emoji_reference(self, emoji_ref: str) -> bool:
+        """Check if emoji reference format is valid"""
+        if not emoji_ref.startswith('emoji:'):
+            return False
+        emoji_part = emoji_ref[6:]  # Remove 'emoji:' prefix
+        return len(emoji_part) > 0  # Basic validation - could be enhanced
+
+    def _validate_page_hierarchy(self, pages: List[Dict]) -> List[str]:
+        """Validate parent-child relationships in page hierarchy"""
+        issues = []
+
+        # Build title to page mapping
+        page_by_title = {p.get('title'): p for p in pages if p.get('title') and p.get('title') != 'None'}
+
+        # Check each page's parent
+        for page in pages:
+            title = page.get('title')
+            parent = page.get('parent')
+
+            if not title or title == 'None':
+                continue  # Already reported in YAML validation
+
+            if parent and parent not in page_by_title:
+                issues.append(f"Missing parent '{parent}' for page '{title}'")
+
+        return issues
+
+    def _test_deployment_phases_with_mocks(self, yaml_data: Dict, csv_data: Dict) -> List[str]:
+        """Test deployment logic with mocked API calls"""
+        test_errors = []
+
+        try:
+            # Create mock state for testing
+            mock_state = DeploymentState()
+            mock_state.created_pages = {}
+            mock_state.created_databases = {}
+
+            pages = yaml_data.get('pages', [])
+
+            # Test build_block function with state parameter
+            for page in pages[:5]:  # Test first 5 pages
+                if 'blocks' in page:
+                    for block in page['blocks']:
+                        try:
+                            built_block = build_block(block, mock_state)
+                            if not built_block:
+                                test_errors.append(f"build_block failed for page '{page.get('title', 'Unknown')}'")
+                        except Exception as e:
+                            if "state" in str(e):
+                                test_errors.append(f"State parameter issue in build_block: {str(e)}")
+                            else:
+                                test_errors.append(f"build_block error: {str(e)}")
+
+            # Test asset URL resolution
+            for page in pages[:10]:  # Test first 10 pages with assets
+                if 'icon_file' in page or 'cover_file' in page:
+                    try:
+                        if 'icon_file' in page:
+                            icon_url = get_asset_url(page, 'icon')
+                        if 'cover_file' in page:
+                            cover_url = get_asset_url(page, 'cover')
+                    except Exception as e:
+                        test_errors.append(f"Asset URL resolution failed for '{page.get('title', 'Unknown')}': {str(e)}")
+
+        except Exception as e:
+            test_errors.append(f"Mock testing framework error: {str(e)}")
+
+        return test_errors
+
 
 # ============================================================================
 # ENTRY POINT

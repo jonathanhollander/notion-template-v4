@@ -2,7 +2,7 @@
 # Implements the suggestion from DATABASE_ENHANCEMENT_SUGGESTIONS.md
 # Output Directory: split_yaml_discovered_phase2/
 pages:
-  - title: "Guidance for Children & Teens (Enhanced)"
+  - title: "Guidance for Children & Teens"
     parent: "Family Support Center"
     description: "A filterable database of resources to help younger family members navigate grief."
     role: "family"

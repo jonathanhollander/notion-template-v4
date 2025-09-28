@@ -4,6 +4,7 @@ complexity: moderate
 # Adds an Admin Settings page and patches Acceptance DB with an "Estate Complexity" selector.
 pages:
   - title: "Admin – Settings"
+    parent: "Admin Hub"
     icon: "emoji:⚙️"
     description: "Set foundational options before sharing the template. Delete Admin branch before handoff."
     body:

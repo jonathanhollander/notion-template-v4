@@ -3,6 +3,7 @@ complexity: moderate
 # Admin assets checklist + guidance to keep visuals consistent.
 pages:
   - title: "Admin – Assets & Icons"
+    parent: "Admin Hub"
     icon: "emoji:🖼️"
     description: "Standardize icons and covers for a cohesive look. Delete before sharing."
     body:

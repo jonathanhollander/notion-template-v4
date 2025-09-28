@@ -4,6 +4,7 @@ complexity: moderate
 
 pages:
   - title: "Admin – Guided Helpers"
+    parent: "Admin Hub"
     icon: "emoji:🧩"
     description: "More detailed helpers for common manual steps. Delete before sharing."
     body:

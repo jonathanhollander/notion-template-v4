@@ -142,7 +142,8 @@
       "Bash(./catalog_all_discovered_systems.sh)",
       "Bash(./refined_systems_catalog.sh:*)",
       "Bash(git reset:*)",
-      "Read(///**)"
+      "Read(///**)",
+      "Bash(git gc:*)"
     ],
     "deny": [],
     "ask": []

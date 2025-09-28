@@ -44,7 +44,7 @@ databases:
       Task Score:
         type: formula
         formula:
-          expression: "if(prop(\"Status\") == \"Completed\", if(prop(\"Priority\") == \"High\", 10, 5), 0)"
+          expression: "if(prop(\\\"Status\\\") == \\\"Completed\\\", if(prop(\\\"Priority\\\") == \\\"High\\\", 10, 5), 0)"
       Scenario:
         type: select
         select:
