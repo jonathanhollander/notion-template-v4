@@ -467,12 +467,16 @@ def req(method: str, url: str, headers: Optional[Dict] = None,
     timeout = timeout or int(os.getenv("NOTION_TIMEOUT", "25"))
     max_try = int(os.getenv("RETRY_MAX", "5"))
     backoff = float(os.getenv("RETRY_BACKOFF_BASE", "1.5"))
-    
+
+    r = None  # Initialize r to avoid UnboundLocalError
+
+
     for attempt in range(max_try):
         try:
             _throttle()
-            r = requests.request(method, url, headers=headers, data=data, 
+            r = requests.request(method, url, headers=headers, data=data,
                                files=files, timeout=timeout)
+
             
             # Handle rate limiting
             if r.status_code == 429:
@@ -502,7 +506,10 @@ def req(method: str, url: str, headers: Optional[Dict] = None,
                 raise
             logging.warning(f"Connection error: {e}, retrying...")
             time.sleep(backoff ** attempt)
-    
+
+    # If we exhausted all attempts without returning, r might be None or last failed response
+    if r is None:
+        logging.error(f"Failed to get response after {max_try} attempts for {url}")
     return r
 
 def j(r: requests.Response) -> Dict:
@@ -1266,7 +1273,7 @@ def create_database(db_name: str, schema: Dict, state: DeploymentState,
 
     # Ensure at least one title property exists (but not multiple)
     has_title_property = any(
-        (isinstance(prop, dict) and prop.get('type') == 'title') or prop == 'title'
+        isinstance(prop, dict) and 'title' in prop
         for prop in properties.values()
     )
     if not has_title_property and 'Name' not in properties:
@@ -1292,6 +1299,7 @@ def create_database(db_name: str, schema: Dict, state: DeploymentState,
     }
     
     try:
+
         r = req("POST", "https://api.notion.com/v1/databases", data=json.dumps(payload))
         if expect_ok(r, f"Creating database '{db_name}'"):
             db_id = j(r).get('id')
@@ -3088,6 +3096,7 @@ class NotionTemplateDeployer:
                         # Create a minimal version of the database for testing
                         test_db_name = f"Test: {db_name[:20]}"
 
+
                         # For dry-run testing, create a simplified schema without relations/rollups
                         # These properties require other databases to exist which aren't in test env
                         test_schema = db_schema.copy()
@@ -3107,6 +3116,7 @@ class NotionTemplateDeployer:
                                 if prop_type not in ['relation', 'rollup', 'formula']:
                                     cleaned_props[prop_name] = prop_def
                             test_schema['properties'] = cleaned_props
+
 
                         result = create_database(test_db_name, test_schema, self.state, test_page_id)
                         if result:
